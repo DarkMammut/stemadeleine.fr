@@ -1,0 +1,35 @@
+.header {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  background-color: #210803;
+
+  width: 100%;
+  &__logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 100%;
+    background-image: "../../assets/logo.png" center;
+    z-index: 1;
+  }
+  &__content {
+    &__title {
+      font-family: "blackknightflfregular", "sans-serif";
+      font-size: 60px;
+      color: #fff;
+      text-align: center;
+    }
+    &__subhead {
+      font-family: "sans-serif";
+      color: #fff;
+      text-align: center;
+    }
+  }
+  &__navigation {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}

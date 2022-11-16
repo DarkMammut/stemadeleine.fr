@@ -133,3 +133,12 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+@font-face {
+  font-family: "blackknightflfregular";
+  src: url("./assets/blackknightflf-webfont.woff2") format("woff2"),
+    url("./assets/blackknightflf-webfont.woff") format("woff"),
+    url("./assets/blackknightflf-webfont.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+}

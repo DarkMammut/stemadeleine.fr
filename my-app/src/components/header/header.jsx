@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import "./header.scss";
 
 const LINKS = [
   { id: "link1", name: "Acceuil", path: "/" },
@@ -10,9 +11,10 @@ const LINKS = [
 function Header() {
   const location = useLocation();
   return (
-    <header>
+    <header className="header">
+      <div className="header__logo" />
       <div className="header__content">
-        <h1 className="header__content__title">Les amis de Sainte Madeleine</h1>
+        <h1 className="header__content__title">Les amis de Sainte Madeleine de la Jarrie</h1>
         <h2 className="header__content__subhead">Eglise de la Jarrie</h2>
       </div>
       <nav className="header__navigation">
