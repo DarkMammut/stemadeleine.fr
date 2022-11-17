@@ -1,0 +1,9 @@
+.project{
+    &__image {
+        width: auto;
+        height: 400px;
+        & img {
+            height: 100%;
+        }
+    }
+}

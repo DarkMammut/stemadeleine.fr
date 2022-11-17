@@ -1,10 +1,13 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
 .burger {
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
-  right: 20px;
-  top:20px;
+  right: 30px;
+  top: 30px;
 }
 
 #burger-toggle {
@@ -108,14 +111,12 @@
 
 .menu {
   position: fixed;
-  top: 150px;
-  left: 0;
-  width: 100%;
-  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #1a1e23;
+  left: 0;
+  width: 100%;
+  background: rgba($secondary-color, 0.5);
   opacity: 0;
   overflow-x: hidden;
   visibility: hidden;
@@ -128,43 +129,49 @@
     padding: 0;
     text-align: center;
     list-style-type: none;
+    width: 100%;
 
     &__content {
+      display: flex;
       flex: 1;
-    }
+      justify-content: space-around;
+      width: 100%;
+      &__link {
+        position: relative;
+        display: inline-flex;
+        font-size: 200%;
+        color: $primary-color;
+        text-decoration: none;
 
-    &__link {
-      position: relative;
-      display: inline-flex;
-      font-size: 2rem;
-      color: white;
-      text-decoration: none;
+        span {
+          overflow: hidden;
+        }
 
-      span {
-        overflow: hidden;
+        &::after {
+          position: absolute;
+          content: "";
+          top: 100%;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: var(--primary-color);
+          transform: scaleX(0);
+          transform-origin: right;
+          transition: transform 0.5s;
+        }
 
-        div {
-          transform: translateY(102%);
+        &:hover::after {
+          transform: scaleX(1);
+          transform-origin: left;
         }
       }
-
-      &::after {
-        position: absolute;
-        content: "";
-        top: 100%;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: var(--primary-color);
-        transform: scaleX(0);
-        transform-origin: right;
-        transition: transform 0.5s;
-      }
-
-      &:hover::after {
-        transform: scaleX(1);
-        transform-origin: left;
-      }
     }
+  }
+}
+
+@include desktop-layout {
+  .menu {
+    top: 150px;
+    height: 50px;
   }
 }

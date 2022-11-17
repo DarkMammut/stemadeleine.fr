@@ -1,0 +1,15 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+@include desktop-layout {
+    main {
+        width: 1024px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.bells {
+    display: flex;
+    justify-content: center;
+}

@@ -4,8 +4,9 @@ import "./burger.scss";
 
 const LINKS = [
   { id: "link1", name: "Acceuil", path: "/" },
-  { id: "link2", name: "A Propos", path: "/about" },
-  { id: "link3", name: "Les Cloches", path: "/cloches" }
+  { id: "link2", name: "Histoire", path: "/histoire" },
+  { id: "link3", name: "Les cloches", path: "/cloches" },
+  { id: "link4", name: "Projet", path: "/projet" }
 ];
 
 function Burger() {

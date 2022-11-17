@@ -1,10 +1,11 @@
 import React from "react";
 import content from "../../assets/bells_sections.json";
+import "./bells.scss";
 
 function Bells() {
   return (
     <main>
-      <h1 className="bells__title">Les cloches de Sainte Madeleine de la Jarrie</h1>
+      <h1 className="title">Les cloches de Sainte Madeleine de la Jarrie</h1>
       <p className="bells__paragraph">
         On atteint la salle des cloches de l’imposant clocher-porche du XIIe siècle en empruntant un
         escalier à vis. Cette salle abrite les 4 cloches de la Jarrie. Ce jeu est le plus gros
