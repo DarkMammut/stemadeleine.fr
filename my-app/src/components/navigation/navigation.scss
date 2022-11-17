@@ -170,6 +170,15 @@
 }
 
 @include desktop-layout {
+  .burger {
+    display: none;
+  }
+  .menu {
+    display: none;
+  }
+}
+
+@include mobile-layout {
   .menu {
     top: 150px;
     height: 50px;

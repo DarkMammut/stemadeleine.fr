@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
-import "./burger.scss";
+import "./navigation.scss";
 
 const LINKS = [
   { id: "link1", name: "Acceuil", path: "/" },
@@ -9,7 +9,7 @@ const LINKS = [
   { id: "link4", name: "Projet", path: "/projet" }
 ];
 
-function Burger() {
+function Navigation() {
   const location = useLocation();
 
   return (
@@ -45,4 +45,4 @@ function Burger() {
   );
 }
 
-export default Burger;
+export default Navigation;
