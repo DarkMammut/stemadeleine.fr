@@ -20,8 +20,6 @@
     &__menu {
       z-index: 100;
       display: block;
-      width: $burger-menu-radius;
-      height: $burger-menu-radius;
       outline: none;
       cursor: pointer;
 
@@ -54,7 +52,7 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background: red;
+          background: orange;
           transform: translateX(-100%);
           transition: 0.25s;
         }
@@ -85,11 +83,7 @@
     overflow-x: hidden;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 1;
-
-    top: 50px;
-    height: 100%;
-    background: rgba($secondary-color, 0.5);
+    z-index: 99;
 
     &__nav {
       display: flex;
@@ -101,11 +95,9 @@
       justify-content: space-around;
       width: 100%;
 
-      &__link {
+      &__link a {
         position: relative;
         display: inline-flex;
-        font-size: 200%;
-        color: $primary-color;
         text-decoration: none;
 
         span {
@@ -119,7 +111,7 @@
           left: 0;
           width: 100%;
           height: 3px;
-          background: var(--primary-color);
+          background: $accent-color;
           transform: scaleX(0);
           transform-origin: right;
           transition: transform 0.5s;
@@ -136,33 +128,78 @@
 
 // Burger toggle button action
 
-.navigation__burger[toggle="1"] {
-  .navigation {
-    &__menu {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    &__nav__link span div {
-      transform: translateY(0);
-      transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
-    }
-
-    &__burger__menu__line {
+.navigation {
+  &__burger[data-toggle="1"] {
+    .navigation__burger__menu__line {
       &::after {
         transform: translateX(0);
       }
-
-      &:nth-child(1) {
-        transform: translateY(calc($burger-menu-radius / 5)) rotate(45deg);
-      }
-
       &:nth-child(2) {
         transform: scaleX(0);
       }
+    }
+  }
 
-      &:nth-child(3) {
-        transform: translateY(calc($burger-menu-radius / -5)) rotate(-45deg);
+  &__menu[data-toggle="1"] {
+    opacity: 1;
+    visibility: visible;
+
+    .navigation__menu__nav__link span div {
+      transform: translateY(0);
+      transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
+    }
+  }
+}
+
+@include desktop-layout {
+  .navigation {
+    &__burger {
+      display: none;
+    }
+    &__menu {
+      opacity: 1;
+      visibility: visible;
+      top: 0;
+      height: 75px;
+      background: transparent;
+      &__nav {
+        &__link a {
+          font-size: 100%;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+}
+@include mobile-layout {
+  .navigation {
+    &__burger {
+      display: block;
+      &__menu {
+        width: $mobile-header-radius;
+        height: $mobile-header-radius;
+      }
+      &[data-toggle="1"] {
+        .navigation__burger__menu__line {
+          &:nth-child(1) {
+            transform: translateY(calc($mobile-header-radius / 5)) rotate(45deg);
+          }
+
+          &:nth-child(3) {
+            transform: translateY(calc($mobile-header-radius / -5)) rotate(-45deg);
+          }
+        }
+      }
+    }
+    &__menu {
+      top: 50px;
+      height: 100%;
+      background: rgba($secondary-color, 0.8);
+      &__nav {
+        &__link a {
+          font-size: 200%;
+          color: $primary-color;
+        }
       }
     }
   }
