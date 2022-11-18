@@ -1,0 +1,8 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+@include desktop-layout {
+  main {
+    width: 1224px;
+  }
+}

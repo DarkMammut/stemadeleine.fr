@@ -9,6 +9,8 @@
   width: 100%;
   height: 500px;
   background-image: url("../../assets/logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
 
   &__textarea {
     width: 50%;

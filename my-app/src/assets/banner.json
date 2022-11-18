@@ -1,0 +1,20 @@
+[
+  {
+    "id": "b-home",
+    "type": "large",
+    "title": "Les amis de Sainte Madeleine de la Jarrie",
+    "subhead": "Eglise de la Jarrie"
+  },
+  {
+    "id": "b-history",
+    "type": "small",
+    "title": "L'histoire de Sainte Madeleine de la Jarrie",
+    "subhead": ""
+  },
+  {
+    "id": "b-bells",
+    "type": "small",
+    "title": "Les cloches de Sainte Madeleine de la Jarrie",
+    "subhead": ""
+  }
+]
