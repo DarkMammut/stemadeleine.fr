@@ -2,13 +2,13 @@ import React, { useState } from "react";
 
 import "./banner.scss";
 
-function Banner() {
+function Banner({ content }) {
   const [scrolldown, setScrolldown] = useState(0);
   return (
     <div className="banner">
       <div className="banner__textarea">
-        <h1 className="banner__textarea__title">Les amis de Sainte Madeleine de la Jarrie</h1>
-        <span className="banner__textarea__subhead">Eglise de la Jarrie</span>
+        <h1 className="banner__textarea__title">{content.title}</h1>
+        <span className="banner__textarea__subhead">{content.subhead}</span>
       </div>
       <button
         className="banner__down"

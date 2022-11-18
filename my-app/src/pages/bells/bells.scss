@@ -3,7 +3,7 @@
 
 @include desktop-layout {
     main {
-        width: 1024px;
+        width: 1224px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -11,5 +11,10 @@
 
 .bells {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+
+    &__title {
+        text-align: center;
+    }
 }
