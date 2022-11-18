@@ -1,141 +1,106 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-.burger {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 30px;
-  top: 30px;
-}
+// Navigation
 
-#burger-toggle {
-  position: absolute;
-  appearance: none;
-  opacity: 0;
+.navigation {
+  &__burger {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    right: 10px;
+    top: 0;
+    padding: 0;
+    background-color: transparent;
 
-  &:checked {
-    & ~ .menu {
-      opacity: 1;
-      visibility: visible;
+    &__menu {
+      z-index: 100;
+      display: block;
+      width: $burger-menu-radius;
+      height: $burger-menu-radius;
+      outline: none;
+      cursor: pointer;
 
-      &__nav {
-        &__content {
-          &__link {
-            transform: translateY(0);
-            transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
-          }
-        }
-      }
-    }
-
-    & ~ .burger-menu {
-      .line {
-        &::after {
-          transform: translateX(0);
-        }
+      &__line {
+        position: absolute;
+        left: 25%;
+        width: 50%;
+        height: 3px;
+        background: hsla(0, 0%, 100%, 0.7);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: 0.5s;
 
         &:nth-child(1) {
-          transform: translateY(calc(var(--burger-menu-radius) / 5)) rotate(45deg);
+          top: 30%;
         }
 
         &:nth-child(2) {
-          transform: scaleX(0);
+          top: 50%;
         }
 
         &:nth-child(3) {
-          transform: translateY(calc(var(--burger-menu-radius) / -5)) rotate(-45deg);
+          top: 70%;
+        }
+
+        &::after {
+          position: absolute;
+          content: "";
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: red;
+          transform: translateX(-100%);
+          transition: 0.25s;
+        }
+
+        @for $i from 2 through 3 {
+          &:nth-child(#{$i})::after {
+            transition-delay: 0.1s * ($i - 1);
+          }
+        }
+      }
+
+      &:hover {
+        .navigation__burger__menu__line::after {
+          transform: translateX(0);
         }
       }
     }
   }
-}
 
-.burger-menu {
-  --burger-menu-radius: 4em;
-  z-index: 100;
-  display: block;
-  width: var(--burger-menu-radius);
-  height: var(--burger-menu-radius);
-  outline: none;
-  cursor: pointer;
-
-  .line {
-    position: absolute;
-    left: 25%;
-    width: 50%;
-    height: 3px;
-    background: hsla(0, 0%, 100%, 0.7);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: 0.5s;
-
-    &:nth-child(1) {
-      top: 30%;
-    }
-
-    &:nth-child(2) {
-      top: 50%;
-    }
-
-    &:nth-child(3) {
-      top: 70%;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--primary-color-darker);
-      transform: translateX(-100%);
-      transition: 0.25s;
-    }
-
-    @for $i from 2 through 3 {
-      &:nth-child(#{$i})::after {
-        transition-delay: 0.1s * ($i - 1);
-      }
-    }
-  }
-
-  &:hover {
-    .line::after {
-      transform: translateX(0);
-    }
-  }
-}
-
-.menu {
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  left: 0;
-  width: 100%;
-  background: rgba($secondary-color, 0.5);
-  opacity: 0;
-  overflow-x: hidden;
-  visibility: hidden;
-  transition: 0.3s;
-
-  &__nav {
+  &__menu {
+    position: fixed;
     display: flex;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    list-style-type: none;
+    justify-content: center;
+    align-items: center;
+    left: 0;
     width: 100%;
+    opacity: 0;
+    overflow-x: hidden;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 1;
 
-    &__content {
+    top: 50px;
+    height: 100%;
+    background: rgba($secondary-color, 0.5);
+
+    &__nav {
       display: flex;
-      flex: 1;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      list-style-type: none;
       justify-content: space-around;
       width: 100%;
+
       &__link {
         position: relative;
         display: inline-flex;
@@ -169,18 +134,36 @@
   }
 }
 
-@include desktop-layout {
-  .burger {
-    display: none;
-  }
-  .menu {
-    display: none;
-  }
-}
+// Burger toggle button action
 
-@include mobile-layout {
-  .menu {
-    top: 150px;
-    height: 50px;
+.navigation__burger[toggle="1"] {
+  .navigation {
+    &__menu {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    &__nav__link span div {
+      transform: translateY(0);
+      transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
+    }
+
+    &__burger__menu__line {
+      &::after {
+        transform: translateX(0);
+      }
+
+      &:nth-child(1) {
+        transform: translateY(calc($burger-menu-radius / 5)) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        transform: scaleX(0);
+      }
+
+      &:nth-child(3) {
+        transform: translateY(calc($burger-menu-radius / -5)) rotate(-45deg);
+      }
+    }
   }
 }

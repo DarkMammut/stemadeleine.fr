@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./navigation.scss";
 
@@ -11,36 +11,39 @@ const LINKS = [
 
 function Navigation() {
   const location = useLocation();
+  const [toggle, setToggle] = useState(0);
 
   return (
-    <div className="burger">
-      <input type="checkbox" id="burger-toggle" />
-      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-      <label htmlFor="burger-toggle" className="burger-menu">
-        <div className="line" />
-        <div className="line" />
-        <div className="line" />
-      </label>
-      <div className="menu">
-        <nav className="menu__nav">
-          <ul className="menu__nav__content">
-            {LINKS.map((link) => (
-              <li key={link.id} className="menu__nav__content__link">
-                <Link to={link.path}>
-                  <span>
-                    <div
-                      style={{
-                        fontWeight: link.path === location.pathname ? "bold" : "none"
-                      }}>
-                      {link.name}
-                    </div>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+    <div className="navigation">
+      <button
+        className="navigation__burger"
+        type="button"
+        onClick={() => setToggle(toggle ? 0 : 1)}
+        toggle={toggle}>
+        <ul className="navigation__burger__menu">
+          <li className="navigation__burger__menu__line" />
+          <li className="navigation__burger__menu__line" />
+          <li className="navigation__burger__menu__line" />
+        </ul>
+      </button>
+      <nav className="navigation__menu">
+        <ul className="navigation__menu__nav">
+          {LINKS.map((link) => (
+            <li key={link.id} className="navigation__menu__nav__link">
+              <Link to={link.path}>
+                <span>
+                  <div
+                    style={{
+                      fontWeight: link.path === location.pathname ? "bold" : "none"
+                    }}>
+                    {link.name}
+                  </div>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }
