@@ -4,6 +4,8 @@ import bannerArray from "../../assets/banner.json";
 import "./bells.scss";
 import Banner from "../../components/banner/banner";
 
+document.title = "Les cloches";
+
 function Bells() {
   const banner = bannerArray.find((obj) => {
     return obj.id === "b-bells";
