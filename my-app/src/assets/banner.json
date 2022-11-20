@@ -1,20 +1,34 @@
 [
   {
     "id": "b-home",
+    "location": "/",
     "type": "large",
+    "url": "/logo.png",
     "title": "Les amis de Sainte Madeleine de la Jarrie",
     "subhead": "Eglise de la Jarrie"
   },
   {
     "id": "b-history",
+    "location": "/histoire",
     "type": "small",
+    "url": "",
     "title": "L'histoire de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
   {
     "id": "b-bells",
+    "location": "/cloches",
     "type": "small",
+    "url": "",
     "title": "Les cloches de Sainte Madeleine de la Jarrie",
+    "subhead": ""
+  },
+  {
+    "id": "b-projects",
+    "location": "/projets",
+    "type": "small",
+    "url": "",
+    "title": "Les projets",
     "subhead": ""
   }
 ]

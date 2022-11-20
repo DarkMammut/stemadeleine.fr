@@ -6,7 +6,7 @@ import Home from "./pages/home";
 import Bells from "./pages/bells/bells";
 import History from "./pages/history/history";
 import Project from "./pages/project/project";
-// import PageNotFound from './pages/404/page_not_found';
+import PageNotFound from "./pages/404/page_not_found";
 import Header from "./components/header/header";
 // import Footer from "./components/footer/footer";
 
@@ -22,9 +22,9 @@ root.render(
         <Route exact path="/cloches" element={<Bells />} />
         <Route exact path="/histoire" element={<History />} />
 
-        <Route exact path="/projet" element={<Project />} />
-        {/* <Route path="*" element={<PageNotFound />} />
-        <Route path="/404" element={<PageNotFound />} /> */}
+        <Route exact path="/projets" element={<Project />} />
+        <Route path="*" element={<PageNotFound />} />
+        <Route path="/404" element={<PageNotFound />} />
       </Routes>
       {/* <Footer /> */}
     </Router>
