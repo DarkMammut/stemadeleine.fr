@@ -155,19 +155,19 @@ table {
   }
 
   h1 {
-    font-family: "blackknightflfregular", Arial, Helvetica, sans-serif;
+    font-family: $titles;
     font-size: 50px;
     color: $secondary-color
   }
 
   h2 {
-    font-family: "blackknightflfregular", Arial, Helvetica, sans-serif;
+    font-family: $titles;
     font-size: 40px;
     color: $secondary-color
   }
 
   h3 {
-    font-family: "blackknightflfregular", Arial, Helvetica, sans-serif;
+    font-family: $titles;
     font-size: 30px;
     color: $secondary-color
   }
@@ -176,7 +176,7 @@ table {
   p,
   span,
   a {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: $body;
     font-size: 20px;
     line-height: 1.3;
   }

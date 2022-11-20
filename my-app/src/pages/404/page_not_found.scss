@@ -3,134 +3,199 @@
 
 @import url("https://fonts.googleapis.com/css?family=Abril+Fatface|Lato");
 
-$white: #ededed;
-$gray: #bfc0c0;
-$dark: #585959;
-$light: #d3deea;
-
-$big: "Abril Fatface", serif;
+$special: "Abril Fatface", serif;
 $body: "Lato", sans-serif;
 
 .page {
-  background: $light;
-}
+  background: $primary-color;
 
-.top {
-  margin-top: 30px;
-}
+  &__top {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
 
-.container {
-  margin: 0 auto;
-  position: relative;
-  width: 250px;
-  height: 250px;
-  margin-top: -40px;
-}
 
-.ghost {
-  width: 50%;
-  height: 53%;
-  left: 25%;
-  top: 10%;
-  position: absolute;
-  border-radius: 50% 50% 0 0;
-  background: $white;
-  border: 1px solid $gray;
-  border-bottom: none;
-  animation: float 2s ease-out infinite;
-}
+    &__title {
+      font-family: $special;
+    }
 
-.ghost-copy {
-  width: 50%;
-  height: 53%;
-  left: 25%;
-  top: 10%;
-  position: absolute;
-  border-radius: 50% 50% 0 0;
-  background: $white;
-  border: 1px solid $gray;
-  border-bottom: none;
-  animation: float 2s ease-out infinite;
-  z-index: 0;
-}
+    &__subhead {
+      font-family: $special;
+    }
+  }
 
-.face {
-  position: absolute;
-  width: 100%;
-  height: 60%;
-  top: 20%;
-}
-.eye,
-.eye-right {
-  position: absolute;
-  background: $dark;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  top: 40%;
-}
+  &__container {
+    margin: 0 auto;
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin-top: -40px;
 
-.eye {
-  left: 25%;
-}
-.eye-right {
-  right: 25%;
-}
+    &__ghost {
+      width: 50%;
+      height: 53%;
+      left: 25%;
+      top: 10%;
+      position: absolute;
+      border-radius: 50% 50% 0 0;
+      background: $color-white;
+      border-bottom: none;
+      animation: float 2s ease-out infinite;
 
-.mouth {
-  position: absolute;
-  top: 50%;
-  left: 45%;
-  width: 10px;
-  height: 10px;
-  border: 3px solid;
-  border-radius: 50%;
-  border-color: transparent $dark $dark transparent;
-  transform: rotate(45deg);
-}
+      &__hands {
+        &--left, &--right {
+          position: absolute;
+          top: 50%;
+          height: 20px;
+          width: 15px;
+          background-color: $color-white;
+        }
 
-.one,
-.two,
-.three,
-.four {
-  position: absolute;
-  background: $white;
-  top: 85%;
-  width: 25%;
-  height: 23%;
-  border: 1px solid $gray;
-  z-index: 0;
-}
+        &--left {
+          left: -12%;
+          border-top-left-radius: 50%;
+          border-bottom-left-radius: 50%;
+        }
 
-.one {
-  border-radius: 0 0 100% 30%;
-  left: -1px;
-}
+        &--right {
+          right: -12%;
+          border-top-right-radius: 50%;
+          border-bottom-right-radius: 50%;
+        }
+      }
 
-.two {
-  left: 23%;
-  border-radius: 0 0 50% 50%;
-}
+      &__face {
+        position: absolute;
+        width: 100%;
+        height: 60%;
+        top: 20%;
+      }
 
-.three {
-  left: 50%;
-  border-radius: 0 0 50% 50%;
-}
+      &__eyes{
+        &--right, &--left {
+        position: absolute;
+        background: $dark-color;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        top: 40%;
+        }
 
-.four {
-  left: 74.5%;
-  border-radius: 0 0 30% 100%;
-}
+        &--left {
+          left: 25%;
+        }
+  
+        &--right {
+          right: 25%;
+        }
+      }
 
-.shadow {
-  position: absolute;
-  width: 30%;
-  height: 7%;
-  background: $gray;
-  left: 35%;
-  top: 80%;
-  border-radius: 50%;
-  animation: scale 2s infinite;
+      &__mouth {
+        position: absolute;
+        top: 50%;
+        left: 45%;
+        width: 10px;
+        height: 10px;
+        border: 3px solid;
+        border-radius: 50%;
+        border-color: transparent $dark-color $dark-color transparent;
+        transform: rotate(45deg);
+      }
+
+      &__feet {
+        &--one, &--two, &--three, &--four {
+          position: absolute;
+          top: 50%;
+          height: 30%;
+          width: 25%;
+          background-color: $color-white;
+        }
+
+        &--one {
+          top: 120%;
+          left: 0;
+          border-bottom-right-radius: 50%;
+          border-bottom-left-radius: 50%;
+        }
+
+        &--two {
+          top: 120%;
+          left: 25%;
+          border-bottom-right-radius: 50%;
+          border-bottom-left-radius: 50%;
+        }
+
+        &--three {
+          top: 120%;
+          right: 25%;
+          border-bottom-right-radius: 50%;
+          border-bottom-left-radius: 50%;
+        }
+        
+        &--four {
+          top: 120%;
+          right: 0;
+          border-bottom-right-radius: 50%;
+          border-bottom-left-radius: 50%;
+        }
+
+      }
+    }
+
+    &__shadow {
+      position: absolute;
+      width: 30%;
+      height: 7%;
+      background: $dark-color;
+      left: 35%;
+      top: 80%;
+      border-radius: 50%;
+      animation: scale 2s infinite;
+    }
+  }
+
+  &__bottom {
+    margin-top: 10px;
+
+    &__title {
+      font-family: $special;
+      color: $color-white;
+      text-align: center;
+      font-size: 9em;
+      margin: 0;
+      text-shadow: -1px 0 $primary-color, 0 1px $primary-color, 1px 0 $primary-color, 0 -1px $primary-color;
+    }
+
+    &__subhead {
+      font-family: $body;
+      font-size: 2em;
+      text-transform: uppercase;
+      text-align: center;
+      color: $primary-color;
+      margin-top: -20px;
+      font-weight: 900;
+    }
+
+    &__text {
+      text-align: center;
+      font-family: $body;
+      color: $dark-color;
+      font-size: 0.6em;
+      margin-top: -20px;
+      text-transform: uppercase;
+    }
+
+    &__home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      color: $accent-color;
+    }
+  }
 }
 
 @keyframes scale {
@@ -148,117 +213,5 @@ $body: "Lato", sans-serif;
 @keyframes float {
   50% {
     transform: translateY(15px);
-  }
-}
-
-.bottom {
-  margin-top: 10px;
-}
-
-/*text styling*/
-
-.title {
-  font-family: $big;
-  color: $white;
-  text-align: center;
-  font-size: 9em;
-  margin: 0;
-  text-shadow: -1px 0 $gray, 0 1px $gray, 1px 0 $gray, 0 -1px $gray;
-}
-.subhead {
-  font-family: $body;
-  font-size: 2em;
-  text-transform: uppercase;
-  text-align: center;
-  color: $gray;
-  margin-top: -20px;
-  font-weight: 900;
-}
-.text {
-  text-align: center;
-  font-family: $body;
-  color: $dark;
-  font-size: 0.6em;
-  margin-top: -20px;
-  text-transform: uppercase;
-}
-
-.search {
-  text-align: center;
-}
-
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-/*search style*/
-
-.search-bar {
-  border: 1px solid $gray;
-  padding: 5px;
-  height: 20px;
-  margin-left: -30px;
-  width: 200px;
-  outline: none;
-  &:focus {
-    border: 1px solid $light;
-  }
-}
-
-.search-btn {
-  position: absolute;
-  width: 30px;
-  height: 32px;
-  border: 1px solid $gray;
-  background: $gray;
-  text-align: center;
-  color: $white;
-  cursor: pointer;
-  font-size: 1em;
-  outline: none;
-  &:hover {
-    background: $white;
-    border: 1px solid $white;
-    color: $gray;
-    transition: all 0.2s ease;
-  }
-}
-
-.btn {
-  background: $white;
-  padding: 15px 20px;
-  margin: 5px;
-  color: $dark;
-  font-family: $body;
-  text-transform: uppercase;
-  font-size: 0.6em;
-  letter-spacing: 1px;
-  border: 0;
-  &:hover {
-    background: $gray;
-    transition: all 0.4s ease-out;
-  }
-}
-
-footer {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  text-align: center;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  padding: 10px;
-  color: #ea7996;
-  letter-spacing: 3px;
-  font-family: $body;
-  a {
-    color: #ffffff;
-    text-decoration: none;
-    &:hover {
-      color: #7d7d7d;
-    }
   }
 }
