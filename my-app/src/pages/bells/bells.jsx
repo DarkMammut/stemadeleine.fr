@@ -1,16 +1,16 @@
 import React from "react";
-import content from "../../assets/bells_sections.json";
-import bannerArray from "../../assets/banner.json";
+import { Helmet } from "react-helmet";
 import "./bells.scss";
+import content from "../../assets/bells_sections.json";
 import Banner from "../../components/banner/banner";
 
 function Bells() {
-  const banner = bannerArray.find((obj) => {
-    return obj.id === "b-bells";
-  });
   return (
     <main className="bells">
-      <Banner content={banner} />
+      <Helmet>
+        <title>CLOCHES | Les amis de Sainte Madeleine de la Jarrie</title>
+      </Helmet>
+      <Banner />
       <p className="bells__paragraph">
         On atteint la salle des cloches de l’imposant clocher-porche du XIIe siècle en empruntant un
         escalier à vis. Cette salle abrite les 4 cloches de la Jarrie. Ce jeu est le plus gros
@@ -19,14 +19,18 @@ function Bells() {
       </p>
       {content.map((section) => (
         <section key={section.id} className="bells__section">
-          <h2 className="bells__section__title">{section.title}</h2>
-          <p className="bells__section__text">{section.text}</p>
-          {section.article.map((art) => (
-            <article key={art.id} className="bells__section__article">
-              <h3 className="bells__section__article__title">{art.title}</h3>
-              <p className="bells__section__article__text">{art.text}</p>
-            </article>
-          ))}
+          <div className="bells__section__textarea">
+            <h2 className="bells__section__textarea__title">{section.title}</h2>
+            <p className="bells__section__textarea__text">{section.text}</p>
+          </div>
+          <div className="bells__section__articles">
+            {section.article.map((art) => (
+              <article key={art.id} className="bells__section__articles__article">
+                <h3 className="bells__section__articles__article__title">{art.title}</h3>
+                <p className="bells__section__articles__article__text">{art.text}</p>
+              </article>
+            ))}
+          </div>
         </section>
       ))}
     </main>
