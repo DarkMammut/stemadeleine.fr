@@ -15,7 +15,7 @@
     width: 100%;
     height: auto;
     margin-top: 100px;
-    justify-content: space-between;
+    justify-content: space-around;
 
     &__textarea {
       display: flex;
@@ -24,6 +24,10 @@
       &__title {
         text-align: center;
         font-family: "blackknightflfregular";
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        color: $secondary-color;
+        border-bottom: solid 1px $accent-color;
       }
     }
 
@@ -59,7 +63,7 @@
 
       .bells__section {
         &__textarea {
-          width: 60%;
+          width: 50%;
         }
         &__articles {
           width: 25%;
@@ -76,7 +80,7 @@
 
       .bells__section {
         &__textarea {
-          width: 60%;
+          width: 50%;
         }
         &__articles {
           width: 25%;
