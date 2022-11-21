@@ -7,7 +7,11 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer__logo" style={style} />
-      <span className="footer__copyright">&copy; 2022 LASMDLJ. All rights reserved</span>
+      <span className="footer__copyright">
+        &copy; 2022 Association Les amis de Sainte Madeleine de la Jarrie.
+        <br />
+        All rights reserved.
+      </span>
     </footer>
   );
 }

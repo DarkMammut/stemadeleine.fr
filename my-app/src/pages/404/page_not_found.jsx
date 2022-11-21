@@ -1,10 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import "./page_not_found.scss";
 
 function PageNotFound() {
   return (
     <main className="page">
+      <Helmet>
+        <title>404 | Page Not Found</title>
+      </Helmet>
       <div id="page__background" />
       <div className="page__top">
         <h1 className="page__top__title">404</h1>

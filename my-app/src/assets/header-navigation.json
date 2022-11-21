@@ -1,0 +1,56 @@
+[
+  {
+    "id": "L1",
+    "name": "ACCUEIL",
+    "path": "/"
+  },
+  {
+    "id": "L2",
+    "name": "L'ASSOCIATION",
+    "path": "/association",
+    "sublinks": [
+      {
+        "id": "L2S1",
+        "name": "QUI SOMMES NOUS ?",
+        "path": "/qui-sommes-nous"
+      },
+      {
+        "id": "L2S2",
+        "name": "NOUS REJOINDRE",
+        "path": "/nous-rejoindre"
+      },
+      {
+        "id": "L2S3",
+        "name": "FAIRE UN DON",
+        "path": "/don"
+      }
+    ]
+  },
+  {
+    "id": "L3",
+    "name": "PROJETS",
+    "path": "/projets"
+  },
+  {
+    "id": "L4",
+    "name": "L'EGLISE",
+    "path": "/eglise",
+    "sublinks": [
+      {
+        "id": "L4S1",
+        "name": "HISTOIRE",
+        "path": "/histoire"
+      },
+      {
+        "id": "L4S2",
+        "name": "LES CLOCHES",
+        "path": "/cloches"
+      }
+    ]
+  },
+  {
+    "id": "L5",
+    "name": "CONTACT",
+    "path": "/contact"
+  }
+]

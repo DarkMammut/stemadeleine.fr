@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import LINKS from "../../assets/header-navigation.json";
 import "./navigation.scss";
-
-const LINKS = [
-  { id: "link1", name: "Accueil", path: "/" },
-  { id: "link2", name: "Histoire", path: "/histoire" },
-  { id: "link3", name: "Les cloches", path: "/cloches" },
-  { id: "link4", name: "Projets", path: "/projets" }
-];
 
 function Navigation() {
   const [toggle, setToggle] = useState(0);

@@ -10,10 +10,12 @@
     height: 200px;
     background-color: $secondary-color;
     bottom: 0;
+    border-top: solid 3px $accent-color;
 
     &__copyright {
         // font-family: $special;
         color: $accent-color;
+        text-align: center;
     }
 
     &__logo {
