@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React from "react";
+import { useLocation, Link } from "react-router-dom";
 import bannerArray from "../../assets/banner.json";
 import "./banner.scss";
 
 function Banner() {
-  const [scrolldown, setScrolldown] = useState(0);
   const location = useLocation();
   const found = bannerArray.find((banner) => banner.location === location.pathname);
   const url = process.env.PUBLIC_URL + found.url;
@@ -18,10 +17,7 @@ function Banner() {
             <h1 className="l-banner__textarea__title">{found.title}</h1>
             <span className="l-banner__textarea__subhead">{found.subhead}</span>
           </div>
-          <button
-            className="l-banner__down"
-            type="button"
-            onClick={() => setScrolldown(scrolldown ? 0 : 1)}>
+          <Link className="l-banner__down" to="#news">
             <div className="l-banner__down__chevron">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -30,7 +26,7 @@ function Banner() {
                 />
               </svg>
             </div>
-          </button>
+          </Link>
         </div>
       );
 

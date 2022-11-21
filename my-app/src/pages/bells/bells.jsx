@@ -4,6 +4,8 @@ import "./bells.scss";
 import content from "../../assets/bells_sections.json";
 import Banner from "../../components/banner/banner";
 
+document.title = "Les cloches";
+
 function Bells() {
   return (
     <main className="bells">

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./navigation.scss";
 
 const LINKS = [
-  { id: "link1", name: "Acceuil", path: "/" },
+  { id: "link1", name: "Accueil", path: "/" },
   { id: "link2", name: "Histoire", path: "/histoire" },
   { id: "link3", name: "Les cloches", path: "/cloches" },
   { id: "link4", name: "Projets", path: "/projets" }

@@ -33,7 +33,8 @@
   align-items: center;
   width: 100%;
   height: 500px;
-  background-size: contain;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   margin-bottom: 50px;
   box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
@@ -50,12 +51,14 @@
 
     &__title {
       margin-bottom: 20px;
-      border-bottom: solid 1px $primary-color;
+      border-bottom: solid 1px rgba($accent-color, 0.7);
       text-align: center;
+      color: $color-white;
     }
 
     &__subhead {
       text-align: center;
+      color: $color-white;
     }
   }
 
@@ -66,10 +69,12 @@
     align-items: center;
     bottom: 50px;
     border-radius: 50%;
+    border: solid 3px $color-white;
     height: 50px;
     width: 50px;
     cursor: pointer;
     background-color: transparent;
+    color: $color-white;
 
     &__chevron {
       height: 100%;
@@ -86,6 +91,7 @@
     .l-banner {
       &__down__chevron svg {
         animation: float 700ms ease-in-out infinite;
+        transform: scale(1.2);
       }
     }
   }

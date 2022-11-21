@@ -1,12 +1,13 @@
 import React from "react";
-// import logo from "../assets/...";
-// import "../styles/footer.css";
+import "./footer.scss";
 
 function Footer() {
+  const url = `${process.env.PUBLIC_URL}/logo.png`;
+  const style = { backgroundImage: `url(${url})` };
   return (
     <footer className="footer">
-      {/* <img src={logo} className="footer__logo" alt="logo" /> */}
-      <span className="footer__copyright">&copy; 2020 Kassa. All rights reserved</span>
+      <div className="footer__logo" style={style} />
+      <span className="footer__copyright">&copy; 2022 LASMDLJ. All rights reserved</span>
     </footer>
   );
 }
