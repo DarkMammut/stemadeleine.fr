@@ -5,12 +5,39 @@
   position: relative;
   display: flex;
   justify-content: center;
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: rgba($color-black, 0.2);
+  margin-bottom: 50px;
+  box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
+
+  &__textarea {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    &__title {
+      text-align: center;
+      justify-content: flex-end;
+      color: $color-white;
+    }
+  }
+}
+
+.l-banner {
+  position: relative;
+  display: flex;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: 500px;
-  background-image: url("../../assets/logo.png");
-  background-size: contain;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
+  margin-bottom: 50px;
+  box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
 
   &__textarea {
     width: 50%;
@@ -19,14 +46,19 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba(grey, 0.3);
+    background-color: rgba($color-black, 0.2);
+    box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.3);
 
     &__title {
       margin-bottom: 20px;
-      border-bottom: 1px $primary-color;
+      border-bottom: solid 1px rgba($accent-color, 0.7);
+      text-align: center;
+      color: $color-white;
     }
 
     &__subhead {
+      text-align: center;
+      color: $color-white;
     }
   }
 
@@ -37,8 +69,42 @@
     align-items: center;
     bottom: 50px;
     border-radius: 50%;
+    border: solid 3px $color-white;
     height: 50px;
     width: 50px;
     cursor: pointer;
+    background-color: transparent;
+    color: $color-white;
+
+    &__chevron {
+      height: 100%;
+      width: 100%;
+
+      & svg {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  & :hover {
+    .l-banner {
+      &__down__chevron svg {
+        animation: float 700ms ease-in-out infinite;
+        transform: scale(1.2);
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translatey(0);
+  }
+  50% {
+    transform: translatey(17%);
+  }
+  100% {
+    transform: translatey(25%);
   }
 }

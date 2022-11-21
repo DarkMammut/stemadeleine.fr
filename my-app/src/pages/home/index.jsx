@@ -1,17 +1,20 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 import "./index.scss";
-import bannerArray from "../../assets/banner.json";
 import Banner from "../../components/banner/banner";
 
 document.title = "Accueil";
 
 function Home() {
-  const banner = bannerArray.find((obj) => {
-    return obj.id === "b-home";
-  });
   return (
     <main>
-      <Banner content={banner} />
+      <Helmet>
+        <title>ACCUEIL | Les amis de Sainte Madeleine de la Jarrie</title>
+      </Helmet>
+      <Banner />
+      <section id="news" className="news">
+        <h2 className="news_title">Actualités</h2>
+      </section>
     </main>
   );
 }
