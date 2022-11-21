@@ -1,0 +1,24 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: $secondary-color;
+
+    &__copyright {
+        // font-family: $special;
+        color: $accent-color;
+    }
+
+    &__logo {
+        width: 50px;
+        height: auto;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+}

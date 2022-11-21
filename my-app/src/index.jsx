@@ -8,7 +8,7 @@ import History from "./pages/history/history";
 import Project from "./pages/project/project";
 import PageNotFound from "./pages/404/page_not_found";
 import Header from "./components/header/header";
-// import Footer from "./components/footer/footer";
+import Footer from "./components/footer/footer";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -26,7 +26,7 @@ root.render(
         <Route path="*" element={<PageNotFound />} />
         <Route path="/404" element={<PageNotFound />} />
       </Routes>
-      {/* <Footer /> */}
+      <Footer />
     </Router>
   </React.StrictMode>
 );

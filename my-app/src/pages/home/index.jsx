@@ -10,6 +10,9 @@ function Home() {
         <title>ACCUEIL | Les amis de Sainte Madeleine de la Jarrie</title>
       </Helmet>
       <Banner />
+      <section id="news" className="news">
+        <h2 className="news_title">Actualités</h2>
+      </section>
     </main>
   );
 }

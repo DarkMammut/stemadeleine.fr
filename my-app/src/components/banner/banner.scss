@@ -69,10 +69,12 @@
     align-items: center;
     bottom: 50px;
     border-radius: 50%;
+    border: solid 3px $color-white;
     height: 50px;
     width: 50px;
     cursor: pointer;
     background-color: transparent;
+    color: $color-white;
 
     &__chevron {
       height: 100%;
@@ -89,6 +91,7 @@
     .l-banner {
       &__down__chevron svg {
         animation: float 700ms ease-in-out infinite;
+        transform: scale(1.2);
       }
     }
   }
