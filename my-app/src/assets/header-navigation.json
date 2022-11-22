@@ -2,7 +2,8 @@
   {
     "id": "L1",
     "name": "ACCUEIL",
-    "path": "/"
+    "path": "/",
+    "sublinks": []
   },
   {
     "id": "L2",
@@ -29,7 +30,8 @@
   {
     "id": "L3",
     "name": "PROJETS",
-    "path": "/projets"
+    "path": "/projets",
+    "sublinks": []
   },
   {
     "id": "L4",
@@ -51,6 +53,7 @@
   {
     "id": "L5",
     "name": "CONTACT",
-    "path": "/contact"
+    "path": "/contact",
+    "sublinks": []
   }
 ]

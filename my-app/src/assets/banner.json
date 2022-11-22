@@ -7,28 +7,76 @@
     "title": "Les amis de Sainte Madeleine de la Jarrie",
     "subhead": "Eglise de la Jarrie"
   },
+
   {
-    "id": "b-history",
-    "location": "/histoire",
+    "id": "b-church",
+    "location": "/eglise",
     "type": "small",
     "url": "",
-    "title": "L'histoire de Sainte Madeleine de la Jarrie",
+    "title": "L'église de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
+
   {
     "id": "b-bells",
-    "location": "/cloches",
+    "location": "/eglise/cloches",
     "type": "small",
     "url": "",
     "title": "Les cloches de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
+
+  {
+    "id": "b-association",
+    "location": "/association",
+    "type": "small",
+    "url": "",
+    "title": "L'association",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-about",
+    "location": "/association/qui-sommes-nous",
+    "type": "small",
+    "url": "",
+    "title": "Qui sommes nous ?",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-join",
+    "location": "/association/nous-rejoindre",
+    "type": "small",
+    "url": "",
+    "title": "Nous rejoindre",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-donation",
+    "location": "/association/don",
+    "type": "small",
+    "url": "",
+    "title": "Faire un don",
+    "subhead": ""
+  },
+
   {
     "id": "b-projects",
     "location": "/projets",
     "type": "small",
     "url": "",
-    "title": "Les projets",
+    "title": "Nos projets",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-contact",
+    "location": "/contact",
+    "type": "small",
+    "url": "",
+    "title": "Nous contacter",
     "subhead": ""
   }
 ]

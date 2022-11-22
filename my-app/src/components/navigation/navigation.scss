@@ -28,7 +28,7 @@
         left: 25%;
         width: 50%;
         height: 3px;
-        background: rgba($secondary-color,0.7);
+        background: rgba($secondary-color, 0.7);
         border-radius: 10px;
         overflow: hidden;
         transition: 0.5s;
@@ -165,9 +165,30 @@
       height: 75px;
       background: transparent;
       &__nav {
-        &__link a {
-          font-size: 100%;
-          color: $secondary-color;
+        &__link {
+          & a {
+            font-size: 100%;
+            color: $secondary-color;
+
+            & :hover {
+              .navigation__menu__nav__link__sublinks {
+                visibility: visible;
+                opacity: 1;
+              }
+            }
+          }
+
+          &__sublinks {
+            display: flex;
+            position: absolute;
+            top: $desktop-header-radius;
+            left: 0;
+            width: 100%;
+            justify-content: space-around;
+            z-index:1;
+            // visibility: hidden;
+            // opacity: 0;
+          }
         }
       }
     }

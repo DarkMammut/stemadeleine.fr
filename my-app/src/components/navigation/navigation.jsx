@@ -28,6 +28,18 @@ function Navigation() {
                   <div>{link.name}</div>
                 </span>
               </Link>
+              <ul className="navigation__menu__nav__link__sublinks">
+                {link.sublinks.length > 0 &&
+                  link.sublinks.map((sublink) => (
+                    <li key={sublink.id} className="navigation__menu__nav__link">
+                      <Link to={sublink.path}>
+                        <span>
+                          <div>{sublink.name}</div>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
             </li>
           ))}
         </ul>
