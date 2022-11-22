@@ -35,7 +35,7 @@ root.render(
         <Route exact path="/eglise/cloches" element={<Bells />} />
         <Route exact path="/contact" element={<Contact />} />
         <Route path="*" element={<PageNotFound />} />
-        <Route path="/404" element={<PageNotFound />} />
+        <Route exact path="/404" element={<PageNotFound />} />
       </Routes>
       <Footer />
     </Router>

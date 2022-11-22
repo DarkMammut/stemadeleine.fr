@@ -18,6 +18,15 @@
   },
 
   {
+    "id": "b-history",
+    "location": "/eglise/histoire",
+    "type": "small",
+    "url": "",
+    "title": "L'histoire de Sainte Madeleine de la Jarrie",
+    "subhead": ""
+  },
+
+  {
     "id": "b-bells",
     "location": "/eglise/cloches",
     "type": "small",
