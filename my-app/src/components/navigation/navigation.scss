@@ -79,7 +79,6 @@
     align-items: center;
     left: 0;
     opacity: 0;
-    overflow-x: hidden;
     visibility: hidden;
     transition: 0.3s;
     z-index: 99;
@@ -155,6 +154,7 @@
     &__burger {
       display: none;
     }
+
     &__menu {
       opacity: 1;
       visibility: visible;
@@ -169,28 +169,31 @@
           & a {
             font-size: 100%;
             color: $secondary-color;
-
-            & :hover {
-              .navigation__menu__nav__link__sublinks {
-                visibility: visible;
-                opacity: 1;
-              }
-            }
           }
 
-          &__sublinks {
-            display: flex;
+          &__submenu {
+            display: none;
+            flex-direction: column;
             position: absolute;
-            top: $desktop-header-radius;
-            left: 0;
-            width: 100%;
+            top: $desktop-header-radius - 50px;
+            padding-top: 50px;
+            width: 200px;
             justify-content: space-around;
-            z-index:1;
-            // visibility: hidden;
-            // opacity: 0;
+            z-index: 10;
+            background-color: transparent;
+
+            &:hover {
+              display: flex;
+            }
           }
         }
       }
+    }
+  }
+
+  .with-submenu:hover {
+    + .navigation__menu__nav__link__submenu {
+      display: flex;
     }
   }
 }
