@@ -14,6 +14,7 @@ import Bells from "./pages/bells/bells";
 import Contact from "./pages/contact/contact";
 import PageNotFound from "./pages/404/page_not_found";
 import Header from "./components/header/header";
+import Banner from "./components/banner/banner";
 import Footer from "./components/footer/footer";
 
 const container = document.getElementById("root");
@@ -23,6 +24,7 @@ root.render(
   <React.StrictMode>
     <Router>
       <Header />
+      <Banner />
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/association" element={<Association />} />

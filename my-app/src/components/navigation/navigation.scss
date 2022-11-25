@@ -18,7 +18,7 @@
     background-color: transparent;
 
     &__menu {
-      z-index: 100;
+      z-index: 2;
       display: block;
       outline: none;
       cursor: pointer;
@@ -76,21 +76,20 @@
     position: fixed;
     display: flex;
     justify-content: center;
-    align-items: center;
     left: 0;
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 99;
+    z-index: 1;
 
     &__nav {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       margin: 0;
       padding: 0;
       text-align: center;
       list-style-type: none;
-      justify-content: space-around;
       width: 100%;
 
       &__link a {
@@ -159,28 +158,51 @@
       opacity: 1;
       visibility: visible;
       top: 0;
-      left: 15%;
-      right: 15%;
-      width: 70%;
-      height: 75px;
+      left: 10%;
+      right: 10%;
+      height: $desktop-header-radius;
       background: transparent;
       &__nav {
         &__link {
+          position: relative;
+          display: flex;
+          padding-left: 40px;
+          padding-right: 40px;
+          align-items: center;
+          justify-content: center;
+
           & a {
-            font-size: 100%;
-            color: $secondary-color;
+            color: $color-black;
+            z-index: 2;
           }
 
           &__submenu {
+            position: absolute;
             display: none;
             flex-direction: column;
-            position: absolute;
-            top: $desktop-header-radius - 50px;
-            padding-top: 50px;
-            width: 200px;
             justify-content: space-around;
-            z-index: 10;
             background-color: transparent;
+            z-index: 3;
+            top: calc($desktop-header-radius / 2) + 10px;
+            padding-top: calc($desktop-header-radius / 2) - 10px;
+            width: 200px;
+            left: 50%;
+            transform: translatex(-50%);
+
+            &__link {
+              border: solid 0.5px darken($primary-color, 20%);
+              border-top: none;
+              background-color: $primary-color;
+
+              & a {
+                width: 100%;
+
+                & span div {
+                  font-size: 13px;
+                  padding: 5px;
+                }
+              }
+            }
 
             &:hover {
               display: flex;
@@ -224,7 +246,7 @@
       background: rgba($secondary-color, 0.8);
       width: 100%;
       &__nav {
-        &__link a {
+        &__link__container a {
           font-size: 200%;
           color: $primary-color;
         }

@@ -1,0 +1,75 @@
+[
+  {
+    "id": "A1",
+    "display": "disable",
+    "title": "Nouveau tableau",
+    "paragraph": [
+      {
+        "id": "A1P1",
+        "text": "C’est à l’initiative de quelques fidèles laïcs que l’Association des Amis de Sainte Madeleine de La Jarrie s’engage pour assurer le financement de cette peinture représentant Marie-Madeleine dans le jardin au pied du Golgotha au matin de Pâque."
+      },
+      {
+        "id": "A1P2",
+        "text": "Les peintres au cours des siècles ont toujours représenté Marie-Madeleine avec une opulente chevelure blonde et un long manteau pourpre comme une impératrice … des désirs. Tout comme elle est représentée par l’artiste local Louis Ernest Boisnard sur une des toiles marouflées qui décore le chœur de l’église de La Jarrie."
+      },
+      {
+        "id": "A1P3",
+        "text": "Ici, au contraire, cette représentation de Marie-Madeleine rompt avec la tradition picturale.  Avec ses cheveux foncés, ébouriffés, en bataille, l’artiste, Caroline Fleury, traduit la détresse de Marie-Madeleine et sa séparation, définitive, croit-elle, avec Jésus."
+      },
+      {
+        "id": "A1P4",
+        "text": "L’histoire de cette femme est si surprenante qu’elle pose au plus profond le problème de la femme moderne."
+      },
+      {
+        "id": "A1P5",
+        "text": "Avec le souvenir et l’exemple de Marie-Madeleine errante en quête d’indicible, Caroline Fleury ne pouvait pas trouver meilleur modèle pour sa propre démarche personnelle et artistique : à travers la matière picturale, les couleurs, le bois brut comme support, le peintre jette un regard perçant sur les êtres et cherche à exprimer l’ineffable."
+      },
+      {
+        "id": "A1P6",
+        "text": "La première parole du Christ après sa résurrection rejoint la femme là où elle se trouve, dans la détresse et dans son histoire personnelle. C’est une rencontre et une transformation intérieure."
+      },
+      {
+        "id": "A1P7",
+        "text": "Dans ce visage, baigné par les larmes, les yeux de Marie-Madeleine portent déjà la joie de la Résurrection."
+      },
+      {
+        "id": "A1P8",
+        "text": "Cette peinture alliant couleurs vives et expression artistique de notre temps sera placée sous le vitrail éponyme de l’église de La Jarrie. L’œuvre a pour vocation d’invoquer Marie Madeleine dont le souvenir de sa vie peut aider tous ceux et toutes celles qui, comme elle le fut elle-même, sont en quête d’une joie indicible."
+      },
+      {
+        "id": "A1P9",
+        "text": "Marie-Madeleine est sans doute une héroïne de notre temps."
+      }
+    ],
+    "image": {
+      "title": "« FEMME, POURQUOI PLEURES-TU ? »",
+      "alt": "Tableau représentant Sainte Madeleine",
+      "url": "/tableau.png"
+    }
+  },
+
+  {
+    "id": "A2",
+    "display": "enable",
+    "title": "Nouveau projet",
+    "paragraph": [
+      {
+        "id": "A2P1",
+        "text": "Lorem ipsum dolor sit amet. Et aspernatur quia qui voluptatem voluptatem quo molestiae laborum ut adipisci molestias est omnis quam et alias nobis! Et placeat voluptatum qui dolorem quod et rerum autem! Et perferendis illo eum galisum dolore aut quas laudantium est aperiam assumenda ad quaerat facilis 33 reprehenderit libero!"
+      },
+      {
+        "id": "A2P2",
+        "text": "Hic autem iste et aliquid error et sapiente velit et commodi corrupti hic numquam minus. Aut cumque voluptatibus est velit repellendus sed nisi temporibus."
+      },
+      {
+        "id": "A2P3",
+        "text": "Non tempora reiciendis et ipsa optio sed eius iste ut omnis nulla aut doloribus accusamus ad quasi vitae vel dignissimos vitae. Ut facere blanditiis eum exercitationem consectetur a quos temporibus non totam delectus et quod quia hic voluptas nihil qui inventore omnis!"
+      }
+    ],
+    "image": {
+      "title": "picture",
+      "alt": "picture",
+      "url": "/no-image.jpeg"
+    }
+  }
+]

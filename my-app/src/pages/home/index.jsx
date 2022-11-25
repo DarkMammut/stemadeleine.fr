@@ -1,7 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 import "./index.scss";
-import Banner from "../../components/banner/banner";
 
 document.title = "Accueil";
 
@@ -9,9 +8,8 @@ function Home() {
   return (
     <main>
       <Helmet>
-        <title>ACCUEIL | Les amis de Sainte Madeleine de la Jarrie</title>
+        <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <Banner />
       <section id="news" className="news">
         <h2 className="news_title">Actualités</h2>
       </section>
