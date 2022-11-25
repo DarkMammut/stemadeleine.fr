@@ -1,14 +1,15 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Banner from "../../components/banner/banner";
+import ImageSlider from "../../components/slider/slider";
+import SLIDES from "../../assets/slides.json";
 
 function History() {
   return (
     <main>
       <Helmet>
-        <title>HISTOIRE | Les amis de Sainte Madeleine de la Jarrie</title>
+        <title>HISTOIRE | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <Banner />
+      <ImageSlider slides={SLIDES.history} />
       <div>hello</div>
     </main>
   );

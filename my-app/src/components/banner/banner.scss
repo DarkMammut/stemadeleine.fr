@@ -1,17 +1,26 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
+.container {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
 .banner {
   position: relative;
   display: flex;
   justify-content: center;
   width: 100%;
-  height: 200px;
-  background-size: cover;
-  background-repeat: no-repeat;
+  height: 300px;
+  background: {
+    position: center;
+    size: cover;
+    repeat: no-repeat;
+    attachment: fixed;
+  }
   background-color: rgba($color-black, 0.2);
   margin-bottom: 50px;
-  box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
 
   &__textarea {
     display: flex;
@@ -31,13 +40,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 500px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  left: -5%;
+  right: -5%;
+  width: 110%;
+  height: 800px;
+  background: {
+    size: cover;
+    position: center;
+    repeat: no-repeat;
+    attachment: fixed;
+  }
   margin-bottom: 50px;
-  box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.5);
+  border-bottom-left-radius: 50% 20%;
+  border-bottom-right-radius: 50% 20%;
+  border-bottom: solid 1px $color-black;
 
   &__textarea {
     width: 50%;
@@ -69,12 +85,12 @@
     align-items: center;
     bottom: 50px;
     border-radius: 50%;
-    border: solid 3px $color-white;
+    border: solid 3px $primary-color;
     height: 50px;
     width: 50px;
     cursor: pointer;
     background-color: transparent;
-    color: $color-white;
+    color: $primary-color;
 
     &__chevron {
       height: 100%;

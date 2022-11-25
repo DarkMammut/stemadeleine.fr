@@ -1,8 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 import "./bells.scss";
-import content from "../../assets/bells_sections.json";
-import Banner from "../../components/banner/banner";
+import SECTIONS from "../../assets/bells_sections.json";
 
 document.title = "Les cloches";
 
@@ -10,16 +9,15 @@ function Bells() {
   return (
     <main className="bells">
       <Helmet>
-        <title>CLOCHES | Les amis de Sainte Madeleine de la Jarrie</title>
+        <title>CLOCHES | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <Banner />
       <p className="bells__paragraph">
         On atteint la salle des cloches de l’imposant clocher-porche du XIIe siècle en empruntant un
         escalier à vis. Cette salle abrite les 4 cloches de la Jarrie. Ce jeu est le plus gros
         pleinium de l’Aunis, et justifie qu’après quatorze ans de silence la municipalité ait offert
         aux Jariens la joie d’entendre à nouveau son patrimoins campanaire.
       </p>
-      {content.map((section) => (
+      {SECTIONS.map((section) => (
         <section key={section.id} className="bells__section">
           <div className="bells__section__textarea">
             <h2 className="bells__section__textarea__title">{section.title}</h2>
