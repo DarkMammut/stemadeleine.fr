@@ -1,0 +1,114 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+.slider {
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  opacity: 0;
+
+  &[data-open="1"] {
+    display: flex;
+    animation: fade ease 1s forwards;
+  }
+
+  &[data-open="0"] {
+    display: none;
+  }
+
+  &__backgroung {
+    position: fixed;
+    background-color: rgba(black, 0.9);
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__shut {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: $desktop-header-radius;
+    height: $desktop-header-radius;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 4;
+
+    &__line {
+      position: absolute;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background-color: $accent-color;
+      border-radius: 10px;
+      overflow: hidden;
+
+      &:nth-child(1) {
+        top: 30%;
+        transform: translateY(calc($desktop-header-radius / 5)) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        top: 70%;
+        transform: translateY(calc($desktop-header-radius / -5)) rotate(-45deg);
+      }
+    }
+  }
+
+  &__current {
+    position: relative;
+    width: 1200px;
+    height: 700px;
+    background: {
+      position: center;
+      size: cover;
+      repeat: no-repeat;
+    }
+
+    &__right {
+      right: 0;
+    }
+
+    &__left {
+      left: 0;
+    }
+
+    &__right,
+    &__left {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 3%;
+      border: none;
+      background-color: transparent;
+      opacity: 0.3;
+      cursor: pointer;
+
+      &:hover {
+        width: 5%;
+        opacity: 0.8;
+        background-color: $primary-color;
+      }
+    }
+
+    & svg {
+      width: 20px;
+    }
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

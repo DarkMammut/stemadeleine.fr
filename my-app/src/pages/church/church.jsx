@@ -1,14 +1,12 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Banner from "../../components/banner/banner";
 
 function Church() {
   return (
     <main>
       <Helmet>
-        <title>EGLISE | Les amis de Sainte Madeleine de la Jarrie</title>
+        <title>EGLISE | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <Banner />
       <div>hello</div>
     </main>
   );

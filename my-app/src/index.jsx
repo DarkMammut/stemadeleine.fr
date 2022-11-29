@@ -14,6 +14,7 @@ import Bells from "./pages/bells/bells";
 import Contact from "./pages/contact/contact";
 import PageNotFound from "./pages/404/page_not_found";
 import Header from "./components/header/header";
+import Banner from "./components/banner/banner";
 import Footer from "./components/footer/footer";
 
 const container = document.getElementById("root");
@@ -23,6 +24,7 @@ root.render(
   <React.StrictMode>
     <Router>
       <Header />
+      <Banner />
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/association" element={<Association />} />
@@ -34,8 +36,8 @@ root.render(
         <Route exact path="/eglise/histoire" element={<History />} />
         <Route exact path="/eglise/cloches" element={<Bells />} />
         <Route exact path="/contact" element={<Contact />} />
-        <Route path="*" element={<PageNotFound />} />
         <Route exact path="/404" element={<PageNotFound />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Footer />
     </Router>

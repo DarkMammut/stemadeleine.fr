@@ -1,28 +1,42 @@
 import React from "react";
 import { Helmet } from "react-helmet";
+import ARTICLES from "../../assets/project_articles.json";
 import "./project.scss";
-import Banner from "../../components/banner/banner";
 
 function Project() {
   return (
     <main>
       <Helmet>
-        <title>PROJETS | Les amis de Sainte Madeleine de la Jarrie</title>
+        <title>PROJETS | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <Banner />
-      <section className="project">
-        <h2 className="project__title">Tableau de Marie Madeleine</h2>
-        <div className="project__image">
-          <img
-            src={`${process.env.PUBLIC_URL}/tableau.png`}
-            title="Saint Madeleine"
-            alt="tableau de Sainte Madeleine"
-          />
-        </div>
-
-        <p className="project__paragraph">
-          ljsdgljqbnwvnjqvjlb slqjbnvjlqnljvnbqjlbvjbjqkblvjblqjsbnvljbnq,lnbclj ml
-        </p>
+      <section className="projects">
+        {ARTICLES.map((article) => {
+          if (article.display === "enable") {
+            return (
+              <article className="projects__article" key={article.id}>
+                <div className="projects__article__textarea">
+                  <h2 className="projects__article__textarea__title">{article.title}</h2>
+                  {article.paragraph.map((ph) => (
+                    <p key={ph.id} className="projects__article__textarea__paragraph">
+                      {ph.text}
+                    </p>
+                  ))}
+                </div>
+                <div className="projects__article__image">
+                  <div className="projects__article__image__container">
+                    <img
+                      src={process.env.PUBLIC_URL + article.image.url}
+                      title={article.image.title}
+                      alt={article.image.alt}
+                    />
+                  </div>
+                  <span>{article.image.title}</span>
+                </div>
+              </article>
+            );
+          }
+          return null;
+        })}
       </section>
     </main>
   );

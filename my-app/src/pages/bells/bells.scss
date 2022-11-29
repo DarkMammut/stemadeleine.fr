@@ -23,10 +23,9 @@
 
       &__title {
         text-align: center;
-        font-family: "blackknightflfregular";
+        font-family: $titles;
         margin-bottom: 30px;
         padding-bottom: 15px;
-        color: $secondary-color;
         border-bottom: solid 1px $accent-color;
       }
     }
@@ -40,14 +39,13 @@
         border: solid 3px $accent-color;
         border-top-left-radius: 50px;
         border-bottom-right-radius: 50px;
-        background-color: $secondary-color;
+        background-color: $dark-color;
         padding: 25px;
         box-shadow: 5px 5px 15px 5px rgba($accent-color, 0.3);
 
         &__title {
           text-align: center;
-          font-family: "blackknightflfregular";
-          color: $accent-color;
+          font-family: $titles;
         }
 
         &__text {

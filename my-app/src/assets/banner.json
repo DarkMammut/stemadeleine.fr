@@ -4,7 +4,7 @@
     "location": "/",
     "type": "large",
     "url": "/logo.png",
-    "title": "Les amis de Sainte Madeleine de la Jarrie",
+    "title": "Les Amis de Sainte Madeleine de La Jarrie",
     "subhead": "Eglise de la Jarrie"
   },
 
@@ -21,7 +21,7 @@
     "id": "b-history",
     "location": "/eglise/histoire",
     "type": "small",
-    "url": "",
+    "url": "/b-history.jpg",
     "title": "L'histoire de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
@@ -86,6 +86,15 @@
     "type": "small",
     "url": "",
     "title": "Nous contacter",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-404",
+    "location": "/404",
+    "type": "none",
+    "url": "",
+    "title": "",
     "subhead": ""
   }
 ]
