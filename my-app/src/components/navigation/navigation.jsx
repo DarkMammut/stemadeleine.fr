@@ -23,7 +23,9 @@ function Navigation() {
         <ul className="navigation__menu__nav">
           {LINKS.map((link) => (
             <li key={link.id} className="navigation__menu__nav__link">
-              <Link to={link.path} className={link.sublinks.length > 0 && "with-submenu"}>
+              <Link
+                to={link.path}
+                className={link.sublinks.length > 0 ? "with-submenu" : "no-submenu"}>
                 <span>
                   <div>{link.name}</div>
                 </span>

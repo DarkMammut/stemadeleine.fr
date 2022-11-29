@@ -7,23 +7,32 @@ $special: "Abril Fatface", serif;
 $body: "Lato", sans-serif;
 
 .page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: - $desktop-header-radius;
+  width: 100%;
+  height: 100%;
   background: $primary-color;
 
   &__top {
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
+    margin-top: $desktop-header-radius;
+    padding: $desktop-header-radius;
     justify-content: center;
     align-items: center;
     height: 300px;
 
-
     &__title {
       font-family: $special;
+      font-size: 150px;
     }
 
     &__subhead {
       font-family: $special;
+      font-size: 50px;
     }
   }
 
@@ -43,10 +52,12 @@ $body: "Lato", sans-serif;
       border-radius: 50% 50% 0 0;
       background: $color-white;
       border-bottom: none;
-      animation: float 2s ease-out infinite;
+      transform: translatey(0px);
+      animation: floating 4s ease-in-out infinite;
 
       &__hands {
-        &--left, &--right {
+        &--left,
+        &--right {
           position: absolute;
           top: 50%;
           height: 20px;
@@ -74,20 +85,22 @@ $body: "Lato", sans-serif;
         top: 20%;
       }
 
-      &__eyes{
-        &--right, &--left {
-        position: absolute;
-        background: $dark-color;
-        width: 13px;
-        height: 13px;
-        border-radius: 50%;
-        top: 40%;
+      &__eyes {
+        &--right,
+        &--left {
+          position: absolute;
+          background: $dark-color;
+          width: 13px;
+          height: 13px;
+          border-radius: 50%;
+          top: 40%;
+          animation: scale 4s ease-in-out infinite;
         }
 
         &--left {
           left: 25%;
         }
-  
+
         &--right {
           right: 25%;
         }
@@ -106,7 +119,10 @@ $body: "Lato", sans-serif;
       }
 
       &__feet {
-        &--one, &--two, &--three, &--four {
+        &--one,
+        &--two,
+        &--three,
+        &--four {
           position: absolute;
           top: 50%;
           height: 30%;
@@ -134,14 +150,13 @@ $body: "Lato", sans-serif;
           border-bottom-right-radius: 50%;
           border-bottom-left-radius: 50%;
         }
-        
+
         &--four {
           top: 120%;
           right: 0;
           border-bottom-right-radius: 50%;
           border-bottom-left-radius: 50%;
         }
-
       }
     }
 
@@ -153,38 +168,19 @@ $body: "Lato", sans-serif;
       left: 35%;
       top: 80%;
       border-radius: 50%;
-      animation: scale 2s infinite;
+      animation: scale 4s infinite;
     }
   }
 
   &__bottom {
     margin-top: 10px;
 
-    &__title {
-      font-family: $special;
-      color: $color-white;
-      text-align: center;
-      font-size: 9em;
-      margin: 0;
-      text-shadow: -1px 0 $primary-color, 0 1px $primary-color, 1px 0 $primary-color, 0 -1px $primary-color;
-    }
-
-    &__subhead {
-      font-family: $body;
-      font-size: 2em;
-      text-transform: uppercase;
-      text-align: center;
-      color: $primary-color;
-      margin-top: -20px;
-      font-weight: 900;
-    }
-
     &__text {
       text-align: center;
       font-family: $body;
-      color: $dark-color;
-      font-size: 0.6em;
-      margin-top: -20px;
+      color: $color-white;
+      font-size: 15px;
+      margin-top: -10px;
       text-transform: uppercase;
     }
 
@@ -192,7 +188,7 @@ $body: "Lato", sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 10px;
+      margin-top: 20px;
       color: $accent-color;
     }
   }
@@ -210,8 +206,14 @@ $body: "Lato", sans-serif;
   }
 }
 
-@keyframes float {
-  50% {
-    transform: translateY(15px);
-  }
+@keyframes floating {
+	0% {
+		transform: translatey(0px);
+	}
+	50% {
+		transform: translatey(-30px);
+	}
+	100% {
+		transform: translatey(0px);
+	}
 }

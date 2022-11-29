@@ -1,0 +1,63 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+.history {
+  &__article {
+    display: flex;
+    justify-content: space-between;
+
+    &__textarea {
+      display: flex;
+      flex-direction: column;
+      width: 60%;
+
+      &__title {
+        text-align: center;
+        font-family: $titles;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: solid 1px $accent-color;
+      }
+
+      &__paragraph {
+        text-align: justify;
+        padding: 5px;
+      }
+    }
+
+    &__image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 30%;
+
+      &__container {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+
+        &__background {
+          height: 200px;
+          width: 300px;
+          box-shadow: 10px 10px 30px -4px rgba(0, 0, 0, 0.75);
+          border: solid 1px $color-black;
+          border-radius: 5px;
+          background: {
+            position: center;
+            size: cover;
+            repeat: no-repeat;
+          }
+        }
+      }
+    }
+
+    &:nth-child(odd) {
+      flex-direction: row;
+    }
+
+    &:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+  }
+}

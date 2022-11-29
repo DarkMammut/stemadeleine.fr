@@ -5,6 +5,12 @@ import "./banner.scss";
 
 function Banner() {
   const location = useLocation();
+  const index = bannerArray.findIndex((object) => object.location === location.pathname);
+
+  if (index === -1) {
+    return null;
+  }
+
   const found = bannerArray.find((banner) => banner.location === location.pathname);
   const url = process.env.PUBLIC_URL + found.url;
   const style = { backgroundImage: `url(${url})` };
@@ -32,7 +38,7 @@ function Banner() {
         </div>
       );
 
-    default:
+    case "small":
       return (
         <div className="banner" style={style}>
           <div className="banner__textarea">
@@ -40,6 +46,9 @@ function Banner() {
           </div>
         </div>
       );
+
+    default:
+      return null;
   }
 }
 

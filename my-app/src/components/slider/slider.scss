@@ -1,114 +1,114 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-.photos {
-  &__container {
-    position: relative;
+.slider {
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  opacity: 0;
+
+  &[data-open="1"] {
+    display: flex;
+    animation: fade ease 1s forwards;
+  }
+
+  &[data-open="0"] {
+    display: none;
+  }
+
+  &__backgroung {
+    position: fixed;
+    background-color: rgba(black, 0.9);
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__shut {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: $desktop-header-radius;
+    height: $desktop-header-radius;
     background-color: transparent;
     border: none;
-    // box-shadow: ;
     cursor: pointer;
+    z-index: 4;
 
-    &__background {
-      width: 100px;
-      height: 60px;
-      background: {
-        position: center;
-        size: cover;
-        repeat: no-repeat;
+    &__line {
+      position: absolute;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background-color: $accent-color;
+      border-radius: 10px;
+      overflow: hidden;
+
+      &:nth-child(1) {
+        top: 30%;
+        transform: translateY(calc($desktop-header-radius / 5)) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        top: 70%;
+        transform: translateY(calc($desktop-header-radius / -5)) rotate(-45deg);
       }
     }
   }
 
-  &__slider {
-    position: fixed;
-    justify-content: center;
-    align-items: center;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color-black, 0.8);
-    z-index: 4;
-
-    &[data-open="1"] {
-      display: flex;
+  &__current {
+    position: relative;
+    width: 1200px;
+    height: 700px;
+    background: {
+      position: center;
+      size: cover;
+      repeat: no-repeat;
     }
 
-    &[data-open="0"] {
-      display: none;
+    &__right {
+      right: 0;
     }
 
-    &__shut {
+    &__left {
+      left: 0;
+    }
+
+    &__right,
+    &__left {
       position: absolute;
       top: 0;
-      right: 0;
-      width: $desktop-header-radius;
-      height: $desktop-header-radius;
-      background-color: transparent;
+      height: 100%;
+      width: 3%;
       border: none;
+      background-color: transparent;
+      opacity: 0.3;
       cursor: pointer;
 
-      &__line {
-        position: absolute;
-        left: 25%;
-        width: 50%;
-        height: 3px;
+      &:hover {
+        width: 5%;
+        opacity: 0.8;
         background-color: $primary-color;
-        border-radius: 10px;
-        overflow: hidden;
-
-        &:nth-child(1) {
-          top: 30%;
-          transform: translateY(calc($desktop-header-radius / 5)) rotate(45deg);
-        }
-
-        &:nth-child(2) {
-          top: 70%;
-          transform: translateY(calc($desktop-header-radius / -5)) rotate(-45deg);
-        }
       }
     }
 
-    &__current {
-      position: relative;
-      width: 1200px;
-      height: 700px;
-      background: {
-        position: center;
-        size: cover;
-        repeat: no-repeat;
-      }
-
-      &__right {
-        right: 0;
-      }
-
-      &__left {
-        left: 0;
-      }
-
-      &__right,
-      &__left {
-        position: absolute;
-        top: 0;
-        height: 100%;
-        width: 3%;
-        border: none;
-        background-color: transparent;
-        opacity: 0.3;
-        cursor: pointer;
-
-        &:hover {
-          width: 5%;
-          opacity: 0.6;
-          background-color: $color-black;
-        }
-      }
-
-      & svg {
-        width: 20px;
-      }
+    & svg {
+      width: 20px;
     }
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

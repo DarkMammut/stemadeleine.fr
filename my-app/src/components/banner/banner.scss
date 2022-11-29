@@ -13,14 +13,14 @@
   justify-content: center;
   width: 100%;
   height: 300px;
+  margin-bottom: 50px;
   background: {
     position: center;
     size: cover;
     repeat: no-repeat;
     attachment: fixed;
+    color: rgba($color-black, 0.2);
   }
-  background-color: rgba($color-black, 0.2);
-  margin-bottom: 50px;
 
   &__textarea {
     display: flex;
@@ -62,19 +62,21 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba($color-black, 0.2);
+    background-color: rgba($dark-color, 0.2);
     box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.3);
+    transform: translatey(-25%);
+    opacity: 0;
+    animation: fadein ease 2s forwards;
 
     &__title {
       margin-bottom: 20px;
+      padding-bottom: 20px;
       border-bottom: solid 1px rgba($accent-color, 0.7);
       text-align: center;
-      color: $color-white;
     }
 
     &__subhead {
       text-align: center;
-      color: $color-white;
     }
   }
 
@@ -85,16 +87,19 @@
     align-items: center;
     bottom: 50px;
     border-radius: 50%;
-    border: solid 3px $primary-color;
+    border: solid 3px $color-white;
     height: 50px;
     width: 50px;
     cursor: pointer;
     background-color: transparent;
-    color: $primary-color;
+    transform: translatey(-25%);
+    opacity: 0;
+    animation: fadein ease 2s forwards;
 
     &__chevron {
       height: 100%;
       width: 100%;
+      color: $color-white;
 
       & svg {
         height: 100%;
@@ -121,5 +126,17 @@
   }
   100% {
     transform: translatey(25%);
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translatey(-25%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translatey(0);
   }
 }

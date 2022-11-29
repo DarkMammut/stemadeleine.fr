@@ -14,10 +14,10 @@ function Project() {
           if (article.display === "enable") {
             return (
               <article className="projects__article" key={article.id}>
-                <div className="projects__article__text">
-                  <h2 className="projects__article__text__title">{article.title}</h2>
+                <div className="projects__article__textarea">
+                  <h2 className="projects__article__textarea__title">{article.title}</h2>
                   {article.paragraph.map((ph) => (
-                    <p key={ph.id} className="projects__article__text__paragraph">
+                    <p key={ph.id} className="projects__article__textarea__paragraph">
                       {ph.text}
                     </p>
                   ))}
