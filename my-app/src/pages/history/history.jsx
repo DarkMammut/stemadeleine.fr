@@ -5,15 +5,21 @@ import SLIDES from "../../assets/slides.json";
 import "./history.scss";
 
 function History() {
-  const [open, setOpen] = useState(0);
   const url = process.env.PUBLIC_URL;
   const pictureIndex = 0;
+  const [open, setOpen] = useState(0);
 
   useEffect(() => {
     if (open === 1) {
       setOpen(0);
     }
   }, [open]);
+
+  function handleKeyDown(e) {
+    if (e.key === "space") {
+      setOpen(1);
+    }
+  }
 
   return (
     <main>
@@ -26,10 +32,14 @@ function History() {
             <button
               className="history__article__image__container"
               onClick={() => setOpen(1)}
-              type="button">
-              <div
-                className="history__article__image__container__background"
-                style={{ backgroundImage: `url(${url}${SLIDES.history[pictureIndex]})` }}
+              onKeyDown={handleKeyDown}
+              type="button"
+              tabIndex={0}>
+              <img
+                className="history__article__image__container__picture"
+                src={url + SLIDES.history[pictureIndex].url}
+                alt={SLIDES.history[pictureIndex].alt}
+                title={SLIDES.history[pictureIndex].title}
               />
             </button>
             <ImageSlider slides={SLIDES.history} openslider={open} startindex={pictureIndex} />

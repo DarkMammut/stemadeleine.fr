@@ -4,7 +4,7 @@ import "./slider.scss";
 function ImageSlider({ slides, openslider, startindex }) {
   const url = process.env.PUBLIC_URL;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [shut, setShut] = useState(0);
+  const [appear, setAppear] = useState(0);
   const { length } = slides;
 
   const prevSlide = () => {
@@ -17,23 +17,43 @@ function ImageSlider({ slides, openslider, startindex }) {
 
   useEffect(() => {
     if (openslider === 1) {
-      setShut(1);
+      setAppear(1);
       setCurrentIndex(startindex);
     }
   }, [openslider]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentIndex(currentIndex === length - 1 ? 0 : currentIndex + 1);
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [currentIndex]);
+
   function handleKeyDown(e) {
-    if (e.key === "escape") {
-      setShut(0);
+    switch (e.key) {
+      case "escape":
+        setAppear(0);
+        break;
+
+      case "spaceArrowRight":
+        setCurrentIndex(currentIndex === length - 1 ? 0 : currentIndex + 1);
+        break;
+
+      case "spaceArrowLeft":
+        setCurrentIndex(currentIndex === 0 ? length - 1 : currentIndex - 1);
+        break;
+
+      default:
     }
   }
 
   return (
-    <div className="slider" data-open={shut}>
+    <div className="slider" data-open={appear}>
       <button
         className="slider__shut"
         aria-label="shut"
-        onClick={() => setShut(0)}
+        onClick={() => setAppear(0)}
         onKeyDown={handleKeyDown}
         type="button">
         <div className="slider__shut__line" />
@@ -42,13 +62,37 @@ function ImageSlider({ slides, openslider, startindex }) {
       <button
         className="slider__backgroung"
         aria-label="shut"
-        onClick={() => setShut(0)}
+        onClick={() => setAppear(0)}
         onKeyDown={handleKeyDown}
         type="button"
       />
-      <div
-        className="slider__current"
-        style={{ backgroundImage: `url(${url}${slides[currentIndex]})` }}>
+      <div className="slider__current">
+        {slides.map((slide, index) => (
+          <div
+            className="slider__current__slide"
+            key={slide.id}
+            style={{ marginLeft: index === 0 ? `-${currentIndex * 100}%` : undefined }}>
+            <img
+              className="slider__current__slide__image"
+              src={url + slide.url}
+              title={slide.title}
+              alt={slide.alt}
+            />
+          </div>
+        ))}
+        <div className="slider__current__indicator">
+          {slides.map((slide, index) => (
+            <button
+              className="slider__current__indicator__dot"
+              key={slide.id}
+              aria-label="go to slide"
+              type="button"
+              onClick={() => setCurrentIndex(index)}
+              onKeyDown={handleKeyDown}
+              style={{ opacity: currentIndex === index ? 1 : 0.5 }}
+            />
+          ))}
+        </div>
         <button className="slider__current__left" onClick={prevSlide} type="button">
           <svg viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path

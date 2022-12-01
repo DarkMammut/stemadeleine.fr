@@ -32,22 +32,23 @@
       width: 30%;
 
       &__container {
+        display: flex;
         position: relative;
+        justify-content: center;
+        align-items: center;
         background-color: transparent;
         border: none;
+        height: 200px;
+        width: 300px;
+        box-shadow: 10px 10px 30px -4px rgba(0, 0, 0, 0.75);
+        border: solid 1px $color-black;
+        border-radius: 5px;
+        overflow: hidden;
         cursor: pointer;
 
-        &__background {
-          height: 200px;
-          width: 300px;
-          box-shadow: 10px 10px 30px -4px rgba(0, 0, 0, 0.75);
-          border: solid 1px $color-black;
-          border-radius: 5px;
-          background: {
-            position: center;
-            size: cover;
-            repeat: no-repeat;
-          }
+        &__picture {
+          width: 120%;
+          height: 120%;
         }
       }
     }

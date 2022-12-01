@@ -61,3 +61,20 @@
     }
   }
 }
+
+.carousel {
+  padding-top: 100px;
+
+  &__slide {
+    object-fit: contain;
+    height: 300px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    &__image {
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
