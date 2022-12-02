@@ -66,79 +66,24 @@
     }
   }
 
-  &__current {
+  &__carousel {
     position: relative;
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: hidden;
-    width: 1200px;
+    width: 1024px;
     height: 700px;
 
     &__slide {
-      display: flex;
-      align-items: center;
-      object-fit: contain;
-      width: 100%;
-      height: 100%;
-      overflow-y: hidden;
-      flex-shrink: 0;
-      transition: 750ms all ease-in-out;
-
+      text-align: -webkit-center;
+      
       &__image {
-        width: 100%;
+        height: 700px;
       }
-    }
-
-    &__indicator {
-      display: flex;
-      flex-wrap: nowrap;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-
-      &__dot {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background-color: $color-white;
-        margin: 5px;
-        transition: 750ms all ease-in-out;
-        cursor: pointer;
-      }
-    }
-
-    &__right {
-      right: 0;
-    }
-
-    &__left {
-      left: 0;
-    }
-
-    &__right,
-    &__left {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 3%;
-      border: none;
-      background-color: transparent;
-      opacity: 0.3;
-      cursor: pointer;
-
-      &:hover {
-        width: 5%;
-        opacity: 0.8;
-        background-color: $accent-color;
-      }
-    }
-
-    & svg {
-      width: 20px;
     }
   }
-} 
+}
+
+.slick-track {
+  margin:auto;
+}
 
 @keyframes fade {
   from {

@@ -20,6 +20,7 @@ function Home() {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
+    focusOnSelect: true,
     centerPadding: "60px",
     centerMode: true,
     variableWidth: true,
@@ -103,7 +104,7 @@ function Home() {
             </button>
           ))}
         </Slider>
-        <ImageSlider slides={SLIDES.home} openslider={open} startindex={currentIndex} />
+        <ImageSlider slidesImages={SLIDES.home} openslider={open} startindex={currentIndex} />
       </section>
     </main>
   );

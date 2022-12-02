@@ -42,7 +42,11 @@ function History() {
                 title={SLIDES.history[pictureIndex].title}
               />
             </button>
-            <ImageSlider slides={SLIDES.history} openslider={open} startindex={pictureIndex} />
+            <ImageSlider
+              slidesImages={SLIDES.history}
+              openslider={open}
+              startindex={pictureIndex}
+            />
           </div>
           <div className="history__article__textarea">
             <h2 className="history__article__textarea__title">Titre</h2>
