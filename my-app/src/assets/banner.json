@@ -40,16 +40,16 @@
     "location": "/association",
     "type": "small",
     "url": "",
-    "title": "L'association",
+    "title": "L'ASSOCIATION",
     "subhead": ""
   },
 
   {
     "id": "b-about",
-    "location": "/association/qui-sommes-nous",
+    "location": "/association/nos-realisations",
     "type": "small",
     "url": "",
-    "title": "Qui sommes nous ?",
+    "title": "NOS REALISATIONS",
     "subhead": ""
   },
 
@@ -58,7 +58,7 @@
     "location": "/association/nous-rejoindre",
     "type": "small",
     "url": "",
-    "title": "Nous rejoindre",
+    "title": "NOUS REJOINDRE",
     "subhead": ""
   },
 
@@ -67,7 +67,7 @@
     "location": "/association/don",
     "type": "small",
     "url": "",
-    "title": "Faire un don",
+    "title": "FAIRE UN DON",
     "subhead": ""
   },
 
@@ -76,7 +76,7 @@
     "location": "/projets",
     "type": "small",
     "url": "",
-    "title": "Nos projets",
+    "title": "NOS PROJETS",
     "subhead": ""
   },
 
@@ -85,7 +85,7 @@
     "location": "/contact",
     "type": "small",
     "url": "",
-    "title": "Nous contacter",
+    "title": "NOUS CONTACTER",
     "subhead": ""
   },
 

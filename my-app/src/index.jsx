@@ -28,7 +28,7 @@ root.render(
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/association" element={<Association />} />
-        <Route exact path="/association/qui-sommes-nous" element={<About />} />
+        <Route exact path="/association/nos-realisations" element={<About />} />
         <Route exact path="/association/nous-rejoindre" element={<Join />} />
         <Route exact path="/association/don" element={<Donation />} />
         <Route exact path="/projets" element={<Project />} />
