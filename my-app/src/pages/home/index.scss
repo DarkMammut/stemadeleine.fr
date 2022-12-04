@@ -5,6 +5,13 @@
 @import "../../sass-utils/variables.scss";
 
 .news {
+  display: flex;
+  flex-direction: column;
+
+  &__title {
+
+  }
+
   &__article {
     display: flex;
     justify-content: space-between;
@@ -12,13 +19,10 @@
     &__textarea {
       display: flex;
       flex-direction: column;
-      width: 60%;
 
       &__title {
         text-align: center;
         font-family: $titles;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
         border-bottom: solid 1px $accent-color;
       }
 
@@ -37,7 +41,7 @@
       &__container {
         display: flex;
         justify-content: center;
-        height: 500px;
+        align-items: center;
 
         & img {
           height: 100%;
@@ -50,14 +54,6 @@
         text-align: center;
         margin-top: 20px;
       }
-    }
-
-    &:nth-child(odd) {
-      flex-direction: row;
-    }
-
-    &:nth-child(even) {
-      flex-direction: row-reverse;
     }
   }
 }
@@ -73,6 +69,127 @@
 
     &__image {
       height: 300px;
+    }
+  }
+}
+
+@include desktop-layout {
+  .news {
+    &__article {
+      justify-content: space-between;
+  
+      &__textarea {
+        width: 60%;
+  
+        &__title {
+          margin-bottom: 30px;
+          padding-bottom: 15px;
+        }
+      }
+  
+      &__image {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 30%;
+  
+        &__container {
+          height: 500px;
+        }
+  
+        & span {
+          font-size: 10px;
+          width: 100%;
+          text-align: center;
+          margin-top: 20px;
+        }
+      }
+  
+      &:nth-child(odd) {
+        flex-direction: row;
+      }
+  
+      &:nth-child(even) {
+        flex-direction: row-reverse;
+      }
+    }
+  }
+  
+  .carousel {
+    padding-top: 100px;
+  
+    &__slide {
+      text-align: -webkit-center;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+  
+      &__image {
+        height: 300px;
+      }
+    }
+  }
+
+}
+
+@include mobile-layout {
+  .news {
+
+    &__title {
+      margin: 20px;
+      text-decoration: underline;
+    }
+  
+
+    &__article {
+      flex-direction: column;
+    
+      &__textarea {
+        width: 100%;
+  
+        &__title {
+          margin-bottom: 30px;
+          padding-bottom: 15px;
+        }
+  
+        &__paragraph {
+          padding: 5px;
+          padding-left: 30px;
+          padding-right: 30px;
+        }
+      }
+  
+      &__image {
+        flex-direction: row;
+        position: relative;
+        width: 100%;
+  
+        &__container {
+          height: 200px;
+        }
+  
+        & span {
+          position: absolute;
+          bottom: -20px;
+          left: 50%;
+          transform: translateX(-50%) ;
+        }
+      }
+    }
+  }
+  
+  .carousel {
+    padding-top: 100px;
+  
+    &__slide {
+      text-align: -webkit-center;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+  
+      &__image {
+        height: 300px;
+      }
     }
   }
 }

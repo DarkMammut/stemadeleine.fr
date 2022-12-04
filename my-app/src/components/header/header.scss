@@ -17,7 +17,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 105px;
     height: $desktop-header-radius;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -31,11 +30,21 @@
 @include desktop-layout {
   .header {
     height: $desktop-header-radius;
+
+    &__logo {
+      width: 105px;
+      height: $mobile-header-radius;
+    }
   }
 }
 
 @include mobile-layout {
   .header {
     height: $mobile-header-radius;
+
+    &__logo {
+      width: 69px;
+      height: $mobile-header-radius;
+    }
   }
 }

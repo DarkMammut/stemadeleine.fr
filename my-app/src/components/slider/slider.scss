@@ -78,6 +78,16 @@
         height: 700px;
       }
     }
+
+    &__dots {
+      opacity: .75;
+      
+       & li button {
+        background-color: $accent-color;
+        color: transparent;
+        border-radius: 50%;
+       }
+    }
   }
 }
 
