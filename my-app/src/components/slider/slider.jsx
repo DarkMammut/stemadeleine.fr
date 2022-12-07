@@ -17,7 +17,8 @@ function ImageSlider({ slidesImages, openslider, startindex }) {
     autoplay: true,
     autoplaySpeed: 15000,
     centerMode: true,
-    centerPadding: 0
+    centerPadding: 0,
+    dotsClass: "slider__carousel__dots"
   };
 
   useEffect(() => {

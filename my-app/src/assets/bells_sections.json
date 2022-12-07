@@ -1,48 +1,119 @@
 [
-    {
-        "id":"S1",
-        "title": "Les cloches dans la tradition",
-        "text": "La tradition chrétienne considère la cloche comme une personne parce qu’elle a une voix et que les termes techniques la décrivent avec un cerveau, une lèvre inférieure, des épaules, sa robe... On lui donne pour cette raison un nom au cours d’une bénédiction solennelle qui s’apparente à un baptême.",
-        "article": [
-            {
-                "id":"S1A1",
-                "title": "Pourquoi sonnent-elles ?",
-                "text": "Elles accompagnent les chrétiens de la naissance à la mort en annonçant les baptêmes, les mariages, les ordinations et les funérailles Selon des codes de sonnerie elles expriment les sentiments d’un peuple qui prie avec les tintement (comme l’angélus), rend grâce avec les volées, pleure avec le glas ou annonce des évènements graves avec le tocsin."
-            }
+  {
+    "id": "S1",
+    "title": "LES CLOCHES DANS LA TRADITION",
+    "text": [
+      {
+        "id": "S1P1",
+        "paragraph": "La tradition chrétienne considère la cloche comme une personne parce qu’elle a une voix et que les termes techniques la décrivent avec un cerveau, une lèvre inférieure, des épaules, sa robe... On lui donne pour cette raison un nom au cours d’une bénédiction solennelle qui s’apparente à un baptême."
+      }
+    ],
+    "images": [],
+    "article": [
+      {
+        "id": "S1A1",
+        "title": "Pourquoi sonnent-elles ?",
+        "text": [
+          {
+            "id": "S1A1P1",
+            "paragraph": "Elles accompagnent les chrétiens de la naissance à la mort en annonçant les baptêmes, les mariages, les ordinations et les funérailles Selon des codes de sonnerie elles expriment les sentiments d’un peuple qui prie avec les tintement (comme l’angélus), rend grâce avec les volées, pleure avec le glas ou annonce des évènements graves avec le tocsin."
+          }
         ]
-    },
-    {
-        "id":"S2",
-        "title": "Nous sommes 4 dans le clocher",
-        "text": "Le son de ma voix est le LA. Je m’appelle Charles-Jean-Baptiste et Louise-Elisabeth. J’ai été bénie en l’an 1764 et donnée à la paroisse par Mercier Dupatit. Sur ma robe l’inscription, surmontée de la couronne comtale, me présente comme « La trompette du Seigneur destinée pour annoncer aux paroissiens de La Jarrie le service divin» Je pèse 600 kg et ma robe mesure 1m de diamètre. En 1946 trois petites sœurs m’ont rejointe. Désormais je ne suis plus toute seule à sonner.",
-        "article": [
-            {
-                "id":"S2A1",
-                "title": "Pourquoi avoir rajouté 3 cloches en 1946 ?",
-                "text": "Les paroissiens de la Jarrie, reconnaissant à la Providence de les avoir épargnés au cours de la seconde guerre mondiale et lors de bombardements de la poche de la Rochelle du 2 mai 1945, ont doté leur vieux clocher de trois nouvelles cloches. Le son de leur voix a été choisi pour qu’elles sonnent toutes les quatre harmonieusement."
-            }
+      }
+    ]
+  },
+  {
+    "id": "S2",
+    "title": "NOUS SOMMES 4 DANS LE CLOCHER",
+    "text": [
+      {
+        "id": "S2P1",
+        "paragraph": "Le son de ma voix est le LA. Je m’appelle Charles-Jean-Baptiste et Louise-Elisabeth. J’ai été bénie en l’an 1764 et donnée à la paroisse par Mercier Dupatit. Sur ma robe l’inscription, surmontée de la couronne comtale, me présente comme « La trompette du Seigneur destinée pour annoncer aux paroissiens de La Jarrie le service divin» Je pèse 600 kg et ma robe mesure 1m de diamètre. En 1946 trois petites sœurs m’ont rejointe. Désormais je ne suis plus toute seule à sonner."
+      }
+    ],
+    "images": [],
+    "article": [
+      {
+        "id": "S2A1",
+        "title": "Pourquoi avoir rajouté 3 cloches en 1946 ?",
+        "text": [
+          {
+            "id": "S2A1P1",
+            "paragraph": "Les paroissiens de la Jarrie, reconnaissant à la Providence de les avoir épargnés au cours de la seconde guerre mondiale et lors de bombardements de la poche de la Rochelle du 2 mai 1945, ont doté leur vieux clocher de trois nouvelles cloches. Le son de leur voix a été choisi pour qu’elles sonnent toutes les quatre harmonieusement."
+          }
         ]
-    },
-    {
-        "id":"S3",
-        "title": "À chaque voix son intention",
-        "text": "",
-        "article": [
-            {
-                "id":"S3A1",
-                "title": "La joie du retour des prisonniers",
-                "text": "La cloche de la joie du retour des prisonniers. « Je remercie le Seigneur qui a rendu nos prisonniers sains et saufs dans leurs familles.» Mon parrrain et ma marraine étaient Jean et Louise Paille.Je pèse 240 kg et le son de ma voix est le DO."
-            },
-            {
-                "id":"S3A2",
-                "title": "Le souvenir des morts",
-                "text": "La cloche du souvenir des morts « Je pleure les enfants de la Jarrie». Mes parrains étaient Joseph et Marie David."
-            },
-            {
-                "id":"S3A3",
-                "title": "La reconnaissance",
-                "text": "La cloche de la reconnaissance. J’ai été béniee le 11 août 1946 avec pour parrain et marraine Raymond et Marie Mouix. Je porte sur ma robe l’inscription «je remercie Dieu d’avoir protégé la Jarrie»"
-            }
+      }
+    ]
+  },
+  {
+    "id": "S3",
+    "title": "ALLIANCE DU FEU ET DE LA TERRE",
+    "text": [
+      {
+        "id": "S3P1",
+        "paragraph": "La cloche est sans doute l’instrument de musique le plus ancien et remonterait au 3° millénaire avant Jésus-Christ."
+      },
+      {
+        "id": "S3P2",
+        "paragraph": "Elles sont obtenues par l’alliance du feu et de la terre et, si à l’origine, elles n’étaient faites que d’une feuille de cuivre ou de fer martelée elles sont à présent en bronze et fondues dans des moules."
+      },
+      {
+        "id": "S3P3",
+        "paragraph": "La Rome antique les utilise comme instrument de communication des foules et ce n’est que plus tard – au IV siècle - qu’elles apparaîtront dans les monastères puis au VII siècle dans le clocher des églises."
+      }
+    ],
+    "images": [
+      {
+        "id": "S3I1",
+        "url": "/bells/photo-1.jpg",
+        "title": "enofifie",
+        "alt": "enfiqsn"
+      },
+      {
+        "id": "S3I2",
+        "url": "/bells/photo-2.jpg",
+        "title": "enofifie",
+        "alt": "enfiqsn"
+      }
+    ],
+    "article": []
+  },
+  {
+    "id": "S4",
+    "title": "A CHAQUE VOIX SON INTENTION",
+    "text": [],
+    "images": [],
+    "article": [
+      {
+        "id": "S4A1",
+        "title": "La joie du retour des prisonniers",
+        "text": [
+          {
+            "id": "S4A1P1",
+            "paragraph": "La cloche de la joie du retour des prisonniers. « Je remercie le Seigneur qui a rendu nos prisonniers sains et saufs dans leurs familles.» Mon parrrain et ma marraine étaient Jean et Louise Paille.Je pèse 240 kg et le son de ma voix est le DO."
+          }
         ]
-    }
+      },
+      {
+        "id": "S4A2",
+        "title": "Le souvenir des morts",
+        "text": [
+          {
+            "id": "S4A2P1",
+            "paragraph": "La cloche du souvenir des morts « Je pleure les enfants de la Jarrie». Mes parrains étaient Joseph et Marie David."
+          }
+        ]
+      },
+      {
+        "id": "S4A3",
+        "title": "La reconnaissance",
+        "text": [
+          {
+            "id": "S4A3P1",
+            "paragraph": "La cloche de la reconnaissance. J’ai été béniee le 11 août 1946 avec pour parrain et marraine Raymond et Marie Mouix. Je porte sur ma robe l’inscription «je remercie Dieu d’avoir protégé la Jarrie»"
+          }
+        ]
+      }
+    ]
+  }
 ]

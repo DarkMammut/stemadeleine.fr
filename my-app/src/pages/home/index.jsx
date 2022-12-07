@@ -18,14 +18,42 @@ function Home() {
     lazyLoad: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     focusOnSelect: true,
     centerPadding: "60px",
     centerMode: true,
     variableWidth: true,
     autoplay: true,
-    autoplaySpeed: 1500
+    autoplaySpeed: 1500,
+    responsive: [
+      {
+        breakpoint: 1224,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 992,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+      // You can unslick at a given breakpoint now by adding:
+      // settings: "unslick"
+      // instead of a settings object
+    ]
   };
 
   useEffect(() => {
