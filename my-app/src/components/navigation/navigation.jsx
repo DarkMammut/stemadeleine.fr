@@ -25,7 +25,8 @@ function Navigation() {
             <li key={link.id} className="navigation__menu__nav__link">
               <Link
                 to={link.path}
-                className={link.sublinks.length > 0 ? "with-submenu" : "no-submenu"}>
+                className={link.sublinks.length > 0 ? "with-submenu" : "no-submenu"}
+                onClick={() => setToggle(0)}>
                 <span>
                   <div>{link.name}</div>
                 </span>
@@ -35,7 +36,7 @@ function Navigation() {
                 <ul className="navigation__menu__nav__link__submenu">
                   {link.sublinks.map((sublink) => (
                     <li key={sublink.id} className="navigation__menu__nav__link__submenu__link">
-                      <Link to={link.path + sublink.path}>
+                      <Link to={link.path + sublink.path} onClick={() => setToggle(0)}>
                         <span>
                           <div>{sublink.name}</div>
                         </span>

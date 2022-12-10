@@ -1,6 +1,17 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .slider {
   position: fixed;
   justify-content: center;
@@ -73,34 +84,35 @@
 
     &__slide {
       text-align: -webkit-center;
-      
+
       &__image {
         height: 700px;
       }
     }
 
     &__dots {
-      opacity: .75;
-      
-       & li button {
-        background-color: $accent-color;
-        color: transparent;
-        border-radius: 50%;
-       }
+      position: absolute;
+      bottom: -25px;
+      display: block;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      text-align: center;
+
+      & li {
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin: 0 5px;
+        padding: 0;
+        cursor: pointer;
+      }
     }
   }
 }
 
 .slick-track {
-  margin:auto;
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  margin: auto;
 }

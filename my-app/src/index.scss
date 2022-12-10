@@ -1,6 +1,6 @@
 @import "./sass-utils/mixins.scss";
 @import "./sass-utils/variables.scss";
-@import url('https://fonts.googleapis.com/css2?family=Fjord+One&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fjord+One&display=swap");
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
@@ -138,10 +138,20 @@ table {
   border-spacing: 0;
 }
 
-@include desktop-layout {
-
+@include large-desktop-layout {
   main {
     width: 1224px;
+  }
+}
+
+@include small-desktop-layout {
+  main {
+    width: 100%;
+  }
+}
+
+@include desktop-layout {
+  main {
     margin-top: $desktop-header-radius + 1px;
     margin-left: auto;
     margin-right: auto;

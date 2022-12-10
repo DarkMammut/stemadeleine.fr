@@ -132,6 +132,33 @@
 
 }
 
+@include small-desktop-layout {
+  .news {
+    &__title {
+      margin-left: 50px;
+    }
+
+    &__article {
+      justify-content: space-around;
+    }
+  }
+  
+  .carousel {
+    padding-top: 100px;
+  
+    &__slide {
+      text-align: -webkit-center;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+  
+      &__image {
+        height: 300px;
+      }
+    }
+  }
+
+}
 @include mobile-layout {
   .news {
 

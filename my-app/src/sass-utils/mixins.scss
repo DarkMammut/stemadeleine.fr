@@ -10,14 +10,20 @@
     }
   }
 
-  @mixin small-desktops-layout {
+  @mixin small-desktop-layout {
     @media only screen and (min-width: 992px) and (max-width: 1224px) {
       @content;
     }
   }
   
-  @mixin desktop-layout {
+  @mixin large-desktop-layout {
     @media only screen and (min-width: 1224px) {
+      @content;
+    }
+  }
+
+  @mixin desktop-layout {
+    @media only screen and (min-width: 992px) {
       @content;
     }
   }

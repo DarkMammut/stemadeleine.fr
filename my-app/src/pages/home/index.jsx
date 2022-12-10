@@ -18,7 +18,7 @@ function Home() {
     lazyLoad: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: 3,
     slidesToScroll: 1,
     focusOnSelect: true,
     centerPadding: "60px",
@@ -30,24 +30,21 @@ function Home() {
       {
         breakpoint: 1224,
         settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          infinite: true,
-          dots: true
+          slidesToShow: 3
         }
       },
       {
         breakpoint: 992,
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1
+          slidesToShow: 2
         }
       },
       {
         breakpoint: 768,
         settings: {
           slidesToShow: 1,
-          slidesToScroll: 1
+          fade: true,
+          centerPadding: 0
         }
       }
       // You can unslick at a given breakpoint now by adding:
