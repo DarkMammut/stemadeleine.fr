@@ -3,8 +3,8 @@ import "./index.scss";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import Home from "./pages/home";
-import Association from "./pages/association/association";
-import About from "./pages/about/about";
+import Association from "./pages/about/about";
+import Realisation from "./pages/realisation/realisation";
 import Join from "./pages/join/join";
 import Donation from "./pages/donation/donation";
 import Project from "./pages/project/project";
@@ -28,7 +28,7 @@ root.render(
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/association" element={<Association />} />
-        <Route exact path="/association/nos-realisations" element={<About />} />
+        <Route exact path="/association/nos-realisations" element={<Realisation />} />
         <Route exact path="/association/nous-rejoindre" element={<Join />} />
         <Route exact path="/association/don" element={<Donation />} />
         <Route exact path="/projets" element={<Project />} />
