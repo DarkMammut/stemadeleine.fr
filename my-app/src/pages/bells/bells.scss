@@ -10,11 +10,10 @@
     width: 100%;
   }
 }
-.section {
-  &:last-child {
+#Bells-S4 {
     flex-direction: column;
 
-    .bells__section {
+    .section {
       &__textarea {
         width: 100%;
       }
@@ -28,4 +27,4 @@
       }
     }
   }
-}
+

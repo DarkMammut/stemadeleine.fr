@@ -5,7 +5,7 @@ function Section({ Sections }) {
   const url = process.env.PUBLIC_URL;
 
   return Sections.map((section) => (
-    <section key={section.id} className="section">
+    <section key={section.id} className="section" id={section.id}>
       <div className="section__textarea">
         <h2 className="section__textarea__title">{section.title}</h2>
         <div className="section__textarea__text">
