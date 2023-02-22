@@ -6,7 +6,9 @@ function Section({ Sections }) {
 
   return Sections.map((section) => (
     <section key={section.id} className="section" id={section.id}>
-      <div className="section__textarea">
+      <div
+        className="section__textarea"
+        style={{ width: section.images.length > 0 || section.article.length > 0 ? "50%" : "100%" }}>
         <h2 className="section__textarea__title">{section.title}</h2>
         <div className="section__textarea__text">
           {section.text.map((sectionText) => (

@@ -49,26 +49,42 @@ function History() {
             />
           </div>
           <div className="history__article__textarea">
-            <h2 className="history__article__textarea__title">Titre</h2>
+            <h2 className="history__article__textarea__title">
+              BULLETIN RELIGIEUX DU DIOCESE DE LA ROCHELLE SAINTES
+            </h2>
+            <h3>samedi 30 octobre 1869</h3>
+            <h4>6° année</h4>
+            <h5>Extrait.</h5>
             <p className="history__article__textarea__paragraph">
-              Lorem ipsum dolor sit amet. Ut libero alias sit error nulla et dicta dolore. Aut harum
-              consequatur ea quos galisum est delectus dolores et facilis culpa sit quia enim vel
-              ducimus voluptatem et temporibus nesciunt. Qui iste laboriosam ex amet provident ut
-              quia officia et ducimus veniam in eligendi debitis non odio voluptatem ut natus
-              explicabo. Quo repudiandae quis et architecto distinctio aut dolor consequatur non
-              nihil internos et quas corrupti. Aut asperiores cumque cum vero unde sit impedit
-              eligendi vel doloribus nihil. Qui aliquam magni ea suscipit corporis aut autem quidem!
-              A dignissimos excepturi aut aliquid placeat sed explicabo facilis vel ipsa aliquam qui
-              quibusdam galisum ut culpa dolores? Eos voluptas voluptatem est magni repellat 33
-              autem dolores 33 temporibus placeat ut deserunt omnis qui fuga commodi a quisquam
-              commodi. Nam nisi asperiores id consectetur possimus aut debitis autem ea eius sint
-              est amet sint ut autem nobis ut officia ipsum? Id voluptas consequuntur ut tenetur
-              temporibus rem adipisci nostrum sed voluptas sint vel sapiente nulla aut beatae
-              voluptate qui enim voluptas. Non nihil explicabo et consequatur sunt eos modi quae. Et
-              velit natus est recusandae minus in saepe voluptas. Non error aliquam vel illum
-              pariatur non provident ullam vel vitae fuga sit neque expedita non voluptatem dolore.
-              At delectus tempora eos autem temporibus qui nulla nihil id consectetur fugit ut vero
-              facere.
+              … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et du
+              concours de ses paroissiens, on a vu s’accomplir une restauration inespérée ;
+              l’intérieur de l’église, jadis si délabré, a pris les proportions et l’élégance d’une
+              nef gothique avec ses deux bas-côtés ; un sanctuaire de même ordre, accompagné de deux
+              chapelles latérales ; a terminé chacune de ces nefs et un délicat autel, marbre et or
+              ; est venu donner à cet ensemble un dernier trait de grâce et de bon goût.
+            </p>
+            <p className="history__article__textarea__paragraph">
+              L’ornementation intérieure de l’édifice laissai encore à désirer, cependant, bien que
+              le genre gothique soit déjà, et par lui-même, une ornementation.
+            </p>
+            <p className="history__article__textarea__paragraph">
+              Le chemin de croix qui a été placé dimanche dernier, ne sera pas la moindre pièce de
+              l’ornementation projetée. Les quatorze tableaux qui me composent, entourés chacun d’un
+              encadrement (néo NDLR) gothique en chêne, découpé à jour, forment autour de l’église
+              une galerie parfaitement harmonisée avec le genre et les proportions de l’édifice.
+              Serons-nous indiscrets en disant que ces gracieux encadrements sont dus au travail
+              habile et patient de M. le curé lui-même.
+            </p>
+            <p className="history__article__textarea__paragraph">
+              La pose du chemin de croix été faite par M. L’abbé Birot, curé de Saint Nicolas,
+              pendant que du haut de la chaire, M. l’abbé Rolland, ancien missionnaire du diocèse,
+              appelait, avec un accent apostolique, l’attention des fidèles sur les grands souvenirs
+              que redit à la foi du chrétien les stations de ce douloureux pèlerinage.
+            </p>
+            <p className="history__article__textarea__paragraph">
+              L’ensemble de la cérémonie était d’un effet émouvant, et, nous en sommes persuadés,
+              cette émotion laissera des traces dans l’âme des fidèles nombreux, présents à la
+              cérémonie ».
             </p>
           </div>
         </article>
