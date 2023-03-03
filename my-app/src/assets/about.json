@@ -18,6 +18,30 @@
       {
         "id": "About-S1P4",
         "paragraph": "Benoît XVI le réaffirme aux Bernardins en avril 2018 : «Ce qui a fondé la culture de l’Europe, la recherche de Dieu et la disponibilité à L’écouter, demeure aujourd’hui encore le fondement de toute culture véritable »."
+      },
+      {
+        "id": "About-S1P5",
+        "paragraph": "Notre association: un désir partagé par des Jarriens de réfléchir au présent de leur église."
+      },
+      {
+        "id": "About-S1P6",
+        "paragraph": "Afin qu'elle retrouve pour son avenir sa place dans le concert de la culture et de l'art."
+      },
+      {
+        "id": "About-S1P7",
+        "paragraph": "Si notre époque contemporaine à l'honorable souci, quasi pétrifié et angoissé, de conserver les églises en les protégeant, c'est bien parce qu'elles représentent un intérêt historique et un témoignage cultuel. Nos églises ont toutes été pendant des siècles le théâtre des arts pour honorer la sainte cène, le lieu de la culture pour servir le culte."
+      },
+      {
+        "id": "About-S1P8",
+        "paragraph": "L’association des Amis de Sainte Madeleine désire s'inscrire dans ce double mouvement, en tout premier lieux de conservation de cet héritage, en lien avec la mairie qui en est propriétaire, mais également dans un même élan comme chantier vivant et jamais refermé d'expression artistique contemporaine de la foi en lien avec la paroisse, dont le curé est l'affectataire."
+      },
+      {
+        "id": "About-S1P9",
+        "paragraph": "Notre église, loin d'être un musée, est avant tout une icône de notre culture avec son bagage national, son patrimoine communal et son histoire locale."
+      },
+      {
+        "id": "About-S1P10",
+        "paragraph": "L’église Sainte Marie-Madeleine de la Jarrie est cet espace commun offert à la vue, à l'ouïe et à l'esprit et, si elle est le lieu consacré au culte par excellence, celui de Dieu, c'est en raison de la foi qui la fonde mais également de sa confiance en l'expression humaine et artistique de cette foi qui fédère une culture, la nôtre."
       }
     ],
     "images": [],
@@ -25,7 +49,7 @@
   },
   {
     "id": "About-S2",
-    "title": "Notre association: un désir partagé par des Jarriens de réfléchir au présent de leur église. ",
+    "title": "Trois principes à retenir.",
     "text": [
       {
         "id": "About-S2P1",
@@ -45,34 +69,6 @@
       },
       {
         "id": "About-S2P5",
-        "paragraph": "L’église Sainte Marie-Madeleine de la Jarrie est cet espace commun offert à la vue, à l'ouïe et à l'esprit et, si elle est le lieu consacré au culte par excellence, celui de Dieu, c'est en raison de la foi qui la fonde mais également de sa confiance en l'expression humaine et artistique de cette foi qui fédère une culture, la nôtre."
-      }
-    ],
-    "images": [],
-    "article": []
-  },
-  {
-    "id": "About-S3",
-    "title": "Notre association: un désir partagé par des Jarriens de réfléchir au présent de leur église. ",
-    "text": [
-      {
-        "id": "About-S3P1",
-        "paragraph": "Afin qu'elle retrouve pour son avenir sa place dans le concert de la culture et de l'art."
-      },
-      {
-        "id": "About-S3P2",
-        "paragraph": "Si notre époque contemporaine à l'honorable souci, quasi pétrifié et angoissé, de conserver les églises en les protégeant, c'est bien parce qu'elles représentent un intérêt historique et un témoignage cultuel. Nos églises ont toutes été pendant des siècles le théâtre des arts pour honorer la sainte cène, le lieu de la culture pour servir le culte."
-      },
-      {
-        "id": "About-S3P3",
-        "paragraph": "L’association des Amis de Sainte Madeleine désire s'inscrire dans ce double mouvement, en tout premier lieux de conservation de cet héritage, en lien avec la mairie qui en est propriétaire, mais également dans un même élan comme chantier vivant et jamais refermé d'expression artistique contemporaine de la foi en lien avec la paroisse, dont le curé est l'affectataire."
-      },
-      {
-        "id": "About-S3P4",
-        "paragraph": "Notre église, loin d'être un musée, est avant tout une icône de notre culture avec son bagage national, son patrimoine communal et son histoire locale."
-      },
-      {
-        "id": "About-S3P5",
         "paragraph": "L’église Sainte Marie-Madeleine de la Jarrie est cet espace commun offert à la vue, à l'ouïe et à l'esprit et, si elle est le lieu consacré au culte par excellence, celui de Dieu, c'est en raison de la foi qui la fonde mais également de sa confiance en l'expression humaine et artistique de cette foi qui fédère une culture, la nôtre."
       }
     ],

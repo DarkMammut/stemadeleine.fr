@@ -10,7 +10,6 @@ function About() {
       <Helmet>
         <title>Qui sommes nous ? | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <p className="about__paragraph">Hello</p>
       <Section Sections={SectionsData} />
     </main>
   );
