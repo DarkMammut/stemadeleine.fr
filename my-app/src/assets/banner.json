@@ -3,7 +3,7 @@
     "id": "b-home",
     "location": "/",
     "type": "large",
-    "url": "/Banner1.jpg",
+    "url": "/banners/Banner-1.jpg",
     "title": "Les Amis de Sainte Madeleine de La Jarrie",
     "subhead": "Eglise de la Jarrie"
   },
@@ -12,7 +12,7 @@
     "id": "b-church",
     "location": "/eglise",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-2.jpeg",
     "title": "L'église de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
@@ -30,7 +30,7 @@
     "id": "b-bells",
     "location": "/eglise/cloches",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-4.jpeg",
     "title": "Les cloches de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
@@ -39,7 +39,7 @@
     "id": "b-association",
     "location": "/association",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-5.jpeg",
     "title": "L'ASSOCIATION",
     "subhead": ""
   },

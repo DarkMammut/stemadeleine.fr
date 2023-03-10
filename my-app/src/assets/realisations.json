@@ -1,0 +1,42 @@
+[
+  {
+    "id": "A1",
+    "display": "enable",
+    "title": "Acquisition du tableau de Sainte Madeleine",
+    "paragraph": [
+      {
+        "id": "A1P1",
+        "text": "L’Association des Amis de Sainte Madeleine de La Jarrie vient d’acquérir cette peinture de Marie Madeleine dans le jardin au pied du Golgotha au matin de Pâque."
+      },
+      {
+        "id": "A1P2",
+        "text": "Au cours des siècles les peintres ont toujours cherché à représenter Marie-Madeleine avec une opulente chevelure blonde et un long manteau pourpre comme une impératrice des désirs. Tout comme elle est représentée par un artiste local, Louis Ernest Boisnard, sur une des toiles dans le chœur de l’église de La Jarrie."
+      },
+      {
+        "id": "A1P3",
+        "text": "Ici, au contraire, cette représentation rompt avec la tradition picturale."
+      },
+      {
+        "id": "A1P4",
+        "text": "Avec ses cheveux foncés, ébouriffés, en bataille, l’artiste, traduit la détresse de  Marie-Madeleine qui a suivi le  Christ jusqu’au pied  de la croix et sa séparation, définitive, croit-elle, avec Lui."
+      },
+      {
+        "id": "A1P5",
+        "text": "Cette huile sur un support en bois usagé, qui donne ce ton naturel en fond de tableau faisant ressortir par ses aspérités l’âpreté de la vie et renvoie à celle de Marie Madeleine, allie couleurs vives et expression artistique de notre temps. C’est l’œuvre d’une femme, Caroline Fleury, à la fois musicienne et peintre, qui a choisi de faire une série de tableaux sur les femmes de la Bible et, pour Marie Madeleine, elle retient ce moment particulier de la parole du Christ, « Femme, pourquoi pleures-tu ? »"
+      },
+      {
+        "id": "A1P6",
+        "text": "Avec le souvenir et l’exemple de Marie-Madeleine, dont le souvenir de sa vie peut aider ceux et celles qui, comme elle le fut elle-même sont en quête d’indicible, Caroline Fleury ne pouvait pas trouver meilleur modèle : le peintre jette un regard perçant sur les êtres et cherche à exprimer l’ineffable."
+      },
+      {
+        "id": "A1P7",
+        "text": "L’histoire de Marie -Madeleine est si surprenante qu’elle pose le problème de la femme moderne. Elle est sans aucun doute une héroïne de notre temps."
+      }
+    ],
+    "image": {
+      "title": "« FEMME, POURQUOI PLEURES-TU ? »",
+      "alt": "Tableau représentant Sainte Madeleine",
+      "url": "/tableau.png"
+    }
+  }
+]

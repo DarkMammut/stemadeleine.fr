@@ -49,10 +49,8 @@ function History() {
             />
           </div>
           <div className="history__article__textarea">
-            <h2 className="history__article__textarea__title">
-              BULLETIN RELIGIEUX DU DIOCESE DE LA ROCHELLE SAINTES
-            </h2>
-            <h3>samedi 30 octobre 1869</h3>
+            <h2 className="history__article__textarea__title">samedi 30 octobre 1869</h2>
+            <h3>BULLETIN RELIGIEUX DU DIOCESE DE LA ROCHELLE SAINTES</h3>
             <h4>6° année</h4>
             <h5>Extrait.</h5>
             <p className="history__article__textarea__paragraph">

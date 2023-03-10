@@ -7,7 +7,7 @@ function Donation() {
       <Helmet>
         <title>FAIRE UN DON | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <div>hello</div>
+      <div>{/* <p></p> */}</div>
     </main>
   );
 }

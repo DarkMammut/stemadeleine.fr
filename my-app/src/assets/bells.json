@@ -8,7 +8,14 @@
         "paragraph": "La tradition chrétienne considère la cloche comme une personne parce qu’elle a une voix et que les termes techniques la décrivent avec un cerveau, une lèvre inférieure, des épaules, sa robe... On lui donne pour cette raison un nom au cours d’une bénédiction solennelle qui s’apparente à un baptême."
       }
     ],
-    "images": [],
+    "images": [
+      {
+        "id": "Bells-S1I1",
+        "url": "/Bells/photo-6.jpeg",
+        "title": "Cloche de du clocher de l'église de Sainte Madeleine de la Jarrie",
+        "alt": "Cloche de du clocher de l'église de Sainte Madeleine de la Jarrie"
+      }
+    ],
     "article": [
       {
         "id": "Bells-S1A1",
@@ -16,7 +23,7 @@
         "text": [
           {
             "id": "Bells-S1A1P1",
-            "paragraph": "Elles accompagnent les chrétiens de la naissance à la mort en annonçant les baptêmes, les mariages, les ordinations et les funérailles Selon des codes de sonnerie elles expriment les sentiments d’un peuple qui prie avec les tintement (comme l’angélus), rend grâce avec les volées, pleure avec le glas ou annonce des évènements graves avec le tocsin."
+            "paragraph": "Elles accompagnent les chrétiens de la naissance à la mort en annonçant les baptêmes, les mariages, les ordinations et les funérailles. Selon des codes de sonnerie elles expriment les sentiments d’un peuple qui prie avec les tintements (comme l’angélus), rend grâce avec les volées, pleure avec le glas ou annonce des évènements graves avec le tocsin."
           }
         ]
       }
@@ -31,7 +38,14 @@
         "paragraph": "Le son de ma voix est le LA. Je m’appelle Charles-Jean-Baptiste et Louise-Elisabeth. J’ai été bénie en l’an 1764 et donnée à la paroisse par Mercier Dupatit. Sur ma robe l’inscription, surmontée de la couronne comtale, me présente comme « La trompette du Seigneur destinée pour annoncer aux paroissiens de La Jarrie le service divin» Je pèse 600 kg et ma robe mesure 1m de diamètre. En 1946 trois petites sœurs m’ont rejointe. Désormais je ne suis plus toute seule à sonner."
       }
     ],
-    "images": [],
+    "images": [
+      {
+        "id": "Bells-S2I1",
+        "url": "/Bells/photo-5.jpeg",
+        "title": "Les cloches de Sainte Madeleine",
+        "alt": "Les cloches de Sainte Madeleine"
+      }
+    ],
     "article": [
       {
         "id": "Bells-S2A1",
@@ -59,7 +73,7 @@
       },
       {
         "id": "Bells-S3P3",
-        "paragraph": "La Rome antique les utilise comme instrument de communication des foules et ce n’est que plus tard – au IV siècle - qu’elles apparaîtront dans les monastères puis au VII siècle dans le clocher des églises."
+        "paragraph": "La Rome antique les utilise comme instrument de communication des foules et ce n’est que plus tard au IV siècle qu’elles apparaîtront dans les monastères puis au VII siècle dans le clocher des églises."
       }
     ],
     "images": [

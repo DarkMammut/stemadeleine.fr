@@ -8,10 +8,14 @@
   height: auto;
   margin-top: 100px;
   justify-content: space-around;
+  background-color: rgb(217, 217, 217);
+  border-radius: 20px;
+  padding: 50px;
 
   &__textarea {
     display: flex;
     flex-direction: column;
+    text-align: justify;
 
     &__title {
       text-align: center;
@@ -26,6 +30,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    width: 40%;
 
     &__image {
       display: flex;
@@ -37,6 +43,7 @@
         display: flex;
         justify-content: center;
         width: 100%;
+        overflow: hidden;
 
         & img {
           width: 100%;
@@ -58,22 +65,18 @@
     &__article {
       display: flex;
       flex-direction: column;
-      border: solid 3px $accent-color;
-      border-top-left-radius: 50px;
-      border-bottom-right-radius: 50px;
-      background-color: $color-black;
       padding: 25px;
-      box-shadow: 5px 5px 15px 5px rgba($accent-color, 0.3);
 
       &__title {
         text-align: center;
         font-family: $titles;
-        color: $color-white;
+        color: $accent-color;
       }
 
       &__text {
         &__paragraph {
-          color: $color-white;
+          text-align: justify;
+          color: $accent-color;
           margin-top: 30px;
           font-size: 15px;
         }
@@ -85,17 +88,14 @@
     flex-direction: row;
 
     .section {
-
       &__images {
-        width: 25%;
-
         &__image {
           width: 100%;
         }
       }
 
       &__articles {
-        width: 25%;
+        width: 100%;
 
         &__article {
           width: 100%;
@@ -108,17 +108,14 @@
     flex-direction: row-reverse;
 
     .section {
-
       &__images {
-        width: 25%;
-
         &__image {
           width: 100%;
         }
       }
 
       &__articles {
-        width: 25%;
+        width: 100%;
 
         &__article {
           width: 100%;

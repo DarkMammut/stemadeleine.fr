@@ -10,7 +10,7 @@ function Church() {
       <Helmet>
         <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <p className="church__paragraph">Hello</p>
+      {/* <p className="church__paragraph"></p> */}
       <Section Sections={SectionsData} />
     </main>
   );
