@@ -1,37 +1,37 @@
 {
     "history": [
         {
-            "id": "h1",
+            "id": "Slide-History-1",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-1.jpg"
         },
         {
-            "id": "h2",
+            "id": "Slide-History-2",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-2.jpg"
         },
         {
-            "id": "h3",
+            "id": "Slide-History-3",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-3.jpg"
         },
         {
-            "id": "h4",
+            "id": "Slide-History-4",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-4.jpg"
         },
         {
-            "id": "h5",
+            "id": "Slide-History-5",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-5.jpg"
         },
         {
-            "id": "h6",
+            "id": "Slide-History-6",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
             "url": "/slides/history/photo-6.jpg"
@@ -40,19 +40,25 @@
 
     "home": [
         {
-            "id": "h1",
+            "id": "Slide-Home-1",
+            "title": "Eglise de La Jarrie",
+            "alt": "Eglise de La Jarrie",
+            "url": "/slides/home/photo-4.jpg"
+        },
+        {
+            "id": "Slide-Home-2",
             "title": "Eglise de La Jarrie",
             "alt": "Eglise de La Jarrie",
             "url": "/slides/home/photo-1.jpg"
         },
         {
-            "id": "h2",
+            "id": "Slide-Home-3",
             "title": "Intérieur",
             "alt": "Intérieur de l'église",
             "url": "/slides/home/photo-2.jpg"
         },
         {
-            "id": "h3",
+            "id": "Slide-Home-4",
             "title": "Vitrail",
             "alt": "Vitrail",
             "url": "/slides/home/photo-3.jpg"

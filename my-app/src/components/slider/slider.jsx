@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./slider.scss";
 
-function ImageSlider({ slidesImages, openslider, startindex }) {
+function ImageSlider({ slidesImages, openSlider, startIndex }) {
   const url = process.env.PUBLIC_URL;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appear, setAppear] = useState(0);
@@ -22,11 +22,11 @@ function ImageSlider({ slidesImages, openslider, startindex }) {
   };
 
   useEffect(() => {
-    if (openslider === 1) {
-      setCurrentIndex(currentIndex + startindex);
+    if (openSlider === 1) {
+      setCurrentIndex(currentIndex + startIndex);
       setAppear(1);
     }
-  }, [openslider]);
+  }, [openSlider]);
 
   function handleKeyDown(e) {
     switch (e.key) {

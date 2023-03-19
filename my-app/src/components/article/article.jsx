@@ -10,24 +10,24 @@ function Article({ Articles }) {
         <article className="article" key={article.id}>
           <div
             className="article__textarea"
-            style={{ width: article.image.length > 0 ? "50%" : "100%" }}>
+            style={{ width: article.images.length > 0 ? "50%" : "100%" }}>
             <h2 className="article__textarea__title">{article.title}</h2>
-            {article.paragraph.map((ph) => (
+            {article.text.map((ph) => (
               <p key={ph.id} className="article__textarea__paragraph">
-                {ph.text}
+                {ph.paragraph}
               </p>
             ))}
           </div>
-          {article.image.length > 0 ? (
-            <div className="article__image">
-              <div className="article__image__container">
-                <img
-                  src={url + article.image.url}
-                  title={article.image.title}
-                  alt={article.image.alt}
-                />
-              </div>
-              <span>{article.image.title}</span>
+          {article.images.length > 0 ? (
+            <div className="article__images">
+              {article.images.map((image) => (
+                <div className="article__images__image" key={image.id}>
+                  <div className="article__images__image__container">
+                    <img src={url + image.url} title={image.title} alt={image.alt} />
+                  </div>
+                  <span>{image.title}</span>
+                </div>
+              ))}
             </div>
           ) : null}
         </article>

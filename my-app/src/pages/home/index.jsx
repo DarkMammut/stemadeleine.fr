@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Slider from "react-slick";
 import ImageSlider from "../../components/slider/slider";
-import NEWS from "../../assets/news.json";
+import Article from "../../components/article/article";
+import ArticleData from "../../assets/news.json";
 import SLIDES from "../../assets/slides.json";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -25,7 +26,7 @@ function Home() {
     centerMode: true,
     variableWidth: true,
     autoplay: true,
-    autoplaySpeed: 1500,
+    autoplaySpeed: 15000,
     responsive: [
       {
         breakpoint: 1224,
@@ -78,33 +79,7 @@ function Home() {
         <h2 id="news" className="news__title">
           Actualités
         </h2>
-        {NEWS.map((article) => {
-          if (article.display === "enable") {
-            return (
-              <article className="news__article" key={article.id}>
-                <div className="news__article__textarea">
-                  <h3 className="news__article__textarea__title">{article.title}</h3>
-                  {article.paragraph.map((ph) => (
-                    <p key={ph.id} className="news__article__textarea__paragraph">
-                      {ph.text}
-                    </p>
-                  ))}
-                </div>
-                <div className="news__article__image">
-                  <div className="news__article__image__container">
-                    <img
-                      src={process.env.PUBLIC_URL + article.image.url}
-                      title={article.image.title}
-                      alt={article.image.alt}
-                    />
-                  </div>
-                  <span>{article.image.title}</span>
-                </div>
-              </article>
-            );
-          }
-          return null;
-        })}
+        <Article Articles={ArticleData} />
       </section>
 
       <section className="carousel">
@@ -129,7 +104,7 @@ function Home() {
             </button>
           ))}
         </Slider>
-        <ImageSlider slidesImages={SLIDES.home} openslider={open} startindex={currentIndex} />
+        <ImageSlider slidesImages={SLIDES.home} openSlider={open} startIndex={currentIndex} />
       </section>
     </main>
   );
