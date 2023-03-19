@@ -24,7 +24,7 @@ function Banner() {
               <h1 className="l-banner__textarea__title">{found.title}</h1>
               <span className="l-banner__textarea__subhead">{found.subhead}</span>
             </div>
-            <Link className="l-banner__down" to="#news">
+            <Link className="l-banner__down" to="#objectives">
               <div className="l-banner__down__chevron">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path

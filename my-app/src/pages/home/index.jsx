@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import Slider from "react-slick";
 import ImageSlider from "../../components/slider/slider";
-import Article from "../../components/article/article";
-import ArticleData from "../../assets/news.json";
 import SLIDES from "../../assets/slides.json";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -75,13 +73,14 @@ function Home() {
       <Helmet>
         <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <section className="news">
-        <h2 id="news" className="news__title">
-          Actualités
-        </h2>
-        <Article Articles={ArticleData} />
+      <section>
+        <p>
+          l’association « Les Amis de Sainte Madeleine de La jarrie» a été créée (2022), notamment
+          pour défendre le patrimoine de la paroisse de La Jarrie, veiller à son entretien notamment
+          avec la Mairie, de faire connaitre au public l’histoire de ce monument et et participer au
+          développement, au rayonnement et à la rénovation de la paroisse.
+        </p>
       </section>
-
       <section className="carousel">
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <Slider {...settings}>
@@ -105,6 +104,21 @@ function Home() {
           ))}
         </Slider>
         <ImageSlider slidesImages={SLIDES.home} openSlider={open} startIndex={currentIndex} />
+      </section>
+      <section>
+        <p>
+          Cette association a pour objectif d’être un outil au service de l’église et de la commune
+          pour mener à bien des travaux de restauration du mobilier et de protection du patrimoine.
+        </p>
+
+        <p>
+          Tous ces projets ne peuvent se faire que grâce au soutien de la commune de La Jarrie et
+          avec l’accord du Curé de la paroisse. Cette association travaille en effet en étroite
+          collaboration avec ce dernier qui doit approuver tous les projets d’action de
+          l’association, et avec la Mairie et notamment la responsable de la Culture.
+        </p>
+
+        <p>L’association compte 29 adhérents</p>
       </section>
     </main>
   );

@@ -45,10 +45,10 @@
   },
 
   {
-    "id": "b-about",
+    "id": "b-realisations",
     "location": "/association/nos-realisations",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-6.jpg",
     "title": "NOS REALISATIONS",
     "subhead": ""
   },

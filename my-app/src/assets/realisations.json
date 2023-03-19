@@ -2,7 +2,7 @@
   {
     "id": "A1",
     "display": "enable",
-    "title": "Acquisition du tableau de Sainte Madeleine",
+    "title": "Tableau de Sainte Madeleine",
     "text": [
       {
         "id": "A1P1",
@@ -39,6 +39,56 @@
         "title": "« FEMME, POURQUOI PLEURES-TU ? »",
         "alt": "Tableau représentant Sainte Madeleine",
         "url": "/tableau.png"
+      }
+    ]
+  },
+  {
+    "id": "A2",
+    "display": "enable",
+    "title": "Quatre kakémonos",
+    "text": [
+      {
+        "id": "A2P1",
+        "paragraph": "Quatre kakémonos ont pris place depuis novembre 2022 dans la nef."
+      },
+      {
+        "id": "A2P2",
+        "paragraph": "Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès."
+      }
+    ],
+    "images": [
+      {
+        "id": "A2I1",
+        "title": "Les quatres Kakémonos",
+        "alt": "Photo des kakémonos",
+        "url": "/kakemonos.jpg"
+      }
+    ]
+  },
+  {
+    "id": "A3",
+    "display": "enable",
+    "title": "Le bénitier",
+    "text": [
+      {
+        "id": "A3P1",
+        "paragraph": "La dîme-bénitier reposant sur une colonnette en bois qui n'assurait pas la stabilité de la pierre sculptée du XVe siècle et repertoriée à l'inventaire des biens mobiliers de l'église communale."
+      },
+      {
+        "id": "A3P2",
+        "paragraph": "Mise à l'écart par mesure de sécurité. cette dîme à usage de bénitier va recevoir un pied-support en pierre de tuffeau et une assise de forme pentagonale ornée de feuilles d'olivier."
+      },
+      {
+        "id": "A3P3",
+        "paragraph": "La commune assure la prise en charge de cette rénovation."
+      }
+    ],
+    "images": [
+      {
+        "id": "A3I1",
+        "title": "Le bénitier",
+        "alt": "Photo du bénitier",
+        "url": "/benitier.jpg"
       }
     ]
   }
