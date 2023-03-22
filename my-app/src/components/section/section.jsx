@@ -1,4 +1,5 @@
 import React from "react";
+import Article from "../article/article";
 import "./section.scss";
 
 function Section({ Sections }) {
@@ -18,24 +19,9 @@ function Section({ Sections }) {
               </p>
             ))}
           </div>
-          {section.article.length > 0 ? (
-            <div className="section__articles">
-              {section.article.map((art) => (
-                <article key={art.id} className="section__articles__article">
-                  <h3 className="section__articles__article__title">{art.title}</h3>
-                  <div className="section__articles__article__text">
-                    {art.text.map((articleText) => (
-                      <p
-                        className="section__articles__article__text__paragraph"
-                        key={articleText.id}>
-                        {articleText.paragraph}
-                      </p>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : null}
+          <div className="section__articles">
+            {section.article.length > 0 ? <Article Articles={section.article} /> : null}
+          </div>
         </div>
         {section.images.length > 0 ? (
           <div className="section__images">

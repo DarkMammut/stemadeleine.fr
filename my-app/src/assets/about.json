@@ -5,7 +5,7 @@
     "text": [
       {
         "id": "About-S1P1",
-        "paragraph": "A n’en pas douter l’église n'est pas un bâtiment comme les autres. C'est le lieu, tout comme les cathédrales ou nos églises où se manifeste l’art contemporain avec le Street Art ou encore la maîtrise d’ouvrage dans l’art architectural contemporain et les nouvelles cathédrales."
+        "paragraph": "A n’en pas douter l’église de la Jarrie n'est pas un bâtiment comme les autres. C'est le lieu, tout comme les cathédrales ou nos églises où se manifeste l’art contemporain par le Street Art ou encore la maîtrise d’ouvrage dans l’architecture contemporaine des nouvelles cathédrales."
       },
       {
         "id": "About-S1P2",
@@ -30,10 +30,6 @@
       {
         "id": "About-S1P7",
         "paragraph": "Notre église, loin d'être un musée, est avant tout une icône de notre culture avec son bagage national, son patrimoine communal et son histoire locale."
-      },
-      {
-        "id": "About-S1P8",
-        "paragraph": "L’église Sainte Marie-Madeleine de la Jarrie est cet espace commun offert à la vue, à l'ouïe et à l'esprit et, si elle est le lieu consacré au culte par excellence, celui de Dieu, c'est en raison de la foi qui la fonde mais également de sa confiance en l'expression humaine et artistique de cette foi qui fédère une culture, la nôtre."
       }
     ],
     "images": [      {
@@ -51,6 +47,7 @@
     "images": [],
     "article": [{
       "id": "About-S2A1",
+      "display": "enable",
       "title": "Principe artistique",
       "text": [
         {
@@ -61,10 +58,12 @@
           "id": "Bells-S2A1P2",
           "paragraph": "Mais également une volonté d’assurer le passage entre un passé qui ne reviendra pas par définition, et que l’on doit de respecter, et un présent vivant."
         }
-      ]
+      ],
+      "images": []
     },
     {
       "id": "About-S2A2",
+      "display": "enable",
       "title": "Principe architectural",
       "text": [
         {
@@ -75,10 +74,12 @@
           "id": "Bells-S2A2P2",
           "paragraph": "Le fidèle, ou le pénitent, entre par le porche et accède au narthex, sorte d’antichambre. Il s’avance dans la nef, passant progressivement de l’ombre à la lumière. Ce principe ancien n’a rien perdu de son actualité. Il a été repris par l’artiste Amaury Dubois pour l’église de Chatelaillon."
         }
-      ]
+      ],
+      "images": []
     },
     {
       "id": "About-S2A3",
+      "display": "enable",
       "title": "Principes liturgiques",
       "text": [
         {
@@ -93,7 +94,8 @@
           "id": "Bells-S2A3P3",
           "paragraph": "De la nef au chœur : Dans le chœur avec l’autel qui est le lieu central, là où se porte le regard et la prière à la jonction du beau et de la foi. L’autel est unique tout comme l’était la pierre sacrificielle du temple de Jérusalem."
         }
-      ]
+      ],
+      "images": []
     }]
   }
 ]

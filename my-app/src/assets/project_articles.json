@@ -2,8 +2,133 @@
   {
     "id": "A2",
     "display": "enable",
-    "title": "Page en construction",
-    "text": [],
-    "images": []
+    "title": "Un chemin de Croix photographique",
+    "text": [
+      {
+        "id": "A2P1",
+        "paragraph": "L'association se lance dans la réalisation d'un “chemin de Croix photographique“ participant à la mise en valeur de l'église."
+      },
+      {
+        "id": "A2P2",
+        "paragraph": "Il s'agira d'aborder la passion du Christ avec un regard mettant en rapport cet épisode dramatique, rapporté par les évangéliotes et son actualité dans le monde contemporain."
+      },
+      {
+        "id": "A2P3",
+        "paragraph": "Les 14 stations du chemin de Croix seront en noir et blanc en tirage au charbon, grand format et encadrées."
+      },
+      {
+        "id": "A2P4",
+        "paragraph": "Le photographe fait partie des peintres officiels de l'armée."
+      },
+      {
+        "id": "A2P5",
+        "paragraph": "Depuis 2011 il a exposé dans diverses galeries, salons nationaux, rencontres photographiques, les Invalides ou encore le Mémorial Charles de Gaulle et le Salon des Artistes Français."
+      },
+      {
+        "id": "A2P6",
+        "paragraph": "Ce chemin de croix exclusif et unique pour l'église de la Jariie bénéficiera de l'art et de l'enseignement désintéressé de Jean-Dominique Leguay."
+      },
+      {
+        "id": "A2P7",
+        "paragraph": "La réalisation matérielle de l'oeuvre photographique, mise en scène, développement, tirages, l'encadrement et protection sera supportée par l'Association des Amis de Sainte Madeleine de la Jarrie dont les dons reçus et le recours au crowdfunding devra financer la totalité de l'acquisition de l'oeuvre auprès de Photophore-Association, par laquelle Jean-Dominique Leguay, photographe, cherche à développer et aider à la création artistique par la photographie."
+      },
+      {
+        "id": "A2P8",
+        "paragraph": "Cette association aide aussi des oeuvres éducatives."
+      }
+    ],
+    "link": "Lire aussi <Link to=`www.elpadre.fr`>www.elpadre.fr<Link>",
+    "images": [
+      {
+        "id": "A2I1",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I2",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I3",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I4",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I5",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I6",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I7",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I8",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I9",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I10",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I11",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I12",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I13",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I14",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I15",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      }
+    ]
   }
 ]

@@ -7,7 +7,7 @@ function Article({ Articles }) {
   return Articles.map((article) => {
     if (article.display === "enable") {
       return (
-        <article className="article" key={article.id}>
+        <article className="article" id={article.id} key={article.id}>
           <div
             className="article__textarea"
             style={{ width: article.images.length > 0 ? "50%" : "100%" }}>
@@ -21,7 +21,7 @@ function Article({ Articles }) {
           {article.images.length > 0 ? (
             <div className="article__images">
               {article.images.map((image) => (
-                <div className="article__images__image" key={image.id}>
+                <div className="article__images__image" id={image.id} key={image.id}>
                   <div className="article__images__image__container">
                     <img src={url + image.url} title={image.title} alt={image.alt} />
                   </div>

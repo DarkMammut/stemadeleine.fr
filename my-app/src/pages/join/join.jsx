@@ -1,16 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import pdf from "../../assets/join.pdf";
 
 function Join() {
+  const pdf = "/join.pdf";
+  const url = process.env.PUBLIC_URL + pdf;
   return (
     <main>
       <Helmet>
         <title>Nous rejoindre | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div>
-        <Link to={pdf} target="_blank">
+        <Link to={url} target="_blank">
           Fiche d&apos;inscription
         </Link>
       </div>
