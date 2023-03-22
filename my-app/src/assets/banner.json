@@ -12,7 +12,7 @@
     "id": "b-church",
     "location": "/eglise",
     "type": "small",
-    "url": "/banners/Banner-2.jpeg",
+    "url": "/banners/Banner-2.jpg",
     "title": "L'église de Sainte Madeleine de la Jarrie",
     "subhead": ""
   },
@@ -39,7 +39,7 @@
     "id": "b-association",
     "location": "/association",
     "type": "small",
-    "url": "/banners/Banner-5.jpeg",
+    "url": "/banners/Banner-5.jpg",
     "title": "L'ASSOCIATION",
     "subhead": ""
   },
@@ -57,7 +57,7 @@
     "id": "b-join",
     "location": "/association/nous-rejoindre",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-7.jpg",
     "title": "NOUS REJOINDRE",
     "subhead": ""
   },
@@ -66,7 +66,7 @@
     "id": "b-donation",
     "location": "/association/don",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-8.jpg",
     "title": "FAIRE UN DON",
     "subhead": ""
   },
@@ -75,7 +75,7 @@
     "id": "b-projects",
     "location": "/projets",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-9.jpeg",
     "title": "NOS PROJETS",
     "subhead": ""
   },

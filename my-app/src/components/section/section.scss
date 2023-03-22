@@ -71,17 +71,12 @@
       margin-bottom: 0;
       padding: 25px;
 
-      &__title {
-        text-align: center;
-        font-family: $titles;
-        color: $accent-color;
-      }
-
-      &__text {
-        &__paragraph {
-          text-align: justify;
+      &__textarea {
+        &__title {
           color: $accent-color;
-          margin-top: 30px;
+        }
+
+        &__paragraph {
           font-size: 15px;
         }
       }

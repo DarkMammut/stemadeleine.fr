@@ -22,7 +22,7 @@ function History() {
   }
 
   return (
-    <main>
+    <main className="history">
       <Helmet>
         <title>HISTOIRE | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

@@ -11,12 +11,15 @@ function Article({ Articles }) {
           <div
             className="article__textarea"
             style={{ width: article.images.length > 0 ? "50%" : "100%" }}>
-            <h2 className="article__textarea__title">{article.title}</h2>
+            <h3 className="article__textarea__title">{article.title}</h3>
             {article.text.map((ph) => (
               <p key={ph.id} className="article__textarea__paragraph">
                 {ph.paragraph}
               </p>
             ))}
+            {article.link.length > 0 ? (
+              <div dangerouslySetInnerHTML={{ __html: article.link }} />
+            ) : null}
           </div>
           {article.images.length > 0 ? (
             <div className="article__images">

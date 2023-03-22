@@ -1,5 +1,22 @@
 [
   {
+    "id": "A1",
+    "display": "enable",
+    "title": "L'autel tombeau",
+    "text": [
+      {
+        "id": "A1P1",
+        "paragraph": "Un autel tombeau qui a subi des détériorations et des manques est installé dans une des absidioles. Cet autel du 18eme, très probablement vers 1765, a incontestablement été réalisé par des artisans doués comme tend à le prouver sa facture qui tranche avec un mobilier ordinaire d’une église paroissiale."
+      },
+      {
+        "id": "A1P2",
+        "paragraph": "La Sauvegarde de l’art français demande expressément à notre association de déposer notre candidature au Grand Concours du Patrimoine Le Pèlerin 2023 pour la restauration de cet autel. Si ce projet est retenu l’aide financière viendra alléger l’investissement de la Jarrie."
+      }
+    ],
+    "link": "",
+    "images": []
+  },
+  {
     "id": "A2",
     "display": "enable",
     "title": "Un chemin de Croix photographique",
@@ -26,7 +43,7 @@
       },
       {
         "id": "A2P6",
-        "paragraph": "Ce chemin de croix exclusif et unique pour l'église de la Jariie bénéficiera de l'art et de l'enseignement désintéressé de Jean-Dominique Leguay."
+        "paragraph": "Ce chemin de croix exclusif et unique pour l'église de la Jarrie bénéficiera de l'art et de l'enseignement désintéressé de Jean-Dominique Leguay."
       },
       {
         "id": "A2P7",
@@ -37,7 +54,7 @@
         "paragraph": "Cette association aide aussi des oeuvres éducatives."
       }
     ],
-    "link": "Lire aussi <Link to=`www.elpadre.fr`>www.elpadre.fr<Link>",
+    "link": "Lire aussi <a href=https://www.elpadre.fr/>www.elpadre.fr</a>",
     "images": [
       {
         "id": "A2I1",

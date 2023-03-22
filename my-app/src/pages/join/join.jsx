@@ -6,7 +6,7 @@ function Join() {
   const pdf = "/join.pdf";
   const url = process.env.PUBLIC_URL + pdf;
   return (
-    <main>
+    <main className="join">
       <Helmet>
         <title>Nous rejoindre | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

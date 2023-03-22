@@ -32,12 +32,14 @@
         "paragraph": "Notre église, loin d'être un musée, est avant tout une icône de notre culture avec son bagage national, son patrimoine communal et son histoire locale."
       }
     ],
-    "images": [      {
-      "id": "About-S1I1",
-      "url": "/About/photo-1.jpeg",
-      "title": "Cathédrale de Paris",
-      "alt": "Cathédrale de Paris"
-    }],
+    "images": [
+      {
+        "id": "About-S1I1",
+        "url": "/About/photo-1.jpeg",
+        "title": "Cathédrale de Paris",
+        "alt": "Cathédrale de Paris"
+      }
+    ],
     "article": []
   },
   {
@@ -45,57 +47,62 @@
     "title": "Trois principes comme guide d'action.",
     "text": [],
     "images": [],
-    "article": [{
-      "id": "About-S2A1",
-      "display": "enable",
-      "title": "Principe artistique",
-      "text": [
-        {
-          "id": "Bells-S2A1P1",
-          "paragraph": "C’est le souci du beau et de ce qu’il doit être en tout, partout et pour tous et une continuation dans ce qui est reçu."
-        },
-        {
-          "id": "Bells-S2A1P2",
-          "paragraph": "Mais également une volonté d’assurer le passage entre un passé qui ne reviendra pas par définition, et que l’on doit de respecter, et un présent vivant."
-        }
-      ],
-      "images": []
-    },
-    {
-      "id": "About-S2A2",
-      "display": "enable",
-      "title": "Principe architectural",
-      "text": [
-        {
-          "id": "Bells-S2A2P1",
-          "paragraph": "Il repose sur l’usage de la lumière qui est à la fois une composante architecturale et théologique."
-        },
-        {
-          "id": "Bells-S2A2P2",
-          "paragraph": "Le fidèle, ou le pénitent, entre par le porche et accède au narthex, sorte d’antichambre. Il s’avance dans la nef, passant progressivement de l’ombre à la lumière. Ce principe ancien n’a rien perdu de son actualité. Il a été repris par l’artiste Amaury Dubois pour l’église de Chatelaillon."
-        }
-      ],
-      "images": []
-    },
-    {
-      "id": "About-S2A3",
-      "display": "enable",
-      "title": "Principes liturgiques",
-      "text": [
-        {
-          "id": "Bells-S2A3P1",
-          "paragraph": "Du parvis au narthex : Dans le narthex, ou salle du clocher, c’est le « Parvis des Gentils », où se rencontraient Juifs et non-Juifs au temple à Jérusalem, un lieu d’accueil de convivialité et de dialogue mais aussi un lieu de culture."
-        },
-        {
-          "id": "Bells-S2A3P2",
-          "paragraph": "Du narthex à la nef : Dans la nef, qui doit permettre aux croyants comme aux non-croyants de péleriner d’un vitrail à un autre, d’une représentation d’un saint à une œuvre suscitant le recueillement jusqu’ aux étapes d’un chemin de Croix"
-        },
-        {
-          "id": "Bells-S2A3P3",
-          "paragraph": "De la nef au chœur : Dans le chœur avec l’autel qui est le lieu central, là où se porte le regard et la prière à la jonction du beau et de la foi. L’autel est unique tout comme l’était la pierre sacrificielle du temple de Jérusalem."
-        }
-      ],
-      "images": []
-    }]
+    "article": [
+      {
+        "id": "About-S2A1",
+        "display": "enable",
+        "title": "Principe artistique",
+        "text": [
+          {
+            "id": "Bells-S2A1P1",
+            "paragraph": "C’est le souci du beau et de ce qu’il doit être en tout, partout et pour tous et une continuation dans ce qui est reçu."
+          },
+          {
+            "id": "Bells-S2A1P2",
+            "paragraph": "Mais également une volonté d’assurer le passage entre un passé qui ne reviendra pas par définition, et que l’on doit de respecter, et un présent vivant."
+          }
+        ],
+        "link": "",
+        "images": []
+      },
+      {
+        "id": "About-S2A2",
+        "display": "enable",
+        "title": "Principe architectural",
+        "text": [
+          {
+            "id": "Bells-S2A2P1",
+            "paragraph": "Il repose sur l’usage de la lumière qui est à la fois une composante architecturale et théologique."
+          },
+          {
+            "id": "Bells-S2A2P2",
+            "paragraph": "Le fidèle, ou le pénitent, entre par le porche et accède au narthex, sorte d’antichambre. Il s’avance dans la nef, passant progressivement de l’ombre à la lumière. Ce principe ancien n’a rien perdu de son actualité. Il a été repris par l’artiste Amaury Dubois pour l’église de Chatelaillon."
+          }
+        ],
+        "link": "",
+        "images": []
+      },
+      {
+        "id": "About-S2A3",
+        "display": "enable",
+        "title": "Principes liturgiques",
+        "text": [
+          {
+            "id": "Bells-S2A3P1",
+            "paragraph": "Du parvis au narthex : Dans le narthex, ou salle du clocher, c’est le « Parvis des Gentils », où se rencontraient Juifs et non-Juifs au temple à Jérusalem, un lieu d’accueil de convivialité et de dialogue mais aussi un lieu de culture."
+          },
+          {
+            "id": "Bells-S2A3P2",
+            "paragraph": "Du narthex à la nef : Dans la nef, qui doit permettre aux croyants comme aux non-croyants de péleriner d’un vitrail à un autre, d’une représentation d’un saint à une œuvre suscitant le recueillement jusqu’ aux étapes d’un chemin de Croix"
+          },
+          {
+            "id": "Bells-S2A3P3",
+            "paragraph": "De la nef au chœur : Dans le chœur avec l’autel qui est le lieu central, là où se porte le regard et la prière à la jonction du beau et de la foi. L’autel est unique tout comme l’était la pierre sacrificielle du temple de Jérusalem."
+          }
+        ],
+        "link": "",
+        "images": []
+      }
+    ]
   }
 ]

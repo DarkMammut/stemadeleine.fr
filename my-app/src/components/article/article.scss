@@ -15,12 +15,9 @@
       font-family: $titles;
       margin-bottom: 30px;
       padding-bottom: 15px;
-      border-bottom: solid 1px $accent-color;
     }
-
-    &__text {
+    &__paragraph {
       text-align: justify;
-      padding: 5px;
     }
   }
 
