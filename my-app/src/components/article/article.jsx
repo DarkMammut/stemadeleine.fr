@@ -1,4 +1,5 @@
 import React from "react";
+import parse from "html-react-parser";
 import "./article.scss";
 
 function Article({ Articles }) {
@@ -17,9 +18,7 @@ function Article({ Articles }) {
                 {ph.paragraph}
               </p>
             ))}
-            {article.link.length > 0 ? (
-              <div dangerouslySetInnerHTML={{ __html: article.link }} />
-            ) : null}
+            {article.link.length > 0 ? <fragment>{parse(article.link)}</fragment> : null}
           </div>
           {article.images.length > 0 ? (
             <div className="article__images">

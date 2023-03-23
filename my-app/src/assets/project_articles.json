@@ -54,7 +54,7 @@
         "paragraph": "Cette association aide aussi des oeuvres éducatives."
       }
     ],
-    "link": "Lire aussi <a href=https://www.elpadre.fr/>www.elpadre.fr</a>",
+    "link": "<p>Lire aussi <a href=https://www.elpadre.fr/ target=_blank>www.elpadre.fr</a>.</p>",
     "images": [
       {
         "id": "A2I1",
