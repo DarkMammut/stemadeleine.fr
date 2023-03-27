@@ -1,7 +1,8 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-.history {
+#history {
+  .section {
   &__article {
     display: flex;
     justify-content: space-between;
@@ -61,4 +62,5 @@
       flex-direction: row-reverse;
     }
   }
+}
 }

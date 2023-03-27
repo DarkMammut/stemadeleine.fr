@@ -6,7 +6,7 @@ import SectionsData from "../../assets/church.json";
 
 function Church() {
   return (
-    <main className="church">
+    <main id="church">
       <Helmet>
         <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

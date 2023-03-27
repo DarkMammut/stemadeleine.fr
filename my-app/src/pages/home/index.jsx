@@ -69,7 +69,7 @@ function Home() {
   }
 
   return (
-    <main className="home">
+    <main id="home">
       <Helmet>
         <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

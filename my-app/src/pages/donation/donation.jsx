@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 
 function Donation() {
   return (
-    <main className="donation">
+    <main id="donation">
       <Helmet>
         <title>FAIRE UN DON | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

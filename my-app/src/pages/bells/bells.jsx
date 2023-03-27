@@ -8,7 +8,7 @@ document.title = "Les cloches";
 
 function Bells() {
   return (
-    <main className="bells">
+    <main id="bells">
       <Helmet>
         <title>CLOCHES | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

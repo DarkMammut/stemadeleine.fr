@@ -5,7 +5,7 @@ import "./page_not_found.scss";
 
 function PageNotFound() {
   return (
-    <main className="page">
+    <main id="pnf">
       <Helmet>
         <title>404 | Page Not Found</title>
       </Helmet>

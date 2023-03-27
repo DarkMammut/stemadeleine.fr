@@ -4,16 +4,9 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-.news {
-  display: flex;
-  flex-direction: column;
-
-  &__title {
-  }
-}
-
 .carousel {
-  padding-top: 100px;
+  margin-top: 100px;
+  margin-bottom: 100px;
 
   &__slide {
     text-align: -webkit-center;

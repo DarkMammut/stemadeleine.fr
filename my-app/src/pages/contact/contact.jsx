@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 
 function Contact() {
   return (
-    <main className="contact">
+    <main id="contact">
       <Helmet>
         <title>CONTACT | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

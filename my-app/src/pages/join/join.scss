@@ -1,0 +1,39 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+#join {
+  .join {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__image {
+      position: relative;
+      width: 70%;
+
+      &__title {
+        position: absolute;
+        width:100%;
+        text-align: center;
+        top: 40%;
+
+        span {
+            font-family: $titles;
+            color: $color-black;
+            font-size: 40px;
+        }
+      }
+
+      img {
+        width: 100%;
+      }
+    }
+
+    p {
+      text-align: justify;
+    }
+  }
+}

@@ -61,7 +61,25 @@
             "id": "Slide-Home-4",
             "title": "Vitrail",
             "alt": "Vitrail",
+            "url": "/slides/home/photo-5.jpg"
+        },
+        {
+            "id": "Slide-Home-5",
+            "title": "Vitrail",
+            "alt": "Vitrail",
             "url": "/slides/home/photo-3.jpg"
+        },
+        {
+            "id": "Slide-Home-6",
+            "title": "Vitrail",
+            "alt": "Vitrail",
+            "url": "/slides/home/photo-7.jpg"
+        },
+        {
+            "id": "Slide-Home-7",
+            "title": "Autel-tombeau",
+            "alt": "Autel-tombeau",
+            "url": "/slides/home/photo-6.jpg"
         }
     ]
 }

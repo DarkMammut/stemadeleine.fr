@@ -6,7 +6,7 @@ import SectionsData from "../../assets/about.json";
 
 function About() {
   return (
-    <main className="about">
+    <main id="about">
       <Helmet>
         <title>Qui sommes nous ? | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

@@ -39,7 +39,7 @@
     "id": "b-association",
     "location": "/association",
     "type": "small",
-    "url": "/banners/Banner-5.jpg",
+    "url": "/banners/Banner-5.jpeg",
     "title": "L'ASSOCIATION",
     "subhead": ""
   },
@@ -57,7 +57,7 @@
     "id": "b-join",
     "location": "/association/nous-rejoindre",
     "type": "small",
-    "url": "/banners/Banner-7.jpg",
+    "url": "/banners/Banner-7.jpeg",
     "title": "NOUS REJOINDRE",
     "subhead": ""
   },
