@@ -4,22 +4,13 @@
 .section {
   width: 100%;
   height: auto;
-  margin-top: 100px;
-  background-color: rgb(217, 217, 217);
-  border-radius: 20px;
-  padding: 50px;
 
   &__container {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
   }
 
   &__title {
-    text-align: center;
     font-family: $titles;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
     border-bottom: solid 1px $accent-color;
     width: 100%;
   }
@@ -29,69 +20,162 @@
     flex-direction: column;
     text-align: justify;
   }
+}
 
-  &__images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 40%;
+@include desktop-layout {
+  .section {
+    margin-top: 100px;
+    background-color: rgb(217, 217, 217);
+    border-radius: 20px;
+    padding: 50px;
 
-    &__image {
+    &__container {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+
+    &__title {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+    }
+
+    &__images {
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
-      width: 100%;
+      width: 40%;
 
-      &__container {
+      &__image {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         width: 100%;
-        overflow: hidden;
 
-        & img {
+        &__container {
+          display: flex;
+          justify-content: center;
           width: 100%;
+          overflow: hidden;
+
+          & img {
+            width: 100%;
+          }
+        }
+
+        & span {
+          font-size: 10px;
+          width: 100%;
+          text-align: center;
+          margin-top: 20px;
         }
       }
+    }
 
-      & span {
-        font-size: 10px;
-        width: 100%;
-        text-align: center;
-        margin-top: 20px;
+    &__articles {
+      display: flex;
+
+      &__article {
+        flex-direction: column;
+        margin-bottom: 0;
+        padding: 25px;
+
+        &__textarea {
+          &__title {
+            color: $accent-color;
+          }
+
+          &__paragraph {
+            font-size: 15px;
+          }
+        }
+      }
+    }
+
+    &:nth-child(odd) {
+      .section__container {
+        flex-direction: row;
+      }
+    }
+
+    &:nth-child(even) {
+      .section__container {
+        flex-direction: row-reverse;
       }
     }
   }
+}
+@include mobile-layout {
+  .section {
+    margin-top: 20px;
+    padding: 20px;
 
-  &__articles {
-    display: flex;
-
-    &__article {
+    &__container {
       flex-direction: column;
-      margin-bottom: 0;
-      padding: 25px;
+    }
 
-      &__textarea {
-        &__title {
-          color: $accent-color;
+    &__title {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+    }
+
+    &__textarea {
+      width: 100%;
+    }
+
+    &__images {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 80%;
+
+      &__image {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+
+        &__container {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          overflow: hidden;
+
+          & img {
+            width: 100%;
+          }
         }
 
-        &__paragraph {
-          font-size: 15px;
+        & span {
+          font-size: 10px;
+          width: 100%;
+          text-align: center;
+          margin-top: 20px;
         }
       }
     }
-  }
 
-  &:nth-child(odd) {
-    .section__container {
-      flex-direction: row;
-    }
-  }
+    &__articles {
+      display: flex;
 
-  &:nth-child(even) {
-    .section__container {
-      flex-direction: row-reverse;
+      &__article {
+        flex-direction: column;
+        margin-bottom: 0;
+        padding: 25px;
+
+        &__textarea {
+          &__title {
+            color: $accent-color;
+          }
+
+          &__paragraph {
+            font-size: 15px;
+          }
+        }
+      }
     }
   }
 }
