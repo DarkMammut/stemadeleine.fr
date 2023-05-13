@@ -1,0 +1,40 @@
+.form {
+    width:40%;
+    margin:10px auto;
+}
+
+.formContainer{
+width:100%;
+margin-top: 10px;
+border:1px solid #d4d4d4;
+padding: 10px;
+}
+
+.formGroup{
+width: 100%;
+margin-bottom: 10px;
+}
+
+.formGroup label{
+width: 100%;
+display: block;
+margin-bottom: 10px;
+}
+
+.formGroup input[type="text"]{
+width:95%;
+padding: 10px;
+}
+
+.formGroup input[type="password"]{
+width:95%;
+padding: 10px;
+}
+
+.textSuccess{
+color: green;
+}
+
+.textError{
+color:red;
+}
