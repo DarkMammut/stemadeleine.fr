@@ -22,13 +22,14 @@ function Contact() {
         {
           secret: process.env.REACT_APP_SECRET_KEY,
           token
-        },
-        console.log(token)
+        }
+        // console.log(token)
       );
       return response.data;
-    } catch (error) {
-      console.log("error ", error);
+    } catch (e) {
+      // console.log("error ", error);
     }
+    return null;
   };
 
   const handleSubmit = async (e) => {
