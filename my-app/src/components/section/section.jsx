@@ -1,4 +1,5 @@
 import React from "react";
+import parse from "html-react-parser";
 import Article from "../article/article";
 import "./section.scss";
 
@@ -14,9 +15,9 @@ function Section({ Sections }) {
           style={{ width: section.images.length > 0 ? "50%" : "100%" }}>
           <div className="section__textarea__text">
             {section.text.map((sectionText) => (
-              <p className="section__textarea__text__paragraph" key={sectionText.id}>
-                {sectionText.paragraph}
-              </p>
+              <div key={sectionText.id} className="section__textarea__text__paragraph">
+                <fragment>{parse(sectionText.paragraph)}</fragment>
+              </div>
             ))}
           </div>
           <div className="section__articles">

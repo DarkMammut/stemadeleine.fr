@@ -20,6 +20,12 @@
     flex-direction: column;
     text-align: justify;
   }
+
+  &__articles {
+    .article{
+      margin-bottom: 0;
+    }
+  }
 }
 
 @include desktop-layout {
@@ -32,6 +38,9 @@
     &__container {
       flex-direction: row;
       justify-content: space-around;
+    }
+    &__textarea__text {
+      margin-bottom: 50px;
     }
 
     &__title {
@@ -88,6 +97,7 @@
 
           &__paragraph {
             font-size: 15px;
+            margin-bottom: 50px;
           }
         }
       }

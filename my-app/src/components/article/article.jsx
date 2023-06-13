@@ -14,11 +14,10 @@ function Article({ Articles }) {
             style={{ width: article.images.length > 0 ? "50%" : "100%" }}>
             <h3 className="article__textarea__title">{article.title}</h3>
             {article.text.map((ph) => (
-              <p key={ph.id} className="article__textarea__paragraph">
-                {ph.paragraph}
-              </p>
+              <div key={ph.id} className="article__textarea__paragraph">
+                <fragment>{parse(ph.paragraph)}</fragment>
+              </div>
             ))}
-            {article.link.length > 0 ? <fragment>{parse(article.link)}</fragment> : null}
           </div>
           {article.images.length > 0 ? (
             <div className="article__images">
