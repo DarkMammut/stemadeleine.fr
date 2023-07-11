@@ -138,6 +138,26 @@ table {
   border-spacing: 0;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.position-relative {
+  position: relative;
+}
+
 @include large-desktop-layout {
   main {
     width: 1224px;
