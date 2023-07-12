@@ -158,20 +158,35 @@ table {
   position: relative;
 }
 
+main {
+  display: flex;
+  justify-content: center;
+}
+
 @include large-desktop-layout {
   main {
-    width: 1224px;
+    .container {
+      width: 1224px;
+      overflow: visible;
+      .full-screen {
+        margin-left: calc(1224px / 2 - 49vw);
+        margin-right: calc(1224px / 2 - 49vw);
+      }
+    }
   }
 }
 
 @include small-desktop-layout {
   main {
-    width: 100%;
+    .container {
+      width: 100%;
+    }
   }
 }
 
 @include desktop-layout {
   main {
+    width: 100%;
     margin-top: $desktop-header-radius + 1px;
     margin-left: auto;
     margin-right: auto;
