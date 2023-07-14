@@ -19,6 +19,7 @@ const groupedItems = SLIDES.home.reduce(
 
 function Home() {
   const [open, setOpen] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (open === 1) {
@@ -32,21 +33,28 @@ function Home() {
         <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div className="container">
-        <section>
+        <article>
           <p>
             L’association « Les Amis de Sainte Madeleine de La jarrie » a été créée pour défendre le
             patrimoine de la paroisse de La Jarrie, veiller à son entretien notamment avec la
             Mairie, de faire connaitre au public l’histoire de ce monument et et participer au
             développement, au rayonnement et à la rénovation de l&apos;église.
           </p>
-        </section>
-        <section className="carousel">
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        </article>
+        <article className="carousel">
           <div className="gallery full-screen">
             {groupedItems.map((column) => (
-              <div className="gallery__column" key={column}>
-                {column.map((slide) => (
-                  <div className="gallery__column__card" id={slide.id} key={slide.id}>
+              <div className="gallery__column" key={Math.random()}>
+                {column.map((slide, index) => (
+                  <button
+                    className="gallery__column__card no-style-btn"
+                    id={slide.id}
+                    key={slide.id}
+                    type="button"
+                    onClick={() => {
+                      setCurrentIndex(index);
+                      setOpen(1);
+                    }}>
                     <figure className="gallery__column__card__thumb">
                       <img
                         src={slide.url}
@@ -57,14 +65,14 @@ function Home() {
                         {slide.title}
                       </figcaption>
                     </figure>
-                  </div>
+                  </button>
                 ))}
               </div>
             ))}
           </div>
-          <ImageSlider slidesImages={SLIDES.home} openSlider={open} startIndex={1} />
-        </section>
-        <section>
+          <ImageSlider slidesImages={SLIDES.home} openSlider={open} startIndex={currentIndex} />
+        </article>
+        <article>
           <p>
             Cette association a pour objectif d’être un outil au service de l’église et de la
             commune pour mener à bien des travaux de restauration du mobilier et de protection du
@@ -79,7 +87,7 @@ function Home() {
           </p>
 
           <p>L’association compte 29 adhérents</p>
-        </section>
+        </article>
       </div>
     </main>
   );

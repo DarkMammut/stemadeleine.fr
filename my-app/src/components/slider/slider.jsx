@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./slider.scss";
@@ -8,18 +7,6 @@ function ImageSlider({ slidesImages, openSlider, startIndex }) {
   const url = process.env.PUBLIC_URL;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appear, setAppear] = useState(0);
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    fade: true,
-    speed: 500,
-    autoplay: true,
-    autoplaySpeed: 15000,
-    centerMode: true,
-    centerPadding: 0,
-    dotsClass: "slider__carousel__dots"
-  };
 
   useEffect(() => {
     if (openSlider === 1) {
@@ -36,6 +23,51 @@ function ImageSlider({ slidesImages, openSlider, startIndex }) {
 
       default:
     }
+  }
+  function getPos(current, active) {
+    const diff = current - active;
+
+    if (Math.abs(current - active) > 2) {
+      return -current;
+    }
+
+    return diff;
+  }
+
+  function update(newActive) {
+    if (!newActive) {
+      console.error("Invalid newActive element");
+      return;
+    }
+
+    const newActivePos = newActive.dataset.pos;
+    const current = document.querySelector('[data-pos="0"]');
+    const prev = document.querySelector('[data-pos="-1"]');
+    const next = document.querySelector('[data-pos="1"]');
+    const first = document.querySelector('[data-pos="-2"]');
+    const last = document.querySelector('[data-pos="2"]');
+
+    if (current) {
+      current.classList.remove("carousel__item_active");
+    }
+
+    [current, prev, next, first, last].forEach((item) => {
+      const theItem = item;
+      const itemPos = item.dataset.pos;
+      const newPos = getPos(itemPos, newActivePos);
+      theItem.dataset.pos = newPos;
+    });
+  }
+
+  function show(e) {
+    const newActive = e.target;
+    const isItem = newActive.closest(".carousel__item");
+
+    if (!isItem || newActive.classList.contains("carousel__item_active")) {
+      return;
+    }
+
+    update(newActive);
   }
 
   return (
@@ -57,19 +89,20 @@ function ImageSlider({ slidesImages, openSlider, startIndex }) {
         type="button"
       />
       <div className="slider__carousel">
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <Slider {...settings}>
+        <ul className="slider__carousel__list">
           {slidesImages.map((slide) => (
-            <div className="slider__carousel__slide" key={slide.id}>
-              <img
-                className="slider__carousel__slide__image"
-                src={url + slide.url}
-                title={slide.title}
-                alt={slide.alt}
-              />
-            </div>
+            <li className="slider__carousel__item" key={slide.id}>
+              <button type="button" className="no-style-btn fill-content" onClick={show}>
+                <img
+                  className="slider__carousel__item__image"
+                  src={url + slide.url}
+                  title={slide.title}
+                  alt={slide.alt}
+                />
+              </button>
+            </li>
           ))}
-        </Slider>
+        </ul>
       </div>
     </div>
   );

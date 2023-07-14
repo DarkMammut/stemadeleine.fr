@@ -18,7 +18,7 @@ function Banner() {
   switch (found.type) {
     case "large":
       return (
-        <div className="container">
+        <div className="container-banner">
           <div className="l-banner" style={style}>
             <div className="l-banner__textarea">
               <h1 className="l-banner__textarea__title">{found.title}</h1>

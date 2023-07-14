@@ -9,40 +9,40 @@ function PageNotFound() {
       <Helmet>
         <title>404 | Page Not Found</title>
       </Helmet>
-      <div id="page__background" />
-      <div className="page__top">
-        <h1 className="page__top__title">404</h1>
-        <h3 className="page__top__subhead">page non trouvée</h3>
-      </div>
-      <div className="page__container">
-        <div className="page__container__ghost">
-          <div className="page__container__ghost__hands">
-            <div className="page__container__ghost__hands--left" />
-            <div className="page__container__ghost__hands--right" />
-          </div>
-          <div className="page__container__ghost__face">
-            <div className="page__container__ghost__eyes">
-              <div className="page__container__ghost__eyes--left" />
-              <div className="page__container__ghost__eyes--right" />
-            </div>
-            <div className="page__container__ghost__mouth" />
-            <div className="page__container__ghost__feet">
-              <div className="page__container__ghost__feet--one" />
-              <div className="page__container__ghost__feet--two" />
-              <div className="page__container__ghost__feet--three" />
-              <div className="page__container__ghost__feet--four" />
-            </div>
-          </div>
+      <div className="container">
+        <div id="background" />
+        <div className="top">
+          <h1 className="top__title">404</h1>
+          <h3 className="top__subhead">page non trouvée</h3>
         </div>
-        <div className="page__container__shadow" />
-      </div>
-      <div className="page__bottom">
-        <p className="page__bottom__text">
-          Boo, il semblerait que la page cherchée est introuvable !
-        </p>
-        <Link to="/" className="page__bottom__home">
-          Retourner à la page d&apos;accueil
-        </Link>
+        <div className="animation">
+          <div className="animation__ghost">
+            <div className="animation__ghost__hands">
+              <div className="animation__ghost__hands--left" />
+              <div className="animation__ghost__hands--right" />
+            </div>
+            <div className="animation__ghost__face">
+              <div className="animation__ghost__eyes">
+                <div className="animation__ghost__eyes--left" />
+                <div className="animation__ghost__eyes--right" />
+              </div>
+              <div className="animation__ghost__mouth" />
+              <div className="animation__ghost__feet">
+                <div className="animation__ghost__feet--one" />
+                <div className="animation__ghost__feet--two" />
+                <div className="animation__ghost__feet--three" />
+                <div className="animation__ghost__feet--four" />
+              </div>
+            </div>
+          </div>
+          <div className="animation__shadow" />
+        </div>
+        <div className="bottom">
+          <p className="bottom__text">Boo, il semblerait que la page cherchée est introuvable !</p>
+          <Link to="/" className="bottom__home">
+            Retourner à la page d&apos;accueil
+          </Link>
+        </div>
       </div>
     </main>
   );

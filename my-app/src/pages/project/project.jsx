@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Article from "../../components/article/article";
-import ArticleData from "../../assets/project_articles.json";
+import Section from "../../components/section/section";
+import SectionData from "../../assets/project_sections.json";
 import "./project.scss";
 
 function Project() {
@@ -10,9 +10,11 @@ function Project() {
       <Helmet>
         <title>PROJETS | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <section>
-        <Article Articles={ArticleData} />
-      </section>
+      <div className="container">
+        <article>
+          <Section Sections={SectionData} />
+        </article>
+      </div>
     </main>
   );
 }
