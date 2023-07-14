@@ -7,6 +7,9 @@ function ImageSlider({ slidesImages, openSlider, startIndex }) {
   const url = process.env.PUBLIC_URL;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appear, setAppear] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<ImageType>();
+  const carouselItemsRef = useRef<HTMLDivElement[] | null[]>([]);
 
   useEffect(() => {
     if (openSlider === 1) {
@@ -24,88 +27,89 @@ function ImageSlider({ slidesImages, openSlider, startIndex }) {
       default:
     }
   }
-  function getPos(current, active) {
-    const diff = current - active;
 
-    if (Math.abs(current - active) > 2) {
-      return -current;
+  useEffect(() => {
+    if (slidesImages && slidesImages[0]) {
+      carouselItemsRef.current = carouselItemsRef.current.slice(
+        0,
+        slidesImages.length
+      );
+
+      setSelectedImageIndex(0);
+      setSelectedImage(slidesImages[0]);
     }
+  }, [slidesImages]);
 
-    return diff;
-  }
-
-  function update(newActive) {
-    if (!newActive) {
-      console.error("Invalid newActive element");
-      return;
+  const handleSelectedImageChange = (newIdx: number) => {
+    if (slidesImages && slidesImages.length > 0) {
+      setSelectedImage(slidesImages[newIdx]);
+      setSelectedImageIndex(newIdx);
+      if (carouselItemsRef?.current[newIdx]) {
+        carouselItemsRef?.current[newIdx]?.scrollIntoView({
+          inline: "center",
+          behavior: "smooth"
+        });
+      }
     }
+  };
 
-    const newActivePos = newActive.dataset.pos;
-    const current = document.querySelector('[data-pos="0"]');
-    const prev = document.querySelector('[data-pos="-1"]');
-    const next = document.querySelector('[data-pos="1"]');
-    const first = document.querySelector('[data-pos="-2"]');
-    const last = document.querySelector('[data-pos="2"]');
-
-    if (current) {
-      current.classList.remove("carousel__item_active");
+  const handleRightClick = () => {
+    if (slidesImages && slidesImages.length > 0) {
+      let newIdx = selectedImageIndex + 1;
+      if (newIdx >= slidesImages.length) {
+        newIdx = 0;
+      }
+      handleSelectedImageChange(newIdx);
     }
+  };
 
-    [current, prev, next, first, last].forEach((item) => {
-      const theItem = item;
-      const itemPos = item.dataset.pos;
-      const newPos = getPos(itemPos, newActivePos);
-      theItem.dataset.pos = newPos;
-    });
-  }
-
-  function show(e) {
-    const newActive = e.target;
-    const isItem = newActive.closest(".carousel__item");
-
-    if (!isItem || newActive.classList.contains("carousel__item_active")) {
-      return;
+  const handleLeftClick = () => {
+    if (slidesImages && slidesImages.length > 0) {
+      let newIdx = selectedImageIndex - 1;
+      if (newIdx < 0) {
+        newIdx = slidesImages.length - 1;
+      }
+      handleSelectedImageChange(newIdx);
     }
-
-    update(newActive);
-  }
+  };
 
   return (
-    <div className="slider" data-open={appear}>
-      <button
-        className="slider__shut"
-        aria-label="shut"
-        onClick={() => setAppear(0)}
-        onKeyDown={handleKeyDown}
-        type="button">
-        <div className="slider__shut__line" />
-        <div className="slider__shut__line" />
-      </button>
-      <button
-        className="slider__backgroung"
-        aria-label="shut"
-        onClick={() => setAppear(0)}
-        onKeyDown={handleKeyDown}
-        type="button"
+    <div className="carousel-container">
+      <h2 className="header">Image Carousel</h2>
+      <div
+        className="selected-image"
+        style={{ backgroundImage: `url(${url}${selectedImage?.url})` }}
       />
-      <div className="slider__carousel">
-        <ul className="slider__carousel__list">
-          {slidesImages.map((slide) => (
-            <li className="slider__carousel__item" key={slide.id}>
-              <button type="button" className="no-style-btn fill-content" onClick={show}>
-                <img
-                  className="slider__carousel__item__image"
-                  src={url + slide.url}
-                  title={slide.title}
-                  alt={slide.alt}
-                />
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className="carousel">
+        <div className="carousel__images">
+          {slidesImages &&
+            slidesImages.map((image, idx) => (
+              <div
+                onClick={() => handleSelectedImageChange(idx)}
+                style={{ backgroundImage: `url(${url}${image.url})` }}
+                key={image.id}
+                className={`carousel__image ${
+                  selectedImageIndex === idx && "carousel__image-selected"
+                }`}
+                ref={(el) => (carouselItemsRef.current[idx] = el)}
+              />
+            ))}
+        </div>
+        <button
+          className="carousel__button carousel__button-left"
+          onClick={handleLeftClick}
+        >
+          Prev
+        </button>
+        <button
+          className="carousel__button carousel__button-right"
+          onClick={handleRightClick}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
-}
+};
 
 export default ImageSlider;
