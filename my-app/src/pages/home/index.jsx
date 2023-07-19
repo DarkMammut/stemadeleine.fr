@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import "./index.scss";
 
 const groupedItems = SLIDES.home.reduce(
