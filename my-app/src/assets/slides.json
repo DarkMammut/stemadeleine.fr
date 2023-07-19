@@ -47,27 +47,27 @@
         },
         {
             "id": "Slide-Home-2",
-            "title": "Eglise de La Jarrie",
-            "alt": "Eglise de La Jarrie",
-            "url": "/slides/home/photo-1.jpg"
-        },
-        {
-            "id": "Slide-Home-3",
-            "title": "Intérieur",
-            "alt": "Intérieur de l'église",
-            "url": "/slides/home/photo-2.jpg"
-        },
-        {
-            "id": "Slide-Home-4",
             "title": "Vitrail",
             "alt": "Vitrail",
             "url": "/slides/home/photo-5.jpg"
         },
         {
+            "id": "Slide-Home-3",
+            "title": "Cloches",
+            "alt": "Cloches",
+            "url": "/slides/home/photo-8.jpg"
+        },
+        {
+            "id": "Slide-Home-4",
+            "title": "Intérieur",
+            "alt": "Intérieur de l'église",
+            "url": "/slides/home/photo-2.jpg"
+        },
+        {
             "id": "Slide-Home-5",
-            "title": "Vitrail",
-            "alt": "Vitrail",
-            "url": "/slides/home/photo-3.jpg"
+            "title": "Autel-tombeau",
+            "alt": "Autel-tombeau",
+            "url": "/slides/home/photo-6.jpg"
         },
         {
             "id": "Slide-Home-6",
@@ -75,11 +75,18 @@
             "alt": "Vitrail",
             "url": "/slides/home/photo-7.jpg"
         },
+
         {
             "id": "Slide-Home-7",
-            "title": "Autel-tombeau",
-            "alt": "Autel-tombeau",
-            "url": "/slides/home/photo-6.jpg"
+            "title": "Eglise de La Jarrie",
+            "alt": "Eglise de La Jarrie",
+            "url": "/slides/home/photo-1.jpg"
+        },
+        {
+            "id": "Slide-Home-8",
+            "title": "Vitrail",
+            "alt": "Vitrail",
+            "url": "/slides/home/photo-3.jpg"
         }
     ]
 }

@@ -4,34 +4,62 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-.carousel {
-  margin-top: 100px;
-  margin-bottom: 100px;
-
-  &__slide {
-    text-align: -webkit-center;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-
-    &__image {
-      height: 300px;
-    }
-  }
-}
-
 @include desktop-layout {
-  .carousel {
-    padding-top: 100px;
+  .gallery {
+    display: flex;
+    padding: 2px;
+    transition: 0.3s;
 
-    &__slide {
-      text-align: -webkit-center;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
+    &:hover &__column__card__thumb__image {
+      filter: grayscale(1);
+    }
 
-      &__image {
-        height: 300px;
+    &__column {
+      display: flex;
+      flex-direction: column;
+      width: 10%;
+
+      &__card {
+        margin: 2px;
+        overflow: hidden;
+
+        &:hover {
+          .gallery__column__card__thumb__image {
+            filter: grayscale(0);
+          }
+
+          .gallery__column__card__thumb__caption {
+            opacity: 1;
+          }
+        }
+
+        &__thumb {
+          position: relative;
+
+          &__image {
+            display: block;
+            width: 100%;
+            transition: 0.3s;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+
+          &__caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 25px 15px 15px;
+            width: 100%;
+            font-family: "Raleway", sans-serif;
+            font-size: 16px;
+            color: white;
+            opacity: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: 0.3s;
+          }
+        }
       }
     }
   }
@@ -47,51 +75,7 @@
       justify-content: space-around;
     }
   }
-
-  .carousel {
-    padding-top: 100px;
-
-    &__slide {
-      text-align: -webkit-center;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-
-      &__image {
-        height: 300px;
-      }
-    }
-  }
 }
+
 @include mobile-layout {
-  .carousel {
-    padding-top: 100px;
-    margin-bottom: 40px;
-
-    &__slide {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-
-      &__image {
-        height: 300px;
-      }
-    }
-
-    .slick-arrow {
-      z-index: 1;
-    }
-
-    .slick-next {
-      right: 25px;
-    }
-
-    .slick-prev {
-      left: 25px;
-    }
-
-    .slick-dots {
-      bottom: 0;
-    }
-  }
 }

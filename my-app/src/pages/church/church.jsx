@@ -1,8 +1,8 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Section from "../../components/section/section";
+import Article from "../../components/article/article";
 import "./church.scss";
-import SectionsData from "../../assets/church.json";
+import ArticlesData from "../../assets/church.json";
 
 function Church() {
   return (
@@ -10,8 +10,10 @@ function Church() {
       <Helmet>
         <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      {/* <p className="church__paragraph"></p> */}
-      <Section Sections={SectionsData} />
+      <div className="container">
+        {/* <p className="church__paragraph"></p> */}
+        <Article Articles={ArticlesData} />
+      </div>
     </main>
   );
 }

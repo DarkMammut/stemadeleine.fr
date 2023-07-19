@@ -1,0 +1,137 @@
+[
+  {
+    "id": "A1",
+    "display": "enable",
+    "title": "L'autel tombeau",
+    "text": [
+      {
+        "id": "A1P1",
+        "paragraph": "<p>Un autel tombeau qui a subi des détériorations et des manques est installé dans une des absidioles. Cet autel du 18eme, très probablement vers 1765, a incontestablement été réalisé par des artisans doués comme tend à le prouver sa facture qui tranche avec un mobilier ordinaire d’une église paroissiale.<br>La Sauvegarde de l’art français demande expressément à notre association de déposer notre candidature au Grand Concours du Patrimoine Le Pèlerin 2023 pour la restauration de cet autel. Si ce projet est retenu l’aide financière viendra alléger l’investissement de la Jarrie.</p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A1I1",
+        "title": "Autel-tombeau",
+        "alt": "Autel-tombeau",
+        "url": "/projects/autel.jpg"
+      }
+    ]
+  },
+  {
+    "id": "A2",
+    "display": "enable",
+    "title": "Un chemin de Croix photographique",
+    "text": [
+      {
+        "id": "A2P1",
+        "paragraph": "<p>L’oeuvre illustre la Passion du Christ par une approche actuelle comme l’ont fait tant de peintres respectant la mode de leur époque.<br>Autour de Jésus, aux traits sémitiques, et d’une Vierge Marie, revêtus des habits de leur temps, gravitent des personnages, hommes et femmes du XXIe siècle, saisis par l’objectif du photographe dans leur comportement ordinaire de leurs activités quotidiennes.<br>Aujourd’hui, et tout au long de ce parcours, le spectateur pourra s’identifier et au bourreau et au fidèle disciple, rendant actuel le drame qui s’est déroulé il y a deux millénaires à Jérusalem, en s’interrogeant sur sa propre attitude qui aurait pu être la sienne sur ce chemin allant du palais de Pilate au Golgotha. Le spectateur est appelé à participer à sa manière au drame qui se déroule devant lui.<br>Aux 14 stations du chemin de Croix s’ajoutera une quinzième station, celle du tombeau vide au matin de Pâque. Cette 15e station renvoie à la représentation figurative de Marie Madeleine au matin de Pâques exposée dans l’église.</p>"
+      },
+      {
+        "id": "A2P2",
+        "paragraph": "<p>Le Christ, la Vierge Marie et la croix sont représentés de façon traditionnelle. Deux personnages et un élément facilement reconnaissable qui renvoient aux représentations picturales et sculpturales traditionnelles.<br>Le reste des personnages a volontairement été choisi comme représentant notre époque à travers le vêtement mais aussi certains objets. Chacun peut ainsi se reconnaître plus facilement comme contemporain de ce processus de stigmatisation et de jugement inique que fut la Passion du Christ.<br>Christ pareillement raillé, humilié, jugé, condamné et enfin mis à mort ; mais aussi accompagné, aidé, consolé par chacun d’entre nous, à travers les nombreuses rencontres que nous faisons dans la vie. Le choix du traitement noir et blanc exprime tout à la fois simplicité et jaillissement. Le choix de travailler les tirages avec de forts contrastes aide à percevoir les contrastes spirituels et psychologiques vécus sur cette « via dolorosa ».<br>Cela permet aussi de mettre la scène dans une atemporalité renvoyant tant au mystère du Christ qu’à notre présent.<br>Le format carré quant à lui donne une rigueur géométrique qui force à la simplicité, centre le sujet choisi et met en valeur les lignes directrices.<br>Inspiré de la représentation picturale présentée dans l’église Saint-Nizier à Lyon, cet ensemble unique en photographie est l’occasion audelà d’une démarche de foi, de faire se rencontrer tradition et modernité.<br>Passion du Christ qui nous renvoie inévitablement à la Passion de tant d'hommes et de femmes d’aujourd’hui ».</p>"
+      },
+      {
+        "id": "A2P3",
+        "paragraph": "<h4>Photophore-Association réalise le projet</h4><br><p>Elle a pour but d'aider à la création artistique par la photographie, de gérer le fonds photographique de l'association sur tout type de support, d'organiser des expositions, vernissages et rencontres autour de la photographie ainsi que d’aider par versements de fonds, grâce à la vente de clichés, diverses oeuvres en faveur de l’enfance.<br>*Ni le photographe ni les bénévoles de cette association ne reçoivent un quelconque émolument de la vente de toutes les productions du photographe.</p>"
+      }
+      ,
+      {
+        "id": "A2P4",
+        "paragraph": "<h4>Le photographe</h4><br><p>Jean-Dominique « <a href='https://www.elpadre.fr/'>El Padre</a> » fait partie de l’académie artistique militaireappelée : les Peintres Officiels de l’Armée, au titre de photographe.Il a répondu à la sollicitation de l’association des Amis de Saint Madeleinede La Jarrie pour réaliser un « chemin de Croix photographique »participant à la mise en valeur de l’église de la Jarrie.</p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A2I1",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/projects/CDC1.jpg"
+      },
+      {
+        "id": "A2I2",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/projects/CDC2.jpg"
+      },
+      {
+        "id": "A2I3",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/projects/CDC3.jpg"
+      },
+      {
+        "id": "A2I4",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I5",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I6",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I7",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I8",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I9",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I10",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I11",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I12",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I13",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I14",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      },
+      {
+        "id": "A2I15",
+        "title": "picture",
+        "alt": "picture",
+        "url": "/no-image.jpeg"
+      }
+    ]
+  }
+]

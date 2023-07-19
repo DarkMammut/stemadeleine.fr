@@ -1,7 +1,6 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-
 @keyframes fade {
   from {
     opacity: 0;
@@ -14,6 +13,7 @@
 
 .slider {
   position: fixed;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   top: 0;
@@ -34,7 +34,8 @@
 
   &__backgroung {
     position: fixed;
-    background-color: rgba(black, 0.9);
+    background: linear-gradient(90deg, $light-color 0%, $primary-color 35%, $dark-color 100%);
+    opacity: 0.7;
     border: none;
     width: 100%;
     height: 100%;
@@ -77,42 +78,77 @@
     }
   }
 
-  &__carousel {
+  &__container {
     position: relative;
-    width: 1024px;
-    height: 700px;
+    justify-content: center;
+    text-align: center;
+    height: 80%;
+    z-index: 5;
+    overflow: hidden;
+    margin-bottom: 1%;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    border-radius: 30px;
 
-    &__slide {
-      text-align: -webkit-center;
+    &__btn {
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      z-index: 6;
+      background-color: $accent-color;
+      opacity: 0;
+      animation: both 1s;
 
-      &__image {
-        height: 700px;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.5;
+      }
+
+      &--next {
+        right: 0;
+      }
+
+      &--previous {
+        left: 0;
       }
     }
 
-    &__dots {
-      position: absolute;
-      bottom: -25px;
-      display: block;
-      width: 100%;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      text-align: center;
+    &__activeslide {
+      height: 100%;
 
-      & li {
-        position: relative;
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        margin: 0 5px;
-        padding: 0;
-        cursor: pointer;
+      img {
+        object-fit: contain;
       }
     }
   }
-}
+  &__thumbnails {
+    flex-wrap: nowrap;
+    justify-content: center;
+    height: 10%;
+    max-width: 15%;
+    z-index: 5;
 
-.slick-track {
-  margin: auto;
+    &__thumbnail {
+      margin: 3%;
+
+      .clicked {
+        transform: scale(1.2);
+        border: thick double $accent-color;
+      }
+      button {
+        height: 100%;
+        overflow: hidden;
+
+        &:hover {
+          cursor: pointer;
+        }
+        img {
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
 }

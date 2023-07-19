@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Article from "../../components/article/article";
-import ArticleData from "../../assets/realisations.json";
+import Section from "../../components/section/section";
+import SectionData from "../../assets/realisations.json";
 import "./realisation.scss";
 
 function Realisation() {
@@ -10,9 +10,11 @@ function Realisation() {
       <Helmet>
         <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
-      <section>
-        <Article Articles={ArticleData} />
-      </section>
+      <div className="container">
+        <article>
+          <Section Sections={SectionData} />
+        </article>
+      </div>
     </main>
   );
 }
