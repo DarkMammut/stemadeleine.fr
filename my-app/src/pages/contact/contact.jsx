@@ -4,7 +4,7 @@ import Recaptcha from "react-google-recaptcha";
 import { FaUser, FaEnvelope, FaLocationArrow, FaPen } from "react-icons/fa";
 import "./contact.scss";
 
-const RECAPTCHA_KEY = "6Le1OMMlAAAAANYwDmnFGkIkhmVOPt2S5gZDEoZb";
+const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
 function encode(state) {
   return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&name=${state.firstname}&name=${state.lastname}&name=${state.email}&subject=${state.subject}&message=${state.message}&rgpd=${state.rgpd}`;
