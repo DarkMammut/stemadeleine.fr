@@ -7,44 +7,24 @@ import "./contact.scss";
 const RECAPTCHA_KEY = "6Le1OMMlAAAAANYwDmnFGkIkhmVOPt2S5gZDEoZb";
 
 function encode(state) {
-  return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&name=${state.firstname}&name=${state.lastname}&name=${state.email}&subject=${state.subject}&message=${state.message}`;
+  return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&name=${state.firstname}&name=${state.lastname}&name=${state.email}&subject=${state.subject}&message=${state.message}&rgpd=${state.rgpd}`;
 }
 
 function ValidateEmail(mail) {
-  const regexpEmail = "/^w+([.-]?w+)*@w+([.-]?w+)*(.w{2,3})+$/";
-  if (regexpEmail.test(mail)) {
-    return true;
-  }
-  alert("You have entered an invalid email address!");
-  return false;
+  const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+  return regexpEmail.test(mail);
 }
 
 function ValidateName(name) {
-  const regexpName = "/^[a-z ,.'-]+$/i";
-  if (regexpName.test(name)) {
-    return true;
-  }
-  alert("You have entered an invalid email address!");
-  return false;
+  const regexpName =
+    /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$/u;
+
+  return regexpName.test(name);
 }
 
 function ValidateMessage(message) {
-  const regexpName = "/^[a-z ,.'-]+$/i";
-  if (regexpName.test(message)) {
-    return true;
-  }
-  alert("You have entered an invalid email address!");
-  return false;
-}
-
-function ValidateForm(state) {
-  if (
-    ValidateName(state.firstname) ||
-    ValidateName(state.lastname) ||
-    ValidateEmail(state.email) ||
-    ValidateName(state.subject) ||
-    ValidateMessage(state.message)
-  ) {
+  const strLength = message.length;
+  if (strLength >= 25) {
     return true;
   }
   return false;
@@ -55,11 +35,66 @@ function Contact() {
   const [buttonDisabled, setButtonDisabled] = useState(true);
 
   const [state, setState] = useState({});
+  const [height, setHeight] = useState({});
+  const [appear, setAppear] = useState(0);
 
   const recaptchaRef = React.createRef(); // new Ref for reCaptcha
 
   const handleChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
+
+    switch (e.target.name) {
+      case "firstname":
+        if (!ValidateName(e.target.value)) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      case "lastname":
+        if (!ValidateName(e.target.value)) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      case "email":
+        if (!ValidateEmail(e.target.value)) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      case "subject":
+        if (!ValidateName(e.target.value)) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      case "message":
+        if (!ValidateMessage(e.target.value)) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      case "rgpd":
+        if (!e.target.checked) {
+          setHeight({ ...height, [e.target.name]: "1rem" });
+        } else {
+          setHeight({ ...height, [e.target.name]: 0 });
+        }
+        break;
+
+      default:
+        console.log("none");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -67,17 +102,26 @@ function Contact() {
     const form = e.target;
     const recaptchaValue = recaptchaRef.current.getValue();
 
-    fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encode({
-        "form-name": form.getAttribute("name"),
-        "g-recaptcha-response": recaptchaValue,
-        ...state
+    if (
+      ValidateName(state.firstname) ||
+      ValidateName(state.lastname) ||
+      ValidateEmail(state.email) ||
+      ValidateName(state.subject) ||
+      ValidateMessage(state.message) ||
+      state.rgpd
+    ) {
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({
+          "form-name": form.getAttribute("name"),
+          "g-recaptcha-response": recaptchaValue,
+          ...state
+        })
       })
-    })
-      .then(() => console.log("here go to thank you page"))
-      .catch((error) => alert(error));
+        .then(() => setAppear(1))
+        .catch((error) => alert(error));
+    }
   };
 
   return (
@@ -88,24 +132,30 @@ function Contact() {
       <div className="container">
         <div className="container-contact d-flex justify-content-center align-items-center">
           <div className="contact-details d-flex justify-content-center align-items-center">
-            <div className="contact-details__adress box d-flex justify-content-center align-items-center">
-              <FaLocationArrow classname="icon" />
-              <span>Rue des Canons 17220 La Jarrie</span>
+            <div className="contact-details__box d-flex justify-content-center align-items-center">
+              <FaLocationArrow className="contact-details__box__icon" />
+              <span>
+                Rue des Canons
+                <br />
+                17220 La Jarrie
+              </span>
             </div>
-            <div className="contact-details__email box justify-content-center align-items-center">
-              <FaEnvelope classname="icon" />
+            <div className="contact-details__box d-flex justify-content-center align-items-center">
+              <FaEnvelope className="contact-details__box__icon" />
               <span>contact@stemadeleine.fr</span>
             </div>
           </div>
-          <iframe
-            title="map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.04729886033!2d-1.0134871825561522!3d46.129887700000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014be2c51280a9%3A0x4e96103d6c8f2a26!2sEglise%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1669420241164!5m2!1sfr!2sfr"
-            width="100%"
-            height="500"
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          <div className="google-map">
+            <iframe
+              title="map"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.04729886033!2d-1.0134871825561522!3d46.129887700000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014be2c51280a9%3A0x4e96103d6c8f2a26!2sEglise%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1669420241164!5m2!1sfr!2sfr"
+              width="100%"
+              height="100%"
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
 
         <div className="container-form d-flex justify-content-center align-items-center">
@@ -879,7 +929,7 @@ function Contact() {
 
             <div className="form-group position-relative">
               <label htmlFor="firstname" className="d-block">
-                <FaUser classname="icon" />
+                <FaUser className="icon" />
               </label>
               <input
                 type="text"
@@ -891,11 +941,14 @@ function Contact() {
                 required
                 minLength="2"
               />
+              <div className="requirements s-text" style={{ maxHeight: `${height.firstname}` }}>
+                Veuillez saisir un de prénom valide.
+              </div>
             </div>
 
             <div className="form-group position-relative">
               <label htmlFor="lastname" className="d-block">
-                <FaUser classname="icon" />
+                <FaUser className="icon" />
               </label>
               <input
                 type="text"
@@ -907,11 +960,14 @@ function Contact() {
                 required
                 minLength="2"
               />
+              <div className="requirements s-text" style={{ maxHeight: `${height.lastname}` }}>
+                Veuillez saisir un de nom de famille valide.
+              </div>
             </div>
 
             <div className="form-group position-relative">
               <label htmlFor="email" className="d-block">
-                <FaEnvelope classname="icon" />
+                <FaEnvelope className="icon" />
               </label>
               <input
                 type="email"
@@ -923,11 +979,14 @@ function Contact() {
                 required
                 minLength="2"
               />
+              <div className="requirements s-text" style={{ maxHeight: `${height.email}` }}>
+                Veuillez indiquer une adresse email valide.
+              </div>
             </div>
 
             <div className="form-group position-relative">
               <label htmlFor="subject" className="d-block">
-                <FaPen classname="icon" />
+                <FaPen className="icon" />
               </label>
               <input
                 type="text"
@@ -939,6 +998,9 @@ function Contact() {
                 required
                 minLength="2"
               />
+              <div className="requirements s-text" style={{ maxHeight: `${height.subject}` }}>
+                Le sujet doit contenir au moins 2 caractères.
+              </div>
             </div>
 
             <div className="form-group message">
@@ -952,6 +1014,9 @@ function Contact() {
                 required
                 minLength="2"
               />
+              <div className="requirements s-text" style={{ maxHeight: `${height.message}` }}>
+                Le message doit contenir au moins 25 caractères.
+              </div>
             </div>
 
             <div className="form-group checkbox">
@@ -963,11 +1028,14 @@ function Contact() {
                 onChange={handleChange}
                 required
               />
-              <label htmlFor="rgpd" className="s-text">
+              <label htmlFor="rgpd" className="s-text" style={{ width: `65%` }}>
                 En soumettant ce formulaire, j’accepte que mes informations soient utilisées
                 exclusivement dans le cadre de ma demande et de la relation commerciale éthique et
                 personnalisée qui pourrait en découler si je le souhaite.
               </label>
+            </div>
+            <div className="requirements s-text" style={{ maxHeight: `${height.rgpd}` }}>
+              Veuillez cocher la case.
             </div>
 
             <Recaptcha
@@ -983,13 +1051,47 @@ function Contact() {
                 type="submit"
                 className="btn btn-primary"
                 tabIndex="-1"
-                onClick={() => ValidateForm(state)}
                 disabled={buttonDisabled}>
                 Envoyer
               </button>
             </div>
           </form>
         </div>
+      </div>
+      <div className="thank-you d-flex" data-open={appear}>
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+          <circle
+            className="path circle"
+            fill="none"
+            stroke="#73AF55"
+            strokeWidth="6"
+            strokeMiterlimit="10"
+            cx="65.1"
+            cy="65.1"
+            r="62.1"
+          />
+          <polyline
+            className="path check"
+            fill="none"
+            stroke="#73AF55"
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeMiterlimit="10"
+            points="100.2,40.2 51.5,88.8 29.8,67.5 "
+          />
+        </svg>
+        <p className="success">
+          Merci pour votre message
+          <br />
+          <br />
+          {state.firstname} {state.lastname}
+        </p>
+        <button
+          type="button"
+          className="thank-you__btn btn btn-primary no-style-btn"
+          onClick={() => setAppear(0)}>
+          OK
+        </button>
       </div>
     </main>
   );

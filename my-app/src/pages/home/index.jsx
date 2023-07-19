@@ -19,13 +19,19 @@ const groupedItems = SLIDES.home.reduce(
 
 function Home() {
   const [open, setOpen] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(0);
 
   useEffect(() => {
     if (open === 1) {
       setOpen(0);
     }
   }, [open]);
+
+  const handleClick = (slide) => {
+    const index = SLIDES.home.findIndex((slides) => slides === slide);
+    setSlideIndex(index);
+    setOpen(1);
+  };
 
   return (
     <main id="home">
@@ -45,15 +51,14 @@ function Home() {
           <div className="gallery full-screen">
             {groupedItems.map((column) => (
               <div className="gallery__column" key={Math.random()}>
-                {column.map((slide, index) => (
+                {column.map((slide) => (
                   <button
                     className="gallery__column__card no-style-btn"
                     id={slide.id}
                     key={slide.id}
                     type="button"
                     onClick={() => {
-                      setCurrentIndex(index);
-                      setOpen(1);
+                      handleClick(slide);
                     }}>
                     <figure className="gallery__column__card__thumb">
                       <img
@@ -70,7 +75,7 @@ function Home() {
               </div>
             ))}
           </div>
-          <ImageSlider slidesImages={SLIDES.home} openSlider={open} startIndex={currentIndex} />
+          <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
         </article>
         <article>
           <p>

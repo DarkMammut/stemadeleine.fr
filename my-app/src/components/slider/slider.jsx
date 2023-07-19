@@ -1,115 +1,111 @@
 import React, { useState, useEffect } from "react";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import "./slider.scss";
 
-function ImageSlider({ slidesImages, openSlider, startIndex }) {
+function ImageSlider({ slidesImages, openSlider, startSlide }) {
   const url = process.env.PUBLIC_URL;
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [appear, setAppear] = useState(0);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState<ImageType>();
-  const carouselItemsRef = useRef<HTMLDivElement[] | null[]>([]);
+  const [sliderData, setSliderData] = useState(slidesImages[0]);
+
+  const handleClick = (index) => {
+    const slider = slidesImages[index];
+    setSliderData(slider);
+  };
 
   useEffect(() => {
     if (openSlider === 1) {
-      setCurrentIndex(currentIndex + startIndex);
       setAppear(1);
+      const slider = slidesImages[startSlide];
+      setSliderData(slider);
     }
   }, [openSlider]);
 
-  function handleKeyDown(e) {
-    switch (e.key) {
-      case "escape":
-        setAppear(0);
-        break;
-
-      default:
-    }
-  }
-
-  useEffect(() => {
-    if (slidesImages && slidesImages[0]) {
-      carouselItemsRef.current = carouselItemsRef.current.slice(
-        0,
-        slidesImages.length
-      );
-
-      setSelectedImageIndex(0);
-      setSelectedImage(slidesImages[0]);
-    }
-  }, [slidesImages]);
-
-  const handleSelectedImageChange = (newIdx: number) => {
-    if (slidesImages && slidesImages.length > 0) {
-      setSelectedImage(slidesImages[newIdx]);
-      setSelectedImageIndex(newIdx);
-      if (carouselItemsRef?.current[newIdx]) {
-        carouselItemsRef?.current[newIdx]?.scrollIntoView({
-          inline: "center",
-          behavior: "smooth"
-        });
-      }
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Enter") {
+      handleClick(index);
+    } else if (e.key === "Escape") {
+      setAppear(0);
     }
   };
 
-  const handleRightClick = () => {
-    if (slidesImages && slidesImages.length > 0) {
-      let newIdx = selectedImageIndex + 1;
-      if (newIdx >= slidesImages.length) {
-        newIdx = 0;
-      }
-      handleSelectedImageChange(newIdx);
+  const next = () => {
+    let nextIndex = 0;
+    const currentIndex = slidesImages.findIndex((slide) => slide === sliderData);
+    if (currentIndex === slidesImages.length - 1) {
+      nextIndex = 0;
+    } else {
+      nextIndex = currentIndex + 1;
     }
+    const nextSlide = slidesImages[nextIndex];
+    setSliderData(nextSlide);
   };
 
-  const handleLeftClick = () => {
-    if (slidesImages && slidesImages.length > 0) {
-      let newIdx = selectedImageIndex - 1;
-      if (newIdx < 0) {
-        newIdx = slidesImages.length - 1;
-      }
-      handleSelectedImageChange(newIdx);
+  const previous = () => {
+    let previousIndex = 0;
+    const currentIndex = slidesImages.findIndex((slide) => slide === sliderData);
+    if (currentIndex === 0) {
+      previousIndex = slidesImages.length - 1;
+    } else {
+      previousIndex = currentIndex - 1;
     }
+    const previousSlide = slidesImages[previousIndex];
+    setSliderData(previousSlide);
   };
 
   return (
-    <div className="carousel-container">
-      <h2 className="header">Image Carousel</h2>
-      <div
-        className="selected-image"
-        style={{ backgroundImage: `url(${url}${selectedImage?.url})` }}
+    <div className="slider d-flex" data-open={appear}>
+      <button
+        className="slider__shut"
+        aria-label="shut"
+        onClick={() => setAppear(0)}
+        onKeyDown={handleKeyDown}
+        type="button">
+        <div className="slider__shut__line" />
+        <div className="slider__shut__line" />
+      </button>
+      <button
+        className="slider__backgroung"
+        aria-label="shut"
+        onClick={() => setAppear(0)}
+        onKeyDown={handleKeyDown}
+        type="button"
       />
-      <div className="carousel">
-        <div className="carousel__images">
-          {slidesImages &&
-            slidesImages.map((image, idx) => (
-              <div
-                onClick={() => handleSelectedImageChange(idx)}
-                style={{ backgroundImage: `url(${url}${image.url})` }}
-                key={image.id}
-                className={`carousel__image ${
-                  selectedImageIndex === idx && "carousel__image-selected"
-                }`}
-                ref={(el) => (carouselItemsRef.current[idx] = el)}
-              />
-            ))}
-        </div>
+      <div className="slider__container">
         <button
-          className="carousel__button carousel__button-left"
-          onClick={handleLeftClick}
-        >
-          Prev
+          className="slider__container__btn slider__container__btn--next no-style-btn d-flex"
+          type="button"
+          onKeyDown={handleKeyDown}
+          onClick={next}>
+          <FaChevronRight className="slider__container__btn__chevrons" />
         </button>
         <button
-          className="carousel__button carousel__button-right"
-          onClick={handleRightClick}
-        >
-          Next
+          className="slider__container__btn slider__container__btn--previous no-style-btn d-flex"
+          type="button"
+          onKeyDown={handleKeyDown}
+          onClick={previous}>
+          <FaChevronLeft className="slider__container__btn__chevrons" />
         </button>
+        <img
+          className="slider__container__activeslide"
+          src={url + sliderData.url}
+          alt={sliderData.alt}
+        />
+      </div>
+      <div className="slider__thumbnails d-flex">
+        {slidesImages.map((image, i) => (
+          <div className="slider__thumbnails__thumbnail" key={image.id}>
+            <button
+              className={sliderData.id === image.id ? "clicked no-style-btn" : "no-style-btn"}
+              type="button"
+              onKeyDown={() => handleKeyDown(i)}
+              onClick={() => handleClick(i)}>
+              <img src={url + image.url} alt={image.alt} />
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
-};
+}
 
 export default ImageSlider;
