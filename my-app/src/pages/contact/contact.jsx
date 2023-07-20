@@ -918,7 +918,7 @@ function Contact() {
           </svg>
 
           <form
-            name="contact-us"
+            name="contact"
             method="POST"
             data-netlify="true"
             data-netlify-recaptcha="true" // new Netlify data attribute regarding recaptcha submissions
