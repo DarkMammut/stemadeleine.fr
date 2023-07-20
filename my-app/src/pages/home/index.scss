@@ -4,7 +4,10 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-@include desktop-layout {
+article {
+  margin-top: 50px;
+  margin-bottom: 50px;
+
   .gallery {
     display: flex;
     padding: 2px;
@@ -17,13 +20,11 @@
     &__column {
       display: flex;
       flex-direction: column;
-      width: 10%;
 
       &__card {
-        margin: 2px;
-        overflow: hidden;
-
         &:hover {
+          cursor: pointer;
+
           .gallery__column__card__thumb__image {
             filter: grayscale(0);
           }
@@ -49,7 +50,8 @@
           &__caption {
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translatex(-50%);
             padding: 25px 15px 15px;
             width: 100%;
             font-family: "Raleway", sans-serif;
@@ -60,6 +62,20 @@
             transition: 0.3s;
           }
         }
+      }
+    }
+  }
+}
+
+@include desktop-layout {
+  .gallery {
+    &__column {
+      flex-direction: column;
+      width: 10%;
+
+      &__card {
+        margin: 5px;
+        overflow: hidden;
       }
     }
   }
@@ -78,4 +94,29 @@
 }
 
 @include mobile-layout {
+  article {
+    p {
+      padding: 0 3rem 0 3rem;
+    }
+
+    .gallery {
+      flex-direction: column;
+
+      &__column {
+        flex-direction: row;
+        width: 100%;
+
+        &__card {
+          margin: 10px;
+          width: calc(100% / 3);
+
+          &__thumb {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 10px;
+            overflow: hidden;
+          }
+        }
+      }
+    }
+  }
 }

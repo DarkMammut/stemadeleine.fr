@@ -82,12 +82,13 @@
     position: relative;
     justify-content: center;
     text-align: center;
-    height: 80%;
     z-index: 5;
     overflow: hidden;
-    margin-bottom: 1%;
     box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    border-radius: 30px;
+
+    &__activeslide {
+      height: 100%;
+    }
 
     &__btn {
       justify-content: center;
@@ -114,15 +115,8 @@
         left: 0;
       }
     }
-
-    &__activeslide {
-      height: 100%;
-
-      img {
-        object-fit: contain;
-      }
-    }
   }
+
   &__thumbnails {
     flex-wrap: nowrap;
     justify-content: center;
@@ -131,8 +125,6 @@
     z-index: 5;
 
     &__thumbnail {
-      margin: 3%;
-
       .clicked {
         transform: scale(1.2);
         border: thick double $accent-color;
@@ -152,3 +144,51 @@
     }
   }
 }
+
+@include desktop-layout {
+  .slider {  
+    &__container {
+      height: 80%;
+      margin-bottom: 1%;
+      border-radius: 30px;
+  
+      &__activeslide {  
+        img {
+          object-fit: contain;
+        }
+      }
+    }
+    &__thumbnails {  
+      &__thumbnail {
+        margin: 5px;
+      }
+    }
+  }
+}
+
+@include mobile-layout {
+  .slider {
+    &__container {
+      max-height: 70%;
+      width: 90%;
+      border-radius: 20px;
+  
+      &__activeslide {
+        width: 100%;
+  
+        img {
+          object-fit: cover;
+        }
+      }
+    }
+    &__thumbnails {
+      position: absolute;
+      bottom: 20px;
+
+      &__thumbnail {
+        margin: 5px;
+      }
+    }
+  }
+}
+
