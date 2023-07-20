@@ -93,7 +93,7 @@ function Contact() {
         break;
 
       default:
-        console.log("none");
+        setHeight({ ...height, [e.target.name]: 0 });
     }
   };
 
@@ -120,7 +120,7 @@ function Contact() {
         })
       })
         .then(() => setAppear(1))
-        .catch((error) => alert(error));
+        .catch((error) => alert(error) /* eslint-disable-line no-alert */);
     }
   };
 
