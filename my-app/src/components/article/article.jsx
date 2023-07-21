@@ -10,9 +10,7 @@ function Article({ Articles }) {
     <article key={article.id} className="article" id={article.id}>
       <h2 className="article__title">{article.title}</h2>
       <div className="article__container">
-        <div
-          className="article__textarea"
-          style={{ width: article.images.length > 0 ? "50%" : "100%" }}>
+        <div className="article__textarea" data-images={article.images.length > 0 ? "1" : "0"}>
           <div className="article__textarea__text">
             {article.text?.map((articleText) => (
               <div key={articleText.id} className="article__textarea__text__paragraph">

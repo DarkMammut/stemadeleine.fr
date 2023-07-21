@@ -37,6 +37,16 @@
   }
 }
 
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.99;
+  }
+}
+
 #illustration {
   height: 27rem;
 }
@@ -247,16 +257,6 @@ form {
   box-shadow: 0 0.5em 0.5em -0.4em #ff923cba;
   background-size: 100% 100%;
   transform: translateY(-0.15em);
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 0.99;
-  }
 }
 
 .thank-you {

@@ -9,9 +9,7 @@ function Section({ Sections }) {
     if (section.display === "enable") {
       return (
         <section className="section" id={section.id} key={section.id}>
-          <div
-            className="section__textarea"
-            style={{ width: section.images.length > 0 ? "50%" : "100%" }}>
+          <div className="section__textarea" data-images={section.images.length > 0 ? "1" : "0"}>
             <h3 className="section__textarea__title">{section.title}</h3>
             {section.text?.map((ph) => (
               <div key={ph.id} className="section__textarea__paragraph">

@@ -118,16 +118,18 @@
   }
 
   &__thumbnails {
-    flex-wrap: nowrap;
-    justify-content: center;
     height: 10%;
-    max-width: 15%;
     z-index: 5;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     &__thumbnail {
       .clicked {
         transform: scale(1.2);
         border: thick double $accent-color;
+        flex: 0 0 auto;
       }
       button {
         height: 100%;
@@ -146,19 +148,19 @@
 }
 
 @include desktop-layout {
-  .slider {  
+  .slider {
     &__container {
       height: 80%;
       margin-bottom: 1%;
       border-radius: 30px;
-  
-      &__activeslide {  
+
+      &__activeslide {
         img {
           object-fit: contain;
         }
       }
     }
-    &__thumbnails {  
+    &__thumbnails {
       &__thumbnail {
         margin: 5px;
       }
@@ -172,10 +174,10 @@
       max-height: 70%;
       width: 90%;
       border-radius: 20px;
-  
+
       &__activeslide {
         width: 100%;
-  
+
         img {
           object-fit: cover;
         }
@@ -191,4 +193,3 @@
     }
   }
 }
-

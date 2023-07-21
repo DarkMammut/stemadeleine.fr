@@ -4,62 +4,64 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-article {
-  margin-top: 50px;
-  margin-bottom: 50px;
+#home {
+  article {
+    margin-top: 50px;
+    margin-bottom: 50px;
 
-  .gallery {
-    display: flex;
-    padding: 2px;
-    transition: 0.3s;
-
-    &:hover &__column__card__thumb__image {
-      filter: grayscale(1);
-    }
-
-    &__column {
+    .gallery {
       display: flex;
-      flex-direction: column;
+      padding: 2px;
+      transition: 0.3s;
 
-      &__card {
-        &:hover {
-          cursor: pointer;
+      &:hover &__column__card__thumb__image {
+        filter: grayscale(1);
+      }
 
-          .gallery__column__card__thumb__image {
-            filter: grayscale(0);
-          }
+      &__column {
+        display: flex;
+        flex-direction: column;
 
-          .gallery__column__card__thumb__caption {
-            opacity: 1;
-          }
-        }
+        &__card {
+          &:hover {
+            cursor: pointer;
 
-        &__thumb {
-          position: relative;
+            .gallery__column__card__thumb__image {
+              filter: grayscale(0);
+            }
 
-          &__image {
-            display: block;
-            width: 100%;
-            transition: 0.3s;
-
-            &:hover {
-              transform: scale(1.1);
+            .gallery__column__card__thumb__caption {
+              opacity: 1;
             }
           }
 
-          &__caption {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translatex(-50%);
-            padding: 25px 15px 15px;
-            width: 100%;
-            font-family: "Raleway", sans-serif;
-            font-size: 16px;
-            color: white;
-            opacity: 0;
-            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
-            transition: 0.3s;
+          &__thumb {
+            position: relative;
+
+            &__image {
+              display: block;
+              width: 100%;
+              transition: 0.3s;
+
+              &:hover {
+                transform: scale(1.1);
+              }
+            }
+
+            &__caption {
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translatex(-50%);
+              padding: 25px 15px 15px;
+              width: 100%;
+              font-family: "Raleway", sans-serif;
+              font-size: 16px;
+              color: white;
+              opacity: 0;
+              background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+              transition: 0.3s;
+            }
           }
         }
       }
@@ -82,38 +84,31 @@ article {
 }
 
 @include small-desktop-layout {
-  .news {
-    &__title {
-      margin-left: 50px;
-    }
-
-    &__article {
-      justify-content: space-around;
-    }
-  }
 }
 
 @include mobile-layout {
-  article {
-    p {
-      padding: 0 3rem 0 3rem;
-    }
+  #home {
+    article {
+      p {
+        padding: 0 3rem 0 3rem;
+      }
 
-    .gallery {
-      flex-direction: column;
+      .gallery {
+        flex-direction: column;
 
-      &__column {
-        flex-direction: row;
-        width: 100%;
+        &__column {
+          flex-direction: row;
+          width: 100%;
 
-        &__card {
-          margin: 10px;
-          width: calc(100% / 3);
+          &__card {
+            margin: 10px;
+            width: calc(100% / 3);
 
-          &__thumb {
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            border-radius: 10px;
-            overflow: hidden;
+            &__thumb {
+              box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+              border-radius: 10px;
+              overflow: hidden;
+            }
           }
         }
       }

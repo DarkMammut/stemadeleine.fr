@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ScrollContainer from "react-indiana-drag-scroll";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import "./slider.scss";
 
@@ -91,7 +92,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           alt={sliderData.alt}
         />
       </div>
-      <div className="slider__thumbnails d-flex">
+      <ScrollContainer className="slider__thumbnails d-flex">
         {slidesImages.map((image, i) => (
           <div className="slider__thumbnails__thumbnail" key={image.id}>
             <button
@@ -103,7 +104,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
             </button>
           </div>
         ))}
-      </div>
+      </ScrollContainer>
     </div>
   );
 }

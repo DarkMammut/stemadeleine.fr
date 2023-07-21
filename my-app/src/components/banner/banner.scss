@@ -44,16 +44,13 @@
     attachment: fixed;
     color: rgba($color-black, 0.2);
   }
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 
   &__textarea {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
 
     &__title {
       text-align: center;
-      justify-content: flex-end;
-      color: $color-white;
     }
   }
 }
@@ -153,6 +150,17 @@
     display: flex;
   }
 }
+
+.banner {
+    &__textarea {
+    flex-direction: column;
+    justify-content: flex-end;
+
+    &__title {
+      color: $color-white;
+    }
+  }
+}
 }
 
 @include mobile-layout {
@@ -168,6 +176,22 @@
         margin-right: 5px;
         margin-bottom: 15px;
         padding-bottom: 15px;
+      }
+    }
+  }
+
+  .banner {
+    border-bottom-left-radius: 50% 20%;
+    border-bottom-right-radius: 50% 20%;
+  
+    &__textarea {
+      position: fixed;
+      height: $mobile-header-radius;
+      z-index: 3;
+      align-items: center;
+
+      &__title {
+        color: $color-white;
       }
     }
   }
