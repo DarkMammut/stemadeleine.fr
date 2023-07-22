@@ -35,7 +35,7 @@
   &__backgroung {
     position: fixed;
     background: linear-gradient(90deg, $light-color 0%, $primary-color 35%, $dark-color 100%);
-    opacity: 0.7;
+    opacity: 0.95;
     border: none;
     width: 100%;
     height: 100%;
@@ -48,7 +48,7 @@
     width: $desktop-header-radius;
     height: $desktop-header-radius;
     background-color: transparent;
-    opacity: 0.5;
+    opacity: 0.8;
     border: none;
     cursor: pointer;
     z-index: 4;
@@ -118,12 +118,8 @@
   }
 
   &__thumbnails {
-    height: 10%;
     z-index: 5;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    justify-content: space-between;
 
     &__thumbnail {
       .clicked {
@@ -147,6 +143,11 @@
   }
 }
 
+.scroll-container {
+  height: calc(100px * 1.2);
+  padding: 0 20px 0 20px;
+}
+
 @include desktop-layout {
   .slider {
     &__container {
@@ -162,6 +163,7 @@
     }
     &__thumbnails {
       &__thumbnail {
+        height: 100px;
         margin: 5px;
       }
     }
@@ -188,6 +190,7 @@
       bottom: 20px;
 
       &__thumbnail {
+        height: 70px;
         margin: 5px;
       }
     }

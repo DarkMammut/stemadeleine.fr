@@ -64,13 +64,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
         <div className="slider__shut__line" />
         <div className="slider__shut__line" />
       </button>
-      <button
-        className="slider__backgroung"
-        aria-label="shut"
-        onClick={() => setAppear(0)}
-        onKeyDown={handleKeyDown}
-        type="button"
-      />
+      <div className="slider__backgroung" />
       <div className="slider__container">
         <button
           className="slider__container__btn slider__container__btn--next no-style-btn d-flex"
@@ -92,18 +86,20 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           alt={sliderData.alt}
         />
       </div>
-      <ScrollContainer className="slider__thumbnails d-flex">
-        {slidesImages.map((image, i) => (
-          <div className="slider__thumbnails__thumbnail" key={image.id}>
-            <button
-              className={sliderData.id === image.id ? "clicked no-style-btn" : "no-style-btn"}
-              type="button"
-              onKeyDown={() => handleKeyDown(i)}
-              onClick={() => handleClick(i)}>
-              <img src={url + image.url} alt={image.alt} />
-            </button>
-          </div>
-        ))}
+      <ScrollContainer className="slider__thumbnails">
+        <div className="scroll-container d-flex align-items-center">
+          {slidesImages.map((image, i) => (
+            <div className="slider__thumbnails__thumbnail" key={image.id}>
+              <button
+                className={sliderData.id === image.id ? "clicked no-style-btn" : "no-style-btn"}
+                type="button"
+                onKeyDown={() => handleKeyDown(i)}
+                onClick={() => handleClick(i)}>
+                <img src={url + image.url} alt={image.alt} />
+              </button>
+            </div>
+          ))}
+        </div>
       </ScrollContainer>
     </div>
   );
