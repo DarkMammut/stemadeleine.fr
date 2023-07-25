@@ -41,13 +41,13 @@
     position: center;
     size: cover;
     repeat: no-repeat;
-    attachment: fixed;
     color: rgba($color-black, 0.2);
   }
   box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 
   &__textarea {
     display: flex;
+    animation: fadein ease 2s forwards;
 
     &__title {
       text-align: center;
@@ -59,12 +59,10 @@
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
   background: {
     size: cover;
     position: center;
     repeat: no-repeat;
-    attachment: fixed;
   }
   width: 100%;
   border-bottom-left-radius: 50% 20%;
@@ -76,14 +74,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba($light-color, 0.6);
-    box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.3);
     transform: translatey(-25%);
     opacity: 0;
     animation: fadein ease 2s forwards;
 
     &__title {
-      border-bottom: solid 1px rgba($accent-color, 0.7);
       text-align: center;
     }
 
@@ -130,37 +125,45 @@
 }
 
 @include desktop-layout {
-.l-banner {
-  height: 800px;
-
-  &__textarea {
-    width: 50%;
-    height: 50%;
-    border-radius: 10px;
-
-    &__title {
-      margin-right: 15px;
-      margin-left: 15px;
-      margin-bottom: 50px;
-      padding-bottom: 50px;
-    }
+  .banner {
+    background-attachment: fixed;
   }
+  .l-banner {
+    background-attachment: fixed;
+    height: 800px;
 
-  &__down {
-    display: flex;
-  }
-}
-
-.banner {
     &__textarea {
-    flex-direction: column;
-    justify-content: flex-end;
+      align-items: center;
+      width: 50%;
+      height: 50%;
+      border-radius: 10px;
+      background-color: rgba($light-color, 0.6);
+      box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.3);
 
-    &__title {
-      color: $color-white;
+      &__title {
+        margin-right: 15px;
+        margin-left: 15px;
+        margin-bottom: 50px;
+        padding-bottom: 50px;
+        border-bottom: solid 1px rgba($accent-color, 0.7);
+      }
+    }
+
+    &__down {
+      display: flex;
     }
   }
-}
+
+  .banner {
+    &__textarea {
+      flex-direction: column;
+      justify-content: flex-end;
+
+      &__title {
+        color: $color-white;
+      }
+    }
+  }
 }
 
 @include mobile-layout {
@@ -168,14 +171,19 @@
     height: 400px;
 
     &__textarea {
-      height: 30%;
-      border-radius: 5px;
-  
+      position: fixed;
+      height: $mobile-header-radius;
+      top: 0;
+      z-index: 3;
+      align-items: center;
+      margin: 0 70px 0 70px;
+
       &__title {
-        margin-left: 5px;
-        margin-right: 5px;
-        margin-bottom: 15px;
-        padding-bottom: 15px;
+        color: $color-white;
+      }
+
+      &__subhead {
+        display: none;
       }
     }
   }
@@ -183,16 +191,17 @@
   .banner {
     border-bottom-left-radius: 50% 20%;
     border-bottom-right-radius: 50% 20%;
-  
+
     &__textarea {
       position: fixed;
       height: $mobile-header-radius;
       z-index: 3;
       align-items: center;
+      margin: 0 70px 0 70px;
 
       &__title {
         color: $color-white;
       }
     }
   }
-  }
+}

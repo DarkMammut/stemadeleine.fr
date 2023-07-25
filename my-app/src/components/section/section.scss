@@ -8,11 +8,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-
-    &__title {
-      text-align: center;
-      font-family: $titles;
-    }
+    
     &__paragraph {
       text-align: justify;
     }
@@ -75,7 +71,9 @@
       &__title {
         margin-bottom: 30px;
         padding-bottom: 15px;
+        text-align: center;
       }
+
       &__paragraph {
         margin-bottom: 50px;
       }
@@ -107,11 +105,13 @@
   
     &__textarea {
       width: 100%;
-      padding: 0 50px 20px 50px;
   
       &__title {
-        padding-bottom: 20px;
+        margin-bottom: 10px;
+        text-align: start;
+        font-style: italic;
       }
+
       &__paragraph {
         margin-bottom: 10px;
       }

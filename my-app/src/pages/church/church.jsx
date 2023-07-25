@@ -8,7 +8,7 @@ function Church() {
   return (
     <main id="church">
       <Helmet>
-        <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
+        <title>EGLISE | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div className="container">
         {/* <p className="church__paragraph"></p> */}

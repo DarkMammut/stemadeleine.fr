@@ -23,8 +23,6 @@
         flex-direction: column;
 
         &__card {
-          box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-          
           &:hover {
             cursor: pointer;
 
@@ -80,6 +78,9 @@
       &__card {
         margin: 5px;
         overflow: hidden;
+        &__thumb {
+          box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+        }
       }
     }
   }

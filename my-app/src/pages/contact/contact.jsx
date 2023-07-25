@@ -36,7 +36,7 @@ function Contact() {
 
   const [state, setState] = useState({});
   const [height, setHeight] = useState({});
-  const [appear, setAppear] = useState(0);
+  const [appear, setAppear] = useState(1);
 
   const recaptchaRef = React.createRef(); // new Ref for reCaptcha
 

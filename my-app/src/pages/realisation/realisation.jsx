@@ -8,7 +8,7 @@ function Realisation() {
   return (
     <main className="realisations">
       <Helmet>
-        <title>ASSOCIATION | Les Amis de Sainte Madeleine de La Jarrie</title>
+        <title>REALISATIONS | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div className="container">
         <article>
