@@ -9,18 +9,16 @@
   #About-A2 {
     .article{
       &__textarea{
-        display: none;
-      }
-
-      &__sections div {
-        display: flex;
-        justify-content: space-around;
-
-        .section {
-          width: 30%;
-
-          &__textarea {
-            justify-content: flex-start;
+        &__sections div {
+          display: flex;
+          justify-content: space-around;
+  
+          .section {
+            width: 30%;
+  
+            &__textarea {
+              justify-content: flex-start;
+            }
           }
         }
       }

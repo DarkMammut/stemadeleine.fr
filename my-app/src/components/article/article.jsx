@@ -37,9 +37,9 @@ function Article({ Articles }) {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="article__sections">
-              {article.section.length > 0 ? <Section Sections={article.section} /> : null}
+              <div className="article__textarea__sections">
+                {article.section.length > 0 ? <Section Sections={article.section} /> : null}
+              </div>
             </div>
             {article.images.length > 0 ? (
               <div className="article__images">
