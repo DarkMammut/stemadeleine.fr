@@ -22,7 +22,7 @@ function Banner() {
           <div className="l-banner" style={style}>
             <div className="l-banner__textarea">
               <h1 className="l-banner__textarea__title">{found.title}</h1>
-              <span className="l-banner__textarea__subhead">{found.subhead}</span>
+              <h2 className="l-banner__textarea__subhead">{found.subhead}</h2>
             </div>
             <Link className="l-banner__down" to="#start">
               <div className="l-banner__down__chevron">

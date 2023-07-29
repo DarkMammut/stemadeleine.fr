@@ -73,7 +73,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     transform: translatey(-25%);
     opacity: 0;
     animation: fadein ease 2s forwards;
@@ -130,6 +129,7 @@
   }
   .l-banner {
     background-attachment: fixed;
+    align-items: center;
     height: 800px;
 
     &__textarea {

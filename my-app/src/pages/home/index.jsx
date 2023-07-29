@@ -37,7 +37,10 @@ function Home() {
         <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div className="container">
-        <article id="#start">
+        <article>
+          <h3 id="start">
+            Bienvenue sur le site de l&apos;association des Amis de Sainte Madeleine de La Jarrie.
+          </h3>
           <section>
             <p>
               L’association « Les Amis de Sainte Madeleine de La jarrie » a été créée pour défendre
