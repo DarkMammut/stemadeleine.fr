@@ -130,12 +130,17 @@
 
       span {
         color: white;
+        text-align: center;
+      }
+
+      &:hover{
+        transform: scale(1.2);
       }
     }
   }
 
   .google-map {
-    width: 70%;
+    width: 60%;
     height: 30rem;
     box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
   }
@@ -359,10 +364,6 @@ form {
           top: 50%;
           left: 1.5rem;
           transform: translatey(-50%);
-          color: white;
-        }
-
-        span {
           color: white;
         }
       }

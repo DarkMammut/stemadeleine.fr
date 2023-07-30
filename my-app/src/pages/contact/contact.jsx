@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import Recaptcha from "react-google-recaptcha";
-import { FaUser, FaEnvelope, FaLocationArrow, FaPen } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLocationArrow, FaPen, FaChurch } from "react-icons/fa";
 import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
 function encode(state) {
-  return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&name=${state.firstname}&name=${state.lastname}&name=${state.email}&subject=${state.subject}&message=${state.message}&rgpd=${state.rgpd}`;
+  return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&firstname=${state.firstname}&lastname=${state.lastname}&email=${state.email}&subject=${state.subject}&message=${state.message}&rgpd=${state.rgpd}`;
 }
 
 function ValidateEmail(mail) {
@@ -133,9 +133,17 @@ function Contact() {
         <div className="container-contact d-flex justify-content-center align-items-center">
           <div className="contact-details d-flex justify-content-center align-items-center">
             <div className="contact-details__box d-flex justify-content-center align-items-center">
+              <FaChurch className="contact-details__box__icon" />
+              <span>
+                Les Amis de Sainte
+                <br />
+                Madeleine de la Jarrie
+              </span>
+            </div>
+            <div className="contact-details__box d-flex justify-content-center align-items-center">
               <FaLocationArrow className="contact-details__box__icon" />
               <span>
-                Rue des Canons
+                3 Rue des Canons
                 <br />
                 17220 La Jarrie
               </span>
@@ -942,7 +950,7 @@ function Contact() {
                 minLength="2"
               />
               <div className="requirements s-text" style={{ maxHeight: `${height.firstname}` }}>
-                Veuillez saisir un de prénom valide.
+                Veuillez saisir un prénom valide.
               </div>
             </div>
 
