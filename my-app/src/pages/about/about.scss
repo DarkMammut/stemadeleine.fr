@@ -1,29 +1,39 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-#about {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-#About-A2 {
-  .article__sections {
-    justify-content: space-between;
-    .section {
-      width: 30%;
+@include desktop-layout {
+  #about {
+    flex-direction: column;
+  }
+  
+  #About-A2 {
+    .article{
+      &__textarea{
+        &__sections div {
+          display: flex;
+          justify-content: space-around;
+  
+          .section {
+            width: 30%;
+  
+            &__textarea {
+              justify-content: flex-start;
+            }
+          }
+        }
+      }
     }
   }
-}
-
-#About-A2S1 {
-  margin-top: 0;
-}
-
-#About-A2S2 {
-  margin-top: 250px;
-}
-
-#About-A2S3 {
-  margin-top: 500px;
+  
+  #About-A2S1 {
+    margin-top: 0;
+  }
+  
+  #About-A2S2 {
+    margin-top: 250px;
+  }
+  
+  #About-A2S3 {
+    margin-top: 500px;
+  }
 }

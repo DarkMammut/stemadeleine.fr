@@ -10,7 +10,7 @@ function Join() {
   return (
     <main id="join">
       <Helmet>
-        <title>Nous rejoindre | Les Amis de Sainte Madeleine de La Jarrie</title>
+        <title>NOUS REJOINDRE | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>
       <div className="container">
         <div className="join">
