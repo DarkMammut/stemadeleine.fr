@@ -99,49 +99,30 @@
   animation-delay: 200ms;
 }
 
-
-
 .container-contact {
   .contact-details {
-    flex-direction: column;
-    width: 30%;
     justify-content: space-evenly;
 
     &__box {
       position: relative;
-      flex-direction: column;
-      width: 90%;
-      height: 100px;
-      border: 0;
-      border-radius: 3rem;
-      background-image: linear-gradient(131deg, $dark-color, $primary-color, $light-color);
-      background-size: 300% 100%;
-      margin-bottom: 2rem;
-      box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
       &__icon {
         position: absolute;
         top: 50%;
-        left: 1.5rem;
         transform: translatey(-50%);
-        color: white;
       }
 
       span {
-        color: white;
         text-align: center;
       }
 
-      &:hover{
+      &:hover {
         transform: scale(1.2);
       }
     }
   }
 
   .google-map {
-    width: 60%;
-    height: 30rem;
     box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
   }
 }
@@ -342,15 +323,7 @@ form {
 
   .container-contact {
     .contact-details {
-      flex-direction: column;
-      width: 30%;
-      justify-content: space-evenly;
-
       &__box {
-        position: relative;
-        flex-direction: column;
-        width: 90%;
-        height: 100px;
         border: 0;
         border-radius: 3rem;
         background-image: linear-gradient(131deg, $dark-color, $primary-color, $light-color);
@@ -360,11 +333,12 @@ form {
           rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
         &__icon {
-          position: absolute;
-          top: 50%;
           left: 1.5rem;
-          transform: translatey(-50%);
-          color: white;
+          color: $color-white;
+        }
+
+        span {
+          color: $color-white;
         }
       }
     }
@@ -372,7 +346,6 @@ form {
     .google-map {
       width: 70%;
       height: 30rem;
-      box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
     }
   }
 
@@ -446,25 +419,6 @@ form {
     }
   }
 
-  .btn.btn-primary {
-    font-family: "Quicksand", sans-serif;
-    font-weight: bold;
-    height: 2.5rem;
-    line-height: 2.5rem;
-    padding: 0 3rem;
-    border: 0;
-    border-radius: 3rem;
-    background-image: linear-gradient(131deg, #ffd340, #ff923c, #ff923c, #ff923c);
-    background-size: 300% 100%;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .btn.btn-primary:hover:enabled {
-    box-shadow: 0 0.5em 0.5em -0.4em #ff923cba;
-    background-size: 100% 100%;
-    transform: translateY(-0.15em);
-  }
-
   .thank-you {
     position: fixed;
     flex-direction: column;
@@ -527,6 +481,42 @@ form {
   }
 }
 
+@include large-desktop-layout {
+  .container-contact {
+    flex-direction: row;
+
+    .contact-details {
+      flex-direction: column;
+      width: 30%;
+
+      &__box {
+        width: 90%;
+        height: 100px;
+      }
+    }
+  }
+}
+
+@include small-desktop-layout {
+  .container-contact {
+    flex-direction: column;
+
+    .contact-details {
+      flex-direction: row;
+      width: 100%;
+
+      &__box {
+        width: 25%;
+        height: 80px;
+
+        span {
+          font-size: 70%;
+        }
+      }
+    }
+  }
+}
+
 @include mobile-layout {
   #contact {
     .container {
@@ -544,7 +534,6 @@ form {
     margin-top: 1rem;
   }
 
-
   .checkbox {
     display: flex;
     width: 100%;
@@ -558,42 +547,25 @@ form {
 
   .container-contact {
     flex-direction: column;
+
     .contact-details {
-      flex-direction: column;
-      width: 30%;
-      justify-content: space-evenly;
+      width: 100%;
 
       &__box {
-        position: relative;
-        flex-direction: column;
-        width: 90%;
-        height: 100px;
-        border: 0;
-        border-radius: 3rem;
-        background-image: linear-gradient(131deg, $dark-color, $primary-color, $light-color);
-        background-size: 300% 100%;
-        margin-bottom: 2rem;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-          rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
-
         &__icon {
-          position: absolute;
-          top: 50%;
-          left: 1.5rem;
-          transform: translatey(-50%);
-          color: white;
+          left: 0;
+          color: $dark-color;
         }
 
         span {
-          color: white;
+          color: $dark-color;
         }
       }
     }
 
     .google-map {
-      width: 70%;
-      height: 30rem;
-      box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+      width: 100%;
+      height: 20rem;
     }
   }
 
@@ -605,25 +577,6 @@ form {
         margin: 1rem 0 1rem 0;
       }
     }
-  }
-
-  .btn.btn-primary {
-    font-family: "Quicksand", sans-serif;
-    font-weight: bold;
-    height: 2.5rem;
-    line-height: 2.5rem;
-    padding: 0 3rem;
-    border: 0;
-    border-radius: 3rem;
-    background-image: linear-gradient(131deg, #ffd340, #ff923c, #ff923c, #ff923c);
-    background-size: 300% 100%;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .btn.btn-primary:hover:enabled {
-    box-shadow: 0 0.5em 0.5em -0.4em #ff923cba;
-    background-size: 100% 100%;
-    transform: translateY(-0.15em);
   }
 
   .thank-you {

@@ -36,7 +36,7 @@ function Contact() {
 
   const [state, setState] = useState({});
   const [height, setHeight] = useState({});
-  const [appear, setAppear] = useState(1);
+  const [appear, setAppear] = useState(0);
 
   const recaptchaRef = React.createRef(); // new Ref for reCaptcha
 
@@ -131,7 +131,7 @@ function Contact() {
       </Helmet>
       <div className="container">
         <div className="container-contact d-flex justify-content-center align-items-center">
-          <div className="contact-details d-flex justify-content-center align-items-center">
+          <div className="contact-details d-flex align-items-center">
             <div className="contact-details__box d-flex justify-content-center align-items-center">
               <FaChurch className="contact-details__box__icon" />
               <span>
@@ -156,7 +156,7 @@ function Contact() {
           <div className="google-map">
             <iframe
               title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.04729886033!2d-1.0134871825561522!3d46.129887700000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014be2c51280a9%3A0x4e96103d6c8f2a26!2sEglise%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1669420241164!5m2!1sfr!2sfr"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.1328520850134!2d-1.0157162491620182!3d46.1281834652468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014bfd557f4e83%3A0x7c008224d0ba1a4c!2s3%20Rue%20des%20Canons%2C%2017220%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1690731444624!5m2!1sfr!2sfr"
               width="100%"
               height="100%"
               allowFullScreen=""

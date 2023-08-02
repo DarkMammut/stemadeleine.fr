@@ -4,9 +4,18 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
+#welcome {
+  text-align: center;
+  text-shadow: 1px 0px 1px #cccccc, 0px 1px 1px #eeeeee, 2px 1px 1px #cccccc, 1px 2px 1px #eeeeee,
+    3px 2px 1px #cccccc, 2px 3px 1px #eeeeee, 4px 3px 1px #cccccc, 3px 4px 1px #eeeeee,
+    5px 4px 1px #cccccc, 4px 5px 1px #eeeeee, 6px 5px 1px #cccccc, 5px 6px 1px #eeeeee,
+    7px 6px 1px #cccccc, -13px 22px 6px rgba(206, 89, 55, 0);
+  font-size: 3.5rem;
+}
+
 #home {
   article {
-    margin-top: 50px;
+    text-align: justify;
     margin-bottom: 50px;
 
     .gallery {
@@ -70,20 +79,35 @@
 }
 
 @include desktop-layout {
-  .gallery {
-    &__column {
-      flex-direction: column;
-      width: 10%;
+  #welcome {
+    padding: $desktop-header-radius 250px 0 250px;
+  }
 
-      &__card {
-        margin: 5px;
-        overflow: hidden;
-        &__thumb {
-          box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  #home {
+    section {
+      margin-top: 50px;
+      p {
+        margin-bottom: 40px;
+      }
+    }
+    .gallery {
+      &__column {
+        flex-direction: column;
+        width: 10%;
+
+        &__card {
+          margin: 5px;
+          overflow: hidden;
+          &__thumb {
+            box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+          }
         }
       }
     }
   }
+}
+
+@include large-desktop-layout {
 }
 
 @include small-desktop-layout {

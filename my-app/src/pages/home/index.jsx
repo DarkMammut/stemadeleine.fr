@@ -38,7 +38,7 @@ function Home() {
       </Helmet>
       <div className="container">
         <article>
-          <h3 id="start">
+          <h3 id="welcome" className="full-screen">
             Bienvenue sur le site de l&apos;association des Amis de Sainte Madeleine de La Jarrie.
           </h3>
           <section>

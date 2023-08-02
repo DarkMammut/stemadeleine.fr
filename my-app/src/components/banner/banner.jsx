@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import bannerArray from "../../assets/banner.json";
 import "./banner.scss";
 
@@ -15,6 +15,15 @@ function Banner() {
   const url = process.env.PUBLIC_URL + found.url;
   const style = { backgroundImage: `url(${url})` };
 
+  const handleClick = () => {
+    const element = document.getElementById("welcome");
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest"
+    });
+  };
+
   switch (found.type) {
     case "large":
       return (
@@ -24,7 +33,7 @@ function Banner() {
               <h1 className="l-banner__textarea__title">{found.title}</h1>
               <h2 className="l-banner__textarea__subhead">{found.subhead}</h2>
             </div>
-            <Link className="l-banner__down" to="#start">
+            <button className="l-banner__down no-style-btn" type="button" onClick={handleClick}>
               <div className="l-banner__down__chevron">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -33,7 +42,7 @@ function Banner() {
                   />
                 </svg>
               </div>
-            </Link>
+            </button>
           </div>
         </div>
       );

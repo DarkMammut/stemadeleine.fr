@@ -26,13 +26,17 @@
     align-items: center;
     justify-content: center;
 
-    &__image {
+    &__frame {
       display: flex;
       flex-direction: column;
       justify-content: center;
       width: 100%;
 
-      &__container {
+      &:hover {
+        cursor: pointer;
+      }
+
+      &__image {
         display: flex;
         justify-content: center;
         width: 100%;
@@ -63,8 +67,8 @@
 @include desktop-layout {
   .article {
     margin-top: 100px;
-    background-color: rgb(217, 217, 217);
-    border-radius: 20px;
+    background: linear-gradient(90deg, rgba(60,160,122,0.1) 0%, rgba(144,202,180,0.1) 28%, rgba(226,131,43,0.1) 100%);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 
     &__container {
       flex-direction: row;
