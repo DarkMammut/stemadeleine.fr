@@ -10,6 +10,7 @@ function History() {
   const [open, setOpen] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [activeToggle, setActiveToggle] = useState({});
 
   const handleInputChange = (index) => {
     setActiveIndex(index);
@@ -34,14 +35,13 @@ function History() {
   };
 
   const handleShow = (e) => {
-    const textContainer = e.target.closest("span");
-    if (e.target.className === "toggle-btn no-style-btn") {
-      e.target.classList.add("active");
-      textContainer.textContent = "Voir moins";
+    const btnName = e.target.name;
+    if (activeToggle[btnName] === 1) {
+      setActiveToggle({ ...activeToggle, [e.target.name]: 0 });
     } else {
-      e.target.classList.remove("active");
-      textContainer.textContent = "Voir plus";
+      setActiveToggle({ ...activeToggle, [e.target.name]: 1 });
     }
+    console.log(activeToggle);
   };
 
   return (
@@ -80,7 +80,12 @@ function History() {
                     <h3>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h3>
                     <h4>6° année</h4>
                   </div>
-                  <p className="section__textarea__paragraph">
+                  <p
+                    className={
+                      activeToggle.btn_1 === 1
+                        ? "section__textarea__paragraph show"
+                        : "section__textarea__paragraph"
+                    }>
                     … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et
                     du concours de ses paroissiens, on a vu s’accomplir une restauration inespérée ;
                     l’intérieur de l’église, jadis si délabré, a pris les proportions et l’élégance
@@ -109,14 +114,22 @@ function History() {
                     persuadés, cette émotion laissera des traces dans l’âme des fidèles nombreux,
                     présents à la cérémonie ».
                   </p>
+                  <button
+                    className={
+                      activeToggle.btn_1 === 1
+                        ? "toggle-btn no-style-btn d-flex active"
+                        : "toggle-btn no-style-btn d-flex"
+                    }
+                    type="button"
+                    name="btn_1"
+                    onClick={handleShow}>
+                    {activeToggle.btn_1 === 1 ? "Voir moins" : "Voir plus"}
+                    <div className="toggle-btn__arrow d-flex justify-content-center">
+                      <FaAngleDown />
+                    </div>
+                  </button>
                 </div>
               </section>
-              <button className="toggle-btn no-style-btn" type="button" onClick={handleShow}>
-                <span className="toggle-btn__text">Voir plus</span>
-                <div className="toggle-btn__arrow">
-                  <FaAngleDown className="toggle-btn__arrow__icon" />
-                </div>
-              </button>
             </article>
           </div>
         </div>
