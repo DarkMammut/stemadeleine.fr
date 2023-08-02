@@ -41,7 +41,6 @@ function History() {
     } else {
       setActiveToggle({ ...activeToggle, [e.target.name]: 1 });
     }
-    console.log(activeToggle);
   };
 
   return (
