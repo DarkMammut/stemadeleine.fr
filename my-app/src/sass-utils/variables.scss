@@ -15,9 +15,11 @@ $titles: "Fjord One", serif;
 $special: "Abril Fatface", serif;
 
 $numDots: 3;
-$parentWidthBase: calc(1 / $numDots);
-$parentWidth: $parentWidthBase * 100vw;
+$parentBase: calc(1 / $numDots);
+$parentWidth: $parentBase * 100vw;
+$parentHeight: $parentBase * 70vh;
 $parentMaxWidth: 1224px;
+$parentMaxHeight: 70vh;
 $dotWidth: 25px;
 $active: $dark-color;
 $inactive: $light-color;

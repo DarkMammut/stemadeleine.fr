@@ -322,8 +322,10 @@
           justify-content: center;
 
           & a {
-            color: $color-black;
             z-index: 2;
+            div {
+              color: $color-white;
+            }
           }
 
           &__submenu {

@@ -6,7 +6,7 @@ import "./project.scss";
 
 function Project() {
   return (
-    <main>
+    <main id="project">
       <Helmet>
         <title>PROJETS | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

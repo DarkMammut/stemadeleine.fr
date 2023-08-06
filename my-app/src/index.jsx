@@ -28,10 +28,10 @@ root.render(
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/association" element={<Association />} />
-        <Route exact path="/association/nos-realisations" element={<Realisation />} />
+        <Route exact path="/association/projets" element={<Project />} />
         <Route exact path="/association/nous-rejoindre" element={<Join />} />
         <Route exact path="/association/don" element={<Donation />} />
-        <Route exact path="/projets" element={<Project />} />
+        <Route exact path="/nos-realisations" element={<Realisation />} />
         <Route exact path="/eglise" element={<Church />} />
         <Route exact path="/eglise/histoire" element={<History />} />
         <Route exact path="/eglise/cloches" element={<Bells />} />

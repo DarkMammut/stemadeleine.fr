@@ -79,22 +79,6 @@ function Home() {
             </div>
             <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
           </section>
-          <section>
-            <p>
-              Cette association a pour objectif d’être un outil au service de l’église et de la
-              commune pour mener à bien des travaux de restauration du mobilier et de protection du
-              patrimoine.
-            </p>
-
-            <p>
-              Tous ces projets ne peuvent se faire que grâce au soutien de la commune de La Jarrie
-              et avec l’accord du Curé de la paroisse. Cette association travaille en étroite
-              collaboration avec ce dernier qui doit approuver tous les projets d’action de
-              l’association, et avec la Mairie et la responsable de la Culture.
-            </p>
-
-            <p>L’association compte 29 adhérents</p>
-          </section>
         </article>
       </div>
     </main>

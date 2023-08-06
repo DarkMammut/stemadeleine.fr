@@ -12,8 +12,8 @@
     "sublinks": [
       {
         "id": "L2S1",
-        "name": "NOS REALISATIONS",
-        "path": "/nos-realisations"
+        "name": "NOS PROJETS",
+        "path": "/projets"
       },
       {
         "id": "L2S2",
@@ -29,8 +29,8 @@
   },
   {
     "id": "L3",
-    "name": "PROJETS",
-    "path": "/projets",
+    "name": "NOS REALISATIONS",
+    "path": "/nos-realisations",
     "sublinks": []
   },
   {

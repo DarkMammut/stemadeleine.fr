@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { FaAngleDown } from "react-icons/fa";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
 import "./history.scss";
@@ -38,6 +37,11 @@ function History() {
     const btnName = e.target.name;
     if (activeToggle[btnName] === 1) {
       setActiveToggle({ ...activeToggle, [e.target.name]: 0 });
+      e.target.closest(".article").scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest"
+      });
     } else {
       setActiveToggle({ ...activeToggle, [e.target.name]: 1 });
     }
@@ -122,10 +126,7 @@ function History() {
                     type="button"
                     name="btn_1"
                     onClick={handleShow}>
-                    {activeToggle.btn_1 === 1 ? "Voir moins" : "Voir plus"}
-                    <div className="toggle-btn__arrow d-flex justify-content-center">
-                      <FaAngleDown />
-                    </div>
+                    {activeToggle.btn_1 === 1 ? "Réduire" : "En savoir +"}
                   </button>
                 </div>
               </section>

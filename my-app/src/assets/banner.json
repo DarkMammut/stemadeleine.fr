@@ -46,7 +46,7 @@
 
   {
     "id": "b-realisations",
-    "location": "/association/nos-realisations",
+    "location": "/nos-realisations",
     "type": "small",
     "url": "/banners/Banner-6.jpg",
     "title": "NOS REALISATIONS",
@@ -73,7 +73,7 @@
 
   {
     "id": "b-projects",
-    "location": "/projets",
+    "location": "/association/projets",
     "type": "small",
     "url": "/banners/Banner-9.jpeg",
     "title": "NOS PROJETS",

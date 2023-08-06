@@ -6,7 +6,7 @@
     height: 0;
   }
   50% {
-    height : 100px;
+    height: 100px;
   }
   100% {
     height: auto;
@@ -15,18 +15,12 @@
 
 #history {
   .parent {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     height: 100%;
   }
   .input-container {
     justify-content: space-around;
     align-items: center;
-    width: $parentWidth;
-    height: 100px;
-    max-width: $parentMaxWidth;
     position: relative;
     z-index: 0;
   }
@@ -45,18 +39,7 @@
       display: block;
       position: absolute;
       z-index: -1;
-      top: 50%;
-      transform: translateY(-50%);
       background-color: $active;
-      width: calc($parentWidth / $numDots);
-      height: 5px;
-      max-width: calc($parentMaxWidth / $numDots);
-    }
-    &::before {
-      left: calc(calc(-1 * $parentWidth / $numDots) + calc($dotWidth / 2));
-    }
-    &::after {
-      right: calc(calc(-1 * $parentWidth / $numDots) + calc($dotWidth / 2));
     }
     &.active {
       background-color: $active;
@@ -95,27 +78,25 @@
       &::after {
         visibility: visible;
         position: absolute;
-        left: 50%;
       }
       &::after {
         content: attr(data-year);
-        top: -50px;
-        transform: translateX(-50%);
         font-size: 14px;
       }
     }
   }
   .description-container {
     flex: 1 1 auto;
-    margin-bottom: 100px;
 
     .article {
       display: none;
       position: relative;
       border-radius: 5rem;
       overflow: hidden;
+      margin-top: 0;
 
       .section {
+        margin-top: 0;
         &__textarea {
           &__title {
             border-bottom: solid 3px $accent-color;
@@ -126,7 +107,6 @@
             height: 0;
             overflow: hidden;
             z-index: -1;
-            padding: 0 5rem 0 5rem;
 
             &.show {
               animation: show 0.7s ease both;
@@ -137,27 +117,9 @@
             position: absolute;
             justify-content: space-evenly;
             align-items: center;
-            bottom: 15px;
-            right: 50%;
-            transform: translateX(50%);
             color: $color-white;
             cursor: pointer;
-            width: 115px;
-            height: 40px;
-            border-radius: 5px;
             background: $dark-color;
-            font-size: 15px;
-            font-weight: 700;
-
-            &__arrow {
-              color: $color-white;
-            }
-
-            &.active {
-              .toggle-btn__arrow {
-                transform: rotate(180deg);
-              }
-            }
           }
         }
       }
@@ -184,6 +146,215 @@
 
       &__picture {
         width: 100%;
+      }
+    }
+  }
+}
+
+@include desktop-layout {
+  #history {
+    .parent {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .input-container {
+      flex-direction: row;
+      width: $parentWidth;
+      height: 100px;
+      max-width: $parentMaxWidth;
+    }
+    .input {
+      &::before,
+      &::after {
+        top: 50%;
+        transform: translateY(-50%);
+        width: calc($parentWidth / $numDots);
+        height: 5px;
+        max-width: calc($parentMaxWidth / $numDots);
+      }
+      &::before {
+        left: calc(calc(-1 * $parentWidth / $numDots) + calc($dotWidth / 2));
+      }
+      &::after {
+        right: calc(calc(-1 * $parentWidth / $numDots) + calc($dotWidth / 2));
+      }
+      span {
+        &::before,
+        &::after {
+          left: 50%;
+        }
+        &::after {
+          top: -50px;
+          transform: translateX(-50%);
+        }
+      }
+    }
+    .description-container {
+      margin-bottom: 100px;
+
+      .article {
+        .section {
+          &__textarea {
+            &__title {
+            }
+
+            &__paragraph {
+              padding: 0 5rem 0 5rem;
+
+              &.show {
+                animation: show 0.7s ease both;
+              }
+            }
+
+            .toggle-btn {
+              bottom: 40px;
+              right: 50%;
+              transform: translateX(50%);
+              width: 115px;
+              height: 40px;
+              border-radius: 5px;
+              font-size: 15px;
+              font-weight: 700;
+            }
+          }
+        }
+
+        &.active {
+          display: block;
+        }
+      }
+    }
+    .gallery {
+      align-items: center;
+      width: 100%;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+
+      &__frame {
+        flex: 0 1 260px;
+        position: relative;
+        box-shadow: 10px 10px 30px -4px rgba(0, 0, 0, 0.75);
+        border-radius: 40px;
+        cursor: pointer;
+        overflow: hidden;
+        margin: 20px 0 20px 0;
+
+        &__picture {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@include mobile-layout {
+  #history {
+    .parent {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .input-container {
+      flex-direction: column;
+      height: $parentHeight;
+      max-width: $parentMaxWidth;
+    }
+    .input {
+      &::before,
+      &::after {
+        left: 50%;
+        transform: translateX(-50%);
+        height: calc($parentHeight / $numDots);
+        width: 5px;
+        max-height: calc($parentMaxHeight / $numDots);
+      }
+      &::before {
+        top: calc(calc(-1 * $parentHeight / $numDots) + calc($dotWidth / 2));
+      }
+      &::after {
+        bottom: calc(calc(-1 * $parentHeight / $numDots) + calc($dotWidth / 2));
+      }
+      span {
+        &::before,
+        &::after {
+          top: 50%;
+        }
+        &::after {
+          right: -55px;
+          transform: translateY(-50%);
+        }
+      }
+    }
+    .description-container {
+      margin-bottom: 50px;
+      max-width: 80%;
+
+      .article {
+        background: linear-gradient(90deg, rgba(60,160,122,0.1) 0%, rgba(144,202,180,0.1) 28%, rgba(226,131,43,0.1) 100%);
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        
+        .section {
+          &__textarea {
+            &__title {
+              text-align: center;
+              & h2, h3, h4 {
+                color: $color-white;
+                text-decoration: none;
+
+              }
+            }
+
+            &__paragraph {
+              padding: 0 0.5rem 0 0.5rem;
+
+              &.show {
+                animation: show 0.7s ease both;
+              }
+            }
+
+            .toggle-btn {
+              position: absolute;
+              justify-content: space-evenly;
+              align-items: center;
+              bottom: 15px;
+              right: 50%;
+              transform: translateX(50%);
+              color: $color-white;
+              cursor: pointer;
+              width: 115px;
+              height: 40px;
+              border-radius: 5px;
+              background: $dark-color;
+              font-size: 15px;
+              font-weight: 700;
+            }
+          }
+        }
+
+        &.active {
+          display: block;
+        }
+      }
+    }
+    .gallery {
+      align-items: center;
+      width: 100%;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+
+      &__frame {
+        flex: 0 1 260px;
+        position: relative;
+        box-shadow: 10px 10px 30px -4px rgba(0, 0, 0, 0.75);
+        border-radius: 40px;
+        cursor: pointer;
+        overflow: hidden;
+        margin: 20px 0 20px 0;
+
+        &__picture {
+          width: 100%;
+        }
       }
     }
   }

@@ -6,7 +6,7 @@ import "./realisation.scss";
 
 function Realisation() {
   return (
-    <main className="realisations">
+    <main id="realisations">
       <Helmet>
         <title>REALISATIONS | Les Amis de Sainte Madeleine de La Jarrie</title>
       </Helmet>

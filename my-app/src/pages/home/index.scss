@@ -10,7 +10,6 @@
     3px 2px 1px #cccccc, 2px 3px 1px #eeeeee, 4px 3px 1px #cccccc, 3px 4px 1px #eeeeee,
     5px 4px 1px #cccccc, 4px 5px 1px #eeeeee, 6px 5px 1px #cccccc, 5px 6px 1px #eeeeee,
     7px 6px 1px #cccccc, -13px 22px 6px rgba(206, 89, 55, 0);
-  font-size: 3.5rem;
 }
 
 #home {
@@ -81,6 +80,7 @@
 @include desktop-layout {
   #welcome {
     padding: $desktop-header-radius 250px 0 250px;
+    font-size: 3.5rem;
   }
 
   #home {
@@ -114,10 +114,17 @@
 }
 
 @include mobile-layout {
+
+  #welcome {
+    padding: $mobile-header-radius 10px 10px 10px;
+    font-size: 1.5rem;
+    text-decoration: none;
+  }
+
   #home {
     article {
       p {
-        padding: 0 3rem 0 3rem;
+        padding: 0 1rem 0 1rem;
       }
 
       .gallery {
