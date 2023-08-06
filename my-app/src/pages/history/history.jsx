@@ -78,7 +78,7 @@ function History() {
             <article className={activeIndex === 0 ? "article active" : "article"}>
               <section className="section">
                 <div className="section__textarea">
-                  <div className="section__textarea__title">
+                  <div className="section__textarea__title d-flex justify-content-center">
                     <h2>30 octobre 1869</h2>
                     <h3>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h3>
                     <h4>6° année</h4>
