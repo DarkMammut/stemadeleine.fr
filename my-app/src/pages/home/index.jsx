@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
+import parse from "html-react-parser";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
+import NewsLetter from "../../assets/newsletter.json";
 import "./index.scss";
 
 const groupedItems = SLIDES.home.reduce(
@@ -16,6 +18,8 @@ const groupedItems = SLIDES.home.reduce(
 );
 
 function Home() {
+  const domain = "/newsletter/";
+  const url = process.env.PUBLIC_URL;
   const [open, setOpen] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
 
@@ -33,9 +37,6 @@ function Home() {
 
   return (
     <main id="home">
-      <Helmet>
-        <title>ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie</title>
-      </Helmet>
       <div className="container">
         <article>
           <h3 id="welcome" className="full-screen">
@@ -64,7 +65,7 @@ function Home() {
                       }}>
                       <figure className="gallery__column__card__thumb">
                         <img
-                          src={slide.url}
+                          src={url + slide.url}
                           alt={slide.alt}
                           className="gallery__column__card__thumb__image"
                         />
@@ -79,6 +80,21 @@ function Home() {
             </div>
             <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
           </section>
+        </article>
+        <article className="article">
+          {NewsLetter.map((news) => (
+            <section key={news.id}>
+              <Link to={domain + news.id}>
+                <div className="news">
+                  <figure className="news__image">
+                    <img src={url + news.image.url} title={news.image.title} alt={news.image.alt} />
+                    <figcaption>{news.image.title}</figcaption>
+                  </figure>
+                  <div className="news__text">{parse(news.text)}</div>
+                </div>
+              </Link>
+            </section>
+          ))}
         </article>
       </div>
     </main>

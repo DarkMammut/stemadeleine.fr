@@ -1,0 +1,21 @@
+[
+  {
+    "id": "nl001",
+    "title": "Lettre n°1 - Mai 2023",
+    "image": {
+      "id": "nl001-i1",
+      "title": "Président de l'association, Philippe JEAN-JEAN",
+      "alt": "Portrait du président de l'association : Philippe JEAN-JEAN",
+      "url": "/president.png"
+    },
+    "text": "<p>Aujourd’hui je voudrais vous faire part de tout ce que vous nous avez permis d’accomplir depuis la création récente de notre association et de vous dire mon enthousiasme pour tout ce que nous avons et allons faire en 2023/2024.</br>Je vous en fais ici une rapide présentation :</p>",
+    "section": [
+      {
+        "id": "nl001-s1",
+        "title": "",
+        "text": ""
+      }
+    ],
+    "conclusion": ""
+  }
+]

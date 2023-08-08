@@ -6,12 +6,13 @@ import "./banner.scss";
 function Banner() {
   const location = useLocation();
   const index = bannerArray.findIndex((object) => object.location === location.pathname);
+  let path = location.pathname;
 
   if (index === -1) {
-    return null;
+    path = "/newsletter/:id";
   }
 
-  const found = bannerArray.find((banner) => banner.location === location.pathname);
+  const found = bannerArray.find((banner) => banner.location === path);
   const url = process.env.PUBLIC_URL + found.url;
   const style = { backgroundImage: `url(${url})` };
 

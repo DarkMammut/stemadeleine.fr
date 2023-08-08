@@ -21,7 +21,7 @@
     "id": "b-history",
     "location": "/eglise/histoire",
     "type": "small",
-    "url": "/b-history.jpg",
+    "url": "/banners/Banner-3.jpg",
     "title": "L'HISTOIRE",
     "subhead": ""
   },
@@ -84,8 +84,17 @@
     "id": "b-contact",
     "location": "/contact",
     "type": "small",
-    "url": "",
+    "url": "/banners/Banner-10.jpg",
     "title": "NOUS CONTACTER",
+    "subhead": ""
+  },
+
+  {
+    "id": "b-newsletter",
+    "location": "/newsletter/:id",
+    "type": "small",
+    "url": "/banners/Banner-11.jpg",
+    "title": "NEWSLETTER",
     "subhead": ""
   },
 

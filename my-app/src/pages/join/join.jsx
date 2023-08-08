@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import "./join.scss";
 
 function Join() {
@@ -9,9 +8,6 @@ function Join() {
   const url = process.env.PUBLIC_URL;
   return (
     <main id="join">
-      <Helmet>
-        <title>NOUS REJOINDRE | Les Amis de Sainte Madeleine de La Jarrie</title>
-      </Helmet>
       <div className="container">
         <div className="join">
           <div className="join__image">

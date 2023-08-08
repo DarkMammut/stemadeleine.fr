@@ -1,0 +1,90 @@
+[
+  {
+    "id": "h-home",
+    "location": "/",
+    "title": "ACCUEIL | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": "L'association des Amis de Sainte Madeleine de La Jarrie a pour objectif d’être un outil au service de l’église et de la commune pour mener à bien des travaux de restauration du mobilier et de protection du patrimoine."
+  },
+
+  {
+    "id": "h-church",
+    "location": "/eglise",
+    "title": "EGLISE | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": "Eglise située dans la commune de la Jarrie, construit au XIIe siècle, inscrite au titre des monuments historiques par arrêté du 22 août 1949."
+  },
+
+  {
+    "id": "h-history",
+    "location": "/eglise/histoire",
+    "title": "HISTOIRE | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": "Eglise située dans la commune de la Jarrie, construit au XIIe siècle, inscrite au titre des monuments historiques par arrêté du 22 août 1949."
+  },
+
+  {
+    "id": "h-bells",
+    "location": "/eglise/cloches",
+    "title": "CLOCHES | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": "4 cloches dans le clocher de l'église de La Jarrie"
+  },
+
+  {
+    "id": "h-association",
+    "location": "/association",
+    "title": "QUI SOMMES NOUS ? | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": "Eglise de la Jarrie"
+  },
+
+  {
+    "id": "h-realisations",
+    "location": "/nos-realisations",
+    "title": "REALISATIONS | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": ""
+  },
+
+  {
+    "id": "h-join",
+    "location": "/association/nous-rejoindre",
+    "title": "NOUS REJOINDRE | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": ""
+  },
+
+  {
+    "id": "h-donation",
+    "location": "/association/don",
+    "title": "FAIRE UN DON | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": ""
+  },
+
+  {
+    "id": "h-projects",
+    "location": "/association/projets",
+    "title": "PROJETS | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": ""
+  },
+
+  {
+    "id": "h-contact",
+    "location": "/contact",
+    "title": "NOUS CONTACTER",
+    "description": ""
+  },
+
+  {
+    "id": "h-newsletter",
+    "location": "/newsletter/:id",
+    "title": "NEWSLETTER | Les Amis de Sainte Madeleine de La Jarrie",
+    "description": ""
+  },
+  {
+    "id": "h-404",
+    "location": "/",
+    "title": "404 | Page Not Found",
+    "description": "Eglise de la Jarrie"
+  },
+  {
+    "id": "h-error",
+    "location": "*",
+    "title": "404 | Page Not Found",
+    "description": "Eglise de la Jarrie"
+  }
+]

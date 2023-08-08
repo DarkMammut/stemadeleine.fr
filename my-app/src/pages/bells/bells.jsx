@@ -1,5 +1,4 @@
 import React from "react";
-import { Helmet } from "react-helmet";
 import Article from "../../components/article/article";
 import "./bells.scss";
 import ArticlesData from "../../assets/bells.json";
@@ -9,9 +8,6 @@ document.title = "Les cloches";
 function Bells() {
   return (
     <main id="bells">
-      <Helmet>
-        <title>CLOCHES | Les Amis de Sainte Madeleine de La Jarrie</title>
-      </Helmet>
       <div className="container">
         <p className="bells__paragraph">
           On atteint la salle des cloches de l’imposant clocher-porche du XIIe siècle en empruntant

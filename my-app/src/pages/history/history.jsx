@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
 import "./history.scss";
@@ -49,9 +48,6 @@ function History() {
 
   return (
     <main id="history">
-      <Helmet>
-        <title>HISTOIRE | Les Amis de Sainte Madeleine de La Jarrie</title>
-      </Helmet>
       <div className="container">
         <div className="parent d-flex">
           <div className="input-container d-flex">

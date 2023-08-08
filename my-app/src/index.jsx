@@ -3,6 +3,7 @@ import "./index.scss";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import Home from "./pages/home";
+import News from "./pages/news/news";
 import Association from "./pages/about/about";
 import Realisation from "./pages/realisation/realisation";
 import Join from "./pages/join/join";
@@ -13,6 +14,7 @@ import History from "./pages/history/history";
 import Bells from "./pages/bells/bells";
 import Contact from "./pages/contact/contact";
 import PageNotFound from "./pages/404/page_not_found";
+import Meta from "./components/meta/meta";
 import Header from "./components/header/header";
 import Banner from "./components/banner/banner";
 import Footer from "./components/footer/footer";
@@ -23,10 +25,12 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Router>
+      <Meta />
       <Header />
       <Banner />
       <Routes>
         <Route exact path="/" element={<Home />} />
+        <Route exact path="/newsletter/:id" element={<News />} />
         <Route exact path="/association" element={<Association />} />
         <Route exact path="/association/projets" element={<Project />} />
         <Route exact path="/association/nous-rejoindre" element={<Join />} />
