@@ -81,15 +81,15 @@ function Home() {
             <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
           </section>
         </article>
-        <article className="article">
+        <article className="article d-flex justify-content-center">
           {NewsLetter.map((news) => (
-            <section key={news.id}>
+            <section key={news.id} className="article__section">
               <Link to={domain + news.id}>
-                <div className="news">
-                  <figure className="news__image">
-                    <img src={url + news.image.url} title={news.image.title} alt={news.image.alt} />
-                    <figcaption>{news.image.title}</figcaption>
-                  </figure>
+                <div className="news d-flex justify-content-center">
+                  <div
+                    className="news__image"
+                    style={{ backgroundImage: `url(${url} ${news.image.url})` }}
+                  />
                   <div className="news__text">{parse(news.text)}</div>
                 </div>
               </Link>
