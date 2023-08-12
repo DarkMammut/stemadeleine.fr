@@ -101,7 +101,6 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const form = e.target;
 
     if (
       ValidateName(state.firstname) ||
@@ -112,7 +111,7 @@ function Contact() {
       state.rgpd
     ) {
       setState({
-        "form-name": form.getAttribute("name"),
+        "form-name": "contact",
         ...state
       });
       fetch("/", {
