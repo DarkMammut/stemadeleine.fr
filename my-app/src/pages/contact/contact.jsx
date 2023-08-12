@@ -6,6 +6,12 @@ import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
+const encode = (data) => {
+  return Object.keys(data)
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+    .join("&");
+};
+
 function ValidateEmail(mail) {
   const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
   return regexpEmail.test(mail);
@@ -95,8 +101,8 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const myForm = e.target;
-    const formData = new FormData(myForm);
+    const form = e.target;
+    const recaptchaValue = recaptchaRef.current.getValue();
 
     if (
       ValidateName(state.firstname) ||
@@ -109,7 +115,11 @@ function Contact() {
       fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData).toString()
+        body: encode({
+          "form-name": form.getAttribute("name"),
+          "g-recaptcha-response": recaptchaValue,
+          ...state
+        })
       })
         .then(() => setAppear(1), setState({}))
         .catch((error) => alert(error) /* eslint-disable-line no-alert */);
@@ -988,11 +998,11 @@ function Contact() {
                 <FaPen className="icon" />
               </label>
               <input
-                type="text"
                 id="subject"
                 className="form-control form-control-lg thick"
-                placeholder="Sujet"
                 name="subject"
+                type="text"
+                placeholder="Sujet"
                 onChange={handleChange}
                 required
                 minLength="2"
@@ -1006,12 +1016,12 @@ function Contact() {
               <textarea
                 id="message"
                 className="form-control form-control-lg"
-                rows="7"
-                placeholder="Message"
                 name="message"
+                placeholder="Message"
+                rows="7"
+                minLength="2"
                 onChange={handleChange}
                 required
-                minLength="2"
               />
               <div className="requirements s-text" style={{ maxHeight: `${height.message}` }}>
                 Le message doit contenir au moins 25 caractères.
@@ -1019,14 +1029,7 @@ function Contact() {
             </div>
 
             <div className="form-group checkbox">
-              <input
-                type="checkbox"
-                id="rgpd"
-                className=""
-                name="rgpd"
-                onChange={handleChange}
-                required
-              />
+              <input id="rgpd" className="" type="checkbox" onChange={handleChange} required />
               <label htmlFor="rgpd" className="s-text" style={{ width: `65%` }}>
                 En soumettant ce formulaire, j’accepte que mes informations soient utilisées
                 exclusivement dans le cadre de ma demande et de la relation commerciale éthique et
@@ -1038,17 +1041,17 @@ function Contact() {
             </div>
 
             <Recaptcha
+              id="recaptcha-google"
+              className="form-group"
               ref={recaptchaRef}
               sitekey={RECAPTCHA_KEY}
               size="normal"
-              id="recaptcha-google"
-              className="form-group"
-              onChange={() => setButtonDisabled(false)} // disable the disabled button!
+              onChange={() => setButtonDisabled(false)} // enable the disabled button!
             />
             <div className="text-center">
               <button
-                type="submit"
                 className="btn--primary"
+                type="submit"
                 tabIndex="-1"
                 disabled={buttonDisabled}>
                 Envoyer
@@ -1087,7 +1090,7 @@ function Contact() {
         </p>
         <button
           type="button"
-          className="thank-you__btn btn btn-primary no-style-btn"
+          className="btn btn--primary btn--thank-you no-style-btn"
           onClick={() => setAppear(0)}>
           OK
         </button>
