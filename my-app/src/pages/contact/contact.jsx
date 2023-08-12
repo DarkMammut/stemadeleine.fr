@@ -102,7 +102,6 @@ function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
-    const recaptchaValue = recaptchaRef.current.getValue();
 
     if (
       ValidateName(state.firstname) ||
@@ -114,7 +113,6 @@ function Contact() {
     ) {
       setState({
         "form-name": form.getAttribute("name"),
-        "g-recaptcha-response": recaptchaValue,
         ...state
       });
       fetch("/", {
