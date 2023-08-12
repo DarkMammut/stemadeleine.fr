@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/PageIcon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="Les Amis de Sainte Madeleine de La Jarrie"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
 
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/PageIcon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="Les Amis de Sainte Madeleine de La Jarrie" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>Les Amis de Sainte Madeleine de La Jarrie</title>
+</head>
+
+<body>
+  <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+    <input name="firstname" type="text" />
+    <input name="lastname" type="text" />
+    <input name="email" type="email" />
+    <input name="subject" type="text" />
+    <textarea name="message"></textarea>
+    <input name="rgpd" type="checkbox" />
+    <div data-netlify-recaptcha="true"></div>
+  </form>
+  <div id="root"></div>
+</body>
+
 </html>

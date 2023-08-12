@@ -936,8 +936,7 @@ function Contact() {
             data-netlify="true"
             data-netlify-recaptcha="true" // new Netlify data attribute regarding recaptcha submissions
             onSubmit={handleSubmit}>
-            {/* ... all the other inputs here */}
-
+            <input type="hidden" name="form-name" value="contact" />
             <h2 className="title text-center mb-4">Nous écrire</h2>
 
             <div className="form-group position-relative">
@@ -945,11 +944,11 @@ function Contact() {
                 <FaUser className="icon" />
               </label>
               <input
-                type="text"
                 id="firstname"
                 className="form-control form-control-lg thick"
-                placeholder="Prénom"
                 name="firstname"
+                type="text"
+                placeholder="Prénom"
                 onChange={handleChange}
                 required
                 minLength="2"
@@ -964,11 +963,11 @@ function Contact() {
                 <FaUser className="icon" />
               </label>
               <input
-                type="text"
                 id="lastname"
                 className="form-control form-control-lg thick"
-                placeholder="NOM"
                 name="lastname"
+                type="text"
+                placeholder="NOM"
                 onChange={handleChange}
                 required
                 minLength="2"
@@ -983,11 +982,11 @@ function Contact() {
                 <FaEnvelope className="icon" />
               </label>
               <input
-                type="email"
                 id="email"
                 className="form-control form-control-lg thick"
-                placeholder="E-mail"
                 name="email"
+                type="email"
+                placeholder="E-mail"
                 onChange={handleChange}
                 required
                 minLength="2"
