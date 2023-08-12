@@ -6,12 +6,6 @@ import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
-function encode(data) {
-  return Object.keys(data)
-    .map((key) => `${encodeURIComponent(data)}=${encodeURIComponent(data[key])}`)
-    .join("&");
-}
-
 function ValidateEmail(mail) {
   const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
   return regexpEmail.test(mail);
@@ -101,6 +95,8 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const myForm = e.target;
+    const formData = new FormData(myForm);
 
     if (
       ValidateName(state.firstname) ||
@@ -110,16 +106,10 @@ function Contact() {
       ValidateMessage(state.message) ||
       state.rgpd
     ) {
-      setState({
-        "form-name": "contact",
-        ...state
-      });
       fetch("/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: encode(state)
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData).toString()
       })
         .then(() => setAppear(1), setState({}))
         .catch((error) => alert(error) /* eslint-disable-line no-alert */);
