@@ -16,60 +16,59 @@
   article {
     text-align: justify;
     margin-bottom: 50px;
+  }
+  .gallery {
+    display: flex;
+    padding: 2px;
+    transition: 0.3s;
 
-    .gallery {
+    &:hover &__column__card__thumb__image {
+      filter: grayscale(1);
+    }
+
+    &__column {
       display: flex;
-      padding: 2px;
-      transition: 0.3s;
+      flex-direction: column;
 
-      &:hover &__column__card__thumb__image {
-        filter: grayscale(1);
-      }
+      &__card {
+        &:hover {
+          cursor: pointer;
 
-      &__column {
-        display: flex;
-        flex-direction: column;
+          .gallery__column__card__thumb__image {
+            filter: grayscale(0);
+          }
 
-        &__card {
-          &:hover {
-            cursor: pointer;
+          .gallery__column__card__thumb__caption {
+            opacity: 1;
+          }
+        }
 
-            .gallery__column__card__thumb__image {
-              filter: grayscale(0);
-            }
+        &__thumb {
+          position: relative;
 
-            .gallery__column__card__thumb__caption {
-              opacity: 1;
+          &__image {
+            display: block;
+            width: 100%;
+            transition: 0.3s;
+
+            &:hover {
+              transform: scale(1.1);
             }
           }
 
-          &__thumb {
-            position: relative;
-
-            &__image {
-              display: block;
-              width: 100%;
-              transition: 0.3s;
-
-              &:hover {
-                transform: scale(1.1);
-              }
-            }
-
-            &__caption {
-              position: absolute;
-              bottom: 0;
-              left: 50%;
-              transform: translatex(-50%);
-              padding: 25px 15px 15px;
-              width: 100%;
-              font-family: "Raleway", sans-serif;
-              font-size: 16px;
-              color: white;
-              opacity: 0;
-              background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
-              transition: 0.3s;
-            }
+          &__caption {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translatex(-50%);
+            padding: 25px 15px 15px;
+            width: 100%;
+            font-family: "Raleway", sans-serif;
+            font-size: 16px;
+            color: white;
+            opacity: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: 0.3s;
           }
         }
       }
@@ -104,27 +103,91 @@
         }
       }
     }
-    .article {
-      a {
-        text-decoration: none;
+    .newsletter {
+      &__title {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 100px;
+        padding: 40px 0 15px 0;
+        border-bottom: solid 1px #e2832b;
+        font-size: 40px;
+      }
 
-        .news {
-          border-radius: 100px 0 0 100px;
-          background-color: red;
-          justify-content: space-between;
+      ul > li {
+        .progressBar {
+          flex-direction: column;
+          margin: 0 150px 0 50px;
 
-          &__image {
-            height: 200px;
-            width: 200px;
+          &__dot {
+            height: $dotWidth;
+            width: $dotWidth;
+            background-color: $dark-color;
             border-radius: 50%;
-            overflow: hidden;
-            background-position: center;
-          }
+            position: relative;
 
-          &__text {
-            max-height: 200px;
+            &__top,
+            &__bottom {
+              position: absolute;
+              width: 5px;
+              height: calc(150px);
+              background-color: $dark-color;
+              left: 50%;
+              transform: translateX(-50%);
+            }
+
+            &__top {
+              top: calc(-1 * 150px + $dotWidth);
+            }
+
+            &__bottom {
+              bottom: calc(-1 * 150px + $dotWidth);
+            }
+          }
+        }
+
+        a {
+          text-decoration: none;
+
+          .news {
+            border-radius: 100px;
+            background-color: $light-color;
+            justify-content: space-between;
+            width: 700px;
             overflow: hidden;
-            width: calc(100% - 200px - 30px)
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+              rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
+            &__image {
+              height: 200px;
+              width: 200px;
+              border-radius: 50%;
+              overflow: hidden;
+              background-position: center;
+              box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+            }
+
+            &__text {
+              max-height: calc(200px - 10px * 2);
+              width: 400px;
+              padding: 10px 80px 0 10px;
+
+              h4 {
+                text-align: center;
+                padding: 20px;
+                font-size: 30px;
+                color: $accent-color;
+              }
+
+              p {
+                text-align: justify;
+                width: 100%;
+                display: -webkit-box;
+                text-overflow: ellipsis;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+              }
+            }
           }
         }
       }
@@ -150,23 +213,22 @@
       p {
         padding: 0 1rem 0 1rem;
       }
+    }
+    .gallery {
+      flex-direction: column;
 
-      .gallery {
-        flex-direction: column;
+      &__column {
+        flex-direction: row;
+        width: 100%;
 
-        &__column {
-          flex-direction: row;
-          width: 100%;
+        &__card {
+          margin: 10px;
+          width: calc(100% / 3);
 
-          &__card {
-            margin: 10px;
-            width: calc(100% / 3);
-
-            &__thumb {
-              box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-              border-radius: 10px;
-              overflow: hidden;
-            }
+          &__thumb {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 10px;
+            overflow: hidden;
           }
         }
       }

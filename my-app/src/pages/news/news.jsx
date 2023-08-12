@@ -26,24 +26,31 @@ function News() {
 
   return (
     <main id="news">
-      <div className="constainer">
-        <article id={news.id} className="article">
-          <div className="article__header">
-            <h2 className="article__header__title">{news.title}</h2>
-            <div className="article__header__text">{parse(news.text)}</div>
+      <div className="container">
+        <article id={news.id} className="article d-flex justify-content-center">
+          <div className="article__header d-flex">
             <figure className="article__header__image">
               <img src={url + news.image.url} title={news.image.title} alt={news.image.alt} />
-              <figcaption>{news.image.title}</figcaption>
+              <figcaption className="article__header__image__caption">
+                {news.image.title}
+              </figcaption>
             </figure>
+            <div className="article__header__text d-flex">
+              <h2 className="article__header__text__title">{news.title}</h2>
+              <div className="article__header__text__paragraph">{parse(news.text)}</div>
+            </div>
           </div>
           {news.section.map((section) => (
             <section key={section.id} className="article__section">
               {section.title ? <h3 className="article__section__title">{section.title}</h3> : null}
-              <p className="article__section__text">{section.text}</p>
+              <div className="article__section__text">{parse(section.text)}</div>
             </section>
           ))}
           <div className="article__footer">{parse(news.conclusion)}</div>
         </article>
+        <button className="btn--back no-style-btn" type="button" onClick={() => navigate(-1)}>
+          Retour
+        </button>
       </div>
     </main>
   );

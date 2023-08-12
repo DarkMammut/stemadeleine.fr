@@ -6,8 +6,10 @@ import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
-function encode(state) {
-  return `form-name=${state["form-name"]}&g-recaptcha-response=${state["g-recaptcha-response"]}&firstname=${state.firstname}&lastname=${state.lastname}&email=${state.email}&subject=${state.subject}&message=${state.message}&rgpd=${state.rgpd}`;
+function encode(data) {
+  return Object.keys(data)
+    .map((key) => `${encodeURIComponent(data)}=${encodeURIComponent(data[key])}`)
+    .join("&");
 }
 
 function ValidateEmail(mail) {
@@ -110,16 +112,19 @@ function Contact() {
       ValidateMessage(state.message) ||
       state.rgpd
     ) {
+      setState({
+        "form-name": form.getAttribute("name"),
+        "g-recaptcha-response": recaptchaValue,
+        ...state
+      });
       fetch("/", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode({
-          "form-name": form.getAttribute("name"),
-          "g-recaptcha-response": recaptchaValue,
-          ...state
-        })
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: encode(state)
       })
-        .then(() => setAppear(1))
+        .then(() => setAppear(1), setState({}))
         .catch((error) => alert(error) /* eslint-disable-line no-alert */);
     }
   };
@@ -1057,7 +1062,7 @@ function Contact() {
             <div className="text-center">
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn--primary"
                 tabIndex="-1"
                 disabled={buttonDisabled}>
                 Envoyer

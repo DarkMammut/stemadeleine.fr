@@ -1,18 +1,29 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import bannerArray from "../../assets/banner.json";
+import Data from "../../assets/header.json";
 import "./banner.scss";
+
+function reduceUrl(url) {
+  const dernierSlashIndex = url.lastIndexOf("/");
+  if (dernierSlashIndex > 0) {
+    return url.substring(0, dernierSlashIndex);
+  }
+  return url;
+}
 
 function Banner() {
   const location = useLocation();
-  const index = bannerArray.findIndex((object) => object.location === location.pathname);
-  let path = location.pathname;
+  const path = location.pathname;
+  const mainUrl = reduceUrl(path);
+  let found = "";
 
-  if (index === -1) {
-    path = "/newsletter/:id";
+  if (path === mainUrl || mainUrl === "/newsletter") {
+    found = Data.find((banner) => banner.path === mainUrl);
+  } else {
+    const mainObject = Data.find((object) => object.path === mainUrl);
+    found = mainObject.sublinks.find((banner) => mainUrl + banner.path === path);
   }
 
-  const found = bannerArray.find((banner) => banner.location === path);
   const url = process.env.PUBLIC_URL + found.url;
   const style = { backgroundImage: `url(${url})` };
 

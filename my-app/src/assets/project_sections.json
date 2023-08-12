@@ -6,7 +6,7 @@
     "text": [
       {
         "id": "S1P1",
-        "paragraph": "<p>Un autel tombeau qui a subi des détériorations et des manques est installé dans une des absidioles. Cet autel du 18eme, très probablement vers 1765, a incontestablement été réalisé par des artisans doués comme tend à le prouver sa facture qui tranche avec un mobilier ordinaire d’une église paroissiale.<br>La Sauvegarde de l’art français demande expressément à notre association de déposer notre candidature au Grand Concours du Patrimoine Le Pèlerin 2023 pour la restauration de cet autel. Si ce projet est retenu l’aide financière viendra alléger l’investissement de la Jarrie.</p>"
+        "paragraph": "<p>Un autel tombeau qui a subi des détériorations et des manques est installé dans une des absidioles. Cet autel du XVIIème s., très probablement vers 1765, a incontestablement été réalisé par des artisans doués comme tend à le prouver sa facture qui tranche avec un mobilier ordinaire d’une église paroissiale.</br></br>Ce meuble mérite une restauration et la reconstitution des pièces manquantes notamment une terrasse supportant le tabernacle détérioré.</p>"
       }
     ],
     "images": [
@@ -34,8 +34,7 @@
       {
         "id": "S2P3",
         "paragraph": "<h4>Photophore-Association réalise le projet</h4><br><p>Elle a pour but d'aider à la création artistique par la photographie, de gérer le fonds photographique de l'association sur tout type de support, d'organiser des expositions, vernissages et rencontres autour de la photographie ainsi que d’aider par versements de fonds, grâce à la vente de clichés, diverses oeuvres en faveur de l’enfance.<br>*Ni le photographe ni les bénévoles de cette association ne reçoivent un quelconque émolument de la vente de toutes les productions du photographe.</p>"
-      }
-      ,
+      },
       {
         "id": "S2P4",
         "paragraph": "<h4>Le photographe</h4><br><p>Jean-Dominique « <a href='https://www.elpadre.fr/'>El Padre</a> » fait partie de l’académie artistique militaireappelée : les Peintres Officiels de l’Armée, au titre de photographe.Il a répondu à la sollicitation de l’association des Amis de Saint Madeleinede La Jarrie pour réaliser un « chemin de Croix photographique »participant à la mise en valeur de l’église de la Jarrie.</p>"
@@ -44,92 +43,92 @@
     "images": [
       {
         "id": "S2I1",
-        "title": "picture",
-        "alt": "picture",
+        "title": "1ère station",
+        "alt": "Jésus est condamné à mort. Pilate est assis entouré de ses conseils qui lui communiquent les éléments du dossier. A l’arrière-plan sa femme lui fait part de son rêve.",
         "url": "/projects/CDC1.jpg"
       },
       {
         "id": "S2I2",
-        "title": "picture",
-        "alt": "picture",
-        "url": "/projects/CDC2.jpg"
+        "title": "2ème station",
+        "alt": "2ème station",
+        "url": "/no-image.jpeg"
       },
       {
         "id": "S2I3",
-        "title": "picture",
-        "alt": "picture",
+        "title": "3ème station",
+        "alt": "3ème station",
         "url": "/projects/CDC3.jpg"
       },
       {
         "id": "S2I4",
-        "title": "picture",
-        "alt": "picture",
+        "title": "4ème station",
+        "alt": "4ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I5",
-        "title": "picture",
-        "alt": "picture",
+        "title": "5ème station",
+        "alt": "5ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I6",
-        "title": "picture",
-        "alt": "picture",
+        "title": "6ème station",
+        "alt": "6ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I7",
-        "title": "picture",
-        "alt": "picture",
-        "url": "/no-image.jpeg"
+        "title": "7ème station",
+        "alt": "Jésus tombe pour la seconde fois. Le bourreau le soutient pour qu’il aille jusqu’au bout du supplice sur la croix.",
+        "url": "/projects/CDC7.jpg"
       },
       {
         "id": "S2I8",
-        "title": "picture",
-        "alt": "picture",
+        "title": "8ème station",
+        "alt": "Des femmes revenant de l’école avec leurs enfants ou rentrant de  faire leurs courses croisent le Christ et les console.",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I9",
-        "title": "picture",
-        "alt": "picture",
+        "title": "9ème station",
+        "alt": "Jésus tombe pour la 3e fois. Un gendarme croise Jésus au sol écrasé par le poids de la Croix et alerte ses collègues par téléphone.",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I10",
-        "title": "picture",
-        "alt": "picture",
+        "title": "10ème station",
+        "alt": "10ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I11",
-        "title": "picture",
-        "alt": "picture",
+        "title": "11ème station",
+        "alt": "11ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I12",
-        "title": "picture",
-        "alt": "picture",
+        "title": "12ème station",
+        "alt": "12ème station",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I13",
-        "title": "picture",
-        "alt": "picture",
+        "title": "13ème station",
+        "alt": "Jésus est descendu de la croix et remis à sa mère. Un échafaudage est dressé, un jeune homme et un adulte reçoivent le corps devant Marie.",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I14",
-        "title": "picture",
-        "alt": "picture",
+        "title": "14ème station",
+        "alt": "Jésus est mis dans le sépulcre. Le corps repose sur une table recouverte d’un drap blanc préfigurant l’hostie sur le drap liturgique de l’autel.",
         "url": "/no-image.jpeg"
       },
       {
         "id": "S2I15",
-        "title": "picture",
-        "alt": "picture",
+        "title": "15ème station",
+        "alt": "La résurrection. Entre les deux soldats endormis, détachés par Pilate pour garder le tombeau, Jésus apparaît debout en Christ pantocrator.",
         "url": "/no-image.jpeg"
       }
     ]

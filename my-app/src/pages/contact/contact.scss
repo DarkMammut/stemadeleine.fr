@@ -117,7 +117,7 @@
       }
 
       &:hover {
-        transform: scale(1.2);
+        transform: scale(1.1);
       }
     }
   }
@@ -209,7 +209,7 @@ form {
   }
 }
 
-.btn.btn-primary {
+.btn--primary {
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
   height: 2.5rem;
@@ -222,7 +222,7 @@ form {
   transition: all 0.3s ease-in-out;
 }
 
-.btn.btn-primary:hover:enabled {
+.btn--primary:hover:enabled {
   box-shadow: 0 0.5em 0.5em -0.4em #ff923cba;
   background-size: 100% 100%;
   transform: translateY(-0.15em);

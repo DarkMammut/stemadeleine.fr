@@ -1,0 +1,131 @@
+[
+  {
+    "id": "L1",
+    "enable": "enable",
+    "name": "ACCUEIL",
+    "title": "Les Amis de Sainte Madeleine de La Jarrie",
+    "subhead": "Eglise de la Jarrie",
+    "path": "/",
+    "sublinks": [],
+    "type": "large",
+    "url": "/banners/Banner-1.jpg"
+  },
+  {
+    "id": "L2",
+    "enable": "enable",
+    "name": "L'ASSOCIATION",
+    "title": "L'ASSOCIATION",
+    "subhead": "",
+    "path": "/association",
+    "sublinks": [
+      {
+        "id": "L2S1",
+        "enable": "enable",
+        "name": "NOS PROJETS",
+        "title": "NOS PROJETS",
+        "subhead": "",
+        "path": "/projets",
+        "type": "small",
+        "url": "/banners/Banner-9.jpeg"
+      },
+      {
+        "id": "L2S2",
+        "enable": "enable",
+        "name": "NOUS REJOINDRE",
+        "title": "NOUS REJOINDRE",
+        "subhead": "",
+        "path": "/nous-rejoindre",
+        "type": "small",
+        "url": "/banners/Banner-7.jpeg"
+      },
+      {
+        "id": "L2S3",
+        "enable": "enable",
+        "name": "FAIRE UN DON",
+        "title": "FAIRE UN DON",
+        "subhead": "",
+        "path": "/don",
+        "type": "small",
+        "url": "/banners/Banner-8.jpg"
+      }
+    ],
+    "type": "small",
+    "url": "/banners/Banner-5.jpeg"
+  },
+  {
+    "id": "L3",
+    "enable": "enable",
+    "name": "NOS REALISATIONS",
+    "title": "NOS REALISATIONS",
+    "subhead": "",
+    "path": "/nos-realisations",
+    "sublinks": [],
+    "type": "small",
+    "url": "/banners/Banner-6.jpg"
+  },
+  {
+    "id": "L4",
+    "enable": "enable",
+    "name": "L'EGLISE",
+    "title": "L'EGLISE",
+    "subhead": "",
+    "path": "/eglise",
+    "sublinks": [
+      {
+        "id": "L4S1",
+        "enable": "enable",
+        "name": "HISTOIRE",
+        "title": "L'HISTOIRE",
+        "subhead": "",
+        "path": "/histoire",
+        "type": "small",
+        "url": "/banners/Banner-3.jpg"
+      },
+      {
+        "id": "L4S2",
+        "enable": "enable",
+        "name": "LES CLOCHES",
+        "title": "LES CLOCHES",
+        "subhead": "",
+        "path": "/cloches",
+        "type": "small",
+        "url": "/banners/Banner-4.jpeg"
+      }
+    ],
+    "type": "small",
+    "url": "/banners/Banner-2.jpg"
+  },
+  {
+    "id": "L5",
+    "enable": "enable",
+    "name": "CONTACT",
+    "title": "NOUS CONTACTER",
+    "subhead": "",
+    "path": "/contact",
+    "sublinks": [],
+    "type": "small",
+    "url": "/banners/Banner-10.jpg"
+  },
+  {
+    "id": "L6",
+    "enable": "disable",
+    "name": "NEWSLETTER",
+    "title": "NEWSLETTER",
+    "subhead": "",
+    "path": "/newsletter",
+    "sublinks": [],
+    "type": "small",
+    "url": "/banners/Banner-11.jpg"
+  },
+  {
+    "id": "Error-404",
+    "enable": "disable",
+    "name": "404",
+    "title": "",
+    "subhead": "",
+    "path": "/404",
+    "sublinks": [],
+    "type": "none",
+    "url": ""
+  }
+]

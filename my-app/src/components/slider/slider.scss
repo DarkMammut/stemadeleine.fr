@@ -121,6 +121,12 @@
     z-index: 5;
     justify-content: space-between;
 
+    .scroll-container {
+      display: flex;
+      overflow-x: auto; /* Permet le défilement horizontal */
+      width: 100%; /* Ajustez la largeur comme nécessaire */
+    }
+
     &__thumbnail {
       .clicked {
         transform: scale(1.2);

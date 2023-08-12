@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ScrollContainer from "react-indiana-drag-scroll";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import "./slider.scss";
 
@@ -21,15 +20,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
     }
   }, [openSlider]);
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Enter") {
-      handleClick(index);
-    } else if (e.key === "Escape") {
-      setAppear(0);
-    }
-  };
-
-  const next = () => {
+  const handleNext = () => {
     let nextIndex = 0;
     const currentIndex = slidesImages.findIndex((slide) => slide === sliderData);
     if (currentIndex === slidesImages.length - 1) {
@@ -41,7 +32,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
     setSliderData(nextSlide);
   };
 
-  const previous = () => {
+  const handlePrevious = () => {
     let previousIndex = 0;
     const currentIndex = slidesImages.findIndex((slide) => slide === sliderData);
     if (currentIndex === 0) {
@@ -51,6 +42,18 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
     }
     const previousSlide = slidesImages[previousIndex];
     setSliderData(previousSlide);
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Enter") {
+      handleClick(index);
+    } else if (e.key === "Escape") {
+      setAppear(0);
+    } else if (e.key === "ArrowLeft") {
+      handlePrevious();
+    } else if (e.key === "ArrowRight") {
+      handleNext();
+    }
   };
 
   return (
@@ -70,14 +73,14 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           className="slider__container__btn slider__container__btn--next no-style-btn d-flex"
           type="button"
           onKeyDown={handleKeyDown}
-          onClick={next}>
+          onClick={handleNext}>
           <FaChevronRight className="slider__container__btn__chevrons" />
         </button>
         <button
           className="slider__container__btn slider__container__btn--previous no-style-btn d-flex"
           type="button"
           onKeyDown={handleKeyDown}
-          onClick={previous}>
+          onClick={handlePrevious}>
           <FaChevronLeft className="slider__container__btn__chevrons" />
         </button>
         <img
@@ -86,7 +89,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           alt={sliderData.alt}
         />
       </div>
-      <ScrollContainer className="slider__thumbnails">
+      <div className="slider__thumbnails">
         <div className="scroll-container d-flex align-items-center">
           {slidesImages.map((image, i) => (
             <div className="slider__thumbnails__thumbnail" key={image.id}>
@@ -100,7 +103,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
             </div>
           ))}
         </div>
-      </ScrollContainer>
+      </div>
     </div>
   );
 }

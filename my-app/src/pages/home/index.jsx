@@ -50,52 +50,64 @@ function Home() {
               développement, au rayonnement et à la rénovation de l&apos;église.
             </p>
           </section>
-          <section className="carousel">
-            <div className="gallery full-screen">
-              {groupedItems.map((column) => (
-                <div className="gallery__column" key={Math.random()}>
-                  {column.map((slide) => (
-                    <button
-                      className="gallery__column__card no-style-btn"
-                      id={slide.id}
-                      key={slide.id}
-                      type="button"
-                      onClick={() => {
-                        handleClick(slide);
-                      }}>
-                      <figure className="gallery__column__card__thumb">
-                        <img
-                          src={url + slide.url}
-                          alt={slide.alt}
-                          className="gallery__column__card__thumb__image"
-                        />
-                        <figcaption className="gallery__column__card__thumb__caption">
-                          {slide.title}
-                        </figcaption>
-                      </figure>
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
-            <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
-          </section>
         </article>
-        <article className="article d-flex justify-content-center">
-          {NewsLetter.map((news) => (
-            <section key={news.id} className="article__section">
-              <Link to={domain + news.id}>
-                <div className="news d-flex justify-content-center">
-                  <div
-                    className="news__image"
-                    style={{ backgroundImage: `url(${url} ${news.image.url})` }}
-                  />
-                  <div className="news__text">{parse(news.text)}</div>
+        <div className="carousel">
+          <div className="gallery full-screen">
+            {groupedItems.map((column) => (
+              <div className="gallery__column" key={Math.random()}>
+                {column.map((slide) => (
+                  <button
+                    className="gallery__column__card no-style-btn"
+                    id={slide.id}
+                    key={slide.id}
+                    type="button"
+                    onClick={() => {
+                      handleClick(slide);
+                    }}>
+                    <figure className="gallery__column__card__thumb">
+                      <img
+                        src={url + slide.url}
+                        alt={slide.alt}
+                        className="gallery__column__card__thumb__image"
+                      />
+                      <figcaption className="gallery__column__card__thumb__caption">
+                        {slide.title}
+                      </figcaption>
+                    </figure>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+          <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
+        </div>
+        <div className="newsletter">
+          <h3 className="newsletter__title">Newsletter</h3>
+          <ul className="d-flex">
+            {NewsLetter.map((news) => (
+              <li key={news.id} className="d-flex justify-content-center">
+                <div className="progressBar d-flex justify-content-center">
+                  <div className="progressBar__dot">
+                    <div className="progressBar__dot__top" />
+                    <div className="progressBar__dot__bottom" />
+                  </div>
                 </div>
-              </Link>
-            </section>
-          ))}
-        </article>
+                <Link to={domain + news.id}>
+                  <div className="news d-flex justify-content-center">
+                    <div
+                      className="news__image"
+                      style={{ backgroundImage: `url(${url} ${news.image.url})` }}
+                    />
+                    <div className="news__text">
+                      <h4>{news.title}</h4>
+                      <div>{parse(news.text)}</div>
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </main>
   );
