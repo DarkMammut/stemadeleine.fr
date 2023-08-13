@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet";
 import Recaptcha from "react-google-recaptcha";
 import { FaUser, FaEnvelope, FaLocationArrow, FaPen, FaChurch } from "react-icons/fa";
 import "./contact.scss";
@@ -128,9 +127,6 @@ function Contact() {
 
   return (
     <main id="contact">
-      <Helmet>
-        <title>CONTACT | Les Amis de Sainte Madeleine de La Jarrie</title>
-      </Helmet>
       <div className="container">
         <div className="container-contact d-flex justify-content-center align-items-center">
           <div className="contact-details d-flex align-items-center">

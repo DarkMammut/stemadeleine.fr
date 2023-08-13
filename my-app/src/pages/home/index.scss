@@ -103,20 +103,20 @@
         }
       }
     }
-    .newsletter {
-      &__title {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 100px;
-        padding: 40px 0 15px 0;
-        border-bottom: solid 1px #e2832b;
-        font-size: 40px;
-      }
 
+    .title {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 100px;
+      padding: 40px 0 15px 0;
+      border-bottom: solid 1px #e2832b;
+      font-size: 40px;
+    }
+    .news-container {
       ul > li {
         .progressBar {
           flex-direction: column;
-          margin: 0 150px 0 50px;
+          margin: 0 100px 0 30px;
 
           &__dot {
             height: $dotWidth;
@@ -129,64 +129,106 @@
             &__bottom {
               position: absolute;
               width: 5px;
-              height: calc(150px);
+              height: calc(200px);
               background-color: $dark-color;
               left: 50%;
               transform: translateX(-50%);
             }
 
             &__top {
-              top: calc(-1 * 150px + $dotWidth);
+              top: calc(-1 * 200px + $dotWidth);
             }
 
             &__bottom {
-              bottom: calc(-1 * 150px + $dotWidth);
+              bottom: calc(-1 * 200px + $dotWidth);
             }
           }
         }
 
-        a {
-          text-decoration: none;
+        .news {
+          background-color: $secondary-color;
+          justify-content: space-between;
+          width: 900px;
+          overflow: hidden;
+          border-radius: 5px;
+          border: 12px groove $accent-color;
+          box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 
-          .news {
-            border-radius: 100px;
-            background-color: $light-color;
-            justify-content: space-between;
-            width: 700px;
+          &__image {
+            height: 300px;
+            width: 250px;
             overflow: hidden;
-            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-              rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+            background-position: center;
+            background-size: contain;
+            box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+          }
 
-            &__image {
-              height: 200px;
-              width: 200px;
-              border-radius: 50%;
-              overflow: hidden;
-              background-position: center;
-              box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+          &__text {
+            width: calc(100% - 290px);
+            max-height: 250px;
+            padding: 20px;
+
+            h4 {
+              text-align: center;
+              padding: 10px;
+              font-size: 30px;
+              color: $accent-color;
             }
 
-            &__text {
-              max-height: calc(200px - 10px * 2);
-              width: 400px;
-              padding: 10px 80px 0 10px;
+            p {
+              text-align: justify;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
 
-              h4 {
-                text-align: center;
-                padding: 20px;
-                font-size: 30px;
-                color: $accent-color;
-              }
+    .newsletter-container {
+      flex-direction: column;
+      align-items: center;
 
-              p {
-                text-align: justify;
-                width: 100%;
-                display: -webkit-box;
-                text-overflow: ellipsis;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-              }
+      a {
+        text-decoration: none;
+
+        .newsletter {
+          border-radius: 100px;
+          background-color: $primary-color;
+          justify-content: space-between;
+          width: 700px;
+          overflow: hidden;
+          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+            rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
+          &__image {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-position: center;
+            box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+          }
+
+          &__text {
+            max-height: calc(200px - 10px * 2);
+            width: 400px;
+            padding: 10px 80px 0 10px;
+
+            h4 {
+              text-align: center;
+              padding: 20px;
+              font-size: 30px;
+              color: $accent-color;
+            }
+
+            p {
+
+              width: 100%;
+              display: -webkit-box;
+              text-overflow: ellipsis;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
             }
           }
         }

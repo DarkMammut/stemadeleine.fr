@@ -3,7 +3,7 @@ import "./index.scss";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import Home from "./pages/home";
-import News from "./pages/news/news";
+import Newsletter from "./pages/newsletter/newsletter";
 import Association from "./pages/about/about";
 import Realisation from "./pages/realisation/realisation";
 import Join from "./pages/join/join";
@@ -30,7 +30,7 @@ root.render(
       <Banner />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route exact path="/newsletter/:id" element={<News />} />
+        <Route exact path="/newsletter/:id" element={<Newsletter />} />
         <Route exact path="/association" element={<Association />} />
         <Route exact path="/association/projets" element={<Project />} />
         <Route exact path="/association/nous-rejoindre" element={<Join />} />

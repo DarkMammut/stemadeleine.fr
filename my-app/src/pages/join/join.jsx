@@ -10,14 +10,18 @@ function Join() {
     <main id="join">
       <div className="container">
         <div className="join">
-          <div className="join__image">
-            <div className="join__image__title">
-              <h2>Agissez pour le patrimoine</h2>
-              <span>Devenez membre actif de l&apos;association</span>
+          <div className="join__image d-flex justify-content-center">
+            <div className="join__image__wrapper">
+              <div className="join__image__wrapper__box blury-card">
+                <img src={url + image} title="Eglise de la Jarrie" alt="Eglise de la Jarrie" />
+                <div className="join__image__wrapper__box__frame">
+                  <h2>Agissez pour le patrimoine</h2>
+                  <span>Devenez membre actif de l&apos;association</span>
+                </div>
+              </div>
             </div>
-            <img src={url + image} title="Eglise de la Jarrie" alt="Eglise de la Jarrie" />
           </div>
-          <div>
+          <div className="join__text">
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam at turpis tincidunt,
               commodo ligula a, interdum eros. Proin dignissim ex a mauris tempus interdum. Etiam

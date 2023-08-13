@@ -4,6 +4,7 @@ import parse from "html-react-parser";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
 import NewsLetter from "../../assets/newsletter.json";
+import News from "../../assets/news.json";
 import "./index.scss";
 
 const groupedItems = SLIDES.home.reduce(
@@ -20,6 +21,7 @@ const groupedItems = SLIDES.home.reduce(
 function Home() {
   const domain = "/newsletter/";
   const url = process.env.PUBLIC_URL;
+  const lastNewsletter = NewsLetter[NewsLetter.length - 1];
   const [open, setOpen] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
 
@@ -81,32 +83,50 @@ function Home() {
           </div>
           <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
         </div>
-        <div className="newsletter">
-          <h3 className="newsletter__title">Newsletter</h3>
+        <div className="news-container">
+          <h3 className="title">Actualités</h3>
           <ul className="d-flex">
-            {NewsLetter.map((news) => (
-              <li key={news.id} className="d-flex justify-content-center">
-                <div className="progressBar d-flex justify-content-center">
-                  <div className="progressBar__dot">
-                    <div className="progressBar__dot__top" />
-                    <div className="progressBar__dot__bottom" />
-                  </div>
-                </div>
-                <Link to={domain + news.id}>
-                  <div className="news d-flex justify-content-center">
-                    <div
-                      className="news__image"
-                      style={{ backgroundImage: `url(${url} ${news.image.url})` }}
-                    />
-                    <div className="news__text">
-                      <h4>{news.title}</h4>
-                      <div>{parse(news.text)}</div>
+            {News.map((news) => {
+              if (news.enable === "enable") {
+                return (
+                  <li key={news.id} className="d-flex justify-content-center">
+                    <div className="progressBar d-flex justify-content-center">
+                      <div className="progressBar__dot">
+                        <div className="progressBar__dot__top" />
+                        <div className="progressBar__dot__bottom" />
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                    <div className="news d-flex justify-content-center">
+                      <div
+                        className="news__image"
+                        style={{ backgroundImage: `url(${url} ${news.image.url})` }}
+                      />
+                      <div className="news__text">
+                        <h4>{news.title}</h4>
+                        <div>{parse(news.text)}</div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              }
+              return null; // Renvoyer null si news.enable n'est pas "enable"
+            })}
           </ul>
+        </div>
+        <div className="newsletter-container d-flex justify-content-center">
+          <h3 className="title">Newsletter</h3>
+          <Link to={domain + lastNewsletter.id}>
+            <div id={lastNewsletter.id} className="newsletter d-flex justify-content-center">
+              <div
+                className="newsletter__image"
+                style={{ backgroundImage: `url(${url} ${lastNewsletter.image.url})` }}
+              />
+              <div className="newsletter__text">
+                <h4>{lastNewsletter.title}</h4>
+                <div>{parse(lastNewsletter.text)}</div>
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
     </main>
