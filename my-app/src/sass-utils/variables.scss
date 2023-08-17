@@ -23,3 +23,8 @@ $parentMaxHeight: 70vh;
 $dotWidth: 25px;
 $active: $dark-color;
 $inactive: $light-color;
+
+$cmToPixels: 37.7953;
+$printWidth: 21;
+$printHeight: 29.7;
+$printDesktopRatio: calc(($printWidth * $cmToPixels) / 1224);

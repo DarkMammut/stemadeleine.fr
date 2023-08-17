@@ -1,15 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import Draggable from "react-draggable"; // Import the Draggable component
 import "./slider.scss";
 
 function ImageSlider({ slidesImages, openSlider, startSlide }) {
   const url = process.env.PUBLIC_URL;
   const [appear, setAppear] = useState(0);
   const [sliderData, setSliderData] = useState(slidesImages[0]);
+  const [sliderPosition, setSliderPosition] = useState(0);
+  const scrollContainerRef = useRef(null); // Create a ref for the scroll container
 
   const handleClick = (index) => {
     const slider = slidesImages[index];
     setSliderData(slider);
+
+    // Calculate the position to center the clicked thumbnail
+    const thumbnailWidth = 100; // Adjust as needed based on your design
+    const containerWidth = slidesImages.length * thumbnailWidth;
+    const visibleWidth = 1224; // Adjust as needed based on your design
+    const centerOffset = (containerWidth - visibleWidth) / 2;
+    const centeredPosition = -index * thumbnailWidth + centerOffset;
+    setSliderPosition(centeredPosition);
   };
 
   useEffect(() => {
@@ -56,6 +67,19 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
     }
   };
 
+  const handleDrag = (e, { deltaX }) => {
+    const newSliderPosition = sliderPosition + deltaX;
+
+    // Define your limits (in pixels)
+    const minPosition = -200; // Adjust as needed
+    const maxPosition = 200; // Adjust as needed
+
+    // Ensure the new position stays within limits
+    const clampedPosition = Math.max(minPosition, Math.min(maxPosition, newSliderPosition));
+
+    setSliderPosition(clampedPosition);
+  };
+
   return (
     <div className="slider d-flex" data-open={appear}>
       <button
@@ -90,19 +114,24 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
         />
       </div>
       <div className="slider__thumbnails">
-        <div className="scroll-container d-flex align-items-center">
-          {slidesImages.map((image, i) => (
-            <div className="slider__thumbnails__thumbnail" key={image.id}>
-              <button
-                className={sliderData.id === image.id ? "clicked no-style-btn" : "no-style-btn"}
-                type="button"
-                onKeyDown={() => handleKeyDown(i)}
-                onClick={() => handleClick(i)}>
-                <img src={url + image.url} alt={image.alt} />
-              </button>
-            </div>
-          ))}
-        </div>
+        <Draggable axis="x" onDrag={handleDrag} nodeRef={scrollContainerRef}>
+          <div
+            ref={scrollContainerRef} // Attach the ref to the div element
+            className="scroll-container d-flex align-items-center"
+            style={{ transform: `translateX(${sliderPosition}px)` }}>
+            {slidesImages.map((image, i) => (
+              <div className="slider__thumbnails__thumbnail" key={image.id}>
+                <button
+                  className={sliderData.id === image.id ? "clicked no-style-btn" : "no-style-btn"}
+                  type="button"
+                  onKeyDown={() => handleKeyDown(i)}
+                  onClick={() => handleClick(i)}>
+                  <img src={url + image.url} alt={image.alt} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </Draggable>
       </div>
     </div>
   );

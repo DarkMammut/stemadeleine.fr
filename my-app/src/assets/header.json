@@ -5,6 +5,7 @@
     "name": "ACCUEIL",
     "title": "Les Amis de Sainte Madeleine de La Jarrie",
     "subhead": "Eglise de la Jarrie",
+    "description": "Découvrez l'association des Amis de Sainte Madeleine de La Jarrie et ses projets de restauration du mobilier, de valorisation et de protection de l'église de La Jarrie.",
     "path": "/",
     "sublinks": [],
     "type": "large",
@@ -16,6 +17,7 @@
     "name": "L'ASSOCIATION",
     "title": "L'ASSOCIATION",
     "subhead": "",
+    "description": "L'association Les Amis de Sainte Madeleine de La Jarrie a pour objectif d’être un outil au service de l’église et de la commune pour mener à bien des travaux de restauration du mobilier et de protection du patrimoine.",
     "path": "/association",
     "sublinks": [
       {
@@ -24,6 +26,7 @@
         "name": "NOS PROJETS",
         "title": "NOS PROJETS",
         "subhead": "",
+        "description": "",
         "path": "/projets",
         "type": "small",
         "url": "/banners/Banner-9.jpeg"
@@ -34,6 +37,7 @@
         "name": "NOUS REJOINDRE",
         "title": "NOUS REJOINDRE",
         "subhead": "",
+        "description": "Vous voulez participer à la protection, la valorisation et la restauration de l'église de La Jarrie: découvrez comment agir avec les Amis de Sainte Madeleine de La Jarrie.",
         "path": "/nous-rejoindre",
         "type": "small",
         "url": "/banners/Banner-7.jpeg"
@@ -44,6 +48,7 @@
         "name": "FAIRE UN DON",
         "title": "FAIRE UN DON",
         "subhead": "",
+        "description": "En soutenant notre association, vous contribuez à agir pour la protection, la valorisation et la restauration de l'église de La Jarrie.",
         "path": "/don",
         "type": "small",
         "url": "/banners/Banner-8.jpg"
@@ -58,6 +63,7 @@
     "name": "NOS REALISATIONS",
     "title": "NOS REALISATIONS",
     "subhead": "",
+    "description": "",
     "path": "/nos-realisations",
     "sublinks": [],
     "type": "small",
@@ -69,6 +75,7 @@
     "name": "L'EGLISE",
     "title": "L'EGLISE",
     "subhead": "",
+    "description": "Eglise située dans la commune de la Jarrie, construite au XIIe siècle.",
     "path": "/eglise",
     "sublinks": [
       {
@@ -77,6 +84,7 @@
         "name": "HISTOIRE",
         "title": "L'HISTOIRE",
         "subhead": "",
+        "description": "Découvrez l'histoire de l'église de La Jarrie, construit au XIIe siècle, à travers des textes et photos d'époque.",
         "path": "/histoire",
         "type": "small",
         "url": "/banners/Banner-3.jpg"
@@ -87,6 +95,7 @@
         "name": "LES CLOCHES",
         "title": "LES CLOCHES",
         "subhead": "",
+        "description": "Le clocher de l'église abrite les 4 cloches de La Jarrie : découvrez leur histoire",
         "path": "/cloches",
         "type": "small",
         "url": "/banners/Banner-4.jpeg"
@@ -101,6 +110,7 @@
     "name": "CONTACT",
     "title": "NOUS CONTACTER",
     "subhead": "",
+    "description": "",
     "path": "/contact",
     "sublinks": [],
     "type": "small",
@@ -112,6 +122,7 @@
     "name": "NEWSLETTER",
     "title": "NEWSLETTER",
     "subhead": "",
+    "description": "",
     "path": "/newsletter",
     "sublinks": [],
     "type": "small",
@@ -123,7 +134,21 @@
     "name": "404",
     "title": "",
     "subhead": "",
+    "description": "Eglise de la Jarrie",
     "path": "/404",
+    "sublinks": [],
+    "type": "none",
+    "url": ""
+  },
+  {
+    "id": "Error",
+    "enable": "disable",
+    "name": "404",
+    "title": "",
+    "subhead": "",
+    "head": "404 | Page Not Found",
+    "description": "Eglise de la Jarrie",
+    "path": "*",
     "sublinks": [],
     "type": "none",
     "url": ""

@@ -21,7 +21,11 @@ function Banner() {
     found = Data.find((banner) => banner.path === mainUrl);
   } else {
     const mainObject = Data.find((object) => object.path === mainUrl);
-    found = mainObject.sublinks.find((banner) => mainUrl + banner.path === path);
+    if (!mainObject) {
+      found = Data.find((banner) => banner.id === "Error-404");
+    } else {
+      found = mainObject.sublinks.find((banner) => mainUrl + banner.path === path);
+    }
   }
 
   const url = process.env.PUBLIC_URL + found.url;

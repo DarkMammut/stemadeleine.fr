@@ -1,9 +1,6 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-@import "../../sass-utils/mixins.scss";
-@import "../../sass-utils/variables.scss";
-
 #welcome {
   text-align: center;
   text-shadow: 1px 0px 1px #cccccc, 0px 1px 1px #eeeeee, 2px 1px 1px #cccccc, 1px 2px 1px #eeeeee,
@@ -17,12 +14,12 @@
     text-align: justify;
     margin-bottom: 50px;
   }
+
   .gallery {
-    display: flex;
     padding: 2px;
     transition: 0.3s;
 
-    &:hover &__column__card__thumb__image {
+    &:hover .gallery__column__card__thumb__image {
       filter: grayscale(1);
     }
 
@@ -52,7 +49,7 @@
             transition: 0.3s;
 
             &:hover {
-              transform: scale(1.1);
+              transform: scale(1.2);
             }
           }
 
@@ -74,6 +71,32 @@
       }
     }
   }
+
+  .newsletter-container {
+    position: relative;
+
+    a {
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        transform: translateY(-0.15em);
+
+        .newsletter {
+          background: radial-gradient(
+            circle,
+            rgba(60, 160, 122, 1) 50%,
+            rgba(144, 202, 180, 1) 100%
+          );
+        }
+      }
+    }
+
+    .btn--navigate {
+      position: absolute;
+      right: 0;
+      top: 40px;
+    }
+  }
 }
 
 @include desktop-layout {
@@ -89,10 +112,11 @@
         margin-bottom: 40px;
       }
     }
+
     .gallery {
       &__column {
         flex-direction: column;
-        width: 10%;
+        width: 13%;
 
         &__card {
           margin: 5px;
@@ -112,6 +136,7 @@
       border-bottom: solid 1px #e2832b;
       font-size: 40px;
     }
+
     .news-container {
       ul > li {
         .progressBar {
@@ -193,12 +218,11 @@
 
         .newsletter {
           border-radius: 100px;
-          background-color: $primary-color;
+          background: $light-color;
           justify-content: space-between;
           width: 700px;
           overflow: hidden;
-          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-            rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+          box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
 
           &__image {
             height: 200px;
@@ -222,7 +246,6 @@
             }
 
             p {
-
               width: 100%;
               display: -webkit-box;
               text-overflow: ellipsis;

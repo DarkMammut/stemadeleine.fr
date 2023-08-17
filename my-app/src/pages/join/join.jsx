@@ -13,7 +13,7 @@ function Join() {
           <div className="join__image d-flex justify-content-center">
             <div className="join__image__wrapper">
               <div className="join__image__wrapper__box blury-card">
-                <img src={url + image} title="Eglise de la Jarrie" alt="Eglise de la Jarrie" />
+                <img src={url + image} alt="" title="" />
                 <div className="join__image__wrapper__box__frame">
                   <h2>Agissez pour le patrimoine</h2>
                   <span>Devenez membre actif de l&apos;association</span>

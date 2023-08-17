@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import parse from "html-react-parser";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
@@ -24,6 +24,7 @@ function Home() {
   const lastNewsletter = NewsLetter[NewsLetter.length - 1];
   const [open, setOpen] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open === 1) {
@@ -35,6 +36,10 @@ function Home() {
     const index = SLIDES.home.findIndex((slides) => slides === slide);
     setSlideIndex(index);
     setOpen(1);
+  };
+
+  const handleClickNavigate = () => {
+    navigate("/newsletter"); // Navigates to the "/newsletter" route
   };
 
   return (
@@ -54,7 +59,7 @@ function Home() {
           </section>
         </article>
         <div className="carousel">
-          <div className="gallery full-screen">
+          <div className="gallery full-screen d-flex justify-content-center">
             {groupedItems.map((column) => (
               <div className="gallery__column" key={Math.random()}>
                 {column.map((slide) => (
@@ -127,6 +132,12 @@ function Home() {
               </div>
             </div>
           </Link>
+          <button
+            className="btn btn--navigate no-style-btn"
+            type="button"
+            onClick={handleClickNavigate}>
+            Plus de newsletters
+          </button>
         </div>
       </div>
     </main>

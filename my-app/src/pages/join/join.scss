@@ -9,17 +9,18 @@
 
     &__image {
       flex-wrap: wrap;
+      width: 100%;
 
       &__wrapper {
-        width: 70%;
+        width: 55%;
+        height: auto;
 
         &__box {
           position: relative;
           border-radius: 4px;
           overflow: hidden;
-          box-shadow: 0 1.4px 1.7px rgba(0, 0, 0, 0.017), 0 3.3px 4px rgba(0, 0, 0, 0.024),
-            0 6.3px 7.5px rgba(0, 0, 0, 0.03), 0 11.2px 13.4px rgba(0, 0, 0, 0.036),
-            0 20.9px 25.1px rgba(0, 0, 0, 0.043), 0 50px 60px rgba(0, 0, 0, 0.06);
+          aspect-ratio: 4 / 3;
+          box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 
           .hide {
             opacity: 0;
@@ -65,7 +66,13 @@
 
           img {
             position: relative;
+            height: 100%;
             width: 100%;
+            background: {
+              position: center;
+              size: cover;
+              repeat: no-repeat;
+            }
             z-index: 1;
             transition: all 0.3s ease-in-out;
 
