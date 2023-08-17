@@ -13,14 +13,18 @@ function reduceUrl(url) {
 
 function Meta() {
   const location = useLocation();
-  const path = location.pathname;
-  const mainUrl = reduceUrl(path);
+  let path = location.pathname;
+  let mainUrl = reduceUrl(path);
   const end = " | Les Amis de Sainte Madeleine de La Jarrie";
   let found = "";
 
-  if (path === mainUrl || mainUrl === "/newsletter" || mainUrl === "/don") {
+  if (path === mainUrl || mainUrl === "/newsletter") {
     found = Data.find((helmet) => helmet.path === mainUrl);
   } else {
+    if (path === "/association/don/formulaire") {
+      mainUrl = "/association";
+      path = "/association/don";
+    }
     const mainObject = Data.find((object) => object.path === mainUrl);
     if (!mainObject) {
       found = Data.find((helmet) => helmet.id === "Error-404");
