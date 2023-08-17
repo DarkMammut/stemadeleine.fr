@@ -1,13 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./donation.scss";
 
 function Donation() {
   const navigate = useNavigate();
-
-  const handleClickNavigate = () => {
-    navigate("/association/don/formulaire"); // Navigates to the "formulaire" route
-  };
 
   return (
     <main id="donation">
@@ -24,15 +20,15 @@ function Donation() {
           <button
             className="btn btn--navigate no-style-btn"
             type="button"
-            onClick={handleClickNavigate}>
+            onClick={() => navigate("/association/don/formulaire")}>
             formulaire à imprimer
           </button>
-          <iframe
-            id="haWidget"
-            title="HelloAsso Widget"
-            src="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/1/widget-bouton"
-            style={{ width: "100%", height: "70px", border: "none" }}
-          />
+          <Link
+            to="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/1"
+            target="_blank"
+            className="btn btn--navigate no-style-btn">
+            Je donne en ligne
+          </Link>
         </article>
       </div>
     </main>
