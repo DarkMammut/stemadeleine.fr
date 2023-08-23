@@ -35,7 +35,6 @@ function Meta() {
 
   return (
     <Helmet>
-      <meta charSet="utf-8" />
       <title>{found.name + end}</title>
       <meta name="description" content={found.description} />
     </Helmet>

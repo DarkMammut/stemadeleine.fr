@@ -13,6 +13,10 @@
       text-align: justify;
     }
 
+    .buttons-container {
+      justify-content: space-evenly;
+    }
+
     .btn {
       &--navigate {
         margin-top: 50px;
@@ -20,7 +24,6 @@
         border: 2px solid $dark-color;
         border-radius: 30px;
         box-shadow: $accent-color 4px 4px 0 0;
-        color: $dark-color;
         cursor: pointer;
         display: inline-block;
         font-weight: 600;
