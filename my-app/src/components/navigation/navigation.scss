@@ -209,6 +209,9 @@
           }
         }
       }
+      .btn--mobile {
+        display: none;
+      }
     }
   }
 
@@ -354,6 +357,17 @@
             }
           }
         }
+      }
+
+      .btn--donate{
+        position: absolute;
+        @include btn--donate
+      }
+
+      .btn--mobile {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
       }
     }
   }

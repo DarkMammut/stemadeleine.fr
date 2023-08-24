@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { FaHeart } from "react-icons/fa";
 import LINKS from "../../assets/header.json";
 import "./navigation.scss";
 
@@ -53,6 +54,10 @@ function Navigation() {
             return null; // Renvoyer null si link.enable n'est pas "enable"
           })}
         </ul>
+        <Link to="/association/don" className="btn--donate btn--mobile">
+          Don
+          <FaHeart className="heart" />
+        </Link>
       </nav>
     </div>
   );

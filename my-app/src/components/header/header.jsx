@@ -15,11 +15,9 @@ function Header() {
           <div className="header__logo" style={style} />
         </Link>
         <Navigation />
-        <Link
-          to="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/2"
-          className="btn btn--donate no style-btn">
+        <Link to="/association/don" className="btn--donate btn--desktop">
+          Don
           <FaHeart className="heart" />
-          <span>Don</span>
         </Link>
       </div>
       <Banner />

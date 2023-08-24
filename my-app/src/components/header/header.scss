@@ -25,11 +25,23 @@
     background-color: transparent;
     z-index: 2;
   }
+}
 
-  .btn--donate {
-    position: fixed;
-    top: 0;
-    right: 0;
+@include large-desktop-layout {
+  .header {
+    .btn--desktop {
+      top: 12px;
+      right: 20px;
+    }
+  }
+}
+
+@include small-desktop-layout {
+  .header {
+    .btn--desktop {
+      top: calc($desktop-header-radius + 12px);
+      right: 20px;
+    }
   }
 }
 
@@ -40,6 +52,11 @@
     &__logo {
       width: 105px;
       height: $desktop-header-radius;
+    }
+
+    .btn--donate {
+      position: absolute;
+      @include btn--donate
     }
   }
 }
@@ -52,7 +69,7 @@
       width: 69px;
       height: $mobile-header-radius;
     }
-    .btn--donate {
+    .btn--desktop {
       display: none;
     }
   }

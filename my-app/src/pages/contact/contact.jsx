@@ -5,12 +5,6 @@ import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
-// const encode = (data) => {
-//   return Object.keys(data)
-//     .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
-//     .join("&");
-// };
-
 function ValidateEmail(mail) {
   const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
   return regexpEmail.test(mail);
@@ -114,6 +108,12 @@ function Contact() {
       const formData = new FormData();
 
       formData.append("form-name", "contact");
+      formData.append("firstname", state.firstname);
+      formData.append("lastname", state.lastname);
+      formData.append("email", state.email);
+      formData.append("subject", state.subject);
+      formData.append("message", state.message);
+      formData.append("rgpd", state.rgpd);
 
       fetch("/", {
         method: "POST",
