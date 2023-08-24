@@ -1026,7 +1026,14 @@ function Contact() {
             </div>
 
             <div className="form-group checkbox">
-              <input id="rgpd" className="" type="checkbox" onChange={handleChange} required />
+              <input
+                id="rgpd"
+                className=""
+                name="rgpd"
+                type="checkbox"
+                onChange={handleChange}
+                required
+              />
               <label htmlFor="rgpd" className="s-text" style={{ width: `65%` }}>
                 En soumettant ce formulaire, j’accepte que mes informations soient utilisées
                 exclusivement dans le cadre de ma demande et de la relation commerciale éthique et
