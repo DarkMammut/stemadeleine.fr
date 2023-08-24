@@ -5,11 +5,11 @@ import "./contact.scss";
 
 const RECAPTCHA_KEY = "6LdpyjonAAAAAAILGIfHzgcy6aQyLy3e9oyULUF4";
 
-const encode = (data) => {
-  return Object.keys(data)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
-    .join("&");
-};
+// const encode = (data) => {
+//   return Object.keys(data)
+//     .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+//     .join("&");
+// };
 
 function ValidateEmail(mail) {
   const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -100,8 +100,8 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const form = e.target;
-    const recaptchaValue = recaptchaRef.current.getValue();
+    // const form = e.target;
+    // const recaptchaValue = recaptchaRef.current.getValue();
 
     if (
       ValidateName(state.firstname) ||
@@ -111,15 +111,13 @@ function Contact() {
       ValidateMessage(state.message) ||
       state.rgpd
     ) {
+      const formData = new FormData();
+
+      formData.append("form-name", "contact");
+
       fetch("/", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode({
-          "form-name": form.getAttribute("name"),
-          "g-recaptcha-response": recaptchaValue,
-          netlify: "true",
-          ...state
-        })
+        body: formData
       })
         .then(() => setAppear(1), setState({}))
         .catch((error) => alert(error) /* eslint-disable-line no-alert */);
