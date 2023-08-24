@@ -117,6 +117,7 @@ function Contact() {
         body: encode({
           "form-name": form.getAttribute("name"),
           "g-recaptcha-response": recaptchaValue,
+          netlify: "true",
           ...state
         })
       })

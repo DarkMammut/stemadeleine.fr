@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaHeart } from "react-icons/fa";
 import Navigation from "../navigation/navigation";
 import Banner from "../banner/banner";
 import "./header.scss";
@@ -14,6 +15,12 @@ function Header() {
           <div className="header__logo" style={style} />
         </Link>
         <Navigation />
+        <Link
+          to="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/2"
+          className="btn btn--donate no style-btn">
+          <FaHeart className="heart" />
+          <span>Don</span>
+        </Link>
       </div>
       <Banner />
     </header>

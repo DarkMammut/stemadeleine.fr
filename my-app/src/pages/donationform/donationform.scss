@@ -4,24 +4,32 @@
 @media print {
   body {
     width: 1224px;
+    aspect-ratio: 21 / 29.7;
 
     header {
       display: none;
     }
 
-    footer {
-      display: none;
-    }
+    #donationform {
+      width: auto;
+      padding-bottom: 0;
 
-    main {
-      width: 100%;
       .container {
         width: 100%;
+
+        .form-container {
+          width: 100%;
+          height: 100%;
+        }
 
         .btn {
           display: none;
         }
       }
+    }
+
+    .footer {
+      display: none;
     }
   }
 }
@@ -30,7 +38,7 @@
   .form-container {
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 1224px;
     aspect-ratio: 21 / 29.7;
 
     .frame {
@@ -39,7 +47,7 @@
       border: solid 1px $accent-color;
       flex-direction: column;
       align-items: center;
-      margin: 100px auto 10px auto;
+      margin: 100px 0 10px 0;
 
       &__logo {
         aspect-ratio: 3 / 2;

@@ -11,8 +11,8 @@
   background: linear-gradient(180deg, $dark-color 0%, $primary-color 60%);
   width: 100%;
   z-index: 4;
-  box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.2);
-  
+  box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.2);
+
   &__logo {
     position: fixed;
     top: 0;
@@ -24,6 +24,12 @@
     background-repeat: no-repeat;
     background-color: transparent;
     z-index: 2;
+  }
+
+  .btn--donate {
+    position: fixed;
+    top: 0;
+    right: 0;
   }
 }
 
@@ -45,6 +51,9 @@
     &__logo {
       width: 69px;
       height: $mobile-header-radius;
+    }
+    .btn--donate {
+      display: none;
     }
   }
 }
