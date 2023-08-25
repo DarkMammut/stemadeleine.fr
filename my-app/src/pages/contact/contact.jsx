@@ -92,9 +92,13 @@ function Contact() {
     }
   };
 
+  const handleClick = () => {
+    setAppear(0);
+    window.location.reload();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // const form = e.target;
     // const recaptchaValue = recaptchaRef.current.getValue();
 
     if (
@@ -1093,7 +1097,7 @@ function Contact() {
         <button
           type="button"
           className="btn btn--primary btn--thank-you no-style-btn"
-          onClick={() => setAppear(0)}>
+          onClick={handleClick}>
           OK
         </button>
       </div>
