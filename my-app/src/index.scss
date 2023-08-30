@@ -186,6 +186,10 @@ table {
     background-size: 100% 100%;
     transform: translateY(-0.15em);
   }
+
+  &--donate {
+    @include btn--donate;
+  }
 }
 
 main {

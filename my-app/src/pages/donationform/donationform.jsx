@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import "./donationform.scss";
 
 function DonationForm() {
   const [state, setState] = useState({});
   const url = `${process.env.PUBLIC_URL}/logo.png`;
-  const style = { backgroundImage: `url(${url})` };
 
   const handleCheckboxChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.checked });
@@ -24,9 +22,13 @@ function DonationForm() {
       <div className="container">
         <div className="form-container d-flex">
           <div className="frame d-flex">
-            <Link to="/">
-              <div className="frame__logo" style={style} />
-            </Link>
+            <div className="frame__logo">
+              <img
+                src={url}
+                title="Logo"
+                alt="Logo de l'association des Amis de Sainte Madeleine de La jarrie"
+              />
+            </div>
             <h1>
               FORMULAIRE DE DON
               <br />
@@ -58,9 +60,6 @@ function DonationForm() {
               </div>
             </div>
           </div>
-          <p>
-            Merci d&apos;envoyer votre chèque à l’adresse ci-dessus, accompagné de ce formulaire.
-          </p>
           <form className="form" name="donation">
             <div className="form__block">
               <span>Je suis :</span>
@@ -106,47 +105,82 @@ function DonationForm() {
                 <input name="name" type="text" onChange={handleChange} />
               </label>
             </div>
+            <div
+              className={
+                state.organisation === "option2" || state.organisation === "option3"
+                  ? "form__block active"
+                  : "form__block"
+              }>
+              <label>
+                SIREN :
+                <input
+                  name="name"
+                  type="number"
+                  minLength="9"
+                  maxLength="9"
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
             <div className="form__block">
               <label>
                 Prénom :
-                <input name="firstname" type="text" onChange={handleChange} />
+                <input name="firstname" type="text" onChange={handleChange} required />
               </label>
               <label>
                 Nom :
-                <input name="lastname" type="text" onChange={handleChange} />
+                <input name="lastname" type="text" onChange={handleChange} required />
               </label>
             </div>
             <div className="form__block">
               <label>
-                Adresse :
-                <input name="adress" type="text" onChange={handleChange} />
+                Date de naissance :
+                <input type="date" name="birth" onChange={handleChange} required />
               </label>
             </div>
             <div className="form__block">
               <label>
-                Code Postal :
-                <input name="postalCode" type="text" onChange={handleChange} />
-              </label>
-              <label>
-                Ville :
-                <input name="city" type="text" onChange={handleChange} />
-              </label>
-            </div>
-            <div className="form__block">
-              <label>
-                Pays :
-                <input name="country" type="text" onChange={handleChange} />
-              </label>
-            </div>
-            <div className="form__block">
-              <label>
-                Téléphone :<input type="tel" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" />
+                Téléphone :
+                <input
+                  type="tel"
+                  name="phone"
+                  pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                  onChange={handleChange}
+                />
               </label>
             </div>
             <div className="form__block">
               <label>
                 Email :
-                <input type="email" name="email" />
+                <input type="email" name="email" onChange={handleChange} required />
+              </label>
+            </div>
+            <div className="form__block">
+              <label>
+                Adresse :
+                <input name="adress" type="text" onChange={handleChange} required />
+              </label>
+            </div>
+            <div className="form__block">
+              <label>
+                Code Postal :
+                <input name="postalCode" type="text" onChange={handleChange} required />
+              </label>
+              <label>
+                Ville :
+                <input name="city" type="text" onChange={handleChange} required />
+              </label>
+            </div>
+            <div className="form__block">
+              <label>
+                Pays :
+                <input name="country" type="text" onChange={handleChange} required />
+              </label>
+            </div>
+            <div className="form__block">
+              <label>
+                Je souhaite faire un don de :
+                <input name="money" type="number" onChange={handleChange} required />€
               </label>
             </div>
             <div className="form__block">
@@ -156,6 +190,7 @@ function DonationForm() {
                   type="checkbox"
                   checked={state.checkbox1}
                   onChange={handleCheckboxChange}
+                  required
                 />
                 Je souhaite recevoir un reçu fiscal pour mon don.
               </label>
@@ -167,6 +202,7 @@ function DonationForm() {
                   type="checkbox"
                   checked={state.checkbox2}
                   onChange={handleCheckboxChange}
+                  required
                 />
                 Je souhaite ajouter mon adresse email à la liste de diffusion de l’association pour
                 être tenu au courant de ses activités (emails informatifs, newsletters). Le

@@ -17,7 +17,7 @@ function Header() {
         <Navigation />
         <Link to="/association/don" className="btn--donate btn--desktop">
           Don
-          <FaHeart className="heart" />
+          <FaHeart className="icon" />
         </Link>
       </div>
       <Banner />

@@ -138,6 +138,8 @@
     }
 
     .news-container {
+      margin-top: 100px;
+
       ul > li {
         .progressBar {
           flex-direction: column;
@@ -212,6 +214,7 @@
     .newsletter-container {
       flex-direction: column;
       align-items: center;
+      margin-top: 200px;
 
       a {
         text-decoration: none;

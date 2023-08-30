@@ -52,7 +52,7 @@
     -webkit-transition: all 800ms;
     transition: all 800ms;
 
-    .heart {
+    .icon {
       border-left: 1px solid darken($accent-color, 5%);
       color: darken($accent-color, 10%);
       font: 20px;
@@ -68,7 +68,7 @@
     &:hover {
       background-position: -100% 0;
 
-      .heart {
+      .icon {
         border-left: 1px solid lighten($accent-color, 5%);
         color: #fff;
         text-shadow: 0 0 10px #000;
