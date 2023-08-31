@@ -10,5 +10,31 @@
       "url": "/news/Magnan.JPG"
     },
     "text": "<p>Madame Nicole Magnan a fait don à l’association de cette icône ancienne probablement d’origine grecque ou syrienne.<br/>Elle représente Marie-Madeleine répandant un parfum sur les pieds de Jésus-Christ.<br/>Il est prévu que cette icône sera exposée  dans l’église dès qu'elle aura reçu un encadrement adapté.</p>"
+  },
+
+  {
+    "id": "n002",
+    "enable": "enable",
+    "title": "La dîme-bénitier retrouve sa place",
+    "image": {
+      "id": "n002-i1",
+      "title": "La dîme-bénitier du XVIème s. a retrouvé sa place à l’entrée de l’église.",
+      "alt": "La dîme-bénitier du XVIème s. a retrouvé sa place à l’entrée de l’église.",
+      "url": "/news/benitier.JPG"
+    },
+    "text": "<p>La dîme-bénitier du XVIème s. a retrouvé sa place à l’entrée de l’église sur son support en pierre de tuffeau avec sur le pied une feuille de rameaux d’olivier aux angles.</br>Sur sa partie supérieure l’encoche a été taillée à l’origine pour recevoir une mesure de grains représentant un dixième d’une récolte qu’elle soit journalière ou hebdomadaire.</p>"
+  },
+
+  {
+    "id": "n003",
+    "enable": "enable",
+    "title": "L'arrivée de Marie Madeleine",
+    "image": {
+      "id": "n003-i1",
+      "title": "Le tableau de Marie Madeleine a été installé",
+      "alt": "Le tableau de Marie Madeleine peint par Caroline Fleury- Chevillard, a été installé sous le vitrail éponyme.",
+      "url": "/news/tableauSM.jpeg"
+    },
+    "text": "<p>Le tableau de Marie Madeleine peint par Caroline Fleury- Chevillard, a été installé sous le vitrail éponyme par les soins de Patrice Chupeau – responsable des services techniques - et Christophe …. Le déplacement de quelques bancs à mis à nue la terre battue et nécessité la pose d’une dalle de ciment. L’espace ainsi dégagé assure plus de fluidité pour la circulation des fidèles et des visiteurs sécurisant ainsi le lieu.</p>"
   }
 ]

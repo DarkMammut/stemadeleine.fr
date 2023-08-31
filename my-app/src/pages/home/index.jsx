@@ -89,8 +89,8 @@ function Home() {
           <ImageSlider slidesImages={SLIDES.home} openSlider={open} startSlide={slideIndex} />
         </div>
         <div className="news-container">
-          <h3 className="title">Actualités</h3>
-          <ul className="d-flex">
+          <h3 className="title">EN CE MOMENT DANS L’EGLISE DE LA JARRIE </h3>
+          <ul className="news-list d-flex">
             {News.map((news) => {
               if (news.enable === "enable") {
                 return (

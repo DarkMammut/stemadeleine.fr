@@ -27,7 +27,14 @@
             "paragraph": "<p>C’est le souci du beau et de ce qu’il doit être en tout, partout et pour tous et une continuation dans ce qui est reçu.<br/>Mais également une volonté d’assurer le passage entre un passé qui ne reviendra pas par définition, et que l’on doit de respecter, et un présent vivant.<p/>"
           }
         ],
-        "images": []
+        "images": [
+          {
+            "id": "About-A2S1I1",
+            "url": "/About/photo-2.jpg",
+            "title": "Trois filles regardant l'horizon",
+            "alt": "Trois filles regardant l'horizon"
+          }
+        ]
       },
       {
         "id": "About-A2S2",

@@ -9,15 +9,24 @@
   #About-A2 {
     .article{
       &__textarea{
+        position: relative;
         &__sections div {
           display: flex;
           justify-content: space-around;
   
           .section {
             width: 30%;
+
+            &__images {
+              position: absolute;
+              right: 80px;
+              top: 80px;
+              width: 300px;
+            }
   
             &__textarea {
               justify-content: flex-start;
+              width: 100%;
             }
           }
         }
