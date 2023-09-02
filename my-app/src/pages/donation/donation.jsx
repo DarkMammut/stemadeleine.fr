@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaPrint } from "react-icons/fa";
+import { FaPrint, FaHandHoldingHeart, FaHandshake } from "react-icons/fa";
 import "./donation.scss";
 
 function Donation() {
@@ -26,14 +26,14 @@ function Donation() {
               target="_blank"
               className="btn--donate">
               Don pour l&apos;association
-              <FaPrint className="icon" />
+              <FaHandHoldingHeart className="icon" />
             </Link>
             <Link
               to="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/3"
               target="_blank"
               className="btn--donate">
               Don pour le Chemin de Croix
-              <FaPrint className="icon" />
+              <FaHandshake className="icon" />
             </Link>
           </div>
           <span>

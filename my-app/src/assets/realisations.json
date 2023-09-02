@@ -14,7 +14,7 @@
         "id": "A1I1",
         "title": "« FEMME, POURQUOI PLEURES-TU ? »",
         "alt": "Tableau représentant Sainte Madeleine",
-        "url": "/tableau.png"
+        "url": "/realisations/tableau.png"
       }
     ]
   },
@@ -33,7 +33,7 @@
         "id": "A2I1",
         "title": "Les quatres Kakémonos",
         "alt": "Photo des kakémonos",
-        "url": "/kakemonos.jpg"
+        "url": "/realisations/kakemonos.jpg"
       }
     ]
   },
@@ -56,7 +56,13 @@
         "id": "A3I1",
         "title": "Le bénitier",
         "alt": "Photo du bénitier",
-        "url": "/benitier.jpg"
+        "url": "/realisations/benitier.jpg"
+      },
+      {
+        "id": "A3I2",
+        "title": "Le nouveau vasque",
+        "alt": "Photo du nouveau vasque",
+        "url": "/realisations/vasque_benitier.jpg"
       }
     ]
   }

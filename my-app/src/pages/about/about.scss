@@ -19,8 +19,6 @@
 
             &__images {
               position: absolute;
-              right: 80px;
-              top: 80px;
               width: 300px;
             }
   
@@ -36,13 +34,24 @@
   
   #About-A2S1 {
     margin-top: 0;
+
+    .section__images {
+      top: 20px;
+      right: 50px;
+    }
   }
   
   #About-A2S2 {
-    margin-top: 250px;
+    margin-top: 300px;
   }
   
   #About-A2S3 {
-    margin-top: 500px;
+    margin-top: 600px;
+
+    .section__images {
+      top: 765px;
+      left: 50px;
+    }
   }
+
 }

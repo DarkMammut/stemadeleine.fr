@@ -28,51 +28,38 @@
 }
 
 @mixin btn--donate {
-    text-decoration: none;
-    background: $accent-color;
-    background: -webkit-linear-gradient(top, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
-      -webkit-linear-gradient(left, lighten($accent-color, 15%) 0%, $accent-color 50%, lighten(
-              $accent-color,
-              15%
-            )
-            100%);
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
-      linear-gradient(
-        to right,
-        lighten($accent-color, 15%) 0%,
-        $accent-color 50%,
-        lighten($accent-color, 15%) 100%
-      );
-    background-position: 0 0;
-    background-size: 200% 100%;
-    border-radius: 10px;
-    color: #fff;
-    padding: 15px 65px 15px 15px;
-    text-shadow: 1px 1px 5px #666;
-    -webkit-transition: all 800ms;
-    transition: all 800ms;
+  position: relative;
+  text-decoration: none;
+  background: $accent-color;
+  background-position: 0 0;
+  background-size: 200% 100%;
+  border-radius: 10px;
+  color: #fff;
+  padding: 15px 65px 15px 15px;
+  text-shadow: 1px 1px 5px #666;
+  -webkit-transition: all 800ms;
+  transition: all 800ms;
+
+  .icon {
+    border-left: 1px solid darken($accent-color, 5%);
+    color: darken($accent-color, 10%);
+    font-size: 20px;
+    padding: 10px 0;
+    padding-left: 15px;
+    position: absolute;
+    right: 16px;
+    top: 7px;
+    -webkit-transition: all 600ms 200ms;
+    transition: all 600ms 200ms;
+  }
+
+  &:hover {
+    background-position: -100% 0;
 
     .icon {
-      border-left: 1px solid darken($accent-color, 5%);
-      color: darken($accent-color, 10%);
-      font: 20px;
-      padding: 10px 0;
-      padding-left: 15px;
-      position: absolute;
-      right: 16px;
-      top: 7px;
-      -webkit-transition: all 600ms 200ms;
-      transition: all 600ms 200ms;
+      border-left: 1px solid lighten($accent-color, 5%);
+      color: #fff;
+      text-shadow: 0 0 10px #000;
     }
-
-    &:hover {
-      background-position: -100% 0;
-
-      .icon {
-        border-left: 1px solid lighten($accent-color, 5%);
-        color: #fff;
-        text-shadow: 0 0 10px #000;
-      }
-    }
+  }
 }
-

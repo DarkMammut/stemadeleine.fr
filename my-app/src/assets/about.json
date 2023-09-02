@@ -5,7 +5,7 @@
     "text": [
       {
         "id": "About-A1P1",
-        "paragraph": "<p>L’association des Amis de Sainte Madeleine de La Jarrie a pour objet de concourir à l’embellissement ainsi qu’à la rénovation de l’église de la commune.</p><br/><br/><ul><li><p>Elle se veut être un outil pour mener à bien des travaux de restauration de ce patrimoine communal en accord avec le curé de la paroisse et le Conseil municipal de La Jarrie.</p></li><br/><li><p>Elle se donne pour mission de susciter la protection du mobilier - qu’il soit inscrit à l’inventaire des monuments historiques ou non – sa rénovation quand elle s’avère possible et justifiée, ou encore de prendre elle-même l’initiative de son remplacement dans le respect des critères d’art religieux et en étroite collaboration avec le curé du secteur paroissial d’Aigrefeuille/La Jarrie qui doit approuver les projets d’action de l’association.</p></li><br/><li><p>L’association, les « Amis de sainte Madeleine de La Jarrie », se propose aussi comme « réservoir d’idées », ou force de proposition, auprès du propriétaire et de l’affectataire, pour tout projet de rénovation d’envergure de l’immobilier ou de ce qui se rattache à ce bâtiment communal « pas comme les autres ».</p></li></ul><br/><br/><p>Tous ces projets ne peuvent se faire que grâce au soutien de la commune de La Jarrie et avec l’accord du Curé de la paroisse. Cette association travaille en étroite collaboration avec ce dernier qui doit approuver tous les projets d’action de l’association, et avec la Mairie et la responsable de la Culture.<br/><br>L’association compte actuellement 29 adhérents</p>"
+        "paragraph": "<p>L’association des Amis de Sainte Madeleine de La Jarrie a pour objet de concourir à l’embellissement ainsi qu’à la rénovation de l’église de la commune.</p><br/><br/><ul><li><p>Elle se veut être un outil pour mener à bien des travaux de restauration de ce patrimoine communal en accord avec le curé de la paroisse et le Conseil municipal de La Jarrie.</p></li><br/><li><p>Elle se donne pour mission de susciter la protection du mobilier - qu’il soit inscrit à l’inventaire des monuments historiques ou non – sa rénovation quand elle s’avère possible et justifiée, ou encore de prendre elle-même l’initiative de son remplacement dans le respect des critères d’art religieux et en étroite collaboration avec le curé du secteur paroissial d’Aigrefeuille/La Jarrie qui doit approuver les projets d’action de l’association.</p></li><br/><li><p>L’association, les « Amis de sainte Madeleine de La Jarrie », se propose aussi comme « réservoir d’idées », ou force de proposition, auprès du propriétaire et de l’affectataire, pour tout projet de rénovation d’envergure de l’immobilier ou de ce qui se rattache à ce bâtiment communal « pas comme les autres ».</p></li></ul><br/><br/><p>Tous ces projets ne peuvent se faire que grâce au soutien de la commune de La Jarrie et avec l’accord du Curé de la paroisse.</p>"
       }
     ],
     "images": [],
@@ -58,7 +58,14 @@
             "paragraph": "<p>Du parvis au narthex : Dans le narthex, ou salle du clocher, c’est le « Parvis des Gentils », où se rencontraient Juifs et non-Juifs au temple à Jérusalem, un lieu d’accueil de convivialité et de dialogue mais aussi un lieu de culture.<br/>Du narthex à la nef : Dans la nef, qui doit permettre aux croyants comme aux non-croyants de péleriner d’un vitrail à un autre, d’une représentation d’un saint à une œuvre suscitant le recueillement jusqu’ aux étapes d’un chemin de Croix<br/>De la nef au chœur : Dans le chœur avec l’autel qui est le lieu central, là où se porte le regard et la prière à la jonction du beau et de la foi. L’autel est unique tout comme l’était la pierre sacrificielle du temple de Jérusalem.<p/>"
           }
         ],
-        "images": []
+        "images": [
+          {
+            "id": "About-A2S3I1",
+            "url": "/About/photo-3.jpg",
+            "title": "Vitrail",
+            "alt": "Vitrail"
+          }
+        ]
       }
     ]
   }

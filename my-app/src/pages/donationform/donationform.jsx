@@ -49,10 +49,10 @@ function DonationForm() {
                 </div>
               </div>
               <div className="frame__columns__contact">
-                <div className="frame__columns__contact__row">
+                {/* <div className="frame__columns__contact__row">
                   <span>Tel secrétariat :</span>
                   <p>06 00 00 00 00</p>
-                </div>
+                </div> */}
                 <div className="frame__columns__contact__row">
                   <span>Email :</span>
                   <p>contact@stemadeleine.fr</p>
