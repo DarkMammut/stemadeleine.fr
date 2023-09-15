@@ -23,3 +23,7 @@ $parentMaxHeight: 70vh;
 $dotWidth: 25px;
 $active: $dark-color;
 $inactive: $light-color;
+
+$raised: 5000;
+$goal: 18000;
+$ratioRaised: calc($raised/$goal);

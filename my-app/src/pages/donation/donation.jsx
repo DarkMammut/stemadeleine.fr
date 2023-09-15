@@ -1,6 +1,6 @@
 import React from "react";
+import { FaHandHoldingHeart, FaHandshake, FaPrint } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { FaPrint, FaHandHoldingHeart, FaHandshake } from "react-icons/fa";
 import "./donation.scss";
 
 function Donation() {
