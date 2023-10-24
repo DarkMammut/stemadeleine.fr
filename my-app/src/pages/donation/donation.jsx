@@ -19,7 +19,7 @@ function Donation() {
             France à hauteur de 66% dans la limite de 20% de votre revenu imposable.
           </p>
           <h3>Le paiement est possible par :</h3>
-          <span>1- carte bancaire en ligne sur la platforme HelloAsso :</span>
+          <span>1- carte bancaire en ligne sur la plateforme HelloAsso :</span>
           <div className="buttons-container d-flex">
             <Link
               to="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/2"
