@@ -72,6 +72,50 @@
     }
   }
 
+  .news-container {
+    ul {
+      flex-direction: column-reverse;
+
+      & > li {
+
+        .news {
+          background-color: $secondary-color;
+          justify-content: space-between;
+          margin: 20px 0 20px 0;
+          overflow: hidden;
+          border-radius: 5px;
+          border: 12px groove $accent-color;
+          box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+
+          &__image {
+            overflow: hidden;
+            background-position: center;
+            background-size: contain;
+            box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+          }
+
+          &__text {
+            width: calc(100% - 290px);
+            max-height: 250px;
+            padding: 20px;
+
+            h4 {
+              text-align: center;
+              padding: 10px;
+              font-size: 30px;
+              color: $accent-color;
+            }
+
+            p {
+              text-align: justify;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
   .newsletter-container {
     position: relative;
 
@@ -141,7 +185,6 @@
       margin-top: 100px;
 
       ul {
-        flex-direction: column-reverse;
         & > li {
           .progressBar {
             flex-direction: column;
@@ -175,22 +218,11 @@
           }
 
           .news {
-            background-color: $secondary-color;
-            justify-content: space-between;
             width: 900px;
-            margin: 20px 0 20px 0;
-            overflow: hidden;
-            border-radius: 5px;
-            border: 12px groove $accent-color;
-            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 
             &__image {
               height: 300px;
               width: 250px;
-              overflow: hidden;
-              background-position: center;
-              background-size: contain;
-              box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
             }
 
             &__text {
@@ -286,6 +318,7 @@
         padding: 0 1rem 0 1rem;
       }
     }
+
     .gallery {
       flex-direction: column;
 
@@ -301,6 +334,48 @@
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             border-radius: 10px;
             overflow: hidden;
+          }
+        }
+      }
+    }
+
+    .news-container {
+      margin-top: 50px;
+
+      ul {
+        & > li {
+
+          .news {
+            position: relative;
+            width: 90%;
+
+            &__image {
+              position: absolute;
+              top : 10px;
+              left: 10px;
+              aspect-ratio: 7.5 / 10;
+              width: 80px;
+            }
+
+            &__text {
+              width: 100%;
+              max-height: 250px;
+
+              h4 {
+                text-align: center;
+                padding-top: 30px;
+                padding-left: 90px;
+                padding-bottom: 40px;
+                height: 50px;
+                font-size: 30px;
+                color: $accent-color;
+              }
+
+              p {
+                text-align: justify;
+                padding: 10px;
+              }
+            }
           }
         }
       }
