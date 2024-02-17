@@ -8,7 +8,6 @@ function History() {
   const [open, setOpen] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
-  const [activeToggle, setActiveToggle] = useState({});
 
   const handleInputChange = (index) => {
     setActiveIndex(index);
@@ -30,20 +29,6 @@ function History() {
     const index = SLIDES.history.findIndex((slides) => slides === slide);
     setSlideIndex(index);
     setOpen(1);
-  };
-
-  const handleShow = (e) => {
-    const btnName = e.target.name;
-    if (activeToggle[btnName] === 1) {
-      setActiveToggle({ ...activeToggle, [e.target.name]: 0 });
-      e.target.closest(".article").scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-        inline: "nearest"
-      });
-    } else {
-      setActiveToggle({ ...activeToggle, [e.target.name]: 1 });
-    }
   };
 
   return (
@@ -79,12 +64,7 @@ function History() {
                     <h3>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h3>
                     <h4>6° année</h4>
                   </div>
-                  <p
-                    className={
-                      activeToggle.btn_1 === 1
-                        ? "section__textarea__paragraph show"
-                        : "section__textarea__paragraph"
-                    }>
+                  <p className="section__textarea__paragraph">
                     … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et
                     du concours de ses paroissiens, on a vu s’accomplir une restauration inespérée ;
                     l’intérieur de l’église, jadis si délabré, a pris les proportions et l’élégance
@@ -113,17 +93,6 @@ function History() {
                     persuadés, cette émotion laissera des traces dans l’âme des fidèles nombreux,
                     présents à la cérémonie ».
                   </p>
-                  <button
-                    className={
-                      activeToggle.btn_1 === 1
-                        ? "toggle-btn no-style-btn d-flex active"
-                        : "toggle-btn no-style-btn d-flex"
-                    }
-                    type="button"
-                    name="btn_1"
-                    onClick={handleShow}>
-                    {activeToggle.btn_1 === 1 ? "Réduire" : "En savoir +"}
-                  </button>
                 </div>
               </section>
             </article>
@@ -136,12 +105,7 @@ function History() {
                     <h2>Octobre 1944. Mai 1945.</h2>
                     <h3>Vœux et plaques votives</h3>
                   </div>
-                  <div
-                    className={
-                      activeToggle.btn_1 === 1
-                        ? "section__textarea__paragraph show"
-                        : "section__textarea__paragraph"
-                    }>
+                  <div className="section__textarea__paragraph">
                     <p>
                       En 1944 la guerre n’est pas finie pour les aunisiens de La Jarrie, Croix
                       Chapeau et Salles sur Mer. Ces bourgs sont entourés de champs de mines, de
@@ -245,17 +209,6 @@ function History() {
                     <br />
                     <p>JL Dupas.</p>
                   </div>
-                  <button
-                    className={
-                      activeToggle.btn_1 === 1
-                        ? "toggle-btn no-style-btn d-flex active"
-                        : "toggle-btn no-style-btn d-flex"
-                    }
-                    type="button"
-                    name="btn_1"
-                    onClick={handleShow}>
-                    {activeToggle.btn_1 === 1 ? "Réduire" : "En savoir +"}
-                  </button>
                 </div>
               </section>
             </article>
