@@ -56,7 +56,7 @@ function Navigation() {
         </ul>
         <Link to="/association/don" className="btn--donate btn--mobile">
           Don
-          <FaHeart className="heart" />
+          <FaHeart className="icon" />
         </Link>
       </nav>
     </div>

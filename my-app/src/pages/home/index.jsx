@@ -58,10 +58,10 @@ function Home() {
             </p>
           </section>
         </article>
-        <div className="carousel">
-          <div className="gallery full-screen d-flex justify-content-center">
+        <div className="carousel full-screen">
+          <div className="gallery d-flex justify-content-center">
             {groupedItems.map((column) => (
-              <div className="gallery__column" key={Math.random()}>
+              <div className="gallery__column d-flex" key={Math.random()}>
                 {column.map((slide) => (
                   <button
                     className="gallery__column__card no-style-btn"

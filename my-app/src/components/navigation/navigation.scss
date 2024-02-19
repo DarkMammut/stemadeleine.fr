@@ -124,6 +124,10 @@
           overflow: hidden;
         }
 
+        &:hover div {
+          color: $color-white;
+        }
+
         &::after {
           position: absolute;
           content: "";
@@ -359,15 +363,12 @@
         }
       }
 
-      .btn--donate{
-        position: absolute;
-        @include btn--donate
-      }
-
       .btn--mobile {
-        bottom: 20px;
+        position: absolute;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
+        font-size: 20px;
       }
     }
   }

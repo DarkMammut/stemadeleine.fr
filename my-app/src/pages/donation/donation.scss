@@ -4,25 +4,64 @@
 #donation {
   article {
     h2 {
-      margin-bottom: 50px;
       text-align: center;
     }
 
-    h3 {
-      margin-bottom: 50px;
-    }
-
     p {
-      margin-bottom: 50px;
       text-align: justify;
     }
 
     .buttons-container {
       justify-content: space-evenly;
     }
+  }
+}
 
-    .btn--donate {
-      margin: 50px;
+@include desktop-layout {
+  #donation {
+    article {
+      h2 {
+        margin-bottom: 50px;
+      }
+  
+      h3 {
+        margin-bottom: 50px;
+      }
+  
+      p {
+        margin-bottom: 50px;
+      }
+  
+      .btn--donate {
+        margin: 50px;
+      }
+    }
+  }
+}
+
+@include large-desktop-layout {
+}
+
+@include small-desktop-layout {
+}
+
+@include mobile-layout {
+  #donation {
+    article {
+      h2 {
+        margin-bottom: 20px;
+      }
+  
+      h3 {
+        margin-bottom: 20px;
+      }
+  
+      p {
+        margin-bottom: 20px;
+      }
+  
+      .btn--donate {
+      }
     }
   }
 }
