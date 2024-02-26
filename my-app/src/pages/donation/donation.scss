@@ -50,6 +50,8 @@
     article {
       h2 {
         margin-bottom: 20px;
+        background-color: $light-color;
+        padding: 10px 0;
       }
   
       h3 {
@@ -60,7 +62,13 @@
         margin-bottom: 20px;
       }
   
-      .btn--donate {
+      .buttons-container {
+        flex-direction: column;
+        margin: 10px 0;
+        
+        .btn--donate {
+          margin: 10px 0;
+        }
       }
     }
   }

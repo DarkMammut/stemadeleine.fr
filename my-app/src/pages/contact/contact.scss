@@ -527,6 +527,12 @@
       display: flex;
       flex-direction: column-reverse;
     }
+
+    form {
+      .icon {
+        margin-left: 15px;
+      }
+    }
   }
 
   #illustration {
@@ -550,16 +556,34 @@
   }
 
   .container-contact {
-    flex-direction: column-reverse;
+    flex-direction: column;
 
     .contact-details {
       width: 100%;
       flex-direction: column;
+      border-radius: 20px;
+
+      background-color: $primary-color;
+      background: rgba(22, 179, 113, 0.13);
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      margin-bottom: 20px;
 
       &__box {
+        width: 100%;
+        border-bottom: dashed 1px $dark-color;
+        height: 70px;
+
+        &:nth-last-child(-n+1) {
+          border-bottom: none;
+        }
+
         &__icon {
-          left: 0;
-          color: $dark-color;
+          left: 20px;
+          width: 1.5em;
+          height: 1.5em;
+          color: $accent-color;
         }
 
         span {

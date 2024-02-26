@@ -160,7 +160,7 @@ function Contact() {
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.130235494945!2d-1.0144824226229212!3d46.128235588887435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014b8dbeb53617%3A0x91605841ea9ff9e3!2sLes%20Amis%20de%20Sainte%20Madeleine%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1708610921512!5m2!1sfr!2sfr"
               width="100%"
               height="100%"
-              allowfullscreen=""
+              allowFullScreen=""
               loading="lazy"
             />
           </div>
@@ -936,6 +936,7 @@ function Contact() {
 
             <div className="form-group position-relative">
               <label htmlFor="firstname" className="d-block">
+                {" "}
                 <FaUser className="icon" />
               </label>
               <input
@@ -955,6 +956,7 @@ function Contact() {
 
             <div className="form-group position-relative">
               <label htmlFor="lastname" className="d-block">
+                {" "}
                 <FaUser className="icon" />
               </label>
               <input
@@ -974,6 +976,7 @@ function Contact() {
 
             <div className="form-group position-relative">
               <label htmlFor="email" className="d-block">
+                {" "}
                 <FaEnvelope className="icon" />
               </label>
               <input
@@ -993,6 +996,7 @@ function Contact() {
 
             <div className="form-group position-relative">
               <label htmlFor="subject" className="d-block">
+                {" "}
                 <FaPen className="icon" />
               </label>
               <input
