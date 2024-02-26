@@ -58,82 +58,111 @@
 }
 
 #project {
-  article {
-    position: relative;
+  h4 {
+    text-align: center;
+    font-family: "Pacifico", cursive;
+    margin: 1rem 0 1rem 0;
+  }
 
-    .donation-progress {
-      position: absolute;
-      top: 2500px;
-      right: 0;
-      width: 50%;
+  .donation-progress {
+    text-align: center;
+
+    .progress-bg {
+      margin: 0 auto;
+      width: 100%;
+      height: 50px;
+      border-radius: 10px;
       text-align: center;
+      -moz-box-shadow: inset 0 0 10px #ccc;
+      -webkit-box-shadow: inset 0 0 10px #ccc;
+      box-shadow: inset 0 0 10px #ccc;
 
-      h4 {
+      & .progress-bar {
+        height: 50px;
+        border-radius: 10px;
+        float: left;
+        width: calc(100% * $ratioRaised);
+        overflow: hidden;
+        /* fallback */
+        background-color: #1c314a;
+
+        /* Safari 4-5, Chrome 1-9 */
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#1c314a), to(#27425f));
+
+        /* Safari 5.1, Chrome 10+ */
+        background: -webkit-linear-gradient(top, #1c314a, #27425f);
+
+        /* Firefox 3.6+ */
+        background: -moz-linear-gradient(top, #1c314a, #27425f);
+      }
+
+      & .goal,
+      & .raised {
+        font-size: 1em;
+        line-height: 50px;
+        margin: 0;
+        padding: 0;
+        display: inline;
+      }
+
+      & .raised {
+        color: #fff;
+        margin: 14px 25px 0 0;
+        padding: 0 25px 0 0;
+        -webkit-animation: fadein 4s; /* Safari and Chrome */
+        -moz-animation: fadein 4s; /* Firefox */
+        animation: fadein 4s;
+      }
+
+      & .goal {
+        color: #b2b2b2;
+        text-align: center;
+        float: right;
+        display: inline;
+        padding: 0 25px 0 0;
         text-align: center;
       }
 
-      .progress-bg {
-        margin: 0 auto;
-        margin-bottom: 20px;
-        width: 100%;
-        height: 50px;
-        border-radius: 10px;
+      & div {
+        -webkit-animation: progress-bar 2s ease forwards;
+        -moz-animation: progress-bar 2s ease forwards;
+        animation: progress-bar 2s ease forwards;
+      }
+    }
+  }
+}
+
+@include desktop-layout {
+  #project {
+    article {
+      position: relative;
+
+      .donation-progress {
+        position: absolute;
+        top: 2600px;
+        right: 0;
+        width: 50%;
         text-align: center;
-        -moz-box-shadow: inset 0 0 10px #ccc;
-        -webkit-box-shadow: inset 0 0 10px #ccc;
-        box-shadow: inset 0 0 10px #ccc;
 
-        & .progress-bar {
-          height: 50px;
-          border-radius: 10px;
-          float: left;
-          width: calc(100% * $ratioRaised);
-          overflow: hidden;
-          /* fallback */
-          background-color: #1c314a;
-
-          /* Safari 4-5, Chrome 1-9 */
-          background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#1c314a), to(#27425f));
-
-          /* Safari 5.1, Chrome 10+ */
-          background: -webkit-linear-gradient(top, #1c314a, #27425f);
-
-          /* Firefox 3.6+ */
-          background: -moz-linear-gradient(top, #1c314a, #27425f);
+        .progress-bg {
+          margin-bottom: 20px;
         }
+      }
+    }
+  }
+}
 
-        & .goal,
-        & .raised {
-          font-size: 1em;
-          line-height: 50px;
-          margin: 0;
-          padding: 0;
-          display: inline;
-        }
+@include large-desktop-layout {
+}
 
-        & .raised {
-          color: #fff;
-          margin: 14px 25px 0 0;
-          padding: 0 25px 0 0;
-          -webkit-animation: fadein 4s; /* Safari and Chrome */
-          -moz-animation: fadein 4s; /* Firefox */
-          animation: fadein 4s;
-        }
+@include small-desktop-layout {
+}
 
-        & .goal {
-          color: #b2b2b2;
-          text-align: center;
-          float: right;
-          display: inline;
-          padding: 0 25px 0 0;
-          text-align: center;
-        }
-
-        & div {
-          -webkit-animation: progress-bar 2s ease forwards;
-          -moz-animation: progress-bar 2s ease forwards;
-          animation: progress-bar 2s ease forwards;
-        }
+@include mobile-layout {
+  #project {
+    .donation-progress {
+      .progress-bg {
+        margin-bottom: 30px;
       }
     }
   }

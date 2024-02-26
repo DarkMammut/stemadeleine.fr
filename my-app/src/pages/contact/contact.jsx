@@ -156,13 +156,12 @@ function Contact() {
           </div>
           <div className="google-map">
             <iframe
-              title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.1328520850134!2d-1.0157162491620182!3d46.1281834652468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014bfd557f4e83%3A0x7c008224d0ba1a4c!2s3%20Rue%20des%20Canons%2C%2017220%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1690731444624!5m2!1sfr!2sfr"
+              title="map 1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.130235494945!2d-1.0144824226229212!3d46.128235588887435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014b8dbeb53617%3A0x91605841ea9ff9e3!2sLes%20Amis%20de%20Sainte%20Madeleine%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1708610921512!5m2!1sfr!2sfr"
               width="100%"
               height="100%"
-              allowFullScreen=""
+              allowfullscreen=""
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
         </div>

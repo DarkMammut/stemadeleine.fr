@@ -74,8 +74,9 @@
   
       &__title {
         margin-bottom: 30px;
-        padding-bottom: 15px;
+        padding: 20px 0;
         text-align: center;
+        background-color: $light-color;
       }
 
       &__paragraph {

@@ -137,8 +137,11 @@
       width: 50%;
       height: 50%;
       border-radius: 10px;
-      background-color: rgba($light-color, 0.6);
-      box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.3);
+      background-color: $light-color;
+      background: rgba(22, 179, 113, 0.13);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
 
       &__title {
         margin-right: 15px;
