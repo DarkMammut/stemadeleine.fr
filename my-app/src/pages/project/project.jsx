@@ -15,7 +15,7 @@ function Project() {
             <h4>Dons collectés</h4>
             <div className="progress-bg">
               <div className="progress-bar">
-                <h5 className="raised">5 000 €</h5>
+                <h5 className="raised">10 000 €</h5>
               </div>
 
               <h5 className="goal">18 000 €</h5>

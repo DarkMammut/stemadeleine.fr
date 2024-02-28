@@ -81,7 +81,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
   };
 
   return (
-    <div className="slider d-flex" data-open={appear}>
+    <div className="slider" data-open={appear}>
       <button
         className="slider__shut"
         aria-label="shut"
@@ -97,14 +97,16 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           className="slider__container__btn slider__container__btn--next no-style-btn d-flex"
           type="button"
           onKeyDown={handleKeyDown}
-          onClick={handleNext}>
+          onClick={handleNext}
+          aria-label="button to go to the next slide">
           <FaChevronRight className="slider__container__btn__chevrons" />
         </button>
         <button
           className="slider__container__btn slider__container__btn--previous no-style-btn d-flex"
           type="button"
           onKeyDown={handleKeyDown}
-          onClick={handlePrevious}>
+          onClick={handlePrevious}
+          aria-label="button to go to the previous slide">
           <FaChevronLeft className="slider__container__btn__chevrons" />
         </button>
         <img

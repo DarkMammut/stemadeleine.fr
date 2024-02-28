@@ -49,7 +49,11 @@ function Banner() {
               <h1 className="l-banner__textarea__title">{found.title}</h1>
               <h2 className="l-banner__textarea__subhead">{found.subhead}</h2>
             </div>
-            <button className="l-banner__down no-style-btn" type="button" onClick={handleClick}>
+            <button
+              className="l-banner__down no-style-btn"
+              type="button"
+              onClick={handleClick}
+              aria-label="button for scroll down">
               <div className="l-banner__down__chevron">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path

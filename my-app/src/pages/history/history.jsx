@@ -19,11 +19,18 @@ function History() {
     }
   }, [open]);
 
-  function handleKeyDown(e) {
-    if (e.key === "space") {
+  const handleKeyDown = (e) => {
+    if (e.key === "Space") {
       setOpen(1);
     }
-  }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handleClick = (slide) => {
     const index = SLIDES.history.findIndex((slides) => slides === slide);
@@ -39,19 +46,22 @@ function History() {
             <button
               className={activeIndex === 0 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
-              onClick={() => handleInputChange(0)}>
+              onClick={() => handleInputChange(0)}
+              aria-label="Button for year 1869">
               <span data-year="1869" />
             </button>
             <button
               className={activeIndex === 1 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
-              onClick={() => handleInputChange(1)}>
+              onClick={() => handleInputChange(1)}
+              aria-label="Button for year 1944">
               <span data-year="1944" />
             </button>
             <button
               className={activeIndex === 2 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
-              onClick={() => handleInputChange(2)}>
+              onClick={() => handleInputChange(2)}
+              aria-label="Button for year 2023">
               <span data-year="2023" />
             </button>
           </div>

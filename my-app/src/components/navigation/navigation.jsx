@@ -13,7 +13,8 @@ function Navigation() {
         className="navigation__burger"
         type="button"
         onClick={() => setToggle(toggle ? 0 : 1)}
-        data-toggle={toggle}>
+        data-toggle={toggle}
+        aria-label="button for navigation in menu">
         <ul className="navigation__burger__menu">
           <li className="navigation__burger__menu__line" />
           <li className="navigation__burger__menu__line" />
@@ -54,7 +55,10 @@ function Navigation() {
             return null; // Renvoyer null si link.enable n'est pas "enable"
           })}
         </ul>
-        <Link to="/association/don" className="btn--donate btn--mobile">
+        <Link
+          to="/association/don"
+          className="btn--donate btn--mobile"
+          onClick={() => setToggle(0)}>
           Don
           <FaHeart className="icon" />
         </Link>
