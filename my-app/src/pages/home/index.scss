@@ -75,7 +75,6 @@
       flex-direction: column-reverse;
 
       & > li {
-
         .news {
           &__image {
             overflow: hidden;
@@ -253,11 +252,29 @@
             width: 400px;
             padding: 10px 80px 0 10px;
 
-            h4 {
+            &__title {
+              position: relative;
+              flex-direction: row;
               text-align: center;
+              justify-content: space-around;
               padding: 20px;
-              font-size: 30px;
-              color: $accent-color;
+
+              h4,
+              span {
+                font-size: 30px;
+                color: $accent-color;
+              }
+
+              h4::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 15px;
+                height: 3px;
+                background-color: $active;
+                transform: translate(-50%);
+              }
             }
 
             p {
@@ -287,17 +304,17 @@
   #home {
     .gallery {
       flex-direction: column;
-  
+
       &__column {
         flex-direction: row;
         justify-content: space-around;
         margin: -40px 0;
-  
+
         &__card {
           width: calc(100% / 3);
           &:hover {
             cursor: pointer;
-  
+
             .gallery__column__card__thumb__caption {
               transform: translate(-50%, -50px) scale(1.1);
             }
@@ -317,7 +334,6 @@
   }
 
   #home {
-
     h3 {
       text-align: center;
       margin: 30px 0;
@@ -325,7 +341,7 @@
       background-color: $light-color;
       text-decoration: none;
       width: 100%;
-      }
+    }
 
     article {
       p {
@@ -359,7 +375,6 @@
 
       ul {
         & > li {
-
           .news {
             position: relative;
             width: 90%;
@@ -368,7 +383,7 @@
 
             &__image {
               position: absolute;
-              top : 10px;
+              top: 10px;
               left: 10px;
               aspect-ratio: 7.5 / 10;
               width: 80px;
@@ -380,8 +395,8 @@
               h4 {
                 display: flex;
                 text-align: center;
-                align-items:center;
-                justify-content:center;
+                align-items: center;
+                justify-content: center;
                 padding-left: 90px;
                 margin-top: 10px;
                 height: 107px;
@@ -406,13 +421,15 @@
 
       a {
         text-decoration: none;
+        width: 80%;
 
         .newsletter {
           border-radius: 100px;
-          background: $light-color;
+          background: $secondary-color;
           justify-content: space-between;
           overflow: hidden;
-          box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+          width: 100%;
 
           &__image {
             height: 100px;
@@ -420,20 +437,37 @@
             border-radius: 50%;
             background-position: center;
             background-size: 100%;
-            box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
           }
 
           &__text {
             width: calc(100% - 100px);
 
-            h4 {
-              display: flex;
+            &__title {
+              position: relative;
+              flex-direction: column;
               text-align: center;
-              align-items:center;
-              justify-content:center;
+              align-items: center;
+              justify-content: center;
               height: 100px;
-              font-size: 25px;
-              color: $accent-color;
+
+              h4,
+              span {
+                font-size: 25px;
+                color: $accent-color;
+                padding: 10px 0;
+              }
+
+              h4::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 70%;
+                height: 1px;
+                background-color: $color-black;
+                transform: translate(-50%);
+              }
             }
 
             p {
@@ -448,7 +482,5 @@
         bottom: -50px;
       }
     }
-
-    
   }
 }

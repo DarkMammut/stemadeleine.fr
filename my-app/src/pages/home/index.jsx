@@ -127,7 +127,10 @@ function Home() {
                 style={{ backgroundImage: `url(${url} ${lastNewsletter.image.url})` }}
               />
               <div className="newsletter__text">
-                <h4>{lastNewsletter.title}</h4>
+                <div className="newsletter__text__title d-flex">
+                  <h4>{lastNewsletter.title}</h4>
+                  <span>{lastNewsletter.date}</span>
+                </div>
                 <div>{parse(lastNewsletter.text)}</div>
               </div>
             </div>

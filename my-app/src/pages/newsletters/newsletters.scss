@@ -97,4 +97,77 @@
 }
 
 @include mobile-layout {
+  #newsletters {
+    .container {
+      width: 100%;
+
+      .newsletters-container {
+        ul {
+          flex-direction: column;
+
+          .progressBar {
+            display: none;
+          }
+  
+          a {
+            text-decoration: none;
+            width: 80%;
+  
+            .newsletter {
+              border-radius: 100px;
+              background: $light-color;
+              justify-content: space-between;
+              overflow: hidden;
+              width: 100%;
+              box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  
+              &__image {
+                height: 100px;
+                width: 100px;
+                border-radius: 50%;
+                background-position: center;
+                background-size: 100%;
+                box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+              }
+  
+              &__text {
+                width: calc(100% - 100px);
+  
+                &__title {
+                  position: relative;
+                  flex-direction: column;
+                  text-align: center;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100px;
+  
+                  h4,
+                  span {
+                    font-size: 25px;
+                    color: $accent-color;
+                    padding: 10px 0;
+                  }
+  
+                  h4::after {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 70%;
+                    height: 1px;
+                    background-color: $color-black;
+                    transform: translate(-50%);
+                  }
+                }
+  
+                p {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

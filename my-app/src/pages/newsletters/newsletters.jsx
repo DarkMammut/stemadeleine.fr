@@ -30,7 +30,10 @@ function Home() {
                         style={{ backgroundImage: `url(${url} ${newsletter.image.url})` }}
                       />
                       <div className="newsletter__text">
-                        <h4>{newsletter.title}</h4>
+                        <div className="newsletter__text__title d-flex">
+                          <h4>{newsletter.title}</h4>
+                          <span>{newsletter.date}</span>
+                        </div>
                         <div>{parse(newsletter.text)}</div>
                       </div>
                     </div>
