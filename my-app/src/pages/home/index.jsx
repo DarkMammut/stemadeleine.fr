@@ -19,7 +19,7 @@ const groupedItems = SLIDES.home.reduce(
 );
 
 function Home() {
-  const domain = "/newsletter/";
+  const domain = "/association/newsletter/";
   const url = process.env.PUBLIC_URL;
   const lastNewsletter = NewsLetter[NewsLetter.length - 1];
   const [open, setOpen] = useState(0);
@@ -39,7 +39,7 @@ function Home() {
   };
 
   const handleClickNavigate = () => {
-    navigate("/newsletter"); // Navigates to the "/newsletter" route
+    navigate("/association/newsletter"); // Navigates to the "/association/newsletter" route
   };
 
   return (

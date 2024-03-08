@@ -3,15 +3,35 @@
 
 @import url("https://fonts.googleapis.com/css?family=Abril+Fatface|Lato");
 
-$special: "Abril Fatface", serif;
-$body: "Lato", sans-serif;
+@keyframes scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes floating {
+  0% {
+    transform: translatey(0px);
+  }
+  50% {
+    transform: translatey(-30px);
+  }
+  100% {
+    transform: translatey(0px);
+  }
+}
 
 #pnf {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: -$desktop-header-radius;
   width: 100%;
   min-height: 40vw;
   background: $light-color;
@@ -20,8 +40,6 @@ $body: "Lato", sans-serif;
     .top {
       display: flex;
       flex-direction: column;
-      margin-top: $desktop-header-radius;
-      padding: $desktop-header-radius;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -197,26 +215,29 @@ $body: "Lato", sans-serif;
   }
 }
 
-@keyframes scale {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
+@include desktop-layout {
+  #pnf {
+    margin-top: -$desktop-header-radius;
+
+    .container {
+      .top {
+        margin-top: $desktop-header-radius;
+        padding: $desktop-header-radius;
+      }
+    }
   }
 }
 
-@keyframes floating {
-  0% {
-    transform: translatey(0px);
-  }
-  50% {
-    transform: translatey(-30px);
-  }
-  100% {
-    transform: translatey(0px);
+@include mobile-layout {
+  #pnf {
+    margin-top: -$mobile-header-radius;
+    .container {
+      padding-right: 0;
+      padding-left: 0;
+      .top {
+        margin-top: $mobile-header-radius;
+        padding: $mobile-header-radius;
+      }
+    }
   }
 }

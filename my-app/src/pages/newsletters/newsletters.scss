@@ -2,6 +2,25 @@
 @import "../../sass-utils/variables.scss";
 
 #newsletters {
+  .newsletter-container {
+    position: relative;
+
+    a {
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        transform: translateY(-0.15em);
+
+        .newsletter {
+          background: radial-gradient(
+            circle,
+            rgba(60, 160, 122, 1) 50%,
+            rgba(144, 202, 180, 1) 100%
+          );
+        }
+      }
+    }
+  }
 }
 
 @include desktop-layout {
@@ -17,26 +36,26 @@
           &__dot {
             height: $dotWidth;
             width: $dotWidth;
-            background-color: $dark-color;
+            background-color: $accent-color;
             border-radius: 50%;
             position: relative;
 
             &__top,
             &__bottom {
               position: absolute;
-              width: 5px;
+              width: 4px;
               height: 200px;
-              background-color: $dark-color;
-              left: 50%;
+              background-color: $accent-color;
+              left: calc(50% - 0.5px);
               transform: translateX(-50%);
             }
 
             &__top {
-              top: calc(-1 * 200px + $dotWidth);
+              top: calc(-1 * 200px + $dotWidth / 2);
             }
 
             &__bottom {
-              bottom: calc(-1 * 200px + $dotWidth);
+              bottom: calc(-1 * 200px + $dotWidth / 2);
             }
           }
         }
@@ -67,11 +86,29 @@
               width: 400px;
               padding: 10px 80px 0 10px;
 
-              h4 {
+              &__title {
+                position: relative;
+                flex-direction: row;
                 text-align: center;
+                justify-content: space-around;
                 padding: 20px;
-                font-size: 30px;
-                color: $accent-color;
+
+                h4,
+                span {
+                  font-size: 30px;
+                  color: $accent-color;
+                }
+
+                h4::after {
+                  content: "";
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  width: 15px;
+                  height: 3px;
+                  background-color: $active;
+                  transform: translate(-50%);
+                }
               }
 
               p {
@@ -108,31 +145,35 @@
           .progressBar {
             display: none;
           }
-  
+
           a {
             text-decoration: none;
             width: 80%;
-  
+
             .newsletter {
               border-radius: 100px;
-              background: $light-color;
+              background: $secondary-color;
               justify-content: space-between;
               overflow: hidden;
               width: 100%;
-              box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
-  
+              box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+                rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+                rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
               &__image {
                 height: 100px;
                 width: 100px;
                 border-radius: 50%;
                 background-position: center;
                 background-size: 100%;
-                box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+                  rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+                  rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
               }
-  
+
               &__text {
                 width: calc(100% - 100px);
-  
+
                 &__title {
                   position: relative;
                   flex-direction: column;
@@ -140,14 +181,14 @@
                   align-items: center;
                   justify-content: center;
                   height: 100px;
-  
+
                   h4,
                   span {
                     font-size: 25px;
                     color: $accent-color;
                     padding: 10px 0;
                   }
-  
+
                   h4::after {
                     content: "";
                     position: absolute;
@@ -159,7 +200,7 @@
                     transform: translate(-50%);
                   }
                 }
-  
+
                 p {
                   display: none;
                 }

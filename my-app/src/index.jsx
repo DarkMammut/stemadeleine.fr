@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.scss";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import Home from "./pages/home";
 import Newsletters from "./pages/newsletters/newsletters";
@@ -25,27 +25,27 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <Router>
+    <BrowserRouter>
       <Meta />
       <Header />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route exact path="/newsletter" element={<Newsletters />} />
-        <Route exact path="/newsletter/:id" element={<Newsletter />} />
-        <Route exact path="/association" element={<Association />} />
-        <Route exact path="/association/projets" element={<Project />} />
-        <Route exact path="/association/nous-rejoindre" element={<Join />} />
-        <Route exact path="/association/don" element={<Donation />} />
-        <Route exact path="/association/don/formulaire" element={<DonationForm />} />
-        <Route exact path="/nos-realisations" element={<Realisation />} />
-        <Route exact path="/eglise" element={<Church />} />
-        <Route exact path="/eglise/histoire" element={<History />} />
-        <Route exact path="/eglise/cloches" element={<Bells />} />
-        <Route exact path="/contact" element={<Contact />} />
-        <Route exact path="/404" element={<PageNotFound />} />
+        <Route path="/association" element={<Association />} />
+        <Route path="/association/projets" element={<Project />} />
+        <Route path="/association/nous-rejoindre" element={<Join />} />
+        <Route path="/association/newsletter" element={<Newsletters />} />
+        <Route path="/association/newsletter/:id" element={<Newsletter />} />
+        <Route path="/association/don" element={<Donation />} />
+        <Route path="/association/don/formulaire" element={<DonationForm />} />
+        <Route path="/nos-realisations" element={<Realisation />} />
+        <Route path="/eglise" element={<Church />} />
+        <Route path="/eglise/histoire" element={<History />} />
+        <Route path="/eglise/cloches" element={<Bells />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/404" element={<PageNotFound />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Footer />
-    </Router>
+    </BrowserRouter>
   </React.StrictMode>
 );

@@ -75,6 +75,7 @@
   text-shadow: 1px 1px 5px #666;
   -webkit-transition: all 800ms;
   transition: all 800ms;
+  cursor: pointer;
 
   .icon {
     border-left: 1px solid darken($accent-color, 5%);

@@ -18,15 +18,20 @@ function Meta() {
   const end = " | Les Amis de Sainte Madeleine de La Jarrie";
   let found = "";
 
-  if (path === mainUrl || mainUrl === "/newsletter") {
+  if (path === mainUrl) {
     found = Data.find((helmet) => helmet.path === mainUrl);
+
+    if (!found) {
+      found = Data.find((helmet) => helmet.id === "Error-404");
+    }
   } else {
-    if (path === "/association/don/formulaire") {
+    if (path === "/association/don/formulaire" || mainUrl === "/association/newsletter") {
+      path = mainUrl;
       mainUrl = "/association";
-      path = "/association/don";
     }
     const mainObject = Data.find((object) => object.path === mainUrl);
-    if (!mainObject) {
+    const subLink = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
+    if (!mainObject || !subLink) {
       found = Data.find((helmet) => helmet.id === "Error-404");
     } else {
       found = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);

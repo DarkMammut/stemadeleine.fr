@@ -176,6 +176,8 @@
     .description-container {
       .article {
         .section {
+          box-shadow: none;
+          padding: 0;
           &__textarea {
             &__paragraph {
               padding: 0 5rem 0 5rem;

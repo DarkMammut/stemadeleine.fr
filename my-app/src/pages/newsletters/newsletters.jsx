@@ -5,7 +5,7 @@ import NewsLetter from "../../assets/newsletter.json";
 import "./newsletters.scss";
 
 function Home() {
-  const domain = "/newsletter/";
+  const domain = "/association/newsletter/";
   const url = process.env.PUBLIC_URL;
 
   return (

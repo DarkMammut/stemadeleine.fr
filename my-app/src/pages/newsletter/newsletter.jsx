@@ -40,7 +40,11 @@ function Newsletter() {
               </figcaption>
             </figure>
             <div className="article__header__text d-flex">
-              <h2 className="article__header__text__title">{newsletter.title}</h2>
+              <h2 className="article__header__text__title">
+                {newsletter.title}
+                {" - "}
+                {newsletter.date}
+              </h2>
               <div className="article__header__text__paragraph">{parse(newsletter.text)}</div>
             </div>
           </div>

@@ -5,7 +5,7 @@ import "./slider.scss";
 
 function ImageSlider({ slidesImages, openSlider, startSlide }) {
   const publicUrl = process.env.PUBLIC_URL;
-  const [appear, setAppear] = useState(0);
+  const [visible, setVisible] = useState(0);
   const [index, setIndex] = useState(0);
 
   const setFinishedIndex = (i) => {
@@ -14,7 +14,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
 
   useEffect(() => {
     if (openSlider === 1) {
-      setAppear(1);
+      setVisible(1);
       setIndex(startSlide);
     }
   }, [openSlider]);
@@ -37,7 +37,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
 
   const handleKeyDown = (e) => {
     if (e.key === "Escape") {
-      setAppear(0);
+      setVisible(0);
     } else if (e.key === "ArrowLeft") {
       handlePrevious();
     } else if (e.key === "ArrowRight") {
@@ -46,20 +46,21 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
   };
 
   return (
-    <div className="slider" data-open={appear}>
+    <div className="slider" data-open={visible}>
       <button
         className="slider__shut"
         aria-label="shut"
-        onClick={() => setAppear(0)}
+        onClick={() => setVisible(0)}
         onKeyDown={handleKeyDown}
         type="button">
         <div className="slider__shut__line" />
         <div className="slider__shut__line" />
       </button>
-      <div className="slider__backgroung" />
       <div className="slider__container d-flex justify-content-center">
         <button
-          className="slider__container__btn slider__container__btn--next no-style-btn d-flex"
+          className={`slider__container__btn slider__container__btn--next no-style-btn d-flex ${
+            slidesImages.length > 1 ? "" : "hidden"
+          }`}
           type="button"
           onKeyDown={handleKeyDown}
           onClick={handleNext}
@@ -67,7 +68,9 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
           <FaChevronRight className="slider__container__btn__chevrons" />
         </button>
         <button
-          className="slider__container__btn slider__container__btn--previous no-style-btn d-flex"
+          className={`slider__container__btn slider__container__btn--previous no-style-btn d-flex ${
+            slidesImages.length > 1 ? "" : "hidden"
+          }`}
           type="button"
           onKeyDown={handleKeyDown}
           onClick={handlePrevious}
@@ -79,7 +82,7 @@ function ImageSlider({ slidesImages, openSlider, startSlide }) {
             onSlideComplete={setFinishedIndex}
             activeIndex={index}
             threshHold={100}
-            transition={0.2}
+            transition={0.5}
             scaleOnDrag>
             {slidesImages.map(({ id, url, alt }) => (
               <img src={publicUrl + url} key={id} alt={alt} />

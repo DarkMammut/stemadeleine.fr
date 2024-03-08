@@ -13,18 +13,27 @@ function reduceUrl(url) {
 
 function Banner() {
   const location = useLocation();
-  const path = location.pathname;
-  const mainUrl = reduceUrl(path);
+  let path = location.pathname;
+  let mainUrl = reduceUrl(path);
   let found = "";
 
-  if (path === mainUrl || mainUrl === "/newsletter") {
-    found = Data.find((banner) => banner.path === mainUrl);
+  if (path === mainUrl) {
+    found = Data.find((helmet) => helmet.path === mainUrl);
+
+    if (!found) {
+      found = Data.find((helmet) => helmet.id === "Error-404");
+    }
   } else {
+    if (path === "/association/don/formulaire" || mainUrl === "/association/newsletter") {
+      path = mainUrl;
+      mainUrl = "/association";
+    }
     const mainObject = Data.find((object) => object.path === mainUrl);
-    if (!mainObject) {
-      found = Data.find((banner) => banner.id === "Error-404");
+    const subLink = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
+    if (!mainObject || !subLink) {
+      found = Data.find((helmet) => helmet.id === "Error-404");
     } else {
-      found = mainObject.sublinks.find((banner) => mainUrl + banner.path === path);
+      found = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
     }
   }
 

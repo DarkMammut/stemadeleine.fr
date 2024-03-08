@@ -59,8 +59,10 @@
 
 @include desktop-layout {
   .section {
-    justify-content: space-between;
+    justify-content: space-evenly;
+    padding: 40px 0;
     margin-bottom: 50px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
   
     &__textarea {
 
@@ -78,10 +80,6 @@
         text-align: center;
         background-color: $light-color;
       }
-
-      &__paragraph {
-        margin-bottom: 50px;
-      }
     }
   
     &__images {
@@ -89,7 +87,7 @@
   
       &__frame {
         width: 100%;
-        padding-bottom: 50px;
+        padding: 20px 0;
       }
     }
   
@@ -128,7 +126,7 @@
   
       &__frame {
         width: 80%;
-        margin-bottom: 20px;
+        padding: 20px;
       }
     }
   }
