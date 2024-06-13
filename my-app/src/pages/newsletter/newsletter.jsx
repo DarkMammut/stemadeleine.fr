@@ -20,6 +20,10 @@ function Newsletter() {
     }
   }, [newsletter]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
   if (!newsletter) {
     return null;
   }

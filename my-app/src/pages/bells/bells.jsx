@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Article from "../../components/article/article";
 import "./bells.scss";
 import ArticlesData from "../../assets/bells.json";
@@ -6,6 +6,10 @@ import ArticlesData from "../../assets/bells.json";
 document.title = "Les cloches";
 
 function Bells() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
   return (
     <main id="bells">
       <div className="container">

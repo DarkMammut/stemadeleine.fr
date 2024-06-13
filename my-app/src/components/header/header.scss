@@ -9,7 +9,6 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(180deg, $dark-color 0%, $primary-color 60%);
-  width: 100%;
   z-index: 4;
   box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.2);
 
@@ -29,6 +28,8 @@
 
 @include large-desktop-layout {
   .header {
+    width: 100%;
+
     .btn--desktop {
       top: 12px;
       right: 20px;
@@ -38,6 +39,8 @@
 
 @include small-desktop-layout {
   .header {
+    width: 100%;
+
     .btn--desktop {
       top: calc($desktop-header-radius + 12px);
       right: 20px;
@@ -47,6 +50,7 @@
 
 @include desktop-layout {
   .header {
+    width: 100%;
     height: $desktop-header-radius;
 
     &__logo {
@@ -62,11 +66,27 @@
 
 @include mobile-layout {
   .header {
+    width: 100%;
     height: $mobile-header-radius;
 
     &__logo {
       width: 69px;
       height: $mobile-header-radius;
+    }
+    .btn--desktop {
+      display: none;
+    }
+  }
+}
+
+@include tablet-layout {
+  .header {
+    width: 100%;
+    height: $tablet-header-radius;
+
+    &__logo {
+      width: 82.5px;
+      height: $tablet-header-radius;
     }
     .btn--desktop {
       display: none;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Recaptcha from "react-google-recaptcha";
 import { FaUser, FaEnvelope, FaLocationArrow, FaPen, FaChurch } from "react-icons/fa";
 import "./contact.scss";
@@ -127,6 +127,10 @@ function Contact() {
         .catch((error) => alert(error) /* eslint-disable-line no-alert */);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
 
   return (
     <main id="contact">

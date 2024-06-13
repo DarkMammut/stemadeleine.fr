@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaHandHoldingHeart, FaHandshake, FaPrint } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import "./donation.scss";
 
 function Donation() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
 
   return (
     <main id="donation">

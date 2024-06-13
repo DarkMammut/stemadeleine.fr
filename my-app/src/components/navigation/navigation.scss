@@ -1,6 +1,8 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
+//Keyframes
+
 @keyframes dropdown {
   from {
     height: 0;
@@ -25,9 +27,22 @@
   }
 }
 
+@keyframes FadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
 // Navigation
 
 .navigation {
+  & span div {
+    font-family: $titles;
+  }
+
   &__burger {
     display: flex;
     justify-content: center;
@@ -100,7 +115,7 @@
     position: fixed;
     display: flex;
     justify-content: center;
-    left: 0;
+    right: 0;
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
@@ -108,7 +123,6 @@
 
     &__nav {
       display: flex;
-      justify-content: center;
       margin: 0;
       padding: 0;
       text-align: center;
@@ -168,6 +182,8 @@
       background: transparent;
 
       &__nav {
+        justify-content: center;
+
         &__link {
           position: relative;
           display: flex;
@@ -182,17 +198,20 @@
           }
 
           &__submenu {
+            display: flex;
             position: absolute;
-            display: none;
             flex-direction: column;
             justify-content: space-around;
             background-color: transparent;
+            visibility: hidden;
+            overflow: hidden;
+            opacity: 0;
             z-index: 3;
             top: calc($desktop-header-radius / 2) + 10px;
             padding-top: calc($desktop-header-radius / 2) - 10px;
             width: 200px;
             left: 50%;
-            transform: translatex(-50%);
+            transform: translateX(-50%);
 
             &__link {
               background-color: $primary-color;
@@ -208,7 +227,8 @@
             }
 
             &:hover {
-              display: flex;
+              visibility: visible;
+              opacity: 1;
             }
           }
         }
@@ -221,7 +241,8 @@
 
   .with-submenu:hover {
     + .navigation__menu__nav__link__submenu {
-      display: flex;
+      visibility: visible;
+      animation: FadeIn 700ms ease;
     }
   }
 }
@@ -230,6 +251,10 @@
   .navigation {
     &__menu {
       right: 0;
+
+      &__nav {
+        justify-content: center;
+      }
     }
   }
 }
@@ -260,9 +285,13 @@
         visibility: visible;
       }
 
-      .navigation__menu__nav__link span div {
-        transform: translateY(0);
-        transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
+      &__nav {
+        justify-content: center;
+
+        &__link span div {
+          transform: translateY(0);
+          transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
+        }
       }
     }
   }
@@ -345,7 +374,6 @@
             z-index: 3;
 
             &__link {
-              border-bottom: solid 0.5px darken($primary-color, 20%);
               margin-top: 10px;
 
               & a {
@@ -366,6 +394,144 @@
       .btn--mobile {
         position: absolute;
         bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+@include tablet-layout {
+  // Burger toggle button action
+
+  .navigation {
+    &__burger[data-toggle="1"] {
+      .navigation__burger__menu__line {
+        &::after {
+          transform: translateX(0);
+        }
+        &:nth-child(2) {
+          transform: scaleX(0);
+        }
+      }
+    }
+
+    &__menu {
+      &[data-toggle="0"] {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      &[data-toggle="1"] {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .navigation__menu__nav__link span div {
+        transform: translateY(0);
+        transition: 1.2s 0.1s cubic-bezier(0.35, 0, 0.07, 1);
+      }
+    }
+  }
+
+  // Tablet layout
+  .navigation {
+    &__burger {
+      display: block;
+
+      &__menu {
+        width: $tablet-header-radius;
+        height: $tablet-header-radius;
+      }
+
+      &[data-toggle="0"] {
+        + .navigation__menu {
+          animation: raise ease-in-out 700ms forwards;
+        }
+
+        .navigation__burger__menu__line {
+          &:nth-child(1) {
+            transform: translateY(0) rotate(0);
+          }
+
+          &:nth-child(3) {
+            transform: translateY(0) rotate(0);
+          }
+        }
+      }
+
+      &[data-toggle="1"] {
+        + .navigation__menu {
+          animation: dropdown ease-in-out 700ms forwards;
+        }
+
+        .navigation__burger__menu__line {
+          &:nth-child(1) {
+            transform: translateY(calc($tablet-header-radius / 5)) rotate(45deg);
+          }
+
+          &:nth-child(3) {
+            transform: translateY(calc($tablet-header-radius / -5)) rotate(-45deg);
+          }
+        }
+      }
+    }
+
+    &__menu {
+      top: $tablet-header-radius;
+      width: 30%;
+      height: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, $dark-color 0%, $primary-color 100%);
+
+      &__nav {
+        flex-direction: column;
+        margin-top: $tablet-header-radius;
+
+        &__link {
+          display: flex;
+          flex-direction: column;
+          padding-top: 20px;
+          padding-bottom: 20px;
+          align-items: center;
+          justify-content: center;
+
+          & a {
+            div {
+              color: $color-white;
+            }
+          }
+
+          &__submenu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            justify-content: space-around;
+            background-color: transparent;
+
+            &__link {
+              margin-top: 10px;
+
+              & a {
+                & span div {
+                  font-size: 10px;
+                  padding: 6px;
+                }
+              }
+            }
+
+            &:hover {
+              display: flex;
+            }
+          }
+        }
+      }
+
+      .btn--mobile {
+        position: absolute;
+        bottom: calc($tablet-header-radius * 2);
         left: 50%;
         transform: translateX(-50%);
         font-size: 20px;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./donationform.scss";
 
 function DonationForm() {
@@ -16,6 +16,10 @@ function DonationForm() {
   const handlePrint = () => {
     window.print(); // Appel de la fonction d'impression du navigateur
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
 
   return (
     <main id="donationform">

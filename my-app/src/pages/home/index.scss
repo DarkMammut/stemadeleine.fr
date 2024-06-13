@@ -487,3 +487,199 @@
     }
   }
 }
+
+@include tablet-layout {
+  #welcome {
+    background: rgba(22, 179, 113, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    
+  }
+
+  #home {
+    h3 {
+      text-align: center;
+      text-decoration: none;
+      margin: 20px 0;
+      padding: 30px 0;
+      font-size: 30px;
+      background-color: $light-color;
+
+      width: 100%;
+    }
+
+    article {
+      p {
+        padding: 0 1rem 0 1rem;
+      }
+    }
+
+    .gallery {
+      flex-direction: column;
+
+      &__column {
+        flex-direction: row;
+        justify-content: space-around;
+        margin: -20px 0;
+
+        &__card {
+          margin: 10px;
+          width: calc(100% / 3);
+
+          &__thumb {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 5px;
+            overflow: hidden;
+          }
+        }
+      }
+    }
+
+    .news-container {
+      margin-top: 100px;
+
+      ul {
+        & > li {
+          .progressBar {
+            flex-direction: column;
+            margin: 0 50px 0 0;
+
+            &__dot {
+              height: $dotWidth;
+              width: $dotWidth;
+              background-color: $accent-color;
+              border-radius: 50%;
+              position: relative;
+
+              &__top,
+              &__bottom {
+                position: absolute;
+                width: 5px;
+                height: calc(200px);
+                background-color: $accent-color;
+                left: 50%;
+                transform: translateX(-50%);
+              }
+
+              &__top {
+                top: calc(-1 * 215px + $dotWidth);
+              }
+
+              &__bottom {
+                bottom: calc(-1 * 215px + $dotWidth);
+              }
+            }
+          }
+
+          .news {
+            width: 70%;
+            background-color: $secondary-color;
+            justify-content: space-between;
+            margin: 40px 0;
+            overflow: hidden;
+            border-radius: 5px;
+            border: 12px groove $accent-color;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+
+            &__image {
+              height: 300px;
+              width: 215px;
+              background-repeat: no-repeat;
+              background-size: cover;
+            }
+
+            &__text {
+              width: calc(100% - 220px);
+              max-height: 250px;
+              padding: 20px;
+
+              h4 {
+                text-align: center;
+                padding: 10px;
+                font-size: 30px;
+                color: $accent-color;
+              }
+
+              p {
+                text-align: justify;
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .newsletter-container {
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 100px;
+
+      a {
+        text-decoration: none;
+        width: 80%;
+
+        .newsletter {
+          border-radius: 100px;
+          background: $secondary-color;
+          justify-content: space-between;
+          overflow: hidden;
+          width: 100%;
+          box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+            rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
+          &__image {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            background-position: center;
+            background-size: 100%;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+              rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+          }
+
+          &__text {
+            width: calc(100% - 100px);
+
+            &__title {
+              position: relative;
+              flex-direction: column;
+              text-align: center;
+              align-items: center;
+              justify-content: center;
+              height: 100px;
+
+              h4,
+              span {
+                font-size: 25px;
+                color: $accent-color;
+                padding: 10px 0;
+              }
+
+              h4::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 70%;
+                height: 1px;
+                background-color: $color-black;
+                transform: translate(-50%);
+              }
+            }
+
+            p {
+              display: none;
+            }
+          }
+        }
+      }
+
+      .btn--navigate {
+        right: 0;
+        bottom: -50px;
+      }
+    }
+  }
+}

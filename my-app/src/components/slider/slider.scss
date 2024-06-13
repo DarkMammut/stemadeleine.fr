@@ -199,3 +199,34 @@
     }
   }
 }
+
+@include tablet-layout {
+  .slider__container {
+    &__frame {
+      width: 80%;
+      max-width: 80%;
+      height: 70%;
+    }
+
+    &__btn {
+      bottom: 9%;
+
+      &--next {
+        right: 40%;
+      }
+
+      &--previous {
+        left: 40%;
+      }
+    }
+
+    &__dots {
+      bottom: 30px;
+
+      & li {
+        height: 50px;
+        width: 50px;
+      }
+    }
+  }
+}

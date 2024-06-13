@@ -38,6 +38,10 @@ function History() {
     setOpen(1);
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
   return (
     <main id="history">
       <div className="container">

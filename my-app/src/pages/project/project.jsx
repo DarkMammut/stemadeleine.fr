@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaHandshake } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Section from "../../components/section/section";
@@ -6,6 +6,10 @@ import SectionData from "../../assets/project_sections.json";
 import "./project.scss";
 
 function Project() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
   return (
     <main id="project">
       <div className="container">

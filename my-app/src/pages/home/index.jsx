@@ -27,6 +27,10 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  });
+
+  useEffect(() => {
     if (open === 1) {
       setOpen(0);
     }
