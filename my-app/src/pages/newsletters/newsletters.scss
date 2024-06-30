@@ -31,7 +31,7 @@
     .newsletters-container {
       padding: 50px 0;
       ul > li {
-        margin: calc(200px - (100px + $dotWidth / 2)) 0 calc(200px - (100px + $dotWidth / 2)) 0;
+        margin: calc(200px - (100px + $dotWidth / 2)) 0;
         .progressBar {
           flex-direction: column;
           margin: 0 calc((((1224px - 700px) / 2) / 2) - ($dotWidth/2)) 0
@@ -76,14 +76,16 @@
             box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
               rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
-            &__image {
-              height: 200px;
-              width: 200px;
-              border-radius: 50%;
-              overflow: hidden;
-              background-position: center;
-              box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-            }
+              &__image {
+                height: 200px;
+                width: 200px;
+                border-radius: 50%;
+                background-position: center;
+                background-size: 100%;
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+                  rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+                  rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+              }
 
             &__text {
               max-height: calc(200px - 10px * 2);
@@ -143,7 +145,8 @@
       width: 100%;
 
       .newsletters-container {
-        ul {
+        ul > li {
+          margin: 10px 0;
           .progressBar {
             display: none;
           }

@@ -143,7 +143,7 @@ function Home() {
             className="btn btn--navigate no-style-btn"
             type="button"
             onClick={handleClickNavigate}>
-            Plus de newsletters
+            Toutes les newsletters
           </button>
         </div>
       </div>
