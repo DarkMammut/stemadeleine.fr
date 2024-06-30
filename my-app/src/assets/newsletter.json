@@ -18,5 +18,25 @@
       }
     ],
     "conclusion": "<p>Merci de vous associer dès aujourd’hui à ce programme 2023 en renouvelant votre adhésion pour la plupart d’entre vous ou en nous rejoignant en adhérant à l’association des Amis de Sainte Madeleine de La Jarrie.<br/><br/>Bien amicalement.</p>"
+  },
+  {
+    "id": "nl002",
+    "title": "Lettre n°2",
+    "date": "Juin 2024",
+    "image": {
+      "id": "nl002-i1",
+      "title": "7ème station du chemin de croix",
+      "alt": "Jésus tombe pour la seconde fois. Le bourreau le soutient pour qu’il aille jusqu’au bout du supplice sur la croix.",
+      "url": "/newsletter/CDC7.jpg"
+    },
+    "text": "<p>Chers amis,<br/>La deuxième année d’exercice de l’Association s’est achevée fin février.</p>",
+    "section": [
+      {
+        "id": "nl002-s1",
+        "title": "",
+        "text": "<p>L’année 2023 a été marquée par l’acquisition, et l’exposition sous le vitrail éponyme, du tableau représentant Marie-Madeleine aux traits contemporains. Cette représentation picturale fait partie d’un ensemble de tableaux « Les femmes dans la Bible » qu’entreprend de réaliser le peintre, Caroline Fleury.<br/><br/>Au cours de l’année la commune de La Jarrie a procédé à la sauvegarde de la dîme-bénitier du XVIème siècle, mobilier inscrit à l’inventaire des monuments historiques, et votre association a contribué à sa mise en valeur pour lui redonner sa fonction et sa place à l’entrée de l’église sur un nouveau support en pierre de tuffeau.<br/><br/>Concomitamment, nous avons lancé une souscription privée pour le financement du projet de chemin de croix photographique, finalisé au cours du premier semestre 2024, et à sa mise en place toute récente. Nous vous encourageons à venir découvrir cette œuvre du photographe Jean-Dominique El Padre membre de l’association des Peintres des Armées et des Artistes Français.</p>"
+      }
+    ],
+    "conclusion": "<p>Merci de soutenir votre association en renouvelant votre adhésion pour la plupart d’entre vous ou en nous rejoignant en adhérant à l’association des Amis de Sainte Madeleine de La Jarrie</p>"
   }
 ]

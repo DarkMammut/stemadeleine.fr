@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
+import Article from "../../components/article/article";
 import "./history.scss";
+import ArticlesData from "../../assets/history.json";
 
 function History() {
   const url = process.env.PUBLIC_URL;
@@ -38,35 +40,36 @@ function History() {
     setOpen(1);
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  });
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // });
 
   return (
     <main id="history">
       <div className="container">
         <div className="parent d-flex">
+          <Article Articles={ArticlesData} />
           <div className="input-container d-flex">
             <button
               className={activeIndex === 0 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
               onClick={() => handleInputChange(0)}
-              aria-label="Button for year 1869">
-              <span data-year="1869" />
+              aria-label="Button for XIX° century">
+              <span data-year="XIXe" />
             </button>
             <button
               className={activeIndex === 1 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
               onClick={() => handleInputChange(1)}
-              aria-label="Button for year 1944">
-              <span data-year="1944" />
+              aria-label="Button for XX° century">
+              <span data-year="XXe" />
             </button>
             <button
               className={activeIndex === 2 ? "input no-style-btn active" : "input no-style-btn"}
               type="button"
               onClick={() => handleInputChange(2)}
-              aria-label="Button for year 2023">
-              <span data-year="2023" />
+              aria-label="Button for XIX° century">
+              <span data-year="XXIe" />
             </button>
           </div>
           <div className="description-container d-flex">
@@ -74,39 +77,42 @@ function History() {
               <section className="section">
                 <div className="section__textarea">
                   <div className="section__textarea__title d-flex justify-content-center">
-                    <h2>30 octobre 1869</h2>
-                    <h3>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h3>
-                    <h4>6° année</h4>
+                    <h3>30 octobre 1869</h3>
+                    <h4>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h4>
+                    <h5>6° année</h5>
                   </div>
-                  <p className="section__textarea__paragraph">
-                    … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et
-                    du concours de ses paroissiens, on a vu s’accomplir une restauration inespérée ;
-                    l’intérieur de l’église, jadis si délabré, a pris les proportions et l’élégance
-                    d’une nef gothique avec ses deux bas-côtés ; un sanctuaire de même ordre,
-                    accompagné de deux chapelles latérales ; a terminé chacune de ces nefs et un
-                    délicat autel, marbre et or ; est venu donner à cet ensemble un dernier trait de
-                    grâce et de bon goût.
-                    <br />
-                    L’ornementation intérieure de l’édifice laissai encore à désirer, cependant,
-                    bien que le genre gothique soit déjà, et par lui-même, une ornementation.
-                    <br />
-                    Le chemin de croix qui a été placé dimanche dernier, ne sera pas la moindre
-                    pièce de l’ornementation projetée. Les quatorze tableaux qui me composent,
-                    entourés chacun d’un encadrement (néo NDLR) gothique en chêne, découpé à jour,
-                    forment autour de l’église une galerie parfaitement harmonisée avec le genre et
-                    les proportions de l’édifice. Serons-nous indiscrets en disant que ces gracieux
-                    encadrements sont dus au travail habile et patient de M. le curé lui-même.
-                    <br />
-                    La pose du chemin de croix été faite par M. L’abbé Birot, curé de Saint Nicolas,
-                    pendant que du haut de la chaire, M. l’abbé Rolland, ancien missionnaire du
-                    diocèse, appelait, avec un accent apostolique, l’attention des fidèles sur les
-                    grands souvenirs que redit à la foi du chrétien les stations de ce douloureux
-                    pèlerinage.
-                    <br />
-                    L’ensemble de la cérémonie était d’un effet émouvant, et, nous en sommes
-                    persuadés, cette émotion laissera des traces dans l’âme des fidèles nombreux,
-                    présents à la cérémonie ».
-                  </p>
+                  <div className="section__textarea__paragraph">
+                    <p>
+                      … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et
+                      du concours de ses paroissiens, on a vu s’accomplir une restauration inespérée
+                      ; l’intérieur de l’église, jadis si délabré, a pris les proportions et
+                      l’élégance d’une nef gothique avec ses deux bas-côtés ; un sanctuaire de même
+                      ordre, accompagné de deux chapelles latérales ; a terminé chacune de ces nefs
+                      et un délicat autel, marbre et or ; est venu donner à cet ensemble un dernier
+                      trait de grâce et de bon goût.
+                      <br />
+                      L’ornementation intérieure de l’édifice laissai encore à désirer, cependant,
+                      bien que le genre gothique soit déjà, et par lui-même, une ornementation.
+                      <br />
+                      Le chemin de croix qui a été placé dimanche dernier, ne sera pas la moindre
+                      pièce de l’ornementation projetée. Les quatorze tableaux qui me composent,
+                      entourés chacun d’un encadrement (néo NDLR) gothique en chêne, découpé à jour,
+                      forment autour de l’église une galerie parfaitement harmonisée avec le genre
+                      et les proportions de l’édifice. Serons-nous indiscrets en disant que ces
+                      gracieux encadrements sont dus au travail habile et patient de M. le curé
+                      lui-même.
+                      <br />
+                      La pose du chemin de croix été faite par M. L’abbé Birot, curé de Saint
+                      Nicolas, pendant que du haut de la chaire, M. l’abbé Rolland, ancien
+                      missionnaire du diocèse, appelait, avec un accent apostolique, l’attention des
+                      fidèles sur les grands souvenirs que redit à la foi du chrétien les stations
+                      de ce douloureux pèlerinage.
+                      <br />
+                      L’ensemble de la cérémonie était d’un effet émouvant, et, nous en sommes
+                      persuadés, cette émotion laissera des traces dans l’âme des fidèles nombreux,
+                      présents à la cérémonie ».
+                    </p>
+                  </div>
                 </div>
               </section>
             </article>
@@ -116,8 +122,8 @@ function History() {
               <section className="section">
                 <div className="section__textarea">
                   <div className="section__textarea__title d-flex justify-content-center">
-                    <h2>Octobre 1944. Mai 1945.</h2>
-                    <h3>Vœux et plaques votives</h3>
+                    <h3>Octobre 1944. Mai 1945.</h3>
+                    <h4>Vœux et plaques votives</h4>
                   </div>
                   <div className="section__textarea__paragraph">
                     <p>
@@ -139,9 +145,9 @@ function History() {
                       à la volée.
                     </p>
                     <br />
-                    <h4>
+                    <h5>
                       <b>LE VŒU EXAUCE</b>
-                    </h4>
+                    </h5>
                     <br />
                     <span>Jean-Luc Dupas.</span>
                     <br />

@@ -2,8 +2,11 @@
 @import "../../sass-utils/variables.scss";
 
 #newsletters {
-  .newsletter-container {
+  .newsletters-container {
     position: relative;
+    ul {
+      flex-direction: column;
+    }
 
     a {
       transition: all 0.3s ease-in-out;
@@ -26,6 +29,7 @@
 @include desktop-layout {
   #newsletters {
     .newsletters-container {
+      padding: 50px 0;
       ul > li {
         margin: calc(200px - (100px + $dotWidth / 2)) 0 calc(200px - (100px + $dotWidth / 2)) 0;
         .progressBar {
@@ -140,8 +144,6 @@
 
       .newsletters-container {
         ul {
-          flex-direction: column;
-
           .progressBar {
             display: none;
           }

@@ -9,7 +9,7 @@
     "path": "/",
     "sublinks": [],
     "type": "large",
-    "url": "/banners/Banner-1.jpg"
+    "url": "/banners/Banner-1.webp"
   },
   {
     "id": "L2",
@@ -29,7 +29,7 @@
         "description": "",
         "path": "/projets",
         "type": "small",
-        "url": "/banners/Banner-9.jpeg"
+        "url": "/banners/Banner-9.webp"
       },
       {
         "id": "L2S2",
@@ -40,7 +40,7 @@
         "description": "Vous voulez participer à la protection, la valorisation et la restauration de l'église de La Jarrie: découvrez comment agir avec les Amis de Sainte Madeleine de La Jarrie.",
         "path": "/nous-rejoindre",
         "type": "small",
-        "url": "/banners/Banner-7.jpeg"
+        "url": "/banners/Banner-7.webp"
       },
       {
         "id": "L2S3",
@@ -51,7 +51,7 @@
         "description": "",
         "path": "/newsletter",
         "type": "small",
-        "url": "/banners/Banner-11.jpg"
+        "url": "/banners/Banner-11.webp"
       },
       {
         "id": "L2S4",
@@ -62,11 +62,11 @@
         "description": "En soutenant notre association, vous contribuez à agir pour la protection, la valorisation et la restauration de l'église de La Jarrie.",
         "path": "/don",
         "type": "small",
-        "url": "/banners/Banner-8.jpg"
+        "url": "/banners/Banner-8.webp"
       }
     ],
     "type": "small",
-    "url": "/banners/Banner-5.jpeg"
+    "url": "/banners/Banner-5.webp"
   },
   {
     "id": "L3",
@@ -78,7 +78,7 @@
     "path": "/nos-realisations",
     "sublinks": [],
     "type": "small",
-    "url": "/banners/Banner-6.jpg"
+    "url": "/banners/Banner-6.webp"
   },
   {
     "id": "L4",
@@ -98,7 +98,7 @@
         "description": "Découvrez l'histoire de l'église de La Jarrie, construit au XIIe siècle, à travers des textes et photos d'époque.",
         "path": "/histoire",
         "type": "small",
-        "url": "/banners/Banner-3.jpg"
+        "url": "/banners/Banner-3.webp"
       },
       {
         "id": "L4S2",
@@ -109,11 +109,11 @@
         "description": "Le clocher de l'église abrite les 4 cloches de La Jarrie : découvrez leur histoire",
         "path": "/cloches",
         "type": "small",
-        "url": "/banners/Banner-4.jpeg"
+        "url": "/banners/Banner-4.webp"
       }
     ],
     "type": "small",
-    "url": "/banners/Banner-2.jpg"
+    "url": "/banners/Banner-2.webp"
   },
   {
     "id": "L5",
@@ -125,7 +125,7 @@
     "path": "/contact",
     "sublinks": [],
     "type": "small",
-    "url": "/banners/Banner-10.jpg"
+    "url": "/banners/Banner-10.webp"
   },
   {
     "id": "Error-404",

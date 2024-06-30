@@ -4,37 +4,37 @@
             "id": "Slide-History-1",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-1.jpg"
+            "url": "/slides/history/photo-1.webp"
         },
         {
             "id": "Slide-History-2",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-2.jpg"
+            "url": "/slides/history/photo-2.webp"
         },
         {
             "id": "Slide-History-3",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-3.jpg"
+            "url": "/slides/history/photo-3.webp"
         },
         {
             "id": "Slide-History-4",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-4.jpg"
+            "url": "/slides/history/photo-4.webp"
         },
         {
             "id": "Slide-History-5",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-5.jpg"
+            "url": "/slides/history/photo-5.webp"
         },
         {
             "id": "Slide-History-6",
             "title": "Eglise de La Jarrie",
             "alt": "Carte Postale",
-            "url": "/slides/history/photo-6.jpg"
+            "url": "/slides/history/photo-6.webp"
         }
     ],
 
@@ -43,73 +43,73 @@
             "id": "Slide-Home-1",
             "title": "Vitrail Sainte Madeleine",
             "alt": "Vitrail Sainte Madeleine",
-            "url": "/slides/home/photo-5.jpg"
+            "url": "/slides/home/photo-5.webp"
         },
         {
             "id": "Slide-Home-2",
             "title": "Cloches",
             "alt": "Cloches",
-            "url": "/slides/home/photo-8.jpg"
+            "url": "/slides/home/photo-8.webp"
         },
         {
             "id": "Slide-Home-3",
             "title": "Intérieur",
             "alt": "Intérieur de l'église",
-            "url": "/slides/home/photo-2.jpg"
+            "url": "/slides/home/photo-2.webp"
         },
         {
             "id": "Slide-Home-4",
             "title": "Eglise de La Jarrie",
             "alt": "Eglise de La Jarrie",
-            "url": "/slides/home/photo-12.jpg"
+            "url": "/slides/home/photo-12.webp"
         },
         {
             "id": "Slide-Home-5",
             "title": "Vitrail",
             "alt": "Vitrail",
-            "url": "/slides/home/photo-11.jpg"
+            "url": "/slides/home/photo-11.webp"
         },
         {
             "id": "Slide-Home-6",
             "title": "Autel-tombeau",
             "alt": "Autel-tombeau",
-            "url": "/slides/home/photo-6.jpg"
+            "url": "/slides/home/photo-6.webp"
         },
         {
             "id": "Slide-Home-7",
             "title": "Vitrail",
             "alt": "Vitrail",
-            "url": "/slides/home/photo-3.jpg"
+            "url": "/slides/home/photo-3.webp"
         },
         {
             "id": "Slide-Home-8",
             "title": "Eglise de La Jarrie",
             "alt": "Eglise de La Jarrie",
-            "url": "/slides/home/photo-1.jpg"
+            "url": "/slides/home/photo-1.webp"
         },
         {
             "id": "Slide-Home-9",
             "title": "Vitrail",
             "alt": "Vitrail",
-            "url": "/slides/home/photo-7.jpg"
+            "url": "/slides/home/photo-7.webp"
         },
         {
             "id": "Slide-Home-10",
             "title": "Eglise de La Jarrie",
             "alt": "Eglise de La Jarrie",
-            "url": "/slides/home/photo-4.jpg"
+            "url": "/slides/home/photo-4.webp"
         },
         {
             "id": "Slide-Home-11",
             "title": "Grande Porte",
             "alt": "Grande Porte Eglise de La Jarrie",
-            "url": "/slides/home/photo-14.jpg"
+            "url": "/slides/home/photo-14.webp"
         },
         {
             "id": "Slide-Home-12",
             "title": "Hommage Jacques Baudon",
             "alt": "Hommage à Jacques Baudon",
-            "url": "/slides/home/photo-15.jpg"
+            "url": "/slides/home/photo-15.webp"
         }
     ]
 }
