@@ -78,7 +78,7 @@
   #news {
     .article {  
       &__header {
-        margin: 25px 0 50px 0;
+        margin: 50px 0 50px 0;
   
         &__text {
           padding: 0 80px 0 20px ;
@@ -86,6 +86,7 @@
           justify-content: space-around;
   
           &__title {
+            padding-bottom: 75px;
           }
   
           &__paragraph {
