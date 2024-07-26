@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Section from "../../components/section/section";
-import SectionData from "../../assets/realisations.json";
-import "./realisation.scss";
+import SectionData from "../../assets/actions.json";
+import "./action.scss";
 
 function Realisation() {
   useEffect(() => {
@@ -9,7 +9,7 @@ function Realisation() {
   });
 
   return (
-    <main id="realisations">
+    <main id="actions">
       <div className="container">
         <article>
           <Section Sections={SectionData} />

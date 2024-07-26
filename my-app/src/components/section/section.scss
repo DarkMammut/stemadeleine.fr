@@ -4,6 +4,13 @@
 .section {
   display: flex;
 
+  h4 {
+    font-family: $titles;
+    padding: 20px 0;
+    text-align: center;
+    text-decoration: underline;
+  }
+
   &__textarea {
     display: flex;
     flex-direction: column;

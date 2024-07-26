@@ -105,7 +105,7 @@ function Home() {
                         <div className="progressBar__dot__bottom" />
                       </div>
                     </div>
-                    <div className="news d-flex justify-content-center">
+                    <a className="news d-flex justify-content-center" href={news.href}>
                       <div
                         className="news__image"
                         style={{ backgroundImage: `url(${url} ${news.image.url})` }}
@@ -114,7 +114,7 @@ function Home() {
                         <h4>{news.title}</h4>
                         <div>{parse(news.text)}</div>
                       </div>
-                    </div>
+                    </a>
                   </li>
                 );
               }

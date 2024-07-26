@@ -2,20 +2,22 @@
   {
     "id": "n001",
     "enable": "enable",
-    "title": "Don à l'association",
+    "title": "L’ONCTION DE BETHANIE",
+    "href":"https://stemadeleine.fr/nos-actions",
     "image": {
       "id": "n001-i1",
       "title": "Icône ancienne probablement d’origine grecque ou syrienne",
       "alt": "Icône ancienne probablement d’origine grecque ou syrienne représentant Marie-Madeleine répandant un parfum sur les pieds de Jésus-Christ.",
       "url": "/news/Magnan.JPG"
     },
-    "text": "<p>Madame Nicole Magnan a fait don à l’association de cette icône ancienne probablement d’origine grecque ou syrienne.<br/>Elle représente Marie-Madeleine répandant un parfum sur les pieds de Jésus-Christ.<br/>Il est prévu que cette icône sera exposée  dans l’église dès qu'elle aura reçu un encadrement adapté.</p>"
+    "text": "<h5>Don de Madame Nicole Magnan</h5><p>Cette icône date très probablement du tout début du XIX -ème siècle et représente Marie-Madeleine répandant un parfum de grand prix sur les pieds de Jésus. Ses caractéristiques artistiques aussi bien la représentation du Christ à table avec des disciples que l’emploi de couleurs à dominante rouge et rose l’a rattache à l’école d’iconographie de Berat en Albanie.<br/>Elle sera exposée dans l’église dès qu’elle aura reçu un encadrement adapté.</p>"
   },
 
   {
     "id": "n002",
     "enable": "enable",
     "title": "La dîme-bénitier retrouve sa place",
+    "href":"https://stemadeleine.fr/nos-actions#A3",
     "image": {
       "id": "n002-i1",
       "title": "La dîme-bénitier du XVIème s. a retrouvé sa place à l’entrée de l’église.",
@@ -28,13 +30,14 @@
   {
     "id": "n003",
     "enable": "enable",
-    "title": "L'arrivée de Marie Madeleine",
+    "title": "Une représentation contemporaine de Marie-Madeleine",
+    "href":"https://stemadeleine.fr/nos-actions#A1",
     "image": {
       "id": "n003-i1",
       "title": "Le tableau de Marie Madeleine a été installé",
       "alt": "Le tableau de Marie Madeleine peint par Caroline Fleury-Chevillard, a été installé sous le vitrail éponyme.",
       "url": "/news/tableauSM.jpeg"
     },
-    "text": "<p>Le tableau de Marie Madeleine peint par Caroline Fleury-Chevillard, a été installé sous le vitrail éponyme par les soins de Patrice Chupeau – responsable des services techniques - et Christophe Guillemet. Le déplacement de quelques bancs à mis à nue la terre battue et nécessité la pose d’une dalle de ciment. L’espace ainsi dégagé assure plus de fluidité pour la circulation des fidèles et des visiteurs sécurisant ainsi le lieu.</p>"
+    "text": "<h5>Tableau de Marie-Madeleine - Caroline Fleury</h5><p>L’artiste, Caroline Fleury-Chevillard, à la fois musicienne et peintre, établie en région parisienne, s’est formée dans divers ateliers depuis 2004. Sa démarche existentielle et philosophique, cherche à exprimer l’indicible. Elle peint principalement sur bois.<br/>Elle a choisi de faire une série de tableaux sur les femmes de la Bible.<br/>Pour Marie Madeleine elle retient ce moment particulier de la parole du Christ, au matin de Pâques « Femme, pourquoi pleures-tu ? » qui rejoint la femme là où elle se trouve, dans sa détresse. Mais ses yeux portent déjà la joie de la Résurrection : celle de renaitre de nouveau.</p>"
   }
 ]

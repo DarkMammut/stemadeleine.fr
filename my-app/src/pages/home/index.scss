@@ -151,6 +151,12 @@
 
     .news-container {
       margin-top: 100px;
+    
+      h5 {
+        font-family: $titles;
+        text-align: center;
+        padding: 10px 0;
+      }
 
       ul {
         & > li {
@@ -169,18 +175,18 @@
               &__bottom {
                 position: absolute;
                 width: 5px;
-                height: calc(200px);
+                height: calc(250px);
                 background-color: $accent-color;
                 left: 50%;
                 transform: translateX(-50%);
               }
 
               &__top {
-                top: calc(-1 * 215px + $dotWidth);
+                top: calc(-1 * 275px + $dotWidth);
               }
 
               &__bottom {
-                bottom: calc(-1 * 215px + $dotWidth);
+                bottom: calc(-1 * 275px + $dotWidth);
               }
             }
           }
@@ -196,13 +202,13 @@
             box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 
             &__image {
-              height: 300px;
+              height: 420px;
               width: 250px;
             }
 
             &__text {
               width: calc(100% - 290px);
-              max-height: 250px;
+              max-height: 420px;
               padding: 20px;
 
               h4 {

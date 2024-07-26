@@ -1,0 +1,163 @@
+[
+  {
+    "id": "A1",
+    "display": "enable",
+    "title": "Tableau de Sainte Madeleine",
+    "text": [
+      {
+        "id": "A1P1",
+        "paragraph": "<p>L’Association des Amis de Sainte Madeleine de La Jarrie vient d’acquérir cette peinture de Marie Madeleine dans le jardin au pied du Golgotha au matin de Pâque.<br>Au cours des siècles les peintres ont toujours cherché à représenter Marie-Madeleine avec une opulente chevelure blonde et un long manteau pourpre comme une impératrice des désirs. Tout comme elle est représentée par un artiste local, Louis Ernest Boisnard, sur une des toiles dans le chœur de l’église de La Jarrie.<br>Ici, au contraire, cette représentation rompt avec la tradition picturale.<br>Avec ses cheveux foncés, ébouriffés, en bataille, l’artiste, traduit la détresse de  Marie-Madeleine qui a suivi le  Christ jusqu’au pied  de la croix et sa séparation, définitive, croit-elle, avec Lui.<br>Cette huile sur un support en bois usagé, qui donne ce ton naturel en fond de tableau faisant ressortir par ses aspérités l’âpreté de la vie et renvoie à celle de Marie Madeleine, allie couleurs vives et expression artistique de notre temps. C’est l’œuvre d’une femme, Caroline Fleury, à la fois musicienne et peintre, qui a choisi de faire une série de tableaux sur les femmes de la Bible et, pour Marie Madeleine, elle retient ce moment particulier de la parole du Christ, « Femme, pourquoi pleures-tu ? »<br>Avec le souvenir et l’exemple de Marie-Madeleine, dont le souvenir de sa vie peut aider ceux et celles qui, comme elle le fut elle-même sont en quête d’indicible, Caroline Fleury ne pouvait pas trouver meilleur modèle : le peintre jette un regard perçant sur les êtres et cherche à exprimer l’ineffable.<br>L’histoire de Marie-Madeleine est si surprenante qu’elle pose le problème de la femme moderne. Elle est sans aucun doute une héroïne de notre temps.</p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A1I1",
+        "title": "« FEMME, POURQUOI PLEURES-TU ? »",
+        "alt": "Tableau représentant Sainte Madeleine",
+        "url": "/actions/tableau.png"
+      }
+    ]
+  },
+  {
+    "id": "A2",
+    "display": "enable",
+    "title": "Quatre kakémonos",
+    "text": [
+      {
+        "id": "A2P1",
+        "paragraph": "<p>Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
+      },
+      {
+        "id": "A1P2",
+        "paragraph":"<h4>Un plenum de quatre cloches</h4><p>Le clocher de l’église renferme quatre cloches dont la plus ancienne, une cloche comtale de Xvvv-ème siècle, a été rejointe en 1947 par trois autres cloches. Elles ont été offertes par les jarriens pour marquer la fin de la guerre sans que le bourg ait eu à souffrir de bombardements lors de la reddition de l’occupant et leur reconnaissance au retour des prisonniers. Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br/>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
+      },
+      {
+        "id": "A1P3",
+        "paragraph":"<p><br/><i>Question : finalement de quelle époque est ce porche clocher ?</i></p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A2I1",
+        "title": "Les quatres Kakémonos",
+        "alt": "Photo des kakémonos",
+        "url": "/actions/kakemonos.jpg"
+      }
+    ]
+  },
+  {
+    "id": "A3",
+    "display": "enable",
+    "title": "Le bénitier",
+    "text": [
+      {
+        "id": "A3P1",
+        "paragraph": "<p>La dîme-bénitier reposait sur une colonnette en bois qui n'assurait pas la stabilité de la pierre sculptée du XVe siècle et répertoriée à l'inventaire des biens mobiliers de l'église communale.<br>Mise à l'écart par mesure de sécurité, cette dîme à usage de bénitier a reçu un pied-support en pierre de tuffeau et une assise de forme pentagonale ornée de feuilles d'olivier.<br>La commune assure la prise en charge de cette rénovation.<br>Le bénitier restauré recevra une vasque composée de grès et porcelaine noire; ces 2 terres sont mêlées, pour lui donner un aspect de flore marine.<br>Le grès laissé brut par l’artiste et le bord irrégulier s'harmonisent  avec la pierre du XV° s.<br>A l’intérieur, l'émail recouvre une partie de la vasque retenant ainsi l'eau.</p>"
+      },
+      {
+        "id": "A3P2",
+        "paragraph": "<p>Don à la paroisse de La Jarrie de <a href=https://www.terredaunis.com/ target=_blank>L’ATELIER TERRE D'AUNIS</a>, Aigrefeuille. Vasque signée au dos.</p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A3I1",
+        "title": "Le bénitier",
+        "alt": "Photo du bénitier",
+        "url": "/actions/benitier.jpg"
+      },
+      {
+        "id": "A3I2",
+        "title": "Le nouveau vasque",
+        "alt": "Photo du nouveau vasque",
+        "url": "/actions/vasque_benitier.jpg"
+      }
+    ]
+  },
+  {
+    "id": "A4",
+    "display": "enable",
+    "title": "Un chemin de Croix photographique",
+    "text": [
+      {
+        "id": "A4P1",
+        "paragraph": "<p>L’œuvre illustre la Passion du Christ par une approche actuelle comme l’ont fait tant de peintres respectant la mode de leur époque.<br>Autour de Jésus, aux traits sémitiques, et d’une Vierge Marie, revêtus des habits de leur temps, gravitent des personnages, hommes et femmes du XXIe siècle, saisis par l’objectif du photographe dans leur comportement ordinaire de leurs activités quotidiennes.<br>Aujourd’hui, et tout au long de ce parcours, le spectateur pourra s’identifier et au bourreau et au fidèle disciple, rendant actuel le drame qui s’est déroulé il y a deux millénaires à Jérusalem, en s’interrogeant sur sa propre attitude qui aurait pu être la sienne sur ce chemin allant du palais de Pilate au Golgotha. Le spectateur est appelé à participer à sa manière au drame qui se déroule devant lui.<br>Aux 14 stations du chemin de Croix s’ajoutera une quinzième station, celle du tombeau vide au matin de Pâque. Cette 15e station renvoie à la représentation figurative de Marie Madeleine au matin de Pâques exposée dans l’église.</p>"
+      },
+      {
+        "id": "A4P2",
+        "paragraph": "<p>Le Christ, la Vierge Marie et la Croix sont représentés de façon traditionnelle; deux personnages et un élément facilement reconnaissable (la Croix) qui renvoient aux représentations picturales et sculpturales traditionnelles.<br>Le reste des personnages a volontairement été choisi comme représentant notre époque à travers le vêtement mais aussi certains objets. Chacun peut ainsi se reconnaître plus facilement comme contemporain de ce processus de stigmatisation et de jugement inique que fut la Passion du Christ.<br>Christ pareillement raillé, humilié, jugé, condamné et enfin mis à mort ; mais aussi accompagné, aidé, consolé par chacun d’entre nous, à travers les nombreuses rencontres que nous faisons dans la vie. Le choix du traitement noir et blanc exprime tout à la fois simplicité et jaillissement. Le choix de travailler les tirages avec de forts contrastes aide à percevoir les contrastes spirituels et psychologiques vécus sur cette « via dolorosa ».<br>Cela permet aussi de mettre la scène dans une atemporalité renvoyant tant au mystère du Christ qu’à notre présent.<br>Le format carré quant à lui donne une rigueur géométrique qui force à la simplicité, centre le sujet choisi et met en valeur les lignes directrices.<br>Inspiré de la représentation picturale présentée dans l’église Saint-Nizier à Lyon, cet ensemble unique en photographie est l’occasion au-delà d’une démarche de foi, de faire se rencontrer tradition et modernité.<br>Passion du Christ qui nous renvoie inévitablement à la Passion de tant d'hommes et de femmes d’aujourd’hui ». <em><small>Jean-Dominique « El padre »,photographe.</small></em></p>"
+      },
+      {
+        "id": "A4P3",
+        "paragraph": "<h4>Photophore-Association réalise le projet</h4><br/><p>Elle a pour but d'aider à la création artistique par la photographie, de gérer le fonds photographique de l'association sur tout type de support, d'organiser des expositions, vernissages et rencontres autour de la photographie ainsi que d’aider par versements de fonds, grâce à la vente de clichés, diverses œuvres en faveur de l’enfance.<br/>C’est auprès de Photophore-Association que l’association des Amis de Sainte Madeleine acquerra ce chemin de Croix</p>"
+      },
+      {
+        "id": "A4P4",
+        "paragraph": "<h4>Le photographe</h4><br><p>Jean-Dominique « <a href='https://www.elpadre.fr/'>El Padre</a> » fait partie de l’académie artistique militaire appelée : les Peintres Officiels de l’Armée, au titre de photographe. Il a répondu à la sollicitation de l’association des Amis de Saint Madeleine de La Jarrie pour réaliser un « chemin de Croix photographique » participant à la mise en valeur de l’église de La Jarrie.<br/><br/><em>*Ni le photographe ni les bénévoles de cette association ne reçoivent un quelconque émolument de la vente de toutes les productions du photographe.</em></p>"
+      }
+    ],
+    "images": [
+      {
+        "id": "A4I1",
+        "title": "1ère station",
+        "alt": "Jésus est condamné à mort. Pilate est assis entouré de ses conseils qui lui communiquent les éléments du dossier. A l’arrière-plan sa femme lui fait part de son rêve.",
+        "url": "/projects/CDC1.jpg"
+      },
+      {
+        "id": "A4I2",
+        "title": "7ème station",
+        "alt": "Jésus tombe pour la seconde fois. Le bourreau le soutient pour qu’il aille jusqu’au bout du supplice sur la croix.",
+        "url": "/projects/CDC7.jpg"
+      },
+      {
+        "id": "A4I3",
+        "title": "8ème station",
+        "alt": "Des femmes revenant de l’école avec leurs enfants ou rentrant de  faire leurs courses croisent le Christ et les console.",
+        "url": "/projects/CDC8.jpg"
+      },
+      {
+        "id": "A4I4",
+        "title": "9ème station",
+        "alt": "Jésus tombe pour la 3e fois. Un gendarme croise Jésus au sol écrasé par le poids de la Croix et alerte ses collègues par téléphone.",
+        "url": "/projects/CDC9.jpg"
+      },
+      {
+        "id": "A4I5",
+        "title": "13ème station",
+        "alt": "Jésus est descendu de la croix et remis à sa mère. Un échafaudage est dressé, un jeune homme et un adulte reçoivent le corps devant Marie.",
+        "url": "/projects/CDC13.jpg"
+      },
+      {
+        "id": "A4I6",
+        "title": "14ème station",
+        "alt": "Jésus est mis dans le sépulcre. Le corps repose sur une table recouverte d’un drap blanc préfigurant l’hostie sur le drap liturgique de l’autel.",
+        "url": "/projects/CDC14.jpg"
+      },
+      {
+        "id": "A4I7",
+        "title": "15ème station",
+        "alt": "La résurrection. Entre les deux soldats endormis, détachés par Pilate pour garder le tombeau, Jésus apparaît debout en Christ pantocrator.",
+        "url": "/projects/CDC15.jpg"
+      }
+    ]
+  },
+  {
+    "id": "A5",
+    "display": "disable",
+    "title": "L’Onction de Béthanie",
+    "text": [
+      {
+        "id": "A5P1",
+        "paragraph": ""
+      }
+    ],
+    "images": [
+      {
+        "id": "A5I1",
+        "title": "",
+        "alt": "",
+        "url": ""
+      }
+    ]
+  }
+]
