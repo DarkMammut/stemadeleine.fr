@@ -28,8 +28,10 @@ function Banner() {
       path = mainUrl;
       mainUrl = "/association";
     }
+
     const mainObject = Data.find((object) => object.path === mainUrl);
     const subLink = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
+
     if (!mainObject || !subLink) {
       found = Data.find((helmet) => helmet.id === "Error-404");
     } else {

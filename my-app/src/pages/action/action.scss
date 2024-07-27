@@ -1,13 +1,174 @@
 @import "../../sass-utils/mixins.scss";
 @import "../../sass-utils/variables.scss";
 
-#actions {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+#icone {
+  .btn {
+    &--back {
+      background-color: $light-color;
+      border: 2px solid $dark-color;
+      border-radius: 30px;
+      box-shadow: $accent-color 4px 4px 0 0;
+      color: $accent-color;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: 600;
+      font-size: 18px;
+      padding: 0 18px;
+      line-height: 50px;
+      text-align: center;
+      text-decoration: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
 
+      &:hover {
+        background-color: #fff;
+      }
+
+      &:active {
+        box-shadow: #422800 2px 2px 0 0;
+        transform: translate(2px, 2px);
+      }
+    }
+  }
+  .article {
+    flex-direction: column;
+
+    &__header {
+      flex-direction: row;
+      text-align: center;
+      justify-content: space-around;
+      width: 100%;
+
+      &__text {
+        &__title {
+          text-align: center;
+          color: $accent-color;
+        }
+
+        &__paragraph {
+          text-align: justify;
+        }
+      }
+
+      &__image {
+        position: relative;
+
+        & img {
+          width: 100%;
+        }
+
+        &__caption {
+          background-color: $light-color;
+        }
+      }
+    }
+
+    &__section {
+      text-align: justify;
+    }
+
+    &__footer {
+      text-align: justify;
+    }
+  }
+}
+
+@include desktop-layout {
+  #icone {
+    .article {  
+      &__header {
+        margin: 50px 0 50px 0;
   
-  i {
-    font-size: 15px;
+        &__text {
+          padding: 0 80px 0 20px ;
+          flex-direction: column;
+          justify-content: space-around;
+  
+          &__title {
+            padding-bottom: 75px;
+          }
+  
+          &__paragraph {
+          }
+        }
+  
+        &__image {
+          margin-left: 80px;
+          max-width: 300px;
+          box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+
+          &__caption {
+            position: absolute;
+            max-width: 350px;
+            width: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+          }
+        }
+      }
+  
+      &__section {
+        padding: 0 80px 50px 80px;
+      }
+  
+      &__footer {
+        padding: 0 80px 50px 80px;
+      }
+    }
+    .btn {
+      &--back {
+        margin-top: 50px;
+      }
+    }
+  }
+}
+
+@include mobile-layout {
+  #icone {
+    .article {  
+      &__header {
+        padding-bottom: 30px;
+        position: relative;
+  
+        &__text {
+          flex-direction: column;
+          width: 60%;
+  
+          &__title {
+            padding-bottom: 10px;
+          }
+  
+          &__paragraph {
+            width: 100%;
+            text-align: left;
+          }
+        }
+  
+        &__image {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 30%;
+          object-fit: contain;
+
+          & img {
+            width: 100%;
+            box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+          }
+
+          &__caption {
+            margin-top: 10px;
+          }
+        }
+      }
+
+
+      &__footer {
+        padding-top: 20px;
+      }
+    }
+
   }
 }

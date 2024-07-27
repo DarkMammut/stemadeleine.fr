@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import Newsletters from "./pages/newsletters/newsletters";
 import Newsletter from "./pages/newsletter/newsletter";
 import Association from "./pages/about/about";
+import Actions from "./pages/actions/actions";
 import Action from "./pages/action/action";
 import Join from "./pages/join/join";
 import Donation from "./pages/donation/donation";
@@ -37,7 +38,8 @@ root.render(
         <Route path="/association/newsletter/:id" element={<Newsletter />} />
         <Route path="/association/don" element={<Donation />} />
         <Route path="/association/don/formulaire" element={<DonationForm />} />
-        <Route path="/nos-actions" element={<Action />} />
+        <Route path="/nos-actions" element={<Actions />} />
+        <Route path="/nos-actions/:id" element={<Action />} />
         <Route path="/eglise" element={<Church />} />
         <Route path="/eglise/histoire" element={<History />} />
         <Route path="/eglise/cloches" element={<Bells />} />

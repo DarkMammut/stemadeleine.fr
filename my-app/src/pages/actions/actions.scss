@@ -1,0 +1,13 @@
+@import "../../sass-utils/mixins.scss";
+@import "../../sass-utils/variables.scss";
+
+#actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  
+  i {
+    font-size: 15px;
+  }
+}
