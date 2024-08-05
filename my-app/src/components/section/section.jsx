@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import parse from "html-react-parser";
 import ImageSlider from "../slider/slider";
 import "./section.scss";
@@ -8,6 +9,7 @@ function Section({ Sections }) {
   const [open, setOpen] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [activeSection, setActiveSection] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open === 1) {
@@ -20,6 +22,10 @@ function Section({ Sections }) {
     setActiveSection(active);
     setSlideIndex(index);
     setOpen(1);
+  };
+
+  const handleClickNavigate = (link) => {
+    navigate(`/nos-actions/${link}`);
   };
 
   return (
@@ -56,6 +62,14 @@ function Section({ Sections }) {
                     </button>
                   ))}
                 </div>
+              ) : null}
+              {section.button === "enable" ? (
+                <button
+                  className="btn btn--navigate no-style-btn"
+                  type="button"
+                  onClick={() => handleClickNavigate(section.link)}>
+                  more info
+                </button>
               ) : null}
             </section>
           );
