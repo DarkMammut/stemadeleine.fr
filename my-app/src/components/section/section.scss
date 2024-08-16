@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    
+
     &__paragraph {
       text-align: justify;
     }
@@ -31,7 +31,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      
+
       &:hover {
         cursor: pointer;
       }
@@ -66,44 +66,56 @@
 
 @include desktop-layout {
   .section {
+    flex-wrap: wrap;
     justify-content: space-evenly;
     padding: 40px 0;
     margin-bottom: 50px;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-  
-    &__textarea {
 
+    &__textarea {
       &[data-images="0"] {
         width: 100%;
       }
-  
+
       &[data-images="1"] {
         width: 50%;
       }
-  
+
       &__title {
         margin-bottom: 30px;
         padding: 20px 0;
         text-align: center;
         background-color: $light-color;
       }
+
+      &__button {
+        display: flex;
+        margin: 50px 20px 0 20px;
+        width: 100%;
+      }
     }
-  
+
     &__images {
       width: 40%;
-  
+
       &__frame {
         width: 100%;
         padding: 20px 0;
       }
     }
-  
+
     &:nth-child(odd) {
       flex-direction: row;
+      .section__textarea__button {
+        justify-content: flex-start;
+      }
     }
-  
+
     &:nth-child(even) {
       flex-direction: row-reverse;
+      .section__textarea__button {
+        justify-content: flex-end;
+      }
     }
   }
 }
@@ -113,10 +125,10 @@
     flex-direction: column;
     margin-top: 30px;
     padding-bottom: 30px;
-  
+
     &__textarea {
       width: 100%;
-  
+
       &__title {
         margin-bottom: 10px;
         text-align: start;
@@ -127,10 +139,10 @@
         margin-bottom: 10px;
       }
     }
-  
+
     &__images {
       width: 100%;
-  
+
       &__frame {
         width: 80%;
         padding: 20px;

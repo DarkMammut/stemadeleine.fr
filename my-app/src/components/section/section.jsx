@@ -43,6 +43,16 @@ function Section({ Sections }) {
                     {parse(ph.paragraph)}
                   </div>
                 ))}
+                {section.button === "enable" ? (
+                  <div className="section__textarea__button">
+                    <button
+                      className="btn btn--navigate no-style-btn"
+                      type="button"
+                      onClick={() => handleClickNavigate(section.link)}>
+                      more info
+                    </button>
+                  </div>
+                ) : null}
               </div>
               {section.images.length > 0 ? (
                 <div className="section__images">
@@ -62,14 +72,6 @@ function Section({ Sections }) {
                     </button>
                   ))}
                 </div>
-              ) : null}
-              {section.button === "enable" ? (
-                <button
-                  className="btn btn--navigate no-style-btn"
-                  type="button"
-                  onClick={() => handleClickNavigate(section.link)}>
-                  more info
-                </button>
               ) : null}
             </section>
           );
