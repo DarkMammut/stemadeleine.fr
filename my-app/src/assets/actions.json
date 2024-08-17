@@ -33,11 +33,11 @@
       },
       {
         "id": "Actions-A2P2",
-        "paragraph":"<h4>Un plenum de quatre cloches</h4><p>Le clocher de l’église renferme quatre cloches dont la plus ancienne, une cloche comtale de Xvvv-ème siècle, a été rejointe en 1947 par trois autres cloches. Elles ont été offertes par les jarriens pour marquer la fin de la guerre sans que le bourg ait eu à souffrir de bombardements lors de la reddition de l’occupant et leur reconnaissance au retour des prisonniers. Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br/>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
+        "paragraph": "<h4>Un plenum de quatre cloches</h4><p>Le clocher de l’église renferme quatre cloches dont la plus ancienne, une cloche comtale de Xvvv-ème siècle, a été rejointe en 1947 par trois autres cloches. Elles ont été offertes par les jarriens pour marquer la fin de la guerre sans que le bourg ait eu à souffrir de bombardements lors de la reddition de l’occupant et leur reconnaissance au retour des prisonniers. Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br/>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
       },
       {
         "id": "Actions-A2P3",
-        "paragraph":"<p><br/><i>Question : finalement de quelle époque est ce porche clocher ?</i></p>"
+        "paragraph": "<p><br/><i>Question : finalement de quelle époque est ce porche clocher ?</i></p>"
       }
     ],
     "images": [
@@ -172,9 +172,9 @@
     "images": [
       {
         "id": "Actions-A5I1",
-        "title": "",
-        "alt": "",
-        "url": ""
+        "title": "Icône de l’école d’iconographie albanaise de Bérat",
+        "alt": "Icône de l’école d’iconographie albanaise de Bérat. Fin XVII.",
+        "url": "/actions/Magnan.JPG"
       }
     ]
   }
