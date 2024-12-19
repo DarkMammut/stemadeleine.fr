@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Article from "../../components/article/article";
+import Section from "../../components/section/section";
 import "./about.scss";
-import ArticlesData from "../../assets/about.json";
+import SectionsData from "../../assets/about.json";
 
 function About() {
   useEffect(() => {
@@ -11,7 +11,7 @@ function About() {
   return (
     <main id="about">
       <div className="container">
-        <Article Articles={ArticlesData} />
+        <Section Sections={SectionsData} />
       </div>
     </main>
   );

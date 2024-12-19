@@ -1,181 +1,373 @@
 [
   {
-    "id": "Actions-A1",
+    "id": "Actions-S1",
     "display": "enable",
     "button": "disable",
     "link": "",
     "title": "Tableau de Sainte Madeleine",
     "text": [
       {
-        "id": "Actions-A1P1",
+        "id": "Actions-S1P1",
         "paragraph": "<p>L’Association des Amis de Sainte Madeleine de La Jarrie vient d’acquérir cette peinture de Marie Madeleine dans le jardin au pied du Golgotha au matin de Pâque.<br>Au cours des siècles les peintres ont toujours cherché à représenter Marie-Madeleine avec une opulente chevelure blonde et un long manteau pourpre comme une impératrice des désirs. Tout comme elle est représentée par un artiste local, Louis Ernest Boisnard, sur une des toiles dans le chœur de l’église de La Jarrie.<br>Ici, au contraire, cette représentation rompt avec la tradition picturale.<br>Avec ses cheveux foncés, ébouriffés, en bataille, l’artiste, traduit la détresse de  Marie-Madeleine qui a suivi le  Christ jusqu’au pied  de la croix et sa séparation, définitive, croit-elle, avec Lui.<br>Cette huile sur un support en bois usagé, qui donne ce ton naturel en fond de tableau faisant ressortir par ses aspérités l’âpreté de la vie et renvoie à celle de Marie Madeleine, allie couleurs vives et expression artistique de notre temps. C’est l’œuvre d’une femme, Caroline Fleury, à la fois musicienne et peintre, qui a choisi de faire une série de tableaux sur les femmes de la Bible et, pour Marie Madeleine, elle retient ce moment particulier de la parole du Christ, « Femme, pourquoi pleures-tu ? »<br>Avec le souvenir et l’exemple de Marie-Madeleine, dont le souvenir de sa vie peut aider ceux et celles qui, comme elle le fut elle-même sont en quête d’indicible, Caroline Fleury ne pouvait pas trouver meilleur modèle : le peintre jette un regard perçant sur les êtres et cherche à exprimer l’ineffable.<br>L’histoire de Marie-Madeleine est si surprenante qu’elle pose le problème de la femme moderne. Elle est sans aucun doute une héroïne de notre temps.</p>"
       }
     ],
     "images": [
       {
-        "id": "Actions-A1I1",
+        "id": "Actions-S1I1",
         "title": "« FEMME, POURQUOI PLEURES-TU ? »",
         "alt": "Tableau représentant Sainte Madeleine",
         "url": "/actions/tableau.png"
       }
-    ]
+    ],
+    "article": []
   },
   {
-    "id": "Actions-A2",
+    "id": "Actions-S2",
     "display": "enable",
     "button": "disable",
     "link": "",
     "title": "Quatre kakémonos",
     "text": [
       {
-        "id": "Actions-A2P1",
+        "id": "Actions-S2P1",
         "paragraph": "<p>Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
       },
       {
-        "id": "Actions-A2P2",
+        "id": "Actions-S2P2",
         "paragraph": "<h4>Un plenum de quatre cloches</h4><p>Le clocher de l’église renferme quatre cloches dont la plus ancienne, une cloche comtale de Xvvv-ème siècle, a été rejointe en 1947 par trois autres cloches. Elles ont été offertes par les jarriens pour marquer la fin de la guerre sans que le bourg ait eu à souffrir de bombardements lors de la reddition de l’occupant et leur reconnaissance au retour des prisonniers. Quatre kakémonos ont pris place depuis novembre 2022 dans la nef.<br/>Ils présentent les cloches qui occupent le porche-clocher du XIIe siècle auquel les visiteurs ne peuvent avoir accès.</p>"
       },
       {
-        "id": "Actions-A2P3",
+        "id": "Actions-S2P3",
         "paragraph": "<p><br/><i>Question : finalement de quelle époque est ce porche clocher ?</i></p>"
       }
     ],
     "images": [
       {
-        "id": "Actions-A2I1",
+        "id": "Actions-S2I1",
         "title": "Les quatres Kakémonos",
         "alt": "Photo des kakémonos",
         "url": "/actions/kakemonos.jpg"
       }
-    ]
+    ],
+    "article": []
   },
   {
-    "id": "Actions-A3",
+    "id": "Actions-S3",
     "display": "enable",
     "button": "disable",
     "link": "",
     "title": "Le bénitier",
     "text": [
       {
-        "id": "Actions-A3P1",
+        "id": "Actions-S3P1",
         "paragraph": "<p>La dîme-bénitier reposait sur une colonnette en bois qui n'assurait pas la stabilité de la pierre sculptée du XVe siècle et répertoriée à l'inventaire des biens mobiliers de l'église communale.<br>Mise à l'écart par mesure de sécurité, cette dîme à usage de bénitier a reçu un pied-support en pierre de tuffeau et une assise de forme pentagonale ornée de feuilles d'olivier.<br>La commune assure la prise en charge de cette rénovation.<br>Le bénitier restauré recevra une vasque composée de grès et porcelaine noire; ces 2 terres sont mêlées, pour lui donner un aspect de flore marine.<br>Le grès laissé brut par l’artiste et le bord irrégulier s'harmonisent  avec la pierre du XV° s.<br>A l’intérieur, l'émail recouvre une partie de la vasque retenant ainsi l'eau.</p>"
       },
       {
-        "id": "Actions-A3P2",
+        "id": "Actions-S3P2",
         "paragraph": "<p>Don à la paroisse de La Jarrie de <a href=https://www.terredaunis.com/ target=_blank>L’ATELIER TERRE D'AUNIS</a>, Aigrefeuille. Vasque signée au dos.</p>"
       }
     ],
     "images": [
       {
-        "id": "Actions-A3I1",
+        "id": "Actions-S3I1",
         "title": "Le bénitier",
         "alt": "Photo du bénitier",
         "url": "/actions/benitier.jpg"
       },
       {
-        "id": "Actions-A3I2",
+        "id": "Actions-S3I2",
         "title": "La nouvelle vasque",
         "alt": "Photo de la nouvelle vasque",
         "url": "/actions/vasque_benitier.jpg"
       }
-    ]
+    ],
+    "article":[]
   },
   {
-    "id": "Actions-A4",
+    "id": "Actions-S4",
     "display": "enable",
     "button": "disable",
     "link": "",
     "title": "Un chemin de Croix photographique",
     "text": [
       {
-        "id": "Actions-A4P1",
+        "id": "Actions-S4P1",
         "paragraph": "<p>L’œuvre illustre la Passion du Christ par une approche actuelle comme l’ont fait tant de peintres respectant la mode de leur époque.<br>Autour de Jésus, aux traits sémitiques, et d’une Vierge Marie, revêtus des habits de leur temps, gravitent des personnages, hommes et femmes du XXIe siècle, saisis par l’objectif du photographe dans leur comportement ordinaire de leurs activités quotidiennes.<br>Aujourd’hui, et tout au long de ce parcours, le spectateur pourra s’identifier et au bourreau et au fidèle disciple, rendant actuel le drame qui s’est déroulé il y a deux millénaires à Jérusalem, en s’interrogeant sur sa propre attitude qui aurait pu être la sienne sur ce chemin allant du palais de Pilate au Golgotha. Le spectateur est appelé à participer à sa manière au drame qui se déroule devant lui.<br>Aux 14 stations du chemin de Croix s’ajoutera une quinzième station, celle du tombeau vide au matin de Pâque. Cette 15e station renvoie à la représentation figurative de Marie Madeleine au matin de Pâques exposée dans l’église.</p>"
       },
       {
-        "id": "Actions-A4P2",
+        "id": "Actions-S4P2",
         "paragraph": "<p>Le Christ, la Vierge Marie et la Croix sont représentés de façon traditionnelle; deux personnages et un élément facilement reconnaissable (la Croix) qui renvoient aux représentations picturales et sculpturales traditionnelles.<br>Le reste des personnages a volontairement été choisi comme représentant notre époque à travers le vêtement mais aussi certains objets. Chacun peut ainsi se reconnaître plus facilement comme contemporain de ce processus de stigmatisation et de jugement inique que fut la Passion du Christ.<br>Christ pareillement raillé, humilié, jugé, condamné et enfin mis à mort ; mais aussi accompagné, aidé, consolé par chacun d’entre nous, à travers les nombreuses rencontres que nous faisons dans la vie. Le choix du traitement noir et blanc exprime tout à la fois simplicité et jaillissement. Le choix de travailler les tirages avec de forts contrastes aide à percevoir les contrastes spirituels et psychologiques vécus sur cette « via dolorosa ».<br>Cela permet aussi de mettre la scène dans une atemporalité renvoyant tant au mystère du Christ qu’à notre présent.<br>Le format carré quant à lui donne une rigueur géométrique qui force à la simplicité, centre le sujet choisi et met en valeur les lignes directrices.<br>Inspiré de la représentation picturale présentée dans l’église Saint-Nizier à Lyon, cet ensemble unique en photographie est l’occasion au-delà d’une démarche de foi, de faire se rencontrer tradition et modernité.<br>Passion du Christ qui nous renvoie inévitablement à la Passion de tant d'hommes et de femmes d’aujourd’hui ». <em><small>Jean-Dominique « El padre »,photographe.</small></em></p>"
       },
       {
-        "id": "Actions-A4P3",
-        "paragraph": "<h4>Photophore-Association réalise le projet</h4><br/><p>Elle a pour but d'aider à la création artistique par la photographie, de gérer le fonds photographique de l'association sur tout type de support, d'organiser des expositions, vernissages et rencontres autour de la photographie ainsi que d’aider par versements de fonds, grâce à la vente de clichés, diverses œuvres en faveur de l’enfance.<br/>C’est auprès de Photophore-Association que l’association des Amis de Sainte Madeleine acquerra ce chemin de Croix</p>"
-      },
-      {
-        "id": "Actions-A4P4",
+        "id": "Actions-S4P3",
         "paragraph": "<h4>Le photographe</h4><br><p>Jean-Dominique « <a href='https://www.elpadre.fr/'>El Padre</a> » fait partie de l’académie artistique militaire appelée : les Peintres Officiels de l’Armée, au titre de photographe. Il a répondu à la sollicitation de l’association des Amis de Saint Madeleine de La Jarrie pour réaliser un « chemin de Croix photographique » participant à la mise en valeur de l’église de La Jarrie.<br/><br/><em>*Ni le photographe ni les bénévoles de cette association ne reçoivent un quelconque émolument de la vente de toutes les productions du photographe.</em></p>"
       }
     ],
-    "images": [
+    "images": [],
+    "article": [
       {
-        "id": "Actions-A4I1",
-        "title": "1ère station",
-        "alt": "Jésus est condamné à mort. Pilate est assis entouré de ses conseils qui lui communiquent les éléments du dossier. A l’arrière-plan sa femme lui fait part de son rêve.",
-        "url": "/projects/CDC1.jpg"
+        "id": "Actions-S4A1",
+        "display": "enable",
+        "title": "1° Pilate",
+        "text": [
+          {
+            "id": "Actions-S4A1P1",
+            "paragraph": "<p>Pilate est gouverneur militaire et administrateur de la Jud&eacute;e pour Tib&egrave;re, &agrave; ce titre il a droit de justice. Iconographie tr&egrave;s classique renvoyant &agrave; l&rsquo;ensemble de l&rsquo;histoire de l&rsquo;Art par le traitement des profils.<br />Il est en hauteur, au second plan visiblement contrari&eacute;, et loin d&rsquo;&ecirc;tre imp&eacute;rial dans son pouvoir. Assailli par les Pharisiens, les grands pr&ecirc;tres et les sp&eacute;cialistes des Ecritures, menac&eacute;s dans leur pouvoir par ce blasph&eacute;mateur il sait bien quelles sont leurs motivations alors que lui manque totalement d&rsquo;arguments pour une condamnation &agrave; mort.<br />Cependant, cet auto proclam&eacute; roi des juifs est un trouble &agrave; l&rsquo;ordre public, visiblement aim&eacute; d&rsquo;une partie du peuple qui voit en lui un proph&egrave;te alors que s&rsquo;annonce cette f&ecirc;te de la P&acirc;que si importante pour ses administr&eacute;s. De guerre lasse de cette histoire entre juifs, des menaces prof&eacute;r&eacute;es d&rsquo;un rapport &agrave; Tib&egrave;re il acc&egrave;de au d&eacute;sir des intrigants, munis de leurs &laquo; preuves papiers &raquo; en usant d&rsquo;un subterfuge et en faisant lib&eacute;rer en &eacute;change Bar Aabas.<br />Nous sommes spectateurs d&rsquo;un Christ Roi au premier plan, tournant le dos &agrave; son juge, &agrave; l&rsquo;ensemble des plaignants, dans le r&ocirc;le de l&rsquo;avocat g&eacute;n&eacute;ral. Il est s&eacute;v&egrave;rement bless&eacute; dans un halo de lumi&egrave;re, translucidit&eacute; du corps supplici&eacute; d&eacute;j&agrave; couvert d&rsquo;h&eacute;matomes et d&rsquo;&#339;d&egrave;mes le regard bas dans le consentement sans r&eacute;volte, meurtri et d&eacute;j&agrave; bien affaibli par sa couronne d&rsquo;&eacute;pines, les coups, la flagellation.<br />&laquo; Ecce Homo &raquo; dit Pilate en le livrant.<p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A1I1",
+            "title": "1ère station - Pilate",
+            "alt": "Jésus est condamné à mort. Pilate est assis entouré de ses conseils qui lui communiquent les éléments du dossier. A l’arrière-plan sa femme lui fait part de son rêve.",
+            "url": "/projects/CDC1.jpg"
+          }
+        ]
       },
       {
-        "id": "Actions-A4I2",
-        "title": "7ème station",
-        "alt": "Jésus tombe pour la seconde fois. Le bourreau le soutient pour qu’il aille jusqu’au bout du supplice sur la croix.",
-        "url": "/projects/CDC7.jpg"
+        "id": "Actions-S4A2",
+        "display": "enable",
+        "title": "2° Jésus est chargé de sa croix",
+        "text": [
+          {
+            "id": "Actions-S4A2P1",
+            "paragraph": "<p>J&eacute;sus est charg&eacute; de sa croix sous les regards goguenards des bourreaux &agrave; l&rsquo;arri&egrave;re. Sans attitude de r&eacute;volte, il accepte la charge posant sa main droite en maintien.<br />Ainsi se tient il droit devant l&rsquo;Homme G&eacute;n&eacute;rique qui lui mets sur les &eacute;paules tous les p&eacute;ch&eacute;s du monde mais sans attention pour ce tortionnaire lui faisant face.<br /><p/>"
+          }
+        ],
+        "images": []
       },
       {
-        "id": "Actions-A4I3",
-        "title": "8ème station",
-        "alt": "Des femmes revenant de l’école avec leurs enfants ou rentrant de  faire leurs courses croisent le Christ et les console.",
-        "url": "/projects/CDC8.jpg"
+        "id": "Actions-S4A3",
+        "display": "enable",
+        "title": "3° Première faiblesse",
+        "text": [
+          {
+            "id": "Actions-S4A3P1",
+            "paragraph": "<p>Premi&egrave;re faiblesse impitoyablement trait&eacute;e, J&eacute;sus tombe pour la premi&egrave;re fois<br />En dehors peut-&ecirc;tre des soldats accompagnateurs, et encore, la foule excit&eacute;e par les autorit&eacute;s religieuses juives Pharisiens et docteurs de la Loi ne savent pas que J&eacute;sus a subi, non la flagellation juive, comme ce sera par trois fois le cas de saint Paul et dont il t&eacute;moignera ult&eacute;rieurement, limit&eacute;e &agrave; 39 coups de &laquo; flagrum &raquo; mais vraisemblablement au moins le double, une flagellation romaine .Il est donc d&eacute;j&agrave; bien affaibli et c&rsquo;est la premi&egrave;re chute sous le &laquo; patibulum &raquo;. Ce type de flagellation romaine, de caract&egrave;re obligatoire apr&egrave;s condamnation &agrave; mort &eacute;tait &eacute;vit&eacute; aux femmes, aux soldats sauf d&eacute;sertion et aux citoyens romains.<br />Le personnage de second plan administre donc les coups n&eacute;cessaires &agrave; un nouveau d&eacute;part.<br /><p/>"
+          }
+        ],
+        "images": []
       },
       {
-        "id": "Actions-A4I4",
-        "title": "9ème station",
-        "alt": "Jésus tombe pour la 3e fois. Un gendarme croise Jésus au sol écrasé par le poids de la Croix et alerte ses collègues par téléphone.",
-        "url": "/projects/CDC9.jpg"
+        "id": "Actions-S4A4",
+        "display": "enable",
+        "title": "4° Marie",
+        "text": [
+          {
+            "id": "Actions-S4A4P1",
+            "paragraph": "<p>Marie sa m&egrave;re, d&eacute;j&agrave; &acirc;g&eacute;e, J&eacute;sus ayant 37 ans, est sur le chemin de son calvaire. Elle est avertie de fondation de ce destin de son fils vers la mort. Elle s&rsquo;est agenouill&eacute;e face &agrave; lui, ses deux mains orientant le visage d&rsquo;un Christ sans doute d&eacute;j&agrave; d&eacute;sorient&eacute;, confus sous la douleur, la d&eacute;shydratation major&eacute;e par les h&eacute;morragies de la flagellation. Elle &eacute;bauche le geste de tourner la t&ecirc;te de son fils supplici&eacute; vers elle afin qu&rsquo;il l&rsquo;identifie, qu&rsquo;il la reconnaisse. Qu&rsquo;il re&ccedil;oive consolation au sein de cette g&eacute;n&eacute;rale sauvagerie des hommes.<br />Ici se r&eacute;alise la proph&eacute;tie de Sym&eacute;on &agrave; Marie lors de la Pr&eacute;sentation de J&eacute;sus enfant au Temple : &laquo; Cet enfant provoquera la chute et le rel&egrave;vement de beaucoup en Isra&euml;l. Il sera un signe de contradiction &raquo; &#8230;<br />Mais toi, ton &acirc;me sera travers&eacute;e d&rsquo;un glaive.<br />Isa&iuml;e <br />&laquo; Il a &eacute;t&eacute; maltrait&eacute; et opprim&eacute;, et n'a point ouvert la bouche, semblable &agrave; un agneau qu'on m&egrave;ne &agrave; la boucherie. Il a &eacute;t&eacute; enlev&eacute; par l'angoisse et le ch&acirc;timent; parmi ceux de sa g&eacute;n&eacute;ration, qui a cru qu'il &eacute;tait retranch&eacute; de la terre des vivants, frapp&eacute; pour les p&eacute;ch&eacute;s de mon peuple? &raquo;<br /><p/>"
+          }
+        ],
+        "images": []
       },
       {
-        "id": "Actions-A4I5",
-        "title": "13ème station",
-        "alt": "Jésus est descendu de la croix et remis à sa mère. Un échafaudage est dressé, un jeune homme et un adulte reçoivent le corps devant Marie.",
-        "url": "/projects/CDC13.jpg"
+        "id": "Actions-S4A5",
+        "display": "enable",
+        "title": "5° Simon de Cyrène",
+        "text": [
+          {
+            "id": "Actions-S4A5P1",
+            "paragraph": "<p>Simon de Cyr&egrave;ne c&rsquo;est l&rsquo;&eacute;tranger, l&rsquo;immigr&eacute; de service, requis pr&eacute;cipitamment car les accompagnateurs bourreaux r&eacute;alisent bien maintenant que J&eacute;sus est consid&eacute;rablement affaibli, mourant.<br />L&rsquo;agonie sur une croix pouvait durer plusieurs jours. Or, dans l'&Eacute;vangile de Marc, Pilate est &eacute;tonn&eacute; que J&eacute;sus soit d&eacute;j&agrave; mort quelques heures seulement apr&egrave;s la crucifixion.<br />&laquo; Pilate s&rsquo;&eacute;tonna qu&rsquo;il soit d&eacute;j&agrave; mort ; il fit appeler le centurion, et l&rsquo;interrogea pour savoir si J&eacute;sus &eacute;tait mort depuis longtemps. &raquo; (Mc 15,44)<br />C&rsquo;est pourquoi les soldats obligent Simon &agrave; porter la croix : les Romains ont d&ucirc; craindre que J&eacute;sus ne meure avant d&rsquo;atteindre le lieu de la crucifixion.<br />&laquo; Et en sortant, ils trouv&egrave;rent un homme, un Cyr&eacute;n&eacute;en du nom de Simon. C&rsquo;est lui qu&rsquo;ils requirent pour qu&rsquo;il port&acirc;t sa croix. &raquo; (Mt 27,32)<br /><br />Qui est cet homme requis par les soldats romains et contraint contre son gr&eacute; &agrave; prendre part au chemin de croix du Christ ? Il est dit Cyr&eacute;n&eacute;en c&rsquo;est-&agrave;-dire de Lybie . Ancienne colonie grecque, elle abrite une importante diaspora juive et donc Simon est l&rsquo;&eacute;tranger, sans doute juif de seconde zone, immigr&eacute;, saisi au passage lors du parcours menant au Golgotha.<br />Il est, parmi la foule, peut-&ecirc;tre plus costaud que la moyenne, revenant des champs assez fort pour aider J&eacute;sus &agrave; porter son lourd patibulum de 25 &agrave; 40 kg. Symboliquement, cette indication sur sa nationalit&eacute; est une mani&egrave;re d&rsquo;annoncer que le salut apport&eacute; par le Christ n&rsquo;est pas r&eacute;serv&eacute; &agrave; un peuple, mais au contraire qu&rsquo;il est universellement offert.<p/>"
+          }
+        ],
+        "images": []
       },
       {
-        "id": "Actions-A4I6",
-        "title": "14ème station",
-        "alt": "Jésus est mis dans le sépulcre. Le corps repose sur une table recouverte d’un drap blanc préfigurant l’hostie sur le drap liturgique de l’autel.",
-        "url": "/projects/CDC14.jpg"
+        "id": "Actions-S4A6",
+        "display": "enable",
+        "title": "6° La rencontre avec Véronique",
+        "text": [
+          {
+            "id": "Actions-S4A6P1",
+            "paragraph": "<p>La rencontre avec V&eacute;ronique, une des femmes suivantes et portant amour au Christ.<br />Isa&iuml;e proph&eacute;tise : &laquo; La multitude avait &eacute;t&eacute; constern&eacute;e en le voyant, car il &eacute;tait si d&eacute;figur&eacute; qu&rsquo;il ne ressemblait plus &agrave; un homme ; il n&rsquo;avait plus l&rsquo;apparence d&rsquo;un fils d&rsquo;homme&#8230; M&eacute;pris&eacute;, abandonn&eacute; des hommes, homme de douleurs, familier de la souffrance, il &eacute;tait pareil &agrave; celui devant qui on se voile la face ; et nous l&rsquo;avons m&eacute;pris&eacute;, compt&eacute; pour rien. En fait, c&rsquo;&eacute;taient nos souffrances qu&rsquo;il portait, nos douleurs dont il &eacute;tait charg&eacute;. Et nous, nous pensions qu&rsquo;il &eacute;tait frapp&eacute;, meurtri par Dieu, humili&eacute;. &raquo; <br />V&eacute;ronique souffre de le voir souffrir, elle brave la foule hostile pour essuyer le visage du Christ recueillant ainsi sur son linge la Sainte Face. (&laquo; Vera icona &raquo; : l'ic&ocirc;ne authentique)<br />&Agrave; pr&eacute;sent, elle voit son visage de pr&egrave;s, ce visage qui avait tr&egrave;s souvent parl&eacute; &agrave; son &acirc;me. Elle le voit boulevers&eacute;, sanglant et d&eacute;figur&eacute;. Elle ne r&eacute;siste pas. Elle veut soulager ses souffrances. Avec un linge, elle tente d&rsquo;essuyer sang et sueur.<br />Elle s&rsquo;agenouille devant le Christ vacillant sous le regard interrogatif d&rsquo;un gardien pour le moins dubitatif sur l&rsquo;opportunit&eacute; de ce geste de compassion. <br />La tradition s'est enrichie d&rsquo;une &laquo; l&eacute;gende &raquo; selon laquelle le visage du Christ serait rest&eacute; comme imprim&eacute; sur le linge qu'elle avait utilis&eacute;. Ce sera le d&eacute;but de l'histoire du linceul de Turin. Longtemps on a gard&eacute; pli&eacute; ce linge qui concerne en fait la totalit&eacute; du corps, ne laissant voir que le visage du Christ, &quot;v&eacute;ritable ic&ocirc;ne&quot; ou repr&eacute;sentation de celui qui donne sa vie pour nous.<br />Curieuse photographie : car pour mat&eacute;riellement atteindre le visage du Christ, tous deux se regardant sont agenouill&eacute;s en sym&eacute;trie du patibulum. Sc&egrave;ne pr&eacute;figurant voire confondue avec la deuxi&egrave;me chute, d&eacute;tresse du Christ souffrant ne la reconnaissant sans doute qu&rsquo;avec difficult&eacute;s, courbes tr&egrave;s f&eacute;minines de la femme aimante et compatissante. <br />Elle est d&rsquo;ailleurs la sainte patronne des photographes des Arm&eacute;es dont El Padr&eacute;.<p/>"
+          }
+        ],
+        "images": []
       },
       {
-        "id": "Actions-A4I7",
-        "title": "15ème station",
-        "alt": "La résurrection. Entre les deux soldats endormis, détachés par Pilate pour garder le tombeau, Jésus apparaît debout en Christ pantocrator.",
-        "url": "/projects/CDC15.jpg"
+        "id": "Actions-S4A7",
+        "display": "enable",
+        "title": "7° La deuxième chute",
+        "text": [
+          {
+            "id": "Actions-S4A7P1",
+            "paragraph": "<p>La deuxi&egrave;me chute, c&rsquo;est l&rsquo;&eacute;puisement.<br />Inqui&eacute;tude grandissante des tortionnaires, toujours dans la relative inconscience des s&eacute;vices s&eacute;v&egrave;res administr&eacute;s par les soldats romains et de leur retentissement sur le condamn&eacute;. La crainte supr&ecirc;me, le voir rendre l&rsquo;&acirc;me avant la crucifixion prescrite par les Autorit&eacute;s du Temple et pour comble de malchance au sein m&ecirc;me de l&rsquo;enceinte de J&eacute;rusalem, double impuret&eacute; parjure cette veille de la P&acirc;que, f&ecirc;te juive si importante. (La septi&egrave;me station de la Via Dolorosa est &agrave; la limite des murailles d&rsquo;enceinte)<br />Donc plus de Libyen, mais un lien &agrave; distance du condamn&eacute; intouchable pour l&rsquo;aider &agrave; distance &agrave; se redresser. C&rsquo;est le guide du b&acirc;t pour remettre dans le droit chemin la b&ecirc;te de somme portant les p&ecirc;ch&eacute;s du monde.<br />Isa&iuml;e, &laquo; c&rsquo;est &agrave; cause de nos r&eacute;voltes qu&rsquo;il a &eacute;t&eacute; transperc&eacute;, &agrave; cause de nos fautes qu&rsquo;il a &eacute;t&eacute; broy&eacute; le ch&acirc;timent qui a pes&eacute; sur lui nous donne la paix, par ses blessures, il nous gu&eacute;rit &raquo;<br />Mais en sym&eacute;trique, c&rsquo;est la pr&eacute;figuration du &laquo; Noli me tangere &raquo; qui va s&rsquo;adresser &agrave; Marie Madeleine le matin de la r&eacute;surrection chez Fra Ang&eacute;lico : ne me touche pas toi le bourreau, c&rsquo;est Mon Sacrifice consenti et non pas toi, mis&eacute;rable humain qui impose quoi que ce soit au tempo.<p/>"
+          }
+        ],
+        "images": [      
+          {
+          "id": "Actions-S4A7I1",
+          "title": "7ème station - La deuxième chute",
+          "alt": "Jésus tombe pour la seconde fois. Le bourreau le soutient pour qu’il aille jusqu’au bout du supplice sur la croix.",
+          "url": "/projects/CDC7.jpg"
+        }
+      ]
+      },
+      {
+        "id": "Actions-S4A8",
+        "display": "enable",
+        "title": "8° Les femmes de Jérusalem",
+        "text": [
+          {
+            "id": "Actions-S4A8P1",
+            "paragraph": "<p>C&rsquo;est le dernier message du Christ mourant aux hommes, et il s&rsquo;adresse aux femmes, temples des vies &agrave; venir : <br />&laquo; Une grande foule le suivait et parmi elle beaucoup de femmes qui se frappaient la poitrine en se lamentant sur l&rsquo;&eacute;tat de ce fils d&rsquo;homme qui n&rsquo;en avait plus l&rsquo;apparence &#8230;Se retournant il leur dit, ne pleurez pas sur moi, mais plut&ocirc;t sur vous et votre descendance &raquo;<br />Il pr&eacute;dit ainsi de nouveau l&rsquo;&eacute;crasement d&rsquo;Isra&euml;l et la destruction du Temple de J&eacute;rusalem. <br />J&eacute;sus les voit, non ses accompagnatrices de son parcours, mais les anonymes de J&eacute;rusalem, et &agrave; travers elles, toutes celles du monde : il saisit leur sentiment de compassion, mais m&ecirc;me en ce moment dramatique, il veut leur adresser une parole qui d&eacute;passe la simple piti&eacute;. Il d&eacute;sire qu&rsquo;en elles, qu&rsquo;en nous, n&rsquo;habite pas seulement la commis&eacute;ration, mais la conversion du c&#339;ur, qui reconna&icirc;t s&rsquo;&ecirc;tre tromp&eacute;, qui demande pardon, qui recommence une vie nouvelle. Larmes de repentance suivant la reconnaissance des p&ecirc;ch&eacute;s pour lesquels il va personnellement &agrave; la mort.<br />Ce spectacle du Chemin de Croix ne doit pas seulement &eacute;veiller l&rsquo;&eacute;motion, mais surtout conduire &agrave; la Conversion &agrave; la Vie Nouvelle.<br />Ainsi de Luc 23 :28/31<br />&laquo; Filles de J&eacute;rusalem, ne pleurez pas sur moi ! Pleurez plut&ocirc;t sur vous et sur vos enfants !<br />Car voici que viennent des jours o&ugrave; l'on dira : &laquo;Quel bonheur pour les st&eacute;riles, pour les flancs qui n'ont pas enfant&eacute; et les seins qui n'ont pas nourri !&raquo; Alors on se mettra &agrave; dire aux montagnes : &laquo;Tombez sur nous !&raquo; et aux collines : &laquo;Cachez-nous !&raquo; Car, si l'on agit ainsi sur le bois vert, qu'adviendra-t-il du sec ? &raquo;<br />Repentez-vous, changez de vie et vous serez sauv&eacute;s de la mort par la Vie Eternelle.<p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A8I1",
+            "title": "8ème station - Les femmes de Jérusalem",
+            "alt": "Des femmes revenant de l’école avec leurs enfants ou rentrant de  faire leurs courses croisent le Christ et les console.",
+            "url": "/projects/CDC8.jpg"
+          }
+        ]
+      },
+      {
+        "id": "Actions-S4A9",
+        "display": "enable",
+        "title": "9° La Troisième chute",
+        "text": [
+          {
+            "id": "Actions-S4A9P1",
+            "paragraph": "<p>L&rsquo;&eacute;puisement final dans le silence apr&egrave;s le dernier avertissement aux hommes, avec cette crainte grandissante et maintenant majeure des bourreaux qu&rsquo;il n&rsquo;aille pas jusqu&rsquo;&agrave; la crucifixion &agrave; laquelle nous l&rsquo;avons condamn&eacute;.<br />Trois, chiffre bibliquement tr&egrave;s symbolique de la nature Trinitaire de la r&eacute;v&eacute;lation divine et du message terrestre apport&eacute; par le fils, je suis la Voie, la V&eacute;rit&eacute; et paradoxalement &agrave; ce stade la Vie. <br />S&rsquo;&eacute;l&egrave;ve alors la voie du centurion pr&eacute;sent pour rendre compte, peur bleue d&rsquo;&ecirc;tre tenu pour responsable de n&rsquo;avoir pas conduit le condamn&eacute; jusqu&rsquo;&agrave; la croix du calvaire.<br />Il faut de toute urgence rapporter cette situation catastrophique aux autorit&eacute;s hi&eacute;rarchiques.<br />Face au sol, les deux bras lanc&eacute;s en avant, &eacute;cras&eacute; par l&rsquo;instrument de son supplice, le Christ envoie int&eacute;rieurement au P&egrave;re cette derni&egrave;re requ&ecirc;te initi&eacute;e au Jardin des Oliviers :<br />&laquo; Seigneur, entends ma pri&egrave;re et dans ta justice &eacute;coute mon appel, dans ta fid&eacute;lit&eacute; r&eacute;ponds moi. Mes ennemis cherchent ma perte, ils foulent au sol ma Vie. Je tends les mains vers toi. Vite ! r&eacute;ponds moi Seigneur ! je suis &agrave; bout de souffle &raquo; Psaumes (142)<p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A9I1",
+            "title": "9ème station - La Troisième chute",
+            "alt": "Jésus tombe pour la 3e fois. Un gendarme croise Jésus au sol écrasé par le poids de la Croix et alerte ses collègues par téléphone.",
+            "url": "/projects/CDC9.jpg"
+          }
+        ]
+      },
+      {
+        "id": "Actions-S4A10",
+        "display": "enable",
+        "title": "10° Jésus est dépouillé",
+        "text": [
+          {
+            "id": "Actions-S4A10P1",
+            "paragraph": "<p>J&eacute;sus est d&eacute;pouill&eacute; de ses v&ecirc;tements<br />&laquo; Alors tu es mis &agrave; nu devant nous. Beaucoup ont ri. Tu ne bouges pas. Tu ne te d&eacute;fends pas. Tu offres cet horizon gla&ccedil;ant du corps d&eacute;sign&eacute; &agrave; la honte publique, terriblement nu dans son infinie vuln&eacute;rabilit&eacute;. Mais cette nudit&eacute; face au pouvoir, face &agrave; l&rsquo;&eacute;tat d&rsquo;exception de la force, expose l&rsquo;acte de d&eacute;s&#339;uvrement par lequel tu te retires de toute force, de toute r&eacute;sistance. L&rsquo;instant m&ecirc;me de la r&eacute;v&eacute;lation de ton humanit&eacute; offerte. <br />Ta nudit&eacute; est une apocalypse, le d&eacute;voilement de ta Passion. <br />Tu atteins ta Passion dans le nu. Ce moment o&ugrave; les parures mondaines, les v&ecirc;tements de protection, les cuirasses s&rsquo;ouvrent et tombent. <br />Ton corps ainsi lib&eacute;r&eacute; acc&egrave;de &agrave; sa v&eacute;rit&eacute;. Ce oui silencieux au ridicule, &agrave; l&rsquo;humiliation est un non &agrave; la violence. Mais sans ce corps de mis&egrave;re, &laquo; sans &eacute;clat, sans beaut&eacute; &raquo;, pas de corps de gloire. Nous te d&eacute;couvrons, en pleurant ou ricanant. Mais c&rsquo;est alors ta nudit&eacute; qui nous regarde et nous qui sommes nus devant elle. &raquo;<br />Le mot de Fran&ccedil;ois<br />&Ocirc; J&eacute;sus, Fils de l&rsquo;homme, qui t&rsquo;es d&eacute;v&ecirc;tu afin de nous r&eacute;v&eacute;ler la cr&eacute;ature nouvelle ressuscit&eacute;e des morts, arrache en nous le voile qui nous s&eacute;pare de Dieu et tisse en nous ta pr&eacute;sence divine.<br />Donne-nous de vaincre la peur face aux &eacute;v&eacute;nements de la vie qui nous d&eacute;pouillent et nous mettent &agrave; nu, et de rev&ecirc;tir l&rsquo;homme nouveau de notre Bapt&ecirc;me, afin d&rsquo;annoncer la Bonne Nouvelle, en proclamant que tu es le seul vrai Dieu qui conduit l&rsquo;histoire. Amen.<br />Chemin de croix pr&eacute;sid&eacute; par le pape Fran&ccedil;ois, Rome, 3 avril 2015<br />Certains ricanent, d&rsquo;autres font des selfies souvenir &agrave; poster sur les r&eacute;seaux afin que l&rsquo;humiliation devienne universelle.<br />D&rsquo;autres, appliqu&eacute;s, s&rsquo;affairent, il faut rapidement passer &agrave; la crucifixion de ce condamn&eacute; &agrave; bout.<br />&laquo; Saint Jean 19 23/24<br />Les soldats prirent ses v&ecirc;tements, et ils en firent quatre parts, une pour chaque soldat. Ils prirent aussi sa tunique, qui &eacute;tait sans couture, d'un seul tissu depuis le haut jusqu'en bas. Ils se dirent entre eux:<br />Ne la d&eacute;chirons pas, mais tirons-l&agrave; au sort. Ainsi s'accompl&icirc;t cette parole de l'&Eacute;criture: Ils se sont partag&eacute; mes v&ecirc;tements, ils ont tir&eacute; au sort ma tunique. &raquo;<p/>"
+          }
+        ],
+        "images": []
+      },
+      {
+        "id": "Actions-S4A11",
+        "display": "enable",
+        "title": "11° Crucifixion",
+        "text": [
+          {
+            "id": "Actions-S4A11P1",
+            "paragraph": "<p>On s&rsquo;en occupe. Et pourtant, les pr&ecirc;tres Pharisiens, Sp&eacute;cialistes des Ecritures, soldats romains, la foule manipul&eacute;e criant &agrave; la cur&eacute;e croient tous ma&icirc;triser la situation. Or, ils lui ab&icirc;ment le corps, mais certainement pas l&rsquo;&acirc;me, l&rsquo;inatteignable Esprit de Dieu, Son P&egrave;re. Ils entravent ses mouvements, mais lui reste ma&icirc;tre jusqu&rsquo;au bout de son offrande &agrave; Tous, y compris ses bourreaux. <br />&laquo; P&egrave;re, pardonne leur, ils ne savent pas ce qu&rsquo;ils font &raquo;, ces instruments d&rsquo;un destin qui les &eacute;crase.<br />Fin du textuel, et place &agrave; la clinique :<br /><br />H&eacute;rode Le Grand avait aboli ce mode mise &agrave; mort. Mais les Romains en avaient fait un mode tr&egrave;s courant d&rsquo;ex&eacute;cution, &agrave; chaque tentative de turbulence publique, ils n&rsquo;h&eacute;sitaient pas &agrave; y recourir. Selon Cic&eacute;ron et S&eacute;n&egrave;que, c&rsquo;&eacute;tait le plus atroce, le plus cruel des supplices<br /><br />Pour les membres sup&eacute;rieurs, un clou est enfonc&eacute; &agrave; coups de maillet dans chacun des deux poignets. Il est bien certain que c&rsquo;est le poignet qui est enclou&eacute;, et non la paume des mains comme repr&eacute;sent&eacute; dans la plupart des tableaux de la crucifixion. En effet, l&rsquo;enclouage de la paume des mains conduirait &agrave; une d&eacute;chirure avec chute du corps et h&eacute;morragie importante, tandis qu&rsquo;au niveau des poignets, le clou est bien fix&eacute; et retenu par les ligaments du carpe dans l&rsquo;espace de Destot.<br /><br />Pour les membres inf&eacute;rieurs deux clous furent sans doute utilis&eacute;s, l&rsquo;un dans l&rsquo;espace de M&eacute;rat au milieu du tarse pour le pied droit, l&rsquo;autre pour le pied gauche au niveau du sinus du tarse, un peu plus lat&eacute;ralement par rapport &agrave; l&rsquo;axe du pied. Les deux pieds sont clou&eacute;s directement, face plantaire contre le bois.<br /><br />Selon toute vraisemblance, J&eacute;sus fut crucifi&eacute; avec les bras non pas &eacute;tendus &agrave; l&rsquo;horizontale mais l&eacute;g&egrave;rement fl&eacute;chis, probablement soutenu par des cordes au niveau des aisselles. Ceci avait pour but de prolonger la dur&eacute;e du supplice, car suspendu uniquement par les bras, J&eacute;sus n&rsquo;aurait surv&eacute;cu que quelques minutes et son agonie va durer trois heures&#8230;<br />Chaque mouvement respiratoire provoque une intense douleur dans tout le corps, ce qui rend la respiration difficile et superficielle. De plus, Le poids du corps tirant sur les bras et le d&eacute;but des crampes musculaires figent le thorax en inspiration forc&eacute;e par action sur les muscles intercostaux, ce qui emp&ecirc;che l&rsquo;expiration normale. En effet, normalement l&rsquo;inspiration est active et l&rsquo;expiration passive. Ici, le crucifi&eacute; doit expirer de fa&ccedil;on volontaire et, pour cela, le seul moyen est de de s&rsquo;appuyer sur les clous des pieds et en m&ecirc;me temps tirer sur ceux des bras de fa&ccedil;on &agrave; se redresser d&rsquo;une quinzaine de centim&egrave;tres pour vider ses poumons et, rapidement, les remplir par deux ou trois goul&eacute;es d&rsquo;air. Ce faisant, une douleur atroce traverse jambes et bras, les poignets tournent autour des clous, l&rsquo;effort physique est intense et la victime se laisse retomber. Ensuite, le man&egrave;ge recommence : impression d&rsquo;&eacute;touffement, redressement du corps. Avec cela, tout le corps est la proie de crampes musculaires de plus en plus intenses qui favoriseront la rigidit&eacute; extr&ecirc;mement rapide s&rsquo;installant d&egrave;s avant le d&eacute;c&egrave;s. Due &agrave; la d&eacute;shydratation, la soif est d&eacute;vorante. L&rsquo;agonie pouvait ainsi durer des heures, en moyenne 24 heures, mais chez certains jusqu&rsquo;&agrave; trois ou quatre jours.<br />Dans le cas de J&eacute;sus, la mort surviendra rapidement, au bout de trois heures seulement, ce qui &eacute;tonnera Pilate. C&rsquo;est sans doute son &eacute;tat d&rsquo;&eacute;puisement total caus&eacute; par la flagellation, les autres s&eacute;vices et le chemin de croix qui expliquent cela.<br />Un &eacute;chafaudage de fortune sert aux bourreaux qui eux maintenant peinent &agrave; verticaliser la croix dont le condamn&eacute; s&rsquo;&eacute;tait pourtant charg&eacute; seul.<p/>"
+          }
+        ],
+        "images": []
+      },
+      {
+        "id": "Actions-S4A12",
+        "display": "enable",
+        "title": "12° Mort de Jésus",
+        "text": [
+          {
+            "id": "Actions-S4A12P1",
+            "paragraph": "<p>C&rsquo;est l&rsquo;asphyxie terminale mais consciente : &laquo; Tout est achev&eacute; &raquo; <br />Les t&eacute;moins sont tous debout, un &agrave; genoux, hypnotis&eacute;s.<br />Les femmes attach&eacute;es au Christ soutenant la M&egrave;re dans la douleur &agrave; droite, accompagn&eacute;es du centurion &eacute;tranger soudain conscient de la Divinit&eacute; du supplici&eacute;, &agrave; gauche le spectateur anonyme de passage, r&eacute;solument voyeur des ex&eacute;cutions capitales, toujours une rare distraction dans cette J&eacute;rusalem des ann&eacute;es trente.<br />Saint Luc : &laquo; C'&eacute;tait d&eacute;j&agrave; presque midi, (lors de la crucifixion) et il y eut des t&eacute;n&egrave;bres sur tout le pays jusqu'&agrave; trois heures de l'apr&egrave;s-midi. A ce moment, le soleil s'obscurcit et le voile du temple se d&eacute;chira par le milieu. J&eacute;sus s'&eacute;cria d'une voix forte: &laquo;P&egrave;re, je remets mon esprit entre tes mains.&raquo; Apr&egrave;s avoir dit ces paroles, il expira.<br />Ce r&eacute;sultat est-il l&rsquo;&#339;uvre, le path&eacute;tique &laquo; triomphe &raquo; des bourreaux, de ceux qui l&rsquo;ont condamn&eacute; et au-del&agrave; d&rsquo;eux, de nous-m&ecirc;me, spectateurs mais &eacute;galement acteurs du drame ?<br />R&eacute;solument non, c&rsquo;est le don consenti du Christ aux hommes, et parmi cette multitude &agrave; nous :<br />&laquo; Personne ne me prend la vie, c&rsquo;est moi qui la donne volontairement. J&rsquo;ai pouvoir par le P&egrave;re de la donner et de l&rsquo;obtenir &agrave; nouveau. Cela correspond &agrave; l&rsquo;ordre de mon P&egrave;re &raquo; Jean 10/18<p/>"
+          }
+        ],
+        "images": []
+      },
+      {
+        "id": "Actions-S4A13",
+        "display": "enable",
+        "title": "13° Déposition du Christ",
+        "text": [
+          {
+            "id": "Actions-S4A13P1",
+            "paragraph": "<p>Ici tout est en verticalit&eacute;, descente au sol et au-del&agrave;, vers la mise au tombeau &agrave; venir.<br />La vie ainsi que la vue est hachur&eacute;e par les diff&eacute;rentes lignes de force accentuant la sensation de chute, bien que contenue par les linges plac&eacute;s sous les aisselles l&rsquo;amortissant.<br />L&rsquo;&eacute;chafaudage, les deux personnages exer&ccedil;ant une contention distanci&eacute;e mais manifestement respectueuses, le corps et son double le stipex crucis et les deux personnages &agrave; droite, Marie et Jean autant de verticales sugg&eacute;rant le mouvement vers le bas, &agrave; la mani&egrave;re d&rsquo;un plan s&eacute;quence cin&eacute;matographique.<br />Les bourreaux sont partis, leur forfait accompli et le spectacle est termin&eacute;. <br />Contrairement au Caravage du Vatican de composition oblique et o&ugrave; transpire l&rsquo;&eacute;motion, ici le corps du Christ est maintenu &agrave; distance, non saisi &agrave; bras le corps, dans le silence, le respect et la retenue, il est d&eacute;j&agrave; autre chose que sa d&eacute;pouille d&rsquo;homme, il redevient Dieu habit&eacute; par l&rsquo;Esprit.<br />Saint Jean, t&eacute;moin 19-31/34<br />&laquo; Comme c'&eacute;tait le jour de la Pr&eacute;paration &agrave; la P&acirc;que, les juifs demand&egrave;rent alors &agrave; Pilate qu'on leur brise les jambes et qu'ils soient enlev&eacute;s. C'&eacute;tait afin que les corps ne restent pas sur la croix le jour du sabbat, particuli&egrave;rement un grand jour.<br />Les soldats vinrent donc et bris&egrave;rent les jambes du premier, puis de l'autre qui &eacute;tait crucifi&eacute; avec lui.<br />S'approchant de J&eacute;sus, ils virent qu'il &eacute;tait d&eacute;j&agrave; mort et ne lui bris&egrave;rent pas les jambes. Toutefois, l&rsquo;un des soldats lui transper&ccedil;a le c&ocirc;t&eacute; avec sa lance.<br />Et aussit&ocirc;t il en sortit du sang et de l'eau.<br />Celui qui l'a vu rend t&eacute;moignage et son t&eacute;moignage est v&eacute;ridique. Et lui-m&ecirc;me sait qu'il dit vrai afin que vous aussi vous croyiez.<br />Car cela est arriv&eacute; afin que l'&Eacute;criture soit accomplie : &laquo; Pas un de ses os ne sera bris&eacute;. &raquo;<br /><br />La Passion trouve l&agrave; une signification symbolique dans son issue, car c&rsquo;est dans sa totalit&eacute; un long chemin d&rsquo;abaissement.<p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A13I1",
+            "title": "13ème station - Déposition du Christ",
+            "alt": "Jésus est descendu de la croix et remis à sa mère. Un échafaudage est dressé, un jeune homme et un adulte reçoivent le corps devant Marie.",
+            "url": "/projects/CDC13.jpg"
+          }
+        ]
+      },
+      {
+        "id": "Actions-S4A14",
+        "display": "enable",
+        "title": "14° La mise au tombeau",
+        "text": [
+          {
+            "id": "Actions-S4A14P1",
+            "paragraph": "<p>Vue plongeante, le corps central reposant sur le suaire, quatre personnages en sym&eacute;trie,<br />Deux hommes &agrave; l&rsquo;&eacute;clairage Nicod&eacute;me, Joseph d&rsquo;Arimathie ? Deux femmes &agrave; la pr&eacute;paration d&rsquo;embaumement du corps, agenouill&eacute;es, un personnage suppl&eacute;mentaire dans l&rsquo;ombre semblant soutenir la t&ecirc;te du d&eacute;funt. <br />Pas de doute, nous sommes les spectateurs d&rsquo;une sc&egrave;ne prenant place dans un caveau.<br />Le froid est express&eacute;ment perceptible. <br />Sur le rectangle blanc du linge se d&eacute;tache le corps du Fils de l&rsquo;Homme et le halo d&rsquo;un dernier rappel du sacrifice du Christ Roi, sa couronne d&rsquo;&eacute;pines.<br /><br />Jean 19, 38/42 et Matt. 26:12.<br /><br />&laquo; Or apr&egrave;s ces choses, Joseph d'Arimathie qui &eacute;tait disciple de J&eacute;sus, mais en secret par crainte des autorit&eacute;s juives du temple dont il &eacute;tait membre, demanda l'autorisation d'enlever le corps de J&eacute;sus, ce que Pilate permit. Il vint donc et enleva son corps. <br />Puis Nicod&egrave;me, celui qui auparavant &eacute;tait venu de nuit &agrave; J&eacute;sus, vint lui aussi, apportant un m&eacute;lange de myrrhe et d&rsquo;alo&egrave;s de 100 livres environ. Ils prirent alors le corps de J&eacute;sus, l&rsquo;entourant de ce m&eacute;lange d&rsquo;aromates et de bandelettes le liant, comme c&rsquo;est la coutume juive lors des pr&eacute;parations pour la mise au tombeau.<br /><br />Il y avait un jardin non loin de l'endroit o&ugrave; il avait &eacute;t&eacute; crucifi&eacute; et en son sein, un tombeau vide dans lequel personne n'avait encore &eacute;t&eacute; d&eacute;pos&eacute;. Ils d&eacute;pos&egrave;rent donc l&agrave; le corps de J&eacute;sus, &agrave; cause de ce jour de la Pr&eacute;paration &agrave; la P&acirc;que et parce que le tombeau &eacute;tait proche. &raquo;<br />Curieux passage que celui de J&eacute;sus parmi les hommes : envoy&eacute; par le P&egrave;re, il nait dans une &eacute;table sans place pour lui &agrave; l&rsquo;h&ocirc;tellerie et trouve sa derni&egrave;re demeure terrestre dans un tombeau neuf et intact mais initialement destin&eacute; &agrave; un autre. <br />Citons saint Matthieu : chapitre 27, versets 33 &agrave; 44, 50 et 57 &agrave; 61 :<br />&laquo; Le soir venu, vint un homme riche d&rsquo;Arimathie, nomm&eacute; Joseph, qui lui aussi &eacute;tait disciple de J&eacute;sus. Il alla trouver Pilate pour demander le corps de J&eacute;sus. Pilate alors ordonna qu&rsquo;on le lui rem&icirc;t. Ayant pris le corps, Joseph l&rsquo;enveloppa d&rsquo;un linceul blanc, et le d&eacute;posa dans le tombeau neuf qu&rsquo;il s&rsquo;&eacute;tait fait tailler dans le roc ; puis, ayant roul&eacute; une grosse pierre &agrave; l&rsquo;entr&eacute;e du s&eacute;pulcre, il s&rsquo;en alla.<br />Marie la Magdal&eacute;enne et l&rsquo;autre Marie &eacute;taient l&agrave;, assises en face du tombeau. &raquo;<br />Qu&rsquo;aurait d&ucirc; devenir le corps de J&eacute;sus apr&egrave;s la crucifixion ? Les pratiques de l&rsquo;&eacute;poque indiquent que, le plus souvent, on laissait les corps des condamn&eacute;s se d&eacute;composer sur la croix, sans s&eacute;pulture. Pourtant, &agrave; la diff&eacute;rence des disciples apeur&eacute;s en fuite, Joseph d&rsquo;Arimathie n&rsquo;abandonne pas J&eacute;sus, mais trouve au contraire dans le spectacle de la croix la force de sortir de l&rsquo;anonymat et peut-&ecirc;tre m&ecirc;me de se manifester comme disciple. Ainsi demande-t-il la d&eacute;pouille du crucifi&eacute;. C&rsquo;est un acte plein de courage, car il n&rsquo;est pas courant qu&rsquo;une telle demande soit accept&eacute;e par le pouvoir romain pour des crimes de droit commun ou religieux. Joseph d&rsquo;Arimathie va aupr&egrave;s de Pilate lui-m&ecirc;me, c&rsquo;est-&agrave;-dire aupr&egrave;s du gouverneur en personne, pour &ecirc;tre autoris&eacute; &agrave; r&eacute;cup&eacute;rer le corps de J&eacute;sus.<br />La mention de la nouveaut&eacute; du tombeau est d&rsquo;une port&eacute;e tr&egrave;s symbolique. La tombe neuve a sugg&egrave;re inspire deux r&eacute;flexions :<br />&bull; la nouveaut&eacute; absolue de la R&eacute;surrection qui allait s&rsquo;y op&eacute;rer<br />&bull; le caract&egrave;re absolument nouveau de celui qui va devenir Le &laquo; Premier-N&eacute; &raquo; d&rsquo;entre les morts.<br />Une autre symbolique d&eacute;coule des pr&eacute;noms, d&rsquo;une part deux Marie la Vierge M&egrave;re, et une autre Marie La Magdal&eacute;enne, vraisemblablement prostitu&eacute;e repentie et cependant choisie pour &ecirc;tre la premi&egrave;re &agrave; annoncer la Bonne Nouvelle de la R&eacute;surrection. Ceux des Joseph d&rsquo;autre part, p&egrave;res terrestre de l&rsquo;origine et de celui veillant &agrave; la fin. En effet, au d&eacute;but et &agrave; la fin de la vie de J&eacute;sus, ce sont des Joseph et des Marie qui prennent soin de son corps. Leur compl&eacute;mentarit&eacute; accompagne donc &agrave; la fois la naissance du messie aux jours de sa chair et sa naissance &agrave; la vie nouvelle de la r&eacute;surrection.<br /><p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A14I1",
+            "title": "14ème station - La mise au tombeau",
+            "alt": "Jésus est mis dans le sépulcre. Le corps repose sur une table recouverte d’un drap blanc préfigurant l’hostie sur le drap liturgique de l’autel.",
+            "url": "/projects/CDC14.jpg"
+          }
+        ]
+      },
+      {
+        "id": "Actions-S4A15",
+        "display": "enable",
+        "title": "15° Résurrection",
+        "text": [
+          {
+            "id": "Actions-S4A15P1",
+            "paragraph": "<p>La sp&eacute;cificit&eacute; d&rsquo;un tombeau &laquo; taill&eacute; dans le roc &raquo; montre la solidit&eacute; du lieu de l&rsquo;ensevelissement, d&rsquo;autant que Joseph y ajoute &laquo; une grosse pierre &agrave; l&rsquo;entr&eacute;e &raquo;. Ces &laquo; d&eacute;tails &raquo; viennent, par anticipation, attester l&rsquo;impossibilit&eacute; d&rsquo;une sortie du tombeau autre que miraculeuse, au jour de la r&eacute;surrection.<br />L&rsquo;autre sp&eacute;cificit&eacute; de cette version selon El Padr&eacute;, c&rsquo;est qu&rsquo;il s&rsquo;agit ici d&rsquo;une claire illustration de l&rsquo;Evangile de Matthieu qui dans son r&eacute;cit, renforce par la pr&eacute;sence de gardes d&eacute;p&ecirc;ch&eacute;s par les autorit&eacute;s religieuses juives, l&rsquo;impossibilit&eacute; d&rsquo;une sortie autre que Divine de la s&eacute;pulture.<br />L&rsquo;autre renvoi symbolique appartient &agrave; l&rsquo;histoire de l&rsquo;art et &agrave; l&rsquo;interpr&eacute;tation iconographique de Piero de la Francesca illustrant le m&ecirc;me th&egrave;me en pleine &laquo; Renaissance &raquo;<p/>"
+          },
+          {
+            "id": "Actions-S4A15P2",
+            "paragraph": "<p>Selon Matthieu, Dieu corrompt la troupe sacerdotale et l&rsquo;intervention divine au tombeau vient t&eacute;taniser ces derniers : &laquo; Les gardes, dans la crainte qu&rsquo;ils &eacute;prouv&egrave;rent, se mirent &agrave; trembler et devinrent comme morts. &raquo; Leur r&eacute;action montre qu&rsquo;ils appr&eacute;hendent l&rsquo;&eacute;v&eacute;nement telle une action divine contre laquelle ils ne peuvent rien, comme morts de crainte face au jugement de Dieu, inertes et paralys&eacute;s face &agrave; sa puissance. Rien &agrave; voir avec un endormissement. Le r&eacute;cit de Matthieu fait de ces hommes, quoique t&eacute;tanis&eacute;s, de v&eacute;ritables t&eacute;moins de ce moment et le peintre illustre bien cet &eacute;tat dans l&rsquo;attitude du garde assis &agrave; gauche, se voilant la face.<br />Marie- Magdeleine,<br />C&rsquo;est la Sainte Patronne de cette &eacute;glise et le premier t&eacute;moin actif, &eacute;galement tr&egrave;s symbolique de la R&eacute;surrection :<br />Incarnation du p&eacute;ch&eacute; repenti annon&ccedil;ant &agrave; l&rsquo;Humanit&eacute; dans sa totalit&eacute; le rachat de ses fautes par le sacrifice de l&rsquo;Agneau Pascal sous condition de conversion &agrave; une vie nouvelle.<p/>"
+          }
+        ],
+        "images": [
+          {
+            "id": "Actions-S4A15I1",
+            "title": "15ème station - Résurrection",
+            "alt": "La résurrection. Entre les deux soldats endormis, détachés par Pilate pour garder le tombeau, Jésus apparaît debout en Christ pantocrator.",
+            "url": "/projects/CDC15.jpg"
+          }
+        ]
       }
     ]
   },
   {
-    "id": "Actions-A5",
+    "id": "Actions-S5",
     "display": "enable",
     "button": "enable",
     "link": "A001",
     "title": "L’Onction de Béthanie",
     "text": [
       {
-        "id": "Actions-A5P1",
+        "id": "Actions-S5P1",
         "paragraph": "Le passage de l’évangile de Jean au cours duquel Marie-Madeleine répand un parfum de grande valeur sur les pieds de Jésus est représenté de façon picturale sur cette icône dont les dimensions réduites la destinaient très certainement à une iconostase."
       },
       {
-        "id": "Actions-A5P2",
+        "id": "Actions-S5P2",
         "paragraph": "Bien qu’elle ne soit pas signée elle est identifiable comme relevant de l’école de Bérat fondée au XVIème siècle par Onufri qui est l’iconographe le plus connu dans ce genre en Albanie. Il a été formé à l’art de l’icône orthodoxe grecque mais aussi à Venise dont l’influence occidentale le marquera. L’école de Bérat se perpétuera pour être dirigée dans la seconde moitié du XVIIIème siècle par Konstandin Shpataraku qui conservera l’influence de la Renaissance et de l’art d’Occident à laquelle se mêle l’influence ottomane. On le voit ici à l’art de la table ainsi qu’au style ottoman du mobilier."
       },
       {
-        "id": "Actions-A5P3",
+        "id": "Actions-S5P3",
         "paragraph": "La scène de l’onction se situe chez Lazare. Marie-Madeleine est à genou qui verse son parfum, Jésus est assis et face à lui Lazare qu’il a appelé à revenir à la vie quelques jours auparavant. A sa droite, Judas. Comme dans toute icône la position des mains des personnages principaux a son importance tout comme leur vêtement. Jésus et Lazare portent de la même façon, une chemise blanche longue dans le style oriental et un manteau de couleur bleu, couleur de référence à la vie divine."
       }
     ],
     "images": [
       {
-        "id": "Actions-A5I1",
+        "id": "Actions-S5I1",
         "title": "Icône de l’école d’iconographie albanaise de Bérat",
         "alt": "Icône de l’école d’iconographie albanaise de Bérat. Fin XVII.",
         "url": "/actions/Magnan.JPG"
       }
-    ]
+    ],
+    "article": []
   }
 ]

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ImageSlider from "../../components/slider/slider";
 import SLIDES from "../../assets/slides.json";
-import Article from "../../components/article/article";
+import Section from "../../components/section/section";
 import "./history.scss";
-import ArticlesData from "../../assets/history.json";
+import SectionsData from "../../assets/history.json";
 
 function History() {
   const url = process.env.PUBLIC_URL;
@@ -48,7 +48,7 @@ function History() {
     <main id="history">
       <div className="container">
         <div className="parent d-flex">
-          <Article Articles={ArticlesData} />
+          <Section Sections={SectionsData} />
           <div className="input-container d-flex">
             <button
               className={activeIndex === 0 ? "input no-style-btn active" : "input no-style-btn"}
@@ -73,15 +73,15 @@ function History() {
             </button>
           </div>
           <div className="description-container d-flex">
-            <article className={activeIndex === 0 ? "article active" : "article"}>
-              <section className="section">
-                <div className="section__textarea">
-                  <div className="section__textarea__title d-flex justify-content-center">
+            <section className={activeIndex === 0 ? "section active" : "section"}>
+              <article className="article">
+                <div className="article__textarea">
+                  <div className="article__textarea__title d-flex justify-content-center">
                     <h3>30 octobre 1869</h3>
                     <h4>Extrait du bulletin religieux du diocèse de la Rochelle Saintes</h4>
                     <h5>6° année</h5>
                   </div>
-                  <div className="section__textarea__paragraph">
+                  <div className="article__textarea__paragraph">
                     <p>
                       … »(En) moins de trois ans, grâce à l’activité de M. le doyen de La Jarrie, et
                       du concours de ses paroissiens, on a vu s’accomplir une restauration inespérée
@@ -114,18 +114,18 @@ function History() {
                     </p>
                   </div>
                 </div>
-              </section>
-            </article>
+              </article>
+            </section>
           </div>
           <div className="description-container d-flex">
-            <article className={activeIndex === 1 ? "article active" : "article"}>
-              <section className="section">
-                <div className="section__textarea">
-                  <div className="section__textarea__title d-flex justify-content-center">
+            <section className={activeIndex === 1 ? "section active" : "section"}>
+              <article className="article">
+                <div className="article__textarea">
+                  <div className="article__textarea__title d-flex justify-content-center">
                     <h3>Octobre 1944. Mai 1945.</h3>
                     <h4>Vœux et plaques votives</h4>
                   </div>
-                  <div className="section__textarea__paragraph">
+                  <div className="article__textarea__paragraph">
                     <p>
                       En 1944 la guerre n’est pas finie pour les aunisiens de La Jarrie, Croix
                       Chapeau et Salles sur Mer. Ces bourgs sont entourés de champs de mines, de
@@ -230,8 +230,8 @@ function History() {
                     <p>JL Dupas.</p>
                   </div>
                 </div>
-              </section>
-            </article>
+              </article>
+            </section>
           </div>
         </div>
         <div className="gallery d-flex">

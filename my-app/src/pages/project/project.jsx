@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { FaHandshake } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Section from "../../components/section/section";
-import SectionData from "../../assets/project_sections.json";
+import Article from "../../components/article/article";
+import ArticleData from "../../assets/project.json";
 import "./project.scss";
 
 function Project() {
@@ -14,7 +14,7 @@ function Project() {
     <main id="project">
       <div className="container">
         <article>
-          <Section Sections={SectionData} />
+          <Article Articles={ArticleData} />
           <div className="donation-progress">
             <h4>Dons collectés</h4>
             <div className="progress-bg">

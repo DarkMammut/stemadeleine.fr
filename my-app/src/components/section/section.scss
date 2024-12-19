@@ -2,23 +2,22 @@
 @import "../../sass-utils/variables.scss";
 
 .section {
-  display: flex;
+  width: 100%;
+  height: auto;
 
-  h4 {
-    font-family: $titles;
-    padding: 20px 0;
-    text-align: center;
-    text-decoration: underline;
+  &__container {
+    display: flex;
+  }
+
+  &__title {
+    width: 100%;
   }
 
   &__textarea {
     display: flex;
     flex-direction: column;
+    text-align: justify;
     box-sizing: border-box;
-
-    &__paragraph {
-      text-align: justify;
-    }
   }
 
   &__images {
@@ -31,6 +30,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      width: 100%;
 
       &:hover {
         cursor: pointer;
@@ -66,13 +66,24 @@
 
 @include desktop-layout {
   .section {
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    padding: 40px 0;
-    margin-bottom: 50px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    margin-top: 100px;
+    background: linear-gradient(
+      90deg,
+      rgba(60, 160, 122, 0.1) 0%,
+      rgba(144, 202, 180, 0.1) 28%,
+      rgba(226, 131, 43, 0.1) 100%
+    );
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    border-radius: 10px;
+
+    &__container {
+      flex-direction: row;
+      justify-content: space-around;
+    }
 
     &__textarea {
+      padding: 30px;
+
       &[data-images="0"] {
         width: 100%;
       }
@@ -81,11 +92,18 @@
         width: 50%;
       }
 
-      &__title {
-        margin-bottom: 30px;
-        padding: 20px 0;
-        text-align: center;
-        background-color: $light-color;
+      &__text {
+        margin-bottom: 50px;
+      }
+
+      &__articles {
+        .article {
+          box-shadow: none;
+
+          h3 {
+            background: none;
+          }
+        }
       }
 
       &__button {
@@ -95,26 +113,47 @@
       }
     }
 
+    &__title {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 40px 0 15px 0;
+      border-bottom: solid 1px $accent-color;
+    }
+
     &__images {
       width: 40%;
+    }
 
-      &__frame {
-        width: 100%;
-        padding: 20px 0;
+    &__articles {
+      display: flex;
+
+      &__article {
+        flex-direction: column;
+        margin-bottom: 0;
+        padding: 25px;
+
+        &__textarea {
+          &__title {
+            color: $accent-color;
+          }
+
+          &__paragraph {
+            font-size: 15px;
+            margin-bottom: 50px;
+          }
+        }
       }
     }
 
     &:nth-child(odd) {
-      flex-direction: row;
-      .section__textarea__button {
-        justify-content: flex-start;
+      .section__container {
+        flex-direction: row;
       }
     }
 
     &:nth-child(even) {
-      flex-direction: row-reverse;
-      .section__textarea__button {
-        justify-content: flex-end;
+      .section__container {
+        flex-direction: row-reverse;
       }
     }
   }
@@ -122,30 +161,47 @@
 
 @include mobile-layout {
   .section {
-    flex-direction: column;
     margin-top: 30px;
     padding-bottom: 30px;
 
+    &__container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &__title {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 5px 0 5px 0;
+      background-color: $light-color;
+    }
+
     &__textarea {
       width: 100%;
-
-      &__title {
-        margin-bottom: 10px;
-        text-align: start;
-        font-style: italic;
-      }
-
-      &__paragraph {
-        margin-bottom: 10px;
-      }
+      margin-bottom: 10px;
     }
 
     &__images {
-      width: 100%;
+      width: 80%;
+    }
 
-      &__frame {
-        width: 80%;
-        padding: 20px;
+    &__articles {
+      display: flex;
+
+      &__article {
+        flex-direction: column;
+        margin-bottom: 0;
+        padding: 25px;
+
+        &__textarea {
+          &__title {
+            color: $accent-color;
+          }
+
+          &__paragraph {
+            font-size: 15px;
+          }
+        }
       }
     }
   }

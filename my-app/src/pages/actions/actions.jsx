@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Section from "../../components/section/section";
-import SectionData from "../../assets/actions.json";
+import SectionsData from "../../assets/actions.json";
 import "./actions.scss";
 
 function Realisation() {
@@ -12,7 +12,7 @@ function Realisation() {
     <main id="actions">
       <div className="container">
         <article>
-          <Section Sections={SectionData} />
+          <Section Sections={SectionsData} />
         </article>
       </div>
     </main>

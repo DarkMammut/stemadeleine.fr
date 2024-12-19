@@ -1,17 +1,17 @@
 [
   {
-    "id": "S1",
+    "id": "A1",
     "display": "enable",
     "title": "L'autel tombeau",
     "text": [
       {
-        "id": "S1P1",
+        "id": "A1P1",
         "paragraph": "<p>Un autel tombeau qui a subi des détériorations et des manques est installé dans une des absidioles. Cet autel du XVIIIème siècle, très probablement vers 1765, a incontestablement été réalisé par des artisans doués comme tend à prouver sa facture qui tranche avec un mobilier ordinaire d’une église paroissiale. Ce meuble mérite une restauration et la reconstitution des pièces manquantes notamment une terrasse supportant le tabernacle détérioré.</p>"
       }
     ],
     "images": [
       {
-        "id": "S1I1",
+        "id": "A1I1",
         "title": "Autel-tombeau",
         "alt": "Autel-tombeau",
         "url": "/projects/autel.jpg"

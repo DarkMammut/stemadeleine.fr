@@ -14,28 +14,28 @@ function reduceUrl(url) {
 function Banner() {
   const location = useLocation();
   let path = location.pathname;
-  let mainUrl = reduceUrl(path);
+  let reducedPath = reduceUrl(path);
   let found = "";
 
-  if (path === mainUrl) {
-    found = Data.find((helmet) => helmet.path === mainUrl);
+  if (path === reducedPath || reducedPath === "/nos-actions") {
+    found = Data.find((helmet) => helmet.path === reducedPath);
 
     if (!found) {
       found = Data.find((helmet) => helmet.id === "Error-404");
     }
   } else {
-    if (path === "/association/don/formulaire" || mainUrl === "/association/newsletter") {
-      path = mainUrl;
-      mainUrl = "/association";
+    if (path === "/association/don/formulaire" || reducedPath === "/association/newsletter") {
+      path = reducedPath;
+      reducedPath = "/association";
     }
 
-    const mainObject = Data.find((object) => object.path === mainUrl);
-    const subLink = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
+    const mainObject = Data.find((object) => object.path === reducedPath);
+    const subLink = mainObject.sublinks.find((helmet) => reducedPath + helmet.path === path);
 
     if (!mainObject || !subLink) {
       found = Data.find((helmet) => helmet.id === "Error-404");
     } else {
-      found = mainObject.sublinks.find((helmet) => mainUrl + helmet.path === path);
+      found = mainObject.sublinks.find((helmet) => reducedPath + helmet.path === path);
     }
   }
 

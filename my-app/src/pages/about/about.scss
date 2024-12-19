@@ -6,15 +6,15 @@
     flex-direction: column;
   }
   
-  #About-A2 {
-    .article{
+  #About-S2 {
+    .section{
       &__textarea{
         position: relative;
-        &__sections div {
+        &__articles div {
           display: flex;
           justify-content: space-around;
   
-          .section {
+          .article {
             width: 30%;
 
             &__images {
@@ -32,23 +32,23 @@
     }
   }
   
-  #About-A2S1 {
+  #About-S2A1 {
     margin-top: 0;
 
-    .section__images {
+    .article__images {
       top: 20px;
       right: 50px;
     }
   }
   
-  #About-A2S2 {
+  #About-S2A2 {
     margin-top: 300px;
   }
   
-  #About-A2S3 {
+  #About-S2A3 {
     margin-top: 600px;
 
-    .section__images {
+    .article__images {
       top: 765px;
       left: 50px;
     }

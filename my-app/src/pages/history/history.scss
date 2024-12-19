@@ -69,12 +69,12 @@
   .description-container {
     flex: 1 1 auto;
 
-    .article {
+    .section {
       display: none;
       position: relative;
       overflow: hidden;
 
-      .section {
+      .article {
         margin-top: 0;
         &__textarea {
           &__title {
@@ -175,8 +175,8 @@
       }
     }
     .description-container {
-      .article {
-        .section {
+      .section {
+        .article {
           box-shadow: none;
           padding: 0;
           &__textarea {
@@ -263,8 +263,8 @@
     .description-container {
       max-width: 90%;
 
-      .article {
-        .section {
+      .section {
+        .article {
           padding-bottom: 10px;
           &__textarea {
             &__title {

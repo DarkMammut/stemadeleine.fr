@@ -2,22 +2,23 @@
 @import "../../sass-utils/variables.scss";
 
 .article {
-  width: 100%;
-  height: auto;
+  display: flex;
 
-  &__container {
-    display: flex;
-  }
-
-  &__title {
-    width: 100%;
+  h4 {
+    font-family: $titles;
+    padding: 20px 0;
+    text-align: center;
+    text-decoration: underline;
   }
 
   &__textarea {
     display: flex;
     flex-direction: column;
-    text-align: justify;
     box-sizing: border-box;
+
+    &__paragraph {
+      text-align: justify;
+    }
   }
 
   &__images {
@@ -30,7 +31,6 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      width: 100%;
 
       &:hover {
         cursor: pointer;
@@ -66,24 +66,13 @@
 
 @include desktop-layout {
   .article {
-    margin-top: 100px;
-    background: linear-gradient(
-      90deg,
-      rgba(60, 160, 122, 0.1) 0%,
-      rgba(144, 202, 180, 0.1) 28%,
-      rgba(226, 131, 43, 0.1) 100%
-    );
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-    border-radius: 10px;
-
-    &__container {
-      flex-direction: row;
-      justify-content: space-around;
-    }
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding: 40px 0;
+    margin-bottom: 50px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 
     &__textarea {
-      padding: 30px;
-
       &[data-images="0"] {
         width: 100%;
       }
@@ -92,62 +81,40 @@
         width: 50%;
       }
 
-      &__text {
-        margin-bottom: 50px;
+      &__title {
+        margin-bottom: 30px;
+        padding: 20px 0;
+        text-align: center;
+        background-color: $light-color;
       }
 
-      &__sections {
-        .section {
-          box-shadow: none;
-
-          h3 {
-            background: none;
-          }
-        }
+      &__button {
+        display: flex;
+        margin: 50px 20px 0 20px;
+        width: 100%;
       }
-    }
-
-    &__title {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 40px 0 15px 0;
-      border-bottom: solid 1px $accent-color;
     }
 
     &__images {
       width: 40%;
-    }
 
-    &__articles {
-      display: flex;
-
-      &__article {
-        flex-direction: column;
-        margin-bottom: 0;
-        padding: 25px;
-
-        &__textarea {
-          &__title {
-            color: $accent-color;
-          }
-
-          &__paragraph {
-            font-size: 15px;
-            margin-bottom: 50px;
-          }
-        }
+      &__frame {
+        width: 100%;
+        padding: 20px 0;
       }
     }
 
     &:nth-child(odd) {
-      .article__container {
-        flex-direction: row;
+      flex-direction: row;
+      .article__textarea__button {
+        justify-content: flex-start;
       }
     }
 
     &:nth-child(even) {
-      .article__container {
-        flex-direction: row-reverse;
+      flex-direction: row-reverse;
+      .article__textarea__button {
+        justify-content: flex-end;
       }
     }
   }
@@ -155,47 +122,30 @@
 
 @include mobile-layout {
   .article {
+    flex-direction: column;
     margin-top: 30px;
     padding-bottom: 30px;
 
-    &__container {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    &__title {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 5px 0 5px 0;
-      background-color: $light-color;
-    }
-
     &__textarea {
       width: 100%;
-      margin-bottom: 10px;
+
+      &__title {
+        margin-bottom: 10px;
+        text-align: start;
+        font-style: italic;
+      }
+
+      &__paragraph {
+        margin-bottom: 10px;
+      }
     }
 
     &__images {
-      width: 80%;
-    }
+      width: 100%;
 
-    &__articles {
-      display: flex;
-
-      &__article {
-        flex-direction: column;
-        margin-bottom: 0;
-        padding: 25px;
-
-        &__textarea {
-          &__title {
-            color: $accent-color;
-          }
-
-          &__paragraph {
-            font-size: 15px;
-          }
-        }
+      &__frame {
+        width: 80%;
+        padding: 20px;
       }
     }
   }

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Article from "../../components/article/article";
+import Section from "../../components/section/section";
 import "./bells.scss";
-import ArticlesData from "../../assets/bells.json";
+import SectionsData from "../../assets/bells.json";
 
 document.title = "Les cloches";
 
@@ -19,7 +19,7 @@ function Bells() {
           pleinium de l’Aunis, et justifie qu’après quatorze ans de silence la municipalité ait
           offert aux Jarriens la joie d’entendre à nouveau son patrimoins campanaire.
         </p>
-        <Article Articles={ArticlesData} />
+        <Section Sections={SectionsData} />
       </div>
     </main>
   );

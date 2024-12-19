@@ -1,35 +1,35 @@
 [
   {
-    "id": "About-A1",
+    "id": "About-S1",
     "title": "Les Amis de Sainte Madeleine de La Jarrie",
     "text": [
       {
-        "id": "About-A1P1",
+        "id": "About-S1P1",
         "paragraph": "<p>L’association des Amis de Sainte Madeleine de La Jarrie a pour objet de concourir à l’embellissement ainsi qu’à la rénovation de l’église de la commune.</p><br/><br/><ul><li><p>Elle se veut être un outil pour mener à bien des travaux de restauration de ce patrimoine communal en accord avec le curé de la paroisse et le Conseil municipal de La Jarrie.</p></li><br/><li><p>Elle se donne pour mission de susciter la protection du mobilier - qu’il soit inscrit à l’inventaire des monuments historiques ou non – sa rénovation quand elle s’avère possible et justifiée, ou encore de prendre elle-même l’initiative de son remplacement dans le respect des critères d’art religieux et en étroite collaboration avec le curé du secteur paroissial d’Aigrefeuille/La Jarrie qui doit approuver les projets d’action de l’association.</p></li><br/><li><p>L’association, les « Amis de sainte Madeleine de La Jarrie », se propose aussi comme « réservoir d’idées », ou force de proposition, auprès du propriétaire et de l’affectataire, pour tout projet de rénovation d’envergure de l’immobilier ou de ce qui se rattache à ce bâtiment communal « pas comme les autres ».</p></li></ul><br/><br/><p>Tous ces projets ne peuvent se faire que grâce au soutien de la commune de La Jarrie et avec l’accord du Curé de la paroisse.</p>"
       }
     ],
     "images": [],
-    "section": []
+    "article": []
   },
   {
-    "id": "About-A2",
+    "id": "About-S2",
     "title": "Trois principes comme guide d'action.",
     "text": [],
     "images": [],
-    "section": [
+    "article": [
       {
-        "id": "About-A2S1",
+        "id": "About-S2A1",
         "display": "enable",
         "title": "Principe artistique",
         "text": [
           {
-            "id": "Bells-A2S1P1",
+            "id": "About-S2A1P1",
             "paragraph": "<p>C’est le souci du beau et de ce qu’il doit être en tout, partout et pour tous et une continuation dans ce qui est reçu.<br/>Mais également une volonté d’assurer le passage entre un passé qui ne reviendra pas par définition, et que l’on doit de respecter, et un présent vivant.<p/>"
           }
         ],
         "images": [
           {
-            "id": "About-A2S1I1",
+            "id": "About-S2A1I1",
             "url": "/About/photo-2.jpg",
             "title": "Trois filles regardant l'horizon",
             "alt": "Trois filles regardant l'horizon"
@@ -37,30 +37,30 @@
         ]
       },
       {
-        "id": "About-A2S2",
+        "id": "About-S2A2",
         "display": "enable",
         "title": "Principe architectural",
         "text": [
           {
-            "id": "About-A2S2P1",
+            "id": "About-S2A2P1",
             "paragraph": "<p>Il repose sur l’usage de la lumière qui est à la fois une composante architecturale et théologique.<br/>Le fidèle, ou le pénitent, entre par le porche et accède au narthex, sorte d’antichambre. Il s’avance dans la nef, passant progressivement de l’ombre à la lumière. Ce principe ancien n’a rien perdu de son actualité. Il a été repris par l’artiste Amaury Dubois pour l’église de Chatelaillon.<p/>"
           }
         ],
         "images": []
       },
       {
-        "id": "About-A2S3",
+        "id": "About-S2A3",
         "display": "enable",
         "title": "Principes liturgiques",
         "text": [
           {
-            "id": "About-A2S3P1",
+            "id": "About-S2A3P1",
             "paragraph": "<p>Du parvis au narthex : Dans le narthex, ou salle du clocher, c’est le « Parvis des Gentils », où se rencontraient Juifs et non-Juifs au temple à Jérusalem, un lieu d’accueil de convivialité et de dialogue mais aussi un lieu de culture.<br/>Du narthex à la nef : Dans la nef, qui doit permettre aux croyants comme aux non-croyants de péleriner d’un vitrail à un autre, d’une représentation d’un saint à une œuvre suscitant le recueillement jusqu’ aux étapes d’un chemin de Croix<br/>De la nef au chœur : Dans le chœur avec l’autel qui est le lieu central, là où se porte le regard et la prière à la jonction du beau et de la foi. L’autel est unique tout comme l’était la pierre sacrificielle du temple de Jérusalem.<p/>"
           }
         ],
         "images": [
           {
-            "id": "About-A2S3I1",
+            "id": "About-S2A3I1",
             "url": "/About/photo-3.jpg",
             "title": "Vitrail",
             "alt": "Vitrail"

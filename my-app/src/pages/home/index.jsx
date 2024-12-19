@@ -49,19 +49,19 @@ function Home() {
   return (
     <main id="home">
       <div className="container">
-        <article>
+        <section>
           <h3 id="welcome" className="full-screen">
             Bienvenue sur le site de l&apos;association des Amis de Sainte Madeleine de La Jarrie.
           </h3>
-          <section>
+          <article>
             <p>
               L’association « Les Amis de Sainte Madeleine de La jarrie » a été créée pour défendre
               le patrimoine de la paroisse de La Jarrie, veiller à son entretien notamment avec la
               Mairie, de faire connaitre au public l’histoire de ce monument et et participer au
               développement, au rayonnement et à la rénovation de l&apos;église.
             </p>
-          </section>
-        </article>
+          </article>
+        </section>
         <div className="carousel full-screen">
           <div className="gallery d-flex justify-content-center">
             {groupedItems.map((column) => (

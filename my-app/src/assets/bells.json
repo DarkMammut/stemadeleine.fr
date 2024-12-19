@@ -1,29 +1,29 @@
 [
   {
-    "id": "Bells-A1",
+    "id": "Bells-S1",
     "title": "LES CLOCHES DANS LA TRADITION",
     "text": [
       {
-        "id": "Bells-A1P1",
+        "id": "Bells-S1P1",
         "paragraph": "<p>La tradition chrétienne considère la cloche comme une personne parce qu’elle a une voix et que les termes techniques la décrivent avec un cerveau, une lèvre inférieure, des épaules, sa robe... On lui donne pour cette raison un nom au cours d’une bénédiction solennelle qui s’apparente à un baptême.</p>"
       }
     ],
     "images": [
       {
-        "id": "Bells-A1I1",
+        "id": "Bells-S1I1",
         "url": "/Bells/photo-6.jpeg",
         "title": "Cloche de du clocher de l'église de Sainte Madeleine de la Jarrie",
         "alt": "Cloche de du clocher de l'église de Sainte Madeleine de la Jarrie"
       }
     ],
-    "section": [
+    "article": [
       {
-        "id": "Bells-A1S1",
+        "id": "Bells-S1A1",
         "display": "enable",
         "title": "Pourquoi sonnent-elles ?",
         "text": [
           {
-            "id": "Bells-A1S1P1",
+            "id": "Bells-S1A1P1",
             "paragraph": "<p>Elles accompagnent les chrétiens de la naissance à la mort en annonçant les baptêmes, les mariages, les ordinations et les funérailles. Selon des codes de sonnerie elles expriment les sentiments d’un peuple qui prie avec les tintements (comme l’angélus), rend grâce avec les volées, pleure avec le glas ou annonce des évènements graves avec le tocsin.</p>"
           }
         ],
@@ -32,30 +32,30 @@
     ]
   },
   {
-    "id": "Bells-A2",
+    "id": "Bells-S2",
     "title": "NOUS SOMMES 4 DANS LE CLOCHER",
     "text": [
       {
-        "id": "Bells-A2P1",
+        "id": "Bells-S2P1",
         "paragraph": "<p>Le son de ma voix est le LA. Je m’appelle Charles-Jean-Baptiste et Louise-Elisabeth. J’ai été bénie en l’an 1764 et donnée à la paroisse par Mercier Dupatit. Sur ma robe l’inscription, surmontée de la couronne comtale, me présente comme « La trompette du Seigneur destinée pour annoncer aux paroissiens de La Jarrie le service divin» Je pèse 600 kg et ma robe mesure 1m de diamètre. En 1946 trois petites sœurs m’ont rejointe. Désormais je ne suis plus toute seule à sonner.</p>"
       }
     ],
     "images": [
       {
-        "id": "Bells-A2I1",
+        "id": "Bells-S2I1",
         "url": "/Bells/photo-5.jpeg",
         "title": "Les cloches de Sainte Madeleine",
         "alt": "Les cloches de Sainte Madeleine"
       }
     ],
-    "section": [
+    "article": [
       {
-        "id": "Bells-A2S1",
+        "id": "Bells-S2A1",
         "display": "enable",
         "title": "Pourquoi avoir rajouté 3 cloches en 1946 ?",
         "text": [
           {
-            "id": "Bells-A2S1P1",
+            "id": "Bells-S2A1P1",
             "paragraph": "<p>Les paroissiens de la Jarrie, reconnaissant à la Providence de les avoir épargnés au cours de la seconde guerre mondiale et lors de bombardements de la poche de la Rochelle du 2 mai 1945, ont doté leur vieux clocher de trois nouvelles cloches. Le son de leur voix a été choisi pour qu’elles sonnent toutes les quatre harmonieusement.</p>"
           }
         ],
@@ -64,75 +64,75 @@
     ]
   },
   {
-    "id": "Bells-A3",
+    "id": "Bells-S3",
     "title": "ALLIANCE DU FEU ET DE LA TERRE",
     "text": [
       {
-        "id": "Bells-A3P1",
+        "id": "Bells-S3P1",
         "paragraph": "<p>La cloche est sans doute l’instrument de musique le plus ancien et remonterait au 3° millénaire avant Jésus-Christ.</p>"
       },
       {
-        "id": "Bells-A3P2",
+        "id": "Bells-S3P2",
         "paragraph": "<p>Elles sont obtenues par l’alliance du feu et de la terre et, si à l’origine, elles n’étaient faites que d’une feuille de cuivre ou de fer martelée elles sont à présent en bronze et fondues dans des moules.</p>"
       },
       {
-        "id": "Bells-A3P3",
+        "id": "Bells-S3P3",
         "paragraph": "<p>La Rome antique les utilise comme instrument de communication des foules et ce n’est que plus tard au IV siècle qu’elles apparaîtront dans les monastères puis au VII siècle dans le clocher des églises.</p>"
       }
     ],
     "images": [
       {
-        "id": "Bells-A3I1",
+        "id": "Bells-S3I1",
         "url": "/Bells/photo-1.jpg",
         "title": "enofifie",
         "alt": "enfiqsn"
       },
       {
-        "id": "Bells-A3I2",
+        "id": "Bells-S3I2",
         "url": "/Bells/photo-2.jpg",
         "title": "enofifie",
         "alt": "enfiqsn"
       }
     ],
-    "section": []
+    "article": []
   },
   {
-    "id": "Bells-A4",
+    "id": "Bells-S4",
     "title": "A CHAQUE VOIX SON INTENTION",
     "text": [],
     "images": [],
-    "section": [
+    "article": [
       {
-        "id": "Bells-A4S1",
+        "id": "Bells-S4A1",
         "display": "enable",
         "title": "La joie du retour des prisonniers",
         "text": [
           {
-            "id": "Bells-A4S1P1",
+            "id": "Bells-S4A1P1",
             "paragraph": "<p>La cloche de la joie du retour des prisonniers. « Je remercie le Seigneur qui a rendu nos prisonniers sains et saufs dans leurs familles.» Mon parrrain et ma marraine étaient Jean et Louise Paille.Je pèse 240 kg et le son de ma voix est le DO.</p>"
           }
         ],
         "images": []
       },
       {
-        "id": "Bells-A4S2",
+        "id": "Bells-S4A2",
         "display": "enable",
         "title": "Le souvenir des morts",
         "text": [
           {
-            "id": "Bells-A4S2P1",
+            "id": "Bells-S4A2P1",
             "paragraph": "<p>La cloche du souvenir des morts « Je pleure les enfants de la Jarrie». Mes parrains étaient Joseph et Marie David.</p>"
           }
         ],
         "images": []
       },
       {
-        "id": "Bells-A4S3",
+        "id": "Bells-S4A3",
         "display": "enable",
         "title": "La reconnaissance",
         "text": [
           {
-            "id": "Bells-A4S3P1",
+            "id": "Bells-S4A3P1",
             "paragraph": "<p>La cloche de la reconnaissance. J’ai été béniee le 11 août 1946 avec pour parrain et marraine Raymond et Marie Mouix. Je porte sur ma robe l’inscription «je remercie Dieu d’avoir protégé la Jarrie»</p>"
           }
         ],

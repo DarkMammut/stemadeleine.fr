@@ -15,8 +15,8 @@ function Home() {
   return (
     <main id="newsletters">
       <div className="container">
-        <article className="article">
-          <h3 className="article__title">Newsletters</h3>
+        <section className="section">
+          <h3 className="section__title">Newsletters</h3>
           <div className="newsletters-container">
             <ul className="d-flex">
               {NewsLetter.map((newsletter) => (
@@ -46,7 +46,7 @@ function Home() {
               ))}
             </ul>
           </div>
-        </article>
+        </section>
       </div>
     </main>
   );
