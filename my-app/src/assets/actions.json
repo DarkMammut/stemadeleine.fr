@@ -108,7 +108,7 @@
       {
         "id": "Actions-S4A1",
         "display": "enable",
-        "title": "1° Pilate",
+        "title": "I Pilate",
         "text": [
           {
             "id": "Actions-S4A1P1",
@@ -127,7 +127,7 @@
       {
         "id": "Actions-S4A2",
         "display": "enable",
-        "title": "2° Jésus est chargé de sa croix",
+        "title": "II Jésus est chargé de sa croix",
         "text": [
           {
             "id": "Actions-S4A2P1",
@@ -139,7 +139,7 @@
       {
         "id": "Actions-S4A3",
         "display": "enable",
-        "title": "3° Première faiblesse",
+        "title": "III Première faiblesse",
         "text": [
           {
             "id": "Actions-S4A3P1",
@@ -151,7 +151,7 @@
       {
         "id": "Actions-S4A4",
         "display": "enable",
-        "title": "4° Marie",
+        "title": "IV Marie",
         "text": [
           {
             "id": "Actions-S4A4P1",
@@ -163,7 +163,7 @@
       {
         "id": "Actions-S4A5",
         "display": "enable",
-        "title": "5° Simon de Cyrène",
+        "title": "V Simon de Cyrène",
         "text": [
           {
             "id": "Actions-S4A5P1",
@@ -175,7 +175,7 @@
       {
         "id": "Actions-S4A6",
         "display": "enable",
-        "title": "6° La rencontre avec Véronique",
+        "title": "VI La rencontre avec Véronique",
         "text": [
           {
             "id": "Actions-S4A6P1",
@@ -187,7 +187,7 @@
       {
         "id": "Actions-S4A7",
         "display": "enable",
-        "title": "7° La deuxième chute",
+        "title": "VII La deuxième chute",
         "text": [
           {
             "id": "Actions-S4A7P1",
@@ -206,7 +206,7 @@
       {
         "id": "Actions-S4A8",
         "display": "enable",
-        "title": "8° Les femmes de Jérusalem",
+        "title": "VIII Les femmes de Jérusalem",
         "text": [
           {
             "id": "Actions-S4A8P1",
@@ -225,7 +225,7 @@
       {
         "id": "Actions-S4A9",
         "display": "enable",
-        "title": "9° La Troisième chute",
+        "title": "IX La Troisième chute",
         "text": [
           {
             "id": "Actions-S4A9P1",
@@ -244,7 +244,7 @@
       {
         "id": "Actions-S4A10",
         "display": "enable",
-        "title": "10° Jésus est dépouillé",
+        "title": "X Jésus est dépouillé",
         "text": [
           {
             "id": "Actions-S4A10P1",
@@ -256,7 +256,7 @@
       {
         "id": "Actions-S4A11",
         "display": "enable",
-        "title": "11° Crucifixion",
+        "title": "XI Crucifixion",
         "text": [
           {
             "id": "Actions-S4A11P1",
@@ -268,7 +268,7 @@
       {
         "id": "Actions-S4A12",
         "display": "enable",
-        "title": "12° Mort de Jésus",
+        "title": "XII Mort de Jésus",
         "text": [
           {
             "id": "Actions-S4A12P1",
@@ -280,7 +280,7 @@
       {
         "id": "Actions-S4A13",
         "display": "enable",
-        "title": "13° Déposition du Christ",
+        "title": "XIII Déposition du Christ",
         "text": [
           {
             "id": "Actions-S4A13P1",
@@ -299,7 +299,7 @@
       {
         "id": "Actions-S4A14",
         "display": "enable",
-        "title": "14° La mise au tombeau",
+        "title": "XIV La mise au tombeau",
         "text": [
           {
             "id": "Actions-S4A14P1",
@@ -318,7 +318,7 @@
       {
         "id": "Actions-S4A15",
         "display": "enable",
-        "title": "15° Résurrection",
+        "title": "XV Résurrection",
         "text": [
           {
             "id": "Actions-S4A15P1",

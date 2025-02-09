@@ -11,9 +11,7 @@ function Realisation() {
   return (
     <main id="actions">
       <div className="container">
-        <article>
-          <Section Sections={SectionsData} />
-        </article>
+        <Section Sections={SectionsData} />
       </div>
     </main>
   );
