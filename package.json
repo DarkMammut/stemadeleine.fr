@@ -1,0 +1,13 @@
+{
+  "name": "ste-madeleine",
+  "private": true,
+  "scripts": {
+    "api": "docker-compose up backend --build",
+    "dev": "concurrently \"npm run dev --prefix frontend/frontoffice\" \"npm run dev --prefix frontend/backoffice\"",
+    "console": "docker-compose up hasura",
+    "start": "concurrently \"npm run api\" \"npm run dev\" \"npm run console\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

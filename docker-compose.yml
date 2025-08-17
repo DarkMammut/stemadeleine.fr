@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend/api
+    container_name: backend_api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SUPABASE_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${SUPABASE_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${SUPABASE_DB_PASSWORD}
+
+  frontoffice:
+    build: ./frontend/frontoffice
+    container_name: frontoffice
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    stdin_open: true
+    tty: true
+
+  backoffice:
+    build: ./frontend/backoffice
+    container_name: backoffice
+    ports:
+      - "3001:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    stdin_open: true
+    tty: true
+
+  # Optionnel : Hasura ou Supabase Studio si tu veux l’inclure
+  hasura:
+    image: hasura/graphql-engine:v2.26.0
+    container_name: hasura
+    ports:
+      - "8081:8080"
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: ${SUPABASE_DB_URL}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
