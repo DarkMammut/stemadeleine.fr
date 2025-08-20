@@ -5,7 +5,6 @@ import com.stemadeleine.api.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,8 +28,6 @@ public class ContentService {
     }
 
     public Content createContent(Content content) {
-        content.setCreatedAt(Instant.now());
-        content.setUpdatedAt(Instant.now());
         return contentRepository.save(content);
     }
 
@@ -42,7 +39,6 @@ public class ContentService {
                     content.setSortOrder(contentDetails.getSortOrder());
                     content.setIsVisible(contentDetails.getIsVisible());
                     content.setOwnerId(contentDetails.getOwnerId());
-                    content.setUpdatedAt(Instant.now());
                     return contentRepository.save(content);
                 })
                 .orElseThrow(() -> new RuntimeException("Content not found"));

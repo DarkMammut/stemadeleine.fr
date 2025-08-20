@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: ./backend/api
@@ -7,9 +5,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: ${SUPABASE_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${SUPABASE_DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${SUPABASE_DB_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/stemadeleine_dev
+      SPRING_DATASOURCE_USERNAME: dev_user
+      SPRING_DATASOURCE_PASSWORD: dev_pass
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      - db
 
   frontoffice:
     build: ./frontend/frontoffice
@@ -31,12 +32,18 @@ services:
     stdin_open: true
     tty: true
 
-  # Optionnel : Hasura ou Supabase Studio si tu veux l’inclure
-  hasura:
-    image: hasura/graphql-engine:v2.26.0
-    container_name: hasura
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
     ports:
-      - "8081:8080"
+      - "5433:5432"
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: ${SUPABASE_DB_URL}
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      POSTGRES_DB: stemadeleine_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

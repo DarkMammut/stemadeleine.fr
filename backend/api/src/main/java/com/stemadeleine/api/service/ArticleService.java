@@ -5,7 +5,6 @@ import com.stemadeleine.api.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,8 +28,6 @@ public class ArticleService {
     }
 
     public Article createArticle(Article article) {
-        article.setCreatedAt(Instant.now());
-        article.setUpdatedAt(Instant.now());
         return articleRepository.save(article);
     }
 
@@ -42,7 +39,6 @@ public class ArticleService {
                     article.setSortOrder(articleDetails.getSortOrder());
                     article.setIsVisible(articleDetails.getIsVisible());
                     article.setSection(articleDetails.getSection());
-                    article.setUpdatedAt(Instant.now());
                     return articleRepository.save(article);
                 })
                 .orElseThrow(() -> new RuntimeException("Article not found"));

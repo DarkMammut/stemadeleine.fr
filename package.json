@@ -4,10 +4,16 @@
   "scripts": {
     "api": "docker-compose up backend --build",
     "dev": "concurrently \"npm run dev --prefix frontend/frontoffice\" \"npm run dev --prefix frontend/backoffice\"",
-    "console": "docker-compose up hasura",
-    "start": "concurrently \"npm run api\" \"npm run dev\" \"npm run console\""
+    "start": "concurrently \"npm run api\" \"npm run dev\""
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.0.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query-devtools": "^5.85.5"
   }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/news")
+@RequestMapping("/api/newsletter")
 public class NewsletterController {
 
     private final NewsletterService newsletterService;
