@@ -38,6 +38,9 @@ public class Account {
     @Column(name = "provider_account_id")
     private String providerAccountId;
 
+    @Column(nullable = false)
+    private String role;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
