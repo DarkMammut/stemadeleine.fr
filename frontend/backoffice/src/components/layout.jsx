@@ -5,7 +5,7 @@ export default function Layout({ children, current, setCurrent }) {
     <div className="bg-gray-100">
       <header>Hello</header>
       <main>
-        <div className="flex h-screen">
+        <div className="flex h-screen bg-gray-500">
           <Sidebar current={current} setCurrent={setCurrent} />
           {children}
         </div>

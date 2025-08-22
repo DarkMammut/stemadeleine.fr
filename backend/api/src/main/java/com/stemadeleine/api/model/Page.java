@@ -11,8 +11,7 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "pages",
-        uniqueConstraints = {@UniqueConstraint(columnNames = "slug")},
-        indexes = {@Index(name = "idx_pages_slug", columnList = "slug")}
+        indexes = {@Index(name = "idx_pages_page_id_version", columnList = "page_id, version DESC")}
 )
 @Getter
 @Setter
@@ -25,10 +24,19 @@ public class Page {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "page_id", nullable = false, updatable = false)
+    private UUID pageId;
+
+    @Column(nullable = false)
+    private Integer version;
+
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "sub_title", nullable = false)
+    @Column(name = "sub_title")
     private String subTitle;
 
     @Column(columnDefinition = "text default ''")
@@ -40,8 +48,8 @@ public class Page {
     @Column(name = "nav_position")
     private String navPosition;
 
-    @Column
-    private Short sortOrder;
+    @Column(name = "sort_order")
+    private Integer sortOrder;
 
     @ManyToOne
     @JoinColumn(name = "parent_page_id", foreignKey = @ForeignKey(name = "pages_parent_page_id_fkey"))
@@ -51,8 +59,12 @@ public class Page {
     @JoinColumn(name = "hero_media_id", foreignKey = @ForeignKey(name = "pages_hero_media_id_fkey"))
     private Media heroMedia;
 
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
+    private User author;
+
     @Column(name = "is_visible", nullable = false)
-    private Boolean isVisible = true;
+    private Boolean isVisible = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

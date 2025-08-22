@@ -74,22 +74,28 @@ CREATE TABLE media (
 -- =====================
 CREATE TABLE pages (
                        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                       page_id UUID NOT NULL,
+                       version INT NOT NULL,
+                       name VARCHAR(255) NOT NULL,
                        title VARCHAR(255) NOT NULL,
-                       sub_title VARCHAR(255) NOT NULL,
+                       sub_title VARCHAR(255),
                        description TEXT DEFAULT '',
                        slug VARCHAR(255) NOT NULL,
                        nav_position VARCHAR(50),
-                       sort_order SMALLINT,
+                       sort_order INT,
                        parent_page_id UUID,
                        hero_media_id UUID,
-                       is_visible BOOLEAN DEFAULT TRUE NOT NULL,
+                       author_id UUID NOT NULL,
+                       is_visible BOOLEAN DEFAULT FALSE NOT NULL,
                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        CONSTRAINT pages_parent_page_id_fkey FOREIGN KEY (parent_page_id) REFERENCES pages(id),
                        CONSTRAINT pages_hero_media_id_fkey FOREIGN KEY (hero_media_id) REFERENCES media(id),
-                       CONSTRAINT uq_pages_slug UNIQUE (slug)
+                       CONSTRAINT pages_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
 );
-CREATE INDEX idx_pages_slug ON pages(slug);
+
+-- Index to find last version quickly
+CREATE INDEX idx_pages_page_id_version ON pages(page_id, version DESC);
 
 -- =====================
 -- SECTIONS
