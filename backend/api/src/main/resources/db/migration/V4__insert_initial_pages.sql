@@ -1,5 +1,5 @@
 INSERT INTO pages (id, page_id, version, name, title, sub_title, description, slug,
-                   nav_position, sort_order, author_id, is_visible, created_at, updated_at)
+                   status, sort_order, author_id, is_visible, created_at, updated_at)
 SELECT gen_random_uuid(),             -- id unique
        gen_random_uuid(),             -- page_id unique
        1,                             -- version initiale
@@ -8,7 +8,7 @@ SELECT gen_random_uuid(),             -- id unique
        'Home',                        -- sub_title
        'Bienvenue',                   -- description
        'home',                        -- slug
-       'TOP',                         -- nav_position
+       'DRAFT',                       -- status
        1,                             -- sort_order
        (SELECT id FROM users LIMIT 1),-- author_id : prendre le premier user existant
        true,                          -- is_visible : publié

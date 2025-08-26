@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
 
-export default function useGetPages({ route = "" } = {}) {
+export default function useGetPage({ route = "" } = {}) {
   const axios = useAxiosClient();
 
-  const [pages, setPages] = useState([]);
+  const [page, setPage] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchPages = useCallback(async () => {
+  const fetchPage = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -21,7 +21,7 @@ export default function useGetPages({ route = "" } = {}) {
       }
 
       const response = await axios.get(url);
-      setPages(response.data);
+      setPage(response.data);
     } catch (err) {
       setError(err);
     } finally {
@@ -30,8 +30,8 @@ export default function useGetPages({ route = "" } = {}) {
   }, [axios, route]);
 
   useEffect(() => {
-    fetchPages();
-  }, [fetchPages]);
+    fetchPage();
+  }, [fetchPage]);
 
-  return { pages, refetch: fetchPages, loading, error };
+  return { page, refetch: fetchPage, loading, error };
 }

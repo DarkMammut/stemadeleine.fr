@@ -1,6 +1,10 @@
 package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.PageDto;
+import com.stemadeleine.api.dto.PageEditDto;
+import com.stemadeleine.api.mapper.PageEditMapper;
+import com.stemadeleine.api.mapper.PageMapper;
+import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Page;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.PageService;
@@ -11,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -19,11 +24,13 @@ public class PageController {
 
     private final PageService pageService;
     private final PageTreeBuilder pageTreeBuilder;
+    private final PageEditMapper pageEditMapper;
     private final UserService userService;
 
-    public PageController(PageService pageService, PageTreeBuilder pageTreeBuilder, UserService userService) {
+    public PageController(PageService pageService, PageTreeBuilder pageTreeBuilder, PageEditMapper pageEditMapper, UserService userService) {
         this.pageService = pageService;
         this.pageTreeBuilder = pageTreeBuilder;
+        this.pageEditMapper = pageEditMapper;
         this.userService = userService;
     }
 
@@ -41,16 +48,20 @@ public class PageController {
     @GetMapping("/tree")
     public List<PageDto> getPageTree() {
         return pageTreeBuilder.buildTree(
-                pageService.getAllPages().stream()
-                        .filter(Page::getIsVisible)
-                        .toList()
+                pageService.getLatestPagesForTree()
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Page> getPageById(@PathVariable UUID id) {
-        return pageService.getLastVersion(id)
-                .map(ResponseEntity::ok)
+    @PutMapping("/tree")
+    public ResponseEntity<Void> updatePageTree(@RequestBody List<PageDto> tree) {
+        pageService.updatePageTree(tree, null);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{pageId}")
+    public ResponseEntity<PageEditDto> getPageForEdit(@PathVariable UUID pageId) {
+        return pageService.getLastVersion(pageId)
+                .map(page -> ResponseEntity.ok(pageEditMapper.toDto(page)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -63,20 +74,25 @@ public class PageController {
 
     // ----- CREATE NEW PAGE -----
     @PostMapping
-    public ResponseEntity<Page> createNewPage(
+    public ResponseEntity<PageDto> createNewPage(
             @RequestBody CreatePageRequest request,
-            @AuthenticationPrincipal User currentUser
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
     ) {
-        Page parentPage = null;
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
 
+        User currentUser = currentUserDetails.account().getUser();
+
+        Page parentPage = null;
         if (request.parentPageId != null) {
             parentPage = pageService.getPageById(request.parentPageId);
         }
 
         Page newPage = pageService.createNewPage(request.name, currentUser, parentPage);
-        return ResponseEntity.ok(newPage);
-    }
 
+        return ResponseEntity.ok(PageMapper.toDto(newPage));
+    }
 
     // ----- CREATE DRAFT -----
     @PostMapping("/draft")
@@ -98,6 +114,21 @@ public class PageController {
         try {
             Page published = pageService.publishPage(draftId);
             return ResponseEntity.ok(published);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ----- ADD BANNER MEDIA -----
+    @PutMapping("/{pageId}/hero-media")
+    public ResponseEntity<Page> updateHeroMedia(
+            @PathVariable UUID pageId,
+            @RequestBody Map<String, UUID> body
+    ) {
+        UUID heroMediaId = body.get("heroMediaId");
+        try {
+            Page updatedPage = pageService.setHeroMediaLastVersion(pageId, heroMediaId);
+            return ResponseEntity.ok(updatedPage);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

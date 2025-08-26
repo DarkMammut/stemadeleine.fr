@@ -1,24 +1,60 @@
-"use client";
+import { useEffect, useState } from "react";
+import Button from "@/components/ui/Button";
+import { useAxiosClient } from "@/utils/axiosClient";
 
-import Button from "@/components/Button";
+export default function Utilities({ actions = [], apiUrl, data }) {
+  const axios = useAxiosClient();
+  const [saving, setSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
-export default function Utilities({ actions }) {
+  useEffect(() => {
+    if (!data) return;
+    setIsDirty(JSON.stringify(data.current) !== JSON.stringify(data.initial));
+  }, [data]);
+
+  const handleSave = async () => {
+    if (!apiUrl || !data) return;
+    try {
+      setSaving(true);
+      await axios.put(apiUrl, data.current);
+    } catch (err) {
+      console.error("Erreur sauvegarde :", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <div className="flex gap-2 w-full">
-      {actions.map((action, idx) => {
-        const Icon = action.icon;
-        return (
+    <div className="flex w-full justify-between my-4">
+      <div className="flex gap-2">
+        {actions.map((action, idx) => {
+          const Icon = action.icon;
+          return (
+            <Button
+              key={idx}
+              onClick={action.callback}
+              variant="primary"
+              size="sm"
+            >
+              {Icon && <Icon className="w-4 h-4 mr-1" />}
+              {action.label}
+            </Button>
+          );
+        })}
+      </div>
+
+      <div>
+        {isDirty && (
           <Button
-            key={idx}
-            onClick={action.callback}
-            variant="primary"
+            onClick={handleSave}
+            variant="secondary"
             size="sm"
+            loading={saving}
           >
-            {Icon && <Icon className="w-4 h-4 mr-1" />}
-            {action.label}
+            Sauvegarder
           </Button>
-        );
-      })}
+        )}
+      </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -45,8 +46,9 @@ public class Page {
     @Column(nullable = false, updatable = false)
     private String slug;
 
-    @Column(name = "nav_position")
-    private String navPosition;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PageStatus status = PageStatus.DRAFT;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
@@ -63,8 +65,14 @@ public class Page {
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
     private User author;
 
+    @OneToMany(mappedBy = "parentPage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Page> children;
+
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = false;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

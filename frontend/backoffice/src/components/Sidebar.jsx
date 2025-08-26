@@ -67,7 +67,7 @@ export default function Sidebar({ current, setCurrent }) {
               router.push(item.url);
               setCurrent(item.key);
             }}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer ${
               current === item.key ? "bg-gray-700" : "hover:bg-gray-800"
             }`}
           >

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "api": "docker-compose up backend --build",
+    "api:reset": "docker-compose down --rmi all -v && docker-compose up backend --build",
     "dev": "concurrently \"npm run dev --prefix frontend/frontoffice\" \"npm run dev --prefix frontend/backoffice\"",
     "start": "concurrently \"npm run api\" \"npm run dev\""
   },

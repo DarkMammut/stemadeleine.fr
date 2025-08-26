@@ -81,12 +81,13 @@ CREATE TABLE pages (
                        sub_title VARCHAR(255),
                        description TEXT DEFAULT '',
                        slug VARCHAR(255) NOT NULL,
-                       nav_position VARCHAR(50),
+                       status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
                        sort_order INT,
                        parent_page_id UUID,
                        hero_media_id UUID,
                        author_id UUID NOT NULL,
                        is_visible BOOLEAN DEFAULT FALSE NOT NULL,
+                       is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        CONSTRAINT pages_parent_page_id_fkey FOREIGN KEY (parent_page_id) REFERENCES pages(id),
@@ -94,7 +95,7 @@ CREATE TABLE pages (
                        CONSTRAINT pages_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
--- Index to find last version quickly
+-- Index pour retrouver rapidement la dernière version
 CREATE INDEX idx_pages_page_id_version ON pages(page_id, version DESC);
 
 -- =====================

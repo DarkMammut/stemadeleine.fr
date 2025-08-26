@@ -12,34 +12,44 @@ public class PageTreeBuilder {
 
     public List<PageDto> buildTree(List<Page> allPages) {
 
-        // Filtrer uniquement les pages publiées
-        List<Page> publishedPages = allPages.stream()
-                .filter(Page::getIsVisible)
+        List<Page> latestPages = allPages.stream()
+                .collect(Collectors.groupingBy(
+                        Page::getPageId,
+                        Collectors.collectingAndThen(
+                                Collectors.maxBy(Comparator.comparingInt(Page::getVersion)),
+                                Optional::get
+                        )
+                ))
+                .values()
+                .stream()
+                .filter(p -> !Boolean.TRUE.equals(p.getIsDeleted()))
                 .toList();
 
-        Map<UUID, PageDto> dtoMap = publishedPages.stream()
+        Map<UUID, PageDto> dtoMap = latestPages.stream()
                 .collect(Collectors.toMap(
                         Page::getId,
                         p -> new PageDto(
                                 p.getId(),
+                                p.getPageId(),
                                 p.getName(),
                                 p.getTitle(),
                                 p.getSubTitle(),
                                 p.getSlug(),
                                 p.getDescription(),
-                                p.getNavPosition(),
+                                p.getStatus(),
                                 Optional.ofNullable(p.getSortOrder()).orElse(0),
                                 p.getIsVisible(),
+                                p.getIsDeleted(),
                                 new ArrayList<>()
                         )
                 ));
 
         List<PageDto> roots = new ArrayList<>();
-        for (Page page : publishedPages) {
+        for (Page page : latestPages) {
             PageDto dto = dtoMap.get(page.getId());
             if (page.getParentPage() != null) {
                 PageDto parentDto = dtoMap.get(page.getParentPage().getId());
-                if (parentDto != null) { // parent pourrait être draft/non publié
+                if (parentDto != null) {
                     parentDto.children().add(dto);
                 }
             } else {

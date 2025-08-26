@@ -1,5 +1,7 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.UserDto;
+import com.stemadeleine.api.mapper.UserMapper;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.findById(id));
+    public UserDto getUser(@PathVariable UUID id) {
+        User user = userService.getUserById(id); // récupère l'entité User
+        return UserMapper.toDto(user);           // mappe vers DTO
     }
 
     @PostMapping

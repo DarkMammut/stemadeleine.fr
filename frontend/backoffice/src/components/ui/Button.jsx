@@ -1,5 +1,4 @@
 // components/ui/Button.jsx
-
 import clsx from "clsx";
 
 export default function Button({
@@ -7,13 +6,14 @@ export default function Button({
   variant = "primary",
   size = "md",
   as = "button",
+  loading = false,
   className,
   ...props
 }) {
   const Component = as;
 
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center font-medium rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
 
   const variants = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
@@ -32,9 +32,10 @@ export default function Button({
   return (
     <Component
       className={clsx(baseStyles, variants[variant], sizes[size], className)}
+      disabled={loading || props.disabled}
       {...props}
     >
-      {children}
+      {loading ? "Chargement..." : children}
     </Component>
   );
 }

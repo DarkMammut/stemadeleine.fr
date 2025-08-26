@@ -29,6 +29,16 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.child-line::before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    width: 20px;
+    height: 70%;
+    border-left: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

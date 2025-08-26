@@ -13,12 +13,15 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.56.0",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
+    "lodash": "^4.17.21",
     "next": "15.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-dropzone": "^14.3.8",
     "react-sortable-tree": "^2.8.0"
   },
   "devDependencies": {
