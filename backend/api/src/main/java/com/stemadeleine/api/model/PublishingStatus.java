@@ -1,6 +1,6 @@
 package com.stemadeleine.api.model;
 
-public enum PageStatus {
+public enum PublishingStatus {
     DRAFT,
     PUBLISHED,
     DELETED,

@@ -28,6 +28,7 @@ export default function DraggableTree({
   onToggle,
   onEdit,
   onDelete,
+  canHaveChildren,
 }) {
   const [tree, setTree] = useState(initialData);
   const [activeId, setActiveId] = useState(null);
@@ -36,9 +37,7 @@ export default function DraggableTree({
 
   const flattened = useMemo(() => flattenTree(tree), [tree]);
   const sensorContext = useRef({ items: flattened, offset: offsetLeft });
-
   const sensors = useSensors(useSensor(PointerSensor));
-
   const activeItem = activeId ? flattened.find((i) => i.id === activeId) : null;
   const projected =
     activeId && overId
@@ -68,6 +67,13 @@ export default function DraggableTree({
     const cloned = JSON.parse(JSON.stringify(flattened));
     const activeIndex = cloned.findIndex((i) => i.id === event.active.id);
     const overIndex = cloned.findIndex((i) => i.id === event.over.id);
+
+    if (projected.parentId) {
+      const parent = cloned.find((i) => i.id === projected.parentId);
+      if (parent && canHaveChildren && !canHaveChildren(parent)) {
+        return;
+      }
+    }
 
     cloned[activeIndex] = {
       ...cloned[activeIndex],

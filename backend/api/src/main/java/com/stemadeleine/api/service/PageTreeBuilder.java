@@ -2,6 +2,7 @@ package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.PublishingStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,7 +23,7 @@ public class PageTreeBuilder {
                 ))
                 .values()
                 .stream()
-                .filter(p -> !Boolean.TRUE.equals(p.getIsDeleted()))
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
                 .toList();
 
         Map<UUID, PageDto> dtoMap = latestPages.stream()
@@ -39,7 +40,6 @@ public class PageTreeBuilder {
                                 p.getStatus(),
                                 Optional.ofNullable(p.getSortOrder()).orElse(0),
                                 p.getIsVisible(),
-                                p.getIsDeleted(),
                                 new ArrayList<>()
                         )
                 ));

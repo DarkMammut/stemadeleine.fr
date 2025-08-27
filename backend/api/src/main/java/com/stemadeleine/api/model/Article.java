@@ -21,9 +21,15 @@ public class Article {
     @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
+    private Integer version;
+
     @ManyToOne(optional = false)
-    @JoinColumn(name = "section_id", foreignKey = @ForeignKey(name = "articles_section_id_fkey"))
-    private Section section;
+    @JoinColumn(name = "module_id", foreignKey = @ForeignKey(name = "articles_module_id_fkey"))
+    private Module module;
+
+    @Column(nullable = false)
+    private String name;
 
     private String title;
 
@@ -36,6 +42,10 @@ public class Article {
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PublishingStatus status = PublishingStatus.DRAFT;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
@@ -43,5 +53,9 @@ public class Article {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
+    private User author;
 }
 

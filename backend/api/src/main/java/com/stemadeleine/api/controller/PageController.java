@@ -2,8 +2,10 @@ package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.dto.PageEditDto;
+import com.stemadeleine.api.dto.PageSectionDto;
 import com.stemadeleine.api.mapper.PageEditMapper;
 import com.stemadeleine.api.mapper.PageMapper;
+import com.stemadeleine.api.mapper.PageSectionMapper;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Page;
 import com.stemadeleine.api.model.User;
@@ -25,18 +27,20 @@ public class PageController {
     private final PageService pageService;
     private final PageTreeBuilder pageTreeBuilder;
     private final PageEditMapper pageEditMapper;
+    private final PageSectionMapper pageSectionMapper;
     private final UserService userService;
 
-    public PageController(PageService pageService, PageTreeBuilder pageTreeBuilder, PageEditMapper pageEditMapper, UserService userService) {
+    public PageController(PageService pageService, PageTreeBuilder pageTreeBuilder, PageEditMapper pageEditMapper, PageSectionMapper pageSectionMapper, UserService userService) {
         this.pageService = pageService;
         this.pageTreeBuilder = pageTreeBuilder;
         this.pageEditMapper = pageEditMapper;
+        this.pageSectionMapper = pageSectionMapper;
         this.userService = userService;
     }
 
     public static class CreatePageRequest {
         public String name;
-        public UUID parentPageId; // optionnel
+        public UUID parentPageId; // optional
     }
 
     // ----- GET -----
@@ -62,6 +66,13 @@ public class PageController {
     public ResponseEntity<PageEditDto> getPageForEdit(@PathVariable UUID pageId) {
         return pageService.getLastVersion(pageId)
                 .map(page -> ResponseEntity.ok(pageEditMapper.toDto(page)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{pageId}/sections")
+    public ResponseEntity<PageSectionDto> getPageWithSections(@PathVariable UUID pageId) {
+        return pageService.getLastVersion(pageId)
+                .map(page -> ResponseEntity.ok(pageSectionMapper.toDto(page)))
                 .orElse(ResponseEntity.notFound().build());
     }
 

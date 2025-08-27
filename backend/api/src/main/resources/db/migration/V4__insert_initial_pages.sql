@@ -4,10 +4,10 @@ SELECT gen_random_uuid(),             -- id unique
        gen_random_uuid(),             -- page_id unique
        1,                             -- version initiale
        'Accueil',                     -- name
-       'Page d’accueil par défaut',   -- title
-       'Home',                        -- sub_title
-       'Bienvenue',                   -- description
-       'home',                        -- slug
+       'Home',                        -- title
+       'Welcome',                     -- sub_title
+       'Home page',                   -- description
+       '/',                           -- slug
        'DRAFT',                       -- status
        1,                             -- sort_order
        (SELECT id FROM users LIMIT 1),-- author_id : prendre le premier user existant

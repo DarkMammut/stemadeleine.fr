@@ -87,7 +87,6 @@ CREATE TABLE pages (
                        hero_media_id UUID,
                        author_id UUID NOT NULL,
                        is_visible BOOLEAN DEFAULT FALSE NOT NULL,
-                       is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                        CONSTRAINT pages_parent_page_id_fkey FOREIGN KEY (parent_page_id) REFERENCES pages(id),
@@ -103,13 +102,40 @@ CREATE INDEX idx_pages_page_id_version ON pages(page_id, version DESC);
 -- =====================
 CREATE TABLE sections (
                           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                          page_id UUID,
+                          page_id UUID NOT NULL,
+                          section_id UUID NOT NULL,
+                          version INT NOT NULL DEFAULT 1,
+                          name VARCHAR(255) NOT NULL,
                           title VARCHAR(255),
-                          sort_order SMALLINT,
+                          sort_order INT,
                           is_visible BOOLEAN DEFAULT TRUE NOT NULL,
+                          status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
+                          author_id UUID NOT NULL,
                           created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                           updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          CONSTRAINT sections_page_id_fkey FOREIGN KEY (page_id) REFERENCES pages(id)
+                          CONSTRAINT sections_page_id_fkey FOREIGN KEY (page_id) REFERENCES pages(id),
+                          CONSTRAINT sections_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- =====================
+-- MODULES
+-- =====================
+CREATE TABLE modules (
+                         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                         section_id UUID NOT NULL,
+                         version INT NOT NULL DEFAULT 1,
+                         name VARCHAR(255) NOT NULL,
+                         type VARCHAR(50) NOT NULL,
+                         variant VARCHAR(50),
+                         display_variant VARCHAR(50),
+                         sort_order INT,
+                         is_visible BOOLEAN DEFAULT TRUE NOT NULL,
+                         status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
+                         author_id UUID NOT NULL,
+                         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                         CONSTRAINT modules_section_id_fkey FOREIGN KEY (section_id) REFERENCES sections(id),
+                         CONSTRAINT modules_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 -- =====================
@@ -117,14 +143,19 @@ CREATE TABLE sections (
 -- =====================
 CREATE TABLE articles (
                           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                          section_id UUID NOT NULL,
+                          module_id UUID NOT NULL,
+                          version INT NOT NULL DEFAULT 1,
+                          name VARCHAR(255) NOT NULL,
                           title VARCHAR(255),
                           body JSONB,
-                          sort_order SMALLINT,
+                          sort_order INT,
                           is_visible BOOLEAN DEFAULT TRUE NOT NULL,
+                          status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
+                          author_id UUID NOT NULL,
                           created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                           updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          CONSTRAINT articles_section_id_fkey FOREIGN KEY (section_id) REFERENCES sections(id)
+                          CONSTRAINT articles_module_id_fkey FOREIGN KEY (module_id) REFERENCES modules(id),
+                          CONSTRAINT articles_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 -- =====================
@@ -133,12 +164,15 @@ CREATE TABLE articles (
 CREATE TABLE contents (
                           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                           owner_id UUID NOT NULL,
+                          version INT NOT NULL DEFAULT 1, -- versioning
+                          status VARCHAR(50) NOT NULL DEFAULT 'DRAFT', -- status
                           title VARCHAR(255),
                           body JSONB,
-                          sort_order SMALLINT,
+                          sort_order INT,
                           is_visible BOOLEAN DEFAULT TRUE NOT NULL,
                           created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+                          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                          CONSTRAINT contents_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
 -- =====================

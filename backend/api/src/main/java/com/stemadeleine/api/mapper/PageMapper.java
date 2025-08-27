@@ -26,7 +26,6 @@ public class PageMapper {
                 page.getStatus(),
                 page.getSortOrder(),
                 page.getIsVisible(),
-                page.getIsDeleted(),
                 childrenDto
         );
     }

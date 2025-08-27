@@ -9,38 +9,47 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "contents")
+@Table(name = "modules")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Content {
+public class Module {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID ownerId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "section_id", foreignKey = @ForeignKey(name = "modules_section_id_fkey"))
+    private Section section;
 
     @Column(nullable = false)
-    private Integer version = 1; // versioning
+    private String name;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PublishingStatus status = PublishingStatus.DRAFT; // status
+    private String type;
 
-    private String title;
-
-    @Column(columnDefinition = "jsonb")
-    private String body;
+    @Column
+    private String variant;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
+
+    @Column(name = "display_variant")
+    private String displayVariant;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PublishingStatus status = PublishingStatus.DRAFT;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
+    private User author;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

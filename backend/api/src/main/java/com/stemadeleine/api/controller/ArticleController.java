@@ -28,11 +28,6 @@ public class ArticleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/section/{sectionId}")
-    public List<Article> getArticlesBySection(@PathVariable UUID sectionId) {
-        return articleService.getArticlesBySection(sectionId);
-    }
-
     @PostMapping
     public Article createArticle(@RequestBody Article article) {
         return articleService.createArticle(article);

@@ -20,7 +20,8 @@ public class CorsConfig {
                                 "https://stemadeleine.fr"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowCredentials(true);
+                        .allowCredentials(true)
+                        .allowedHeaders("Authorization", "Content-Type", "Cookie");
             }
         };
     }

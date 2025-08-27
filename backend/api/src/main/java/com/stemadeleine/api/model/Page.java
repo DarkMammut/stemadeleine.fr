@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class Page {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PageStatus status = PageStatus.DRAFT;
+    private PublishingStatus status = PublishingStatus.DRAFT;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
@@ -68,11 +69,12 @@ public class Page {
     @OneToMany(mappedBy = "parentPage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Page> children;
 
+    @OneToMany(mappedBy = "page", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Section> sections = new ArrayList<>();
+
+
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = false;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

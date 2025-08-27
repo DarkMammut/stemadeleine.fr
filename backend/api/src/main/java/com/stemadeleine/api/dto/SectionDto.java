@@ -5,17 +5,15 @@ import com.stemadeleine.api.model.PublishingStatus;
 import java.util.List;
 import java.util.UUID;
 
-public record PageDto(
+public record SectionDto(
         UUID id,
-        UUID pageId,
+        UUID sectionId,
         String name,
         String title,
-        String subTitle,
-        String slug,
-        String description,
-        PublishingStatus status,
         Integer sortOrder,
         Boolean isVisible,
-        List<PageDto> children
+        PublishingStatus status,
+        List<ModuleDto> modules,
+        List<ContentDto> contents
 ) {
 }

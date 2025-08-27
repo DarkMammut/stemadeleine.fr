@@ -1,7 +1,7 @@
 package com.stemadeleine.api.repository;
 
 import com.stemadeleine.api.model.Page;
-import com.stemadeleine.api.model.PageStatus;
+import com.stemadeleine.api.model.PublishingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +15,7 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     Optional<Page> findBySlug(String slug);
 
     // Dernière version publiée
-    Optional<Page> findTopByPageIdAndStatusOrderByVersionDesc(UUID pageId, PageStatus status);
+    Optional<Page> findTopByPageIdAndStatusOrderByVersionDesc(UUID pageId, PublishingStatus status);
 
     // Dernière version (draft ou publiée)
     Optional<Page> findTopByPageIdOrderByVersionDesc(UUID pageId);
@@ -28,6 +28,6 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     Integer findMaxSortOrderByParent(@Param("parentId") UUID parentId);
 
     @Modifying
-    @Query("UPDATE Page p SET p.isDeleted = true, p.status = 'DELETED', p.isVisible = false WHERE p.id = :id")
+    @Query("UPDATE Page p SET p.status = 'DELETED', p.isVisible = false WHERE p.id = :id")
     void softDeleteById(@Param("id") UUID id);
 }

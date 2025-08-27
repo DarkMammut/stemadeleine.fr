@@ -1,9 +1,15 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.CreateSectionRequest;
+import com.stemadeleine.api.dto.SectionDto;
+import com.stemadeleine.api.mapper.SectionMapper;
+import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Section;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.SectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +21,7 @@ import java.util.UUID;
 public class SectionController {
 
     private final SectionService sectionService;
+    private final SectionMapper sectionMapper;
 
     @GetMapping
     public List<Section> getAllSections() {
@@ -34,8 +41,40 @@ public class SectionController {
     }
 
     @PostMapping
-    public Section createSection(@RequestBody Section section) {
-        return sectionService.createSection(section);
+    public ResponseEntity<SectionDto> createNewSection(
+            @RequestBody CreateSectionRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+
+        Section newSection = sectionService.createNewSection(
+                request.pageId(),
+                request.name(),
+                currentUser
+        );
+
+        return ResponseEntity.ok(sectionMapper.toDto(newSection));
+    }
+
+    @PostMapping("/draft")
+    public ResponseEntity<SectionDto> createDraft(
+            @RequestBody CreateSectionRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User author = currentUserDetails.account().getUser();
+
+        Section section = sectionService.createNewSection(request.pageId(), request.name(), author);
+        SectionDto dto = sectionMapper.toDto(section);
+
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}")

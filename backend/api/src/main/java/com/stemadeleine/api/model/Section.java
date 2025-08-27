@@ -25,13 +25,26 @@ public class Section {
     @JoinColumn(name = "page_id", foreignKey = @ForeignKey(name = "sections_page_id_fkey"))
     private Page page;
 
+    @Column(nullable = false)
+    private UUID sectionId;
+
+    @Column(nullable = false)
+    private Integer version;
+
+    @Column(nullable = false)
+    private String name;
+
     private String title;
 
     @Column(name = "sort_order")
-    private Short sortOrder;
+    private Integer sortOrder;
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PublishingStatus status = PublishingStatus.DRAFT;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -40,4 +53,8 @@ public class Section {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
+    private User author;
 }

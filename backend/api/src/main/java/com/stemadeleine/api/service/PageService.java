@@ -3,7 +3,7 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.Page;
-import com.stemadeleine.api.model.PageStatus;
+import com.stemadeleine.api.model.PublishingStatus;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.repository.PageRepository;
@@ -27,7 +27,7 @@ public class PageService {
     private final PageRepository pageRepository;
 
     public Optional<Page> getPublishedPage(UUID pageId) {
-        return pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(pageId, PageStatus.PUBLISHED);
+        return pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(pageId, PublishingStatus.PUBLISHED);
     }
 
     public Optional<Page> getPublishedPageBySlug(String slug) {
@@ -41,7 +41,7 @@ public class PageService {
 
     public List<Page> getLatestPagesForTree() {
         return pageRepository.findAll().stream()
-                .filter(p -> !Boolean.TRUE.equals(p.getIsDeleted()))
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
                 .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))))
                 .values()
                 .stream()
@@ -58,7 +58,7 @@ public class PageService {
                 .orElse(0) + 1;
         page.setId(null);
         page.setVersion(nextVersion);
-        page.setStatus(PageStatus.DRAFT);
+        page.setStatus(PublishingStatus.DRAFT);
         return pageRepository.save(page);
     }
 
@@ -67,14 +67,14 @@ public class PageService {
         Page draft = pageRepository.findById(draftId)
                 .orElseThrow(() -> new RuntimeException("Draft not found"));
 
-        pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(draft.getPageId(), PageStatus.PUBLISHED)
+        pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(draft.getPageId(), PublishingStatus.PUBLISHED)
                 .ifPresent(p -> {
-                    p.setStatus(PageStatus.ARCHIVED);
+                    p.setStatus(PublishingStatus.ARCHIVED);
                     p.setIsVisible(false);
                     pageRepository.save(p);
                 });
 
-        draft.setStatus(PageStatus.PUBLISHED);
+        draft.setStatus(PublishingStatus.PUBLISHED);
         draft.setIsVisible(true);
 
         return pageRepository.save(draft);
@@ -126,7 +126,6 @@ public class PageService {
                                 .heroMedia(updatedPage.getHeroMedia())
                                 .author(updatedPage.getAuthor())
                                 .isVisible(false)
-                                .isDeleted(false)
                                 .build();
                         return pageRepository.save(draft);
                     } else {
@@ -163,9 +162,8 @@ public class PageService {
                 .sortOrder(maxSortOrder + 1)
                 .parentPage(parentPage)
                 .author(author)
-                .status(PageStatus.DRAFT)
+                .status(PublishingStatus.DRAFT)
                 .isVisible(false)
-                .isDeleted(false)
                 .build());
     }
 

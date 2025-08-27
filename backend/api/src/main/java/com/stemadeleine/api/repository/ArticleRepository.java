@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ArticleRepository extends JpaRepository<Article, UUID> {
-    List<Article> findBySectionIdOrderBySortOrderAsc(UUID sectionId);
 
     List<Article> findByIsVisibleTrue();
 }

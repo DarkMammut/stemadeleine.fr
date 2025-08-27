@@ -23,10 +23,6 @@ public class ArticleService {
         return articleRepository.findById(id);
     }
 
-    public List<Article> getArticlesBySection(UUID sectionId) {
-        return articleRepository.findBySectionIdOrderBySortOrderAsc(sectionId);
-    }
-
     public Article createArticle(Article article) {
         return articleRepository.save(article);
     }
@@ -38,7 +34,6 @@ public class ArticleService {
                     article.setBody(articleDetails.getBody());
                     article.setSortOrder(articleDetails.getSortOrder());
                     article.setIsVisible(articleDetails.getIsVisible());
-                    article.setSection(articleDetails.getSection());
                     return articleRepository.save(article);
                 })
                 .orElseThrow(() -> new RuntimeException("Article not found"));

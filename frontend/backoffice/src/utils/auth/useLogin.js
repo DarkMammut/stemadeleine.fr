@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/utils/auth/AuthContext";
 
 export default function useLogin() {
   const [loading, setLoading] = useState(false);
