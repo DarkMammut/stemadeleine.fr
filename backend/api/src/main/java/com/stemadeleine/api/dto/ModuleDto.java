@@ -9,6 +9,8 @@ public record ModuleDto(
         Integer sortOrder,
         UUID sectionId,
         String status,
-        Boolean isVisible
-) {
+        Boolean isVisible,
+        Integer version,
+        UUID moduleID
+) implements ModuleDtoMarker {
 }

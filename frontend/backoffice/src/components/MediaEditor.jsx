@@ -8,7 +8,7 @@ import MyForm from "@/components/MyForm";
 export default function MediaEditor({ mediaId, attachToEntity }) {
   const axios = useAxiosClient();
   const [media, setMedia] = useState(null);
-  const [allMedia, setAllMedia] = useState([]); // <-- liste des médias existants
+  const [allMedia, setAllMedia] = useState([]);
   const [loading, setLoading] = useState(!!mediaId);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState({});

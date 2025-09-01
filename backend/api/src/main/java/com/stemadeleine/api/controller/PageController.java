@@ -3,6 +3,7 @@ package com.stemadeleine.api.controller;
 import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.dto.PageEditDto;
 import com.stemadeleine.api.dto.PageSectionDto;
+import com.stemadeleine.api.dto.PageSectionWithoutContentsDto;
 import com.stemadeleine.api.mapper.PageEditMapper;
 import com.stemadeleine.api.mapper.PageMapper;
 import com.stemadeleine.api.mapper.PageSectionMapper;
@@ -70,9 +71,9 @@ public class PageController {
     }
 
     @GetMapping("/{pageId}/sections")
-    public ResponseEntity<PageSectionDto> getPageWithSections(@PathVariable UUID pageId) {
+    public ResponseEntity<PageSectionWithoutContentsDto> getPageWithSections(@PathVariable UUID pageId) {
         return pageService.getLastVersion(pageId)
-                .map(page -> ResponseEntity.ok(pageSectionMapper.toDto(page)))
+                .map(page -> ResponseEntity.ok(pageSectionMapper.toPageSectionWithoutContentsDto(page)))
                 .orElse(ResponseEntity.notFound().build());
     }
 

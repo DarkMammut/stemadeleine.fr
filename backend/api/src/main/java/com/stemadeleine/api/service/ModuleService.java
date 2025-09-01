@@ -36,6 +36,8 @@ public class ModuleService {
                 .author(author)
                 .status(PublishingStatus.DRAFT)
                 .isVisible(false)
+                .version(1)
+                .moduleID(UUID.randomUUID())
                 .build();
 
         return moduleRepository.save(module);

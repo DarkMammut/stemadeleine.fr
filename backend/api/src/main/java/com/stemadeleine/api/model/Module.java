@@ -15,11 +15,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Module {
 
     @Id
     @GeneratedValue
     private UUID id;
+
+    @Column(nullable = false)
+    private UUID moduleID;
+
+    @Column(nullable = false)
+    private Integer version;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "section_id", foreignKey = @ForeignKey(name = "modules_section_id_fkey"))
@@ -29,19 +36,16 @@ public class Module {
     private String name;
 
     @Column(nullable = false)
-    private String type;
+    private String title;
 
-    @Column
-    private String variant;
+    @Column(nullable = false)
+    private String type;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
-
-    @Column(name = "display_variant")
-    private String displayVariant;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

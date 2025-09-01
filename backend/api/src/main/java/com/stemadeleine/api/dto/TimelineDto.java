@@ -1,19 +1,18 @@
 package com.stemadeleine.api.dto;
 
-import com.stemadeleine.api.model.PublishingStatus;
-
 import java.util.List;
 import java.util.UUID;
 
-public record SectionDto(
+public record TimelineDto(
         UUID id,
-        UUID sectionId,
         String name,
-        String title,
+        String type,
         Integer sortOrder,
+        UUID sectionId,
+        String status,
         Boolean isVisible,
-        PublishingStatus status,
-        List<ModuleDtoMarker> modules,
+        Integer version,
+        UUID moduleID,
+        String variant,
         List<ContentDto> contents
-) {
-}
+) implements ModuleDtoMarker {}

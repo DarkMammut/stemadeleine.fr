@@ -25,7 +25,7 @@ public class Content {
     private UUID ownerId;
 
     @Column(nullable = false)
-    private Integer version = 1; // versioning
+    private Integer version = 1;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -49,4 +49,7 @@ public class Content {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<ContentMedia> contentMedias = new java.util.ArrayList<>();
 }

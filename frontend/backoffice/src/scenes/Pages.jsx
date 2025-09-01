@@ -30,15 +30,23 @@ export default function Pages() {
 
   const handleTreeChange = (newTree) => {
     setTreeData(newTree);
-    console.log(newTree);
   };
 
   // Toggle visible
+  const toggleRecursive = (nodes, itemId, newVal) => {
+    return nodes.map((node) => {
+      if (node.id === itemId) {
+        return { ...node, isVisible: newVal };
+      }
+      if (node.children && node.children.length > 0) {
+        return { ...node, children: toggleRecursive(node.children, itemId, newVal) };
+      }
+      return node;
+    });
+  };
+
   const handleToggle = (item, newVal) => {
-    setTreeData((prev) =>
-      prev.map((p) => (p.id === item.id ? { ...p, isVisible: newVal } : p)),
-    );
-    console.log(treeData);
+    setTreeData((prev) => toggleRecursive(prev, item.id, newVal));
   };
 
   // Edit

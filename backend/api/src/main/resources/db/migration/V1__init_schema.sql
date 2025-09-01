@@ -122,12 +122,12 @@ CREATE TABLE sections (
 -- =====================
 CREATE TABLE modules (
                          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                         section_id UUID NOT NULL,
+                         module_id UUID NOT NULL DEFAULT uuid_generate_v4(),
                          version INT NOT NULL DEFAULT 1,
+                         section_id UUID NOT NULL,
                          name VARCHAR(255) NOT NULL,
+                         title VARCHAR(255) NOT NULL,
                          type VARCHAR(50) NOT NULL,
-                         variant VARCHAR(50),
-                         display_variant VARCHAR(50),
                          sort_order INT,
                          is_visible BOOLEAN DEFAULT TRUE NOT NULL,
                          status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
@@ -142,20 +142,18 @@ CREATE TABLE modules (
 -- ARTICLES
 -- =====================
 CREATE TABLE articles (
-                          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                          module_id UUID NOT NULL,
-                          version INT NOT NULL DEFAULT 1,
-                          name VARCHAR(255) NOT NULL,
-                          title VARCHAR(255),
-                          body JSONB,
-                          sort_order INT,
-                          is_visible BOOLEAN DEFAULT TRUE NOT NULL,
-                          status VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
-                          author_id UUID NOT NULL,
-                          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          CONSTRAINT articles_module_id_fkey FOREIGN KEY (module_id) REFERENCES modules(id),
-                          CONSTRAINT articles_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
+                          id UUID PRIMARY KEY,
+                          variant VARCHAR(50) NOT NULL DEFAULT 'STAGGERED',
+                          CONSTRAINT articles_id_fkey FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+-- =====================
+-- TIMELINES
+-- =====================
+CREATE TABLE timelines (
+                           id UUID PRIMARY KEY,
+                           variant VARCHAR(50) NOT NULL DEFAULT 'TABS',
+                           CONSTRAINT timelines_id_fkey FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
 );
 
 -- =====================
@@ -227,4 +225,16 @@ CREATE TABLE newsletters (
                              date TIMESTAMPTZ NOT NULL,
                              created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
                              updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- =====================
+-- TIMELINE_CONTENTS (relation OneToMany)
+-- =====================
+CREATE TABLE timeline_contents (
+    timeline_id UUID NOT NULL,
+    content_id UUID NOT NULL,
+    sort_order INT,
+    PRIMARY KEY (timeline_id, content_id),
+    CONSTRAINT timeline_contents_timeline_id_fkey FOREIGN KEY (timeline_id) REFERENCES timelines(id),
+    CONSTRAINT timeline_contents_content_id_fkey FOREIGN KEY (content_id) REFERENCES contents(id)
 );

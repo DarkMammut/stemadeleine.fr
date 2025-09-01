@@ -1,9 +1,13 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.CreateArticleRequest;
 import com.stemadeleine.api.model.Article;
+import com.stemadeleine.api.model.CustomUserDetails;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,8 +33,13 @@ public class ArticleController {
     }
 
     @PostMapping
-    public Article createArticle(@RequestBody Article article) {
-        return articleService.createArticle(article);
+    public ResponseEntity<Article> createArticleWithModule(@RequestBody CreateArticleRequest request, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        Article article = articleService.createArticleWithModule(request, currentUser);
+        return ResponseEntity.ok(article);
     }
 
     @PutMapping("/{id}")
@@ -44,7 +53,7 @@ public class ArticleController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable UUID id) {
-        articleService.deleteArticle(id);
+        articleService.softDeleteArticle(id);
         return ResponseEntity.noContent().build();
     }
 }

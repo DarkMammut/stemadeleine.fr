@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Layout from "@/components/layout";
 import Sections from "@/scenes/Sections";
+import PagesTabs from "@/components/PagesTabs";
 
-export default function Page() {
+export default function SectionsPage() {
   const { pageId } = useParams();
   const [current, setCurrent] = useState("pages");
 

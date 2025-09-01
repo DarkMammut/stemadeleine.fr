@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -29,11 +29,18 @@ export default function DraggableTree({
   onEdit,
   onDelete,
   canHaveChildren,
+  canDrop, // nouvelle prop pour la validation générique du drop
+  onAddChild, // nouvelle prop optionnelle pour ajouter un enfant
 }) {
   const [tree, setTree] = useState(initialData);
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
+
+  // Synchronise tree avec initialData à chaque changement
+  useEffect(() => {
+    setTree(initialData);
+  }, [initialData]);
 
   const flattened = useMemo(() => flattenTree(tree), [tree]);
   const sensorContext = useRef({ items: flattened, offset: offsetLeft });
@@ -67,9 +74,16 @@ export default function DraggableTree({
     const cloned = JSON.parse(JSON.stringify(flattened));
     const activeIndex = cloned.findIndex((i) => i.id === event.active.id);
     const overIndex = cloned.findIndex((i) => i.id === event.over.id);
+    const activeItem = cloned[activeIndex];
+    const parent = projected.parentId ? cloned.find((i) => i.id === projected.parentId) : null;
+
+    // Validation générique via canDrop
+    if (typeof canDrop === "function") {
+      const isAllowed = canDrop({ dragged: activeItem, targetParent: parent, projected });
+      if (!isAllowed) return;
+    }
 
     if (projected.parentId) {
-      const parent = cloned.find((i) => i.id === projected.parentId);
       if (parent && canHaveChildren && !canHaveChildren(parent)) {
         return;
       }
@@ -110,6 +124,7 @@ export default function DraggableTree({
             onToggle={onToggle}
             onEdit={onEdit}
             onDelete={onDelete}
+            onAddChild={onAddChild} // passe la prop au composant enfant
           />
         ))}
       </SortableContext>

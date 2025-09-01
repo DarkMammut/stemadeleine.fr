@@ -1,11 +1,10 @@
 package com.stemadeleine.api.dto;
 
 import com.stemadeleine.api.model.PublishingStatus;
-
 import java.util.List;
 import java.util.UUID;
 
-public record SectionDto(
+public record SectionWithoutContentsDto(
         UUID id,
         UUID sectionId,
         String name,
@@ -13,7 +12,7 @@ public record SectionDto(
         Integer sortOrder,
         Boolean isVisible,
         PublishingStatus status,
-        List<ModuleDtoMarker> modules,
-        List<ContentDto> contents
+        List<ModuleDto> modules
 ) {
 }
+

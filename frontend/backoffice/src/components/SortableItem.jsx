@@ -13,6 +13,7 @@ export default function SortableItem({
   onToggle,
   onEdit,
   onDelete,
+  onAddChild, // nouvelle prop optionnelle
 }) {
   const {
     attributes,
@@ -59,6 +60,16 @@ export default function SortableItem({
           <span>⋮⋮</span>
           <span className="font-medium">{item.name}</span>
         </div>
+        {/* Bouton Ajouter un enfant si la prop existe */}
+        {onAddChild && (
+          <button
+            className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+            onClick={() => onAddChild(item)}
+            type="button"
+          >
+            + Ajouter un module
+          </button>
+        )}
 
         {/* Non draggable (buttons & switch) */}
         <div className="flex items-center gap-2">

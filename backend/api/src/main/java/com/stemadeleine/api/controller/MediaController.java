@@ -4,6 +4,8 @@ import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.service.MediaService;
 import com.stemadeleine.api.service.SupabaseStorageClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,8 @@ public class MediaController {
 
     @Autowired
     private SupabaseStorageClient storageClient;
+
+    private static final Logger log = LoggerFactory.getLogger(MediaController.class);
 
     private final MediaRepository mediaRepository;
     private final MediaService mediaService;
@@ -66,8 +70,10 @@ public class MediaController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadMedia(@RequestParam("file") MultipartFile file) {
+        log.info("Inside uploadMedia");
         try {
-            String filename = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+            String cleanName = sanitizeFilename(file.getOriginalFilename());
+            String filename = System.currentTimeMillis() + "-" + cleanName;
 
             storageClient.uploadFile(
                     "medias-dev",
@@ -95,5 +101,10 @@ public class MediaController {
         }
     }
 
+    private String sanitizeFilename(String originalName) {
+        if (originalName == null) return "file";
+        String normalized = java.text.Normalizer.normalize(originalName, java.text.Normalizer.Form.NFD);
+        return normalized.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
 
 }

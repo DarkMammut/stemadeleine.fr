@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,4 +58,7 @@ public class Section {
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
     private User author;
+
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Module> modules;
 }

@@ -22,4 +22,7 @@ public interface ModuleRepository extends JpaRepository<Module, UUID> {
     void softDeleteById(@Param("id") UUID id);
 
     List<Module> findBySectionIdOrderBySortOrderAsc(UUID sectionId);
+
+    // Récupère la dernière version d'un module par moduleID
+    Module findTopByModuleIDOrderByVersionDesc(UUID moduleID);
 }

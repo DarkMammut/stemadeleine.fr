@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -15,47 +16,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Article {
+public class Article extends Module{
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'STAGGERED'")
+    private ArticleVariants variant = ArticleVariants.STAGGERED;
 
-    @Column(nullable = false)
-    private Integer version;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "module_id", foreignKey = @ForeignKey(name = "articles_module_id_fkey"))
-    private Module module;
-
-    @Column(nullable = false)
-    private String name;
-
-    private String title;
-
-    @Column(columnDefinition = "jsonb")
-    private String body;
-
-    @Column(name = "sort_order")
-    private Short sortOrder;
-
-    @Column(name = "is_visible", nullable = false)
-    private Boolean isVisible = true;
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PublishingStatus status = PublishingStatus.DRAFT;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
-    private User author;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "article_id", referencedColumnName = "id")
+    private List<Content> contents;
 }
 
