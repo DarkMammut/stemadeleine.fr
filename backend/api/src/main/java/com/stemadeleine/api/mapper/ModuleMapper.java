@@ -1,10 +1,8 @@
 package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.*;
-import com.stemadeleine.api.model.Article;
-import com.stemadeleine.api.model.Timeline;
 import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.List;
+import com.stemadeleine.api.model.*;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
@@ -74,15 +72,94 @@ public class ModuleMapper {
         );
     }
 
-    public ModuleDtoMarker toPolymorphicDto(Module module, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public NewsletterDto toDto(Newsletter newsletter, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+        return new NewsletterDto(
+                newsletter.getId(),
+                newsletter.getModuleID(),
+                newsletter.getSection() != null ? newsletter.getSection().getId() : null,
+                newsletter.getName(),
+                newsletter.getType(),
+                newsletter.getVariant() != null ? newsletter.getVariant().name() : null,
+                newsletter.getDescription(),
+                newsletter.getStartDate(),
+                newsletter.getSortOrder(),
+                newsletter.getStatus() != null ? newsletter.getStatus().name() : null,
+                newsletter.getIsVisible(),
+                newsletter.getVersion(),
+                newsletter.getMedia(),
+                newsletter.getContents() != null ? newsletter.getContents().stream().map(contentMapper).toList() : null
+        );
+    }
+
+    public NewsDto toDto(News news, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+        return new NewsDto(
+                news.getId(),
+                news.getModuleID(),
+                news.getSection() != null ? news.getSection().getId() : null,
+                news.getName(),
+                news.getType(),
+                news.getVariant() != null ? news.getVariant().name() : null,
+                news.getDescription(),
+                news.getStartDate(),
+                news.getEndDate(),
+                news.getSortOrder(),
+                news.getStatus() != null ? news.getStatus().name() : null,
+                news.getIsVisible(),
+                news.getVersion(),
+                news.getMedia(),
+                news.getContents() != null ? news.getContents().stream().map(contentMapper).toList() : null
+        );
+    }
+
+    public CTADto toDto(CTA cta) {
+        return new CTADto(
+                cta.getId(),
+                cta.getModuleID(),
+                cta.getSection() != null ? cta.getSection().getId() : null,
+                cta.getName(),
+                cta.getType(),
+                cta.getSortOrder(),
+                cta.getStatus() != null ? cta.getStatus().name() : null,
+                cta.getIsVisible(),
+                cta.getVersion(),
+                cta.getLabel(),
+                cta.getUrl(),
+                cta.getVariant() != null ? cta.getVariant().name() : null
+        );
+    }
+
+    public GalleryDto toDto(Gallery gallery, Function<Media, MediaDto> mediaMapper) {
+        return new GalleryDto(
+                gallery.getId(),
+                gallery.getModuleID(),
+                gallery.getSection() != null ? gallery.getSection().getId() : null,
+                gallery.getName(),
+                gallery.getType(),
+                gallery.getVariant() != null ? gallery.getVariant().name() : null,
+                gallery.getSortOrder(),
+                gallery.getStatus() != null ? gallery.getStatus().name() : null,
+                gallery.getIsVisible(),
+                gallery.getVersion(),
+                gallery.getMedias() != null ? gallery.getMedias().stream().map(mediaMapper).toList() : null
+        );
+    }
+
+    public ModuleDtoMarker toPolymorphicDto(Module module, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper, Function<Media, MediaDto> mediaMapper) {
         if (module instanceof Article article) {
             return toDto(article, contentMapper);
         } else if (module instanceof Timeline timeline) {
             return toDto(timeline, contentMapper);
         } else if (module instanceof List list) {
             return toDto(list, contentMapper);
-        } else {
-            return toDto(module);
+        } else if (module instanceof Newsletter newsletter) {
+            return toDto(newsletter, contentMapper);
+        } else if (module instanceof News news) {
+            return toDto(news, contentMapper);
+        } else if (module instanceof CTA cta) {
+            return toDto(cta);
+        } else if (module instanceof Gallery gallery) {
+            return toDto(gallery, mediaMapper);
         }
+        return toDto(module);
     }
 }

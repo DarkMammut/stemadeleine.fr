@@ -1,7 +1,11 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "lists")
@@ -9,8 +13,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class List extends Module{
+@SuperBuilder
+public class List extends Module {
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'CARD'")
     private ListVariants variant = ListVariants.CARD;

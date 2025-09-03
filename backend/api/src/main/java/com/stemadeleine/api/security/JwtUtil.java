@@ -3,30 +3,37 @@ package com.stemadeleine.api.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
+    private static final long EXPIRATION_TIME = 86400000; // 24h in ms
 
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
 
-    private Key key;
+    private SecretKey key;
 
     @PostConstruct
     public void init() {
-        if (secretKey == null || secretKey.length() < 32) {
-            throw new IllegalStateException("JWT_SECRET_KEY doit être défini et faire au moins 32 caractères");
+        if (secretKey == null) {
+            logger.error("JWT secret key is null");
+            throw new IllegalStateException("JWT secret key must not be null");
         }
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        if (secretKey.length() < 32) {
+            logger.warn("JWT secret key is less than 32 characters. This is not recommended for production.");
+        }
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        logger.info("JWT key has been initialized successfully");
     }
-
-    private static final long EXPIRATION_TIME = 86400000; // 24h in ms
 
     public String generateToken(String username) {
         return Jwts.builder()
@@ -39,7 +46,7 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return Jwts.parser()
-                .verifyWith((SecretKey) key)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -48,9 +55,10 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith((SecretKey) key).build().parseSignedClaims(token);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
             return false;
         }
     }

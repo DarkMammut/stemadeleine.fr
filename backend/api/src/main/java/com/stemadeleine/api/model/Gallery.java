@@ -1,7 +1,11 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -11,9 +15,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Gallery extends Module{
-
+@SuperBuilder
+public class Gallery extends Module {
     @Column(nullable = false, columnDefinition = "varchar(255) default 'GRID'")
     private GalleryVariants variant = GalleryVariants.GRID;
 

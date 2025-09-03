@@ -1,8 +1,8 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateArticleRequest;
-import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.model.Module;
+import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.ArticleRepository;
 import com.stemadeleine.api.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +27,6 @@ public class ArticleService {
     public Optional<Article> getArticleById(UUID id) {
         return articleRepository.findById(id)
                 .filter(article -> article.getStatus() != PublishingStatus.DELETED);
-    }
-
-    public Article createArticle(Article article) {
-        return articleRepository.save(article);
     }
 
     public Article updateArticle(UUID id, Article articleDetails) {

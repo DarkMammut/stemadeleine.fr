@@ -1,7 +1,12 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 @Entity
@@ -10,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Timeline extends Module {
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'TABS'")

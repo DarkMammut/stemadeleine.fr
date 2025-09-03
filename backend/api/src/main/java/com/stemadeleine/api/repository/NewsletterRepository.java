@@ -7,5 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NewsletterRepository extends JpaRepository<Newsletter, UUID> {
-    List<Newsletter> findByIsVisibleTrueOrderByDateDesc();
+    List<Newsletter> findByIsVisibleTrueOrderByStartDateDesc();
+    List<Newsletter> findByStatusNot(com.stemadeleine.api.model.PublishingStatus status);
 }

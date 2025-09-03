@@ -1,15 +1,12 @@
 package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.*;
-import com.stemadeleine.api.model.Content;
-import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.Page;
-import com.stemadeleine.api.model.Section;
+import com.stemadeleine.api.model.*;
 import org.mapstruct.Context;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.IterableMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -23,8 +20,20 @@ public interface PageSectionMapper {
     @Autowired
     ModuleMapper moduleMapper = null;
 
+    @Autowired
+    ContentMapper contentMapper = null;
+
+    @Autowired
+    MediaMapper mediaMapper = null;
+
     default List<ModuleDtoMarker> mapModules(List<Module> modules) {
-        return modules == null ? null : modules.stream().map(moduleMapper::toPolymorphicDto).toList();
+        return modules == null ? null : modules.stream()
+                .map(module -> moduleMapper.toPolymorphicDto(
+                        module,
+                        content -> contentMapper.toDto(content),
+                        media -> mediaMapper.toDto(media)
+                ))
+                .toList();
     }
 
     default SectionDto toDto(Section section) {
@@ -42,8 +51,10 @@ public interface PageSectionMapper {
     }
 
     PageSectionWithoutContentsDto toPageSectionWithoutContentsDto(Page page);
+
     @IterableMapping(elementTargetType = SectionWithoutContentsDto.class)
     List<SectionWithoutContentsDto> toSectionWithoutContentsDtoList(List<Section> sections);
+
     SectionWithoutContentsDto toSectionWithoutContentsDto(Section section);
 
     @Mapping(source = "content.id", target = "id")

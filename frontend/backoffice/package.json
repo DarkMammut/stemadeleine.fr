@@ -21,8 +21,7 @@
     "next": "15.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-dropzone": "^14.3.8",
-    "react-sortable-tree": "^2.8.0"
+    "react-dropzone": "^14.3.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

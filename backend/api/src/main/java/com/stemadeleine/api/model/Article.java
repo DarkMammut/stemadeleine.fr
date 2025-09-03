@@ -1,13 +1,13 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "articles")
@@ -15,8 +15,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Article extends Module{
+@SuperBuilder
+public class Article extends Module {
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'STAGGERED'")
     private ArticleVariants variant = ArticleVariants.STAGGERED;
@@ -25,4 +25,3 @@ public class Article extends Module{
     @JoinColumn(name = "article_id", referencedColumnName = "id")
     private List<Content> contents;
 }
-

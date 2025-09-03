@@ -14,7 +14,11 @@ public class PageEditMapper {
             heroMediaDto = new MediaDto(
                     page.getHeroMedia().getId(),
                     page.getHeroMedia().getFileUrl(),
-                    page.getHeroMedia().getAltText()
+                    page.getHeroMedia().getFileType(),
+                    page.getHeroMedia().getTitle(),
+                    page.getHeroMedia().getAltText(),
+                    page.getHeroMedia().getIsVisible(),
+                    page.getHeroMedia().getSortOrder()
             );
         }
 

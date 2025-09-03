@@ -1,6 +1,8 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.ArticleDto;
 import com.stemadeleine.api.dto.CreateArticleRequest;
+import com.stemadeleine.api.mapper.ArticleMapper;
 import com.stemadeleine.api.model.Article;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.User;
@@ -19,33 +21,38 @@ import java.util.UUID;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleMapper articleMapper;
 
     @GetMapping
-    public List<Article> getAllArticles() {
-        return articleService.getAllArticles();
+    public List<ArticleDto> getAllArticles() {
+        return articleService.getAllArticles().stream()
+                .map(articleMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Article> getArticleById(@PathVariable UUID id) {
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable UUID id) {
         return articleService.getArticleById(id)
+                .map(articleMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Article> createArticleWithModule(@RequestBody CreateArticleRequest request, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+    public ResponseEntity<ArticleDto> createArticleWithModule(@RequestBody CreateArticleRequest request, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
         if (currentUserDetails == null) {
             throw new RuntimeException("User not authenticated");
         }
         User currentUser = currentUserDetails.account().getUser();
         Article article = articleService.createArticleWithModule(request, currentUser);
-        return ResponseEntity.ok(article);
+        return ResponseEntity.ok(articleMapper.toDto(article));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable UUID id, @RequestBody Article articleDetails) {
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable UUID id, @RequestBody Article articleDetails) {
         try {
-            return ResponseEntity.ok(articleService.updateArticle(id, articleDetails));
+            Article updated = articleService.updateArticle(id, articleDetails);
+            return ResponseEntity.ok(articleMapper.toDto(updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

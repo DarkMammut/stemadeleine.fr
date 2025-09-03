@@ -1,12 +1,14 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Table(name = "newsletters")
@@ -14,33 +16,23 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Newsletter {
+@SuperBuilder
+public class Newsletter extends Module {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
-
-    @Column(name = "public_id", nullable = false, unique = true, updatable = false)
-    private String publicId;
-
-    @Column(nullable = false)
-    private String title;
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'LAST3'")
+    private NewsVariants variant = NewsVariants.LAST3;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "is_visible", nullable = false, columnDefinition = "boolean default true")
-    private Boolean isVisible = true;
+    @Column(name = "start_date", nullable = false)
+    private OffsetDateTime startDate;
 
-    @Column(nullable = false)
-    private OffsetDateTime date;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "media_id", referencedColumnName = "id")
+    private Media media;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "newsletter_id", referencedColumnName = "id")
+    private List<Content> contents;
 }

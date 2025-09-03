@@ -1,18 +1,52 @@
-HELP.md
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Environment files
+.env
+.env.local
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
 *.iml
+*.iws
 *.ipr
 
-### VS Code ###
-.vscode/
-
-### files ###
-node_modules
-.env
-.DS_Store
+# Logs
 *.log
-/dist
-/build
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build tools
+.gradle/
+target/
+build/
+
+# Docker
+*.env
+docker-compose.override.yml
+
+# Package management
+*copy.json
+*.backup.json

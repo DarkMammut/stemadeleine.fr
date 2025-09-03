@@ -39,6 +39,9 @@ public class Media {
     @Column(name = "is_visible", nullable = false, columnDefinition = "boolean default true")
     private Boolean isVisible = true;
 
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
