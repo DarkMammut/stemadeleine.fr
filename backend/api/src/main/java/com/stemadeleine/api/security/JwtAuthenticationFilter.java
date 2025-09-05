@@ -44,19 +44,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwt = null;
 
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            logger.debug("[JWT FILTER] Token trouvé dans Authorization header");
-        }
-
-        if (jwt == null && request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt".equals(cookie.getName())) {
+        // D'abord essayer de récupérer le token depuis les cookies
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("authToken".equals(cookie.getName())) {
                     jwt = cookie.getValue();
-                    logger.debug("[JWT FILTER] Token trouvé dans le cookie 'jwt'");
+                    logger.debug("[JWT FILTER] Token trouvé dans le cookie authToken");
                     break;
                 }
+            }
+        }
+
+        // Fallback: essayer l'header Authorization pour la compatibilité
+        if (jwt == null) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
+                logger.debug("[JWT FILTER] Token trouvé dans Authorization header");
             }
         }
 

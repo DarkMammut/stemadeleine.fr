@@ -24,63 +24,7 @@ CREATE TABLE users (
 );
 
 -- =====================
--- PAGES
--- =====================
-CREATE TABLE pages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    page_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    sub_title VARCHAR(255),
-    description TEXT,
-    is_visible BOOLEAN DEFAULT false NOT NULL,
-    status publishing_status DEFAULT 'DRAFT' NOT NULL,
-    version INTEGER NOT NULL DEFAULT 1,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    author_id UUID,
-    FOREIGN KEY (author_id) REFERENCES users(id)
-);
-
--- =====================
--- SECTIONS
--- =====================
-CREATE TABLE sections (
-                          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                          page_id UUID NOT NULL,
-                          parent_id UUID,
-                          name VARCHAR(255) NOT NULL,
-                          sort_order INTEGER,
-                          is_visible BOOLEAN DEFAULT true NOT NULL,
-                          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                          FOREIGN KEY (parent_id) REFERENCES sections(id) ON DELETE CASCADE
-);
-
--- =====================
--- BASE MODULE TABLE
--- =====================
-CREATE TABLE modules (
-                         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                         module_id UUID NOT NULL,
-                         version INTEGER NOT NULL DEFAULT 1,
-                         section_id UUID NOT NULL,
-                         name VARCHAR(255) NOT NULL,
-                         title VARCHAR(255) NOT NULL,
-                         type VARCHAR(50) NOT NULL,
-                         sort_order INTEGER,
-                         is_visible BOOLEAN DEFAULT true NOT NULL,
-                         status publishing_status DEFAULT 'DRAFT' NOT NULL,
-                         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                         author_id UUID,
-                         FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
-                         FOREIGN KEY (author_id) REFERENCES users(id)
-);
-
--- =====================
--- MEDIA
+-- MEDIA (déplacé avant PAGES car PAGES y fait référence)
 -- =====================
 CREATE TABLE media (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -96,17 +40,86 @@ CREATE TABLE media (
 );
 
 -- =====================
+-- PAGES
+-- =====================
+CREATE TABLE pages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    page_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    sub_title VARCHAR(255),
+    description TEXT,
+    is_visible BOOLEAN DEFAULT false NOT NULL,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER,
+    parent_page_id UUID,
+    hero_media_id UUID,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    author_id UUID NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES users(id),
+    FOREIGN KEY (parent_page_id) REFERENCES pages(id),
+    FOREIGN KEY (hero_media_id) REFERENCES media(id)
+);
+
+-- =====================
+-- SECTIONS
+-- =====================
+CREATE TABLE sections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    section_id UUID NOT NULL,
+    page_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    sort_order INTEGER,
+    is_visible BOOLEAN DEFAULT true NOT NULL,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    author_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- =====================
+-- BASE MODULE TABLE
+-- =====================
+CREATE TABLE modules (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    module_id UUID NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    section_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    sort_order INTEGER,
+    is_visible BOOLEAN DEFAULT true NOT NULL,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    author_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- =====================
 -- CONTENT
 -- =====================
 CREATE TABLE contents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255),
     description TEXT,
-    media_id UUID,
+    body JSONB,
     sort_order INTEGER,
+    is_visible BOOLEAN DEFAULT true NOT NULL,
+    owner_id UUID,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    version INTEGER DEFAULT 1 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (media_id) REFERENCES media(id)
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- =====================
@@ -321,7 +334,9 @@ CREATE TABLE lists (
 
 -- Add indexes for performance
 CREATE INDEX idx_modules_section_id ON modules(section_id);
-CREATE INDEX idx_content_media_id ON contents(media_id);
+CREATE INDEX idx_pages_page_id ON pages(page_id);
+CREATE INDEX idx_sections_section_id ON sections(section_id);
 CREATE INDEX idx_accounts_user_id ON accounts(user_id);
-CREATE INDEX idx_news_status ON news(id);
+CREATE INDEX idx_content_media_content_id ON content_media(content_id);
+CREATE INDEX idx_content_media_media_id ON content_media(media_id);
 CREATE INDEX idx_gallery_media_sort ON gallery_media(sort_order);

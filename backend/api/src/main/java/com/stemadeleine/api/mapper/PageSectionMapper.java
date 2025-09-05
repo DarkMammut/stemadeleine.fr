@@ -1,10 +1,11 @@
 package com.stemadeleine.api.mapper;
 
-import com.stemadeleine.api.dto.*;
+import com.stemadeleine.api.dto.ModuleDtoMarker;
+import com.stemadeleine.api.dto.PageSectionDto;
+import com.stemadeleine.api.dto.SectionDto;
 import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.*;
-import org.mapstruct.Context;
-import org.mapstruct.IterableMapping;
+import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.Section;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +13,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface PageSectionMapper {
-
-    @Mapping(target = "sections", source = "sections")
-    PageSectionDto toDto(Page page);
+public abstract class PageSectionMapper {
 
     @Autowired
-    ModuleMapper moduleMapper = null;
+    protected ModuleMapper moduleMapper;
 
     @Autowired
-    ContentMapper contentMapper = null;
+    protected ContentMapper contentMapper;
 
     @Autowired
-    MediaMapper mediaMapper = null;
+    protected MediaMapper mediaMapper;
 
-    default List<ModuleDtoMarker> mapModules(List<Module> modules) {
-        return modules == null ? null : modules.stream()
+    @Mapping(target = "sections", expression = "java(mapSections(page.getSections()))")
+    public abstract PageSectionDto toDto(Page page);
+
+    // Méthode pour filtrer les sections non supprimées
+    protected List<SectionDto> mapSections(List<Section> sections) {
+        if (sections == null) return null;
+
+        return sections.stream()
+                .filter(section -> section.getStatus() != com.stemadeleine.api.model.PublishingStatus.DELETED)
+                .map(this::toDto)
+                .toList();
+    }
+
+    protected List<ModuleDtoMarker> mapModules(List<Module> modules) {
+        if (modules == null) return null;
+
+        return modules.stream()
                 .map(module -> moduleMapper.toPolymorphicDto(
                         module,
                         content -> contentMapper.toDto(content),
@@ -36,7 +49,9 @@ public interface PageSectionMapper {
                 .toList();
     }
 
-    default SectionDto toDto(Section section) {
+    public SectionDto toDto(Section section) {
+        if (section == null) return null;
+
         return new SectionDto(
                 section.getId(),
                 section.getSectionId(),
@@ -46,26 +61,7 @@ public interface PageSectionMapper {
                 section.getIsVisible(),
                 section.getStatus(),
                 mapModules(section.getModules()),
-                null
+                null // contents - pas de contents dans cette DTO selon le contexte
         );
     }
-
-    PageSectionWithoutContentsDto toPageSectionWithoutContentsDto(Page page);
-
-    @IterableMapping(elementTargetType = SectionWithoutContentsDto.class)
-    List<SectionWithoutContentsDto> toSectionWithoutContentsDtoList(List<Section> sections);
-
-    SectionWithoutContentsDto toSectionWithoutContentsDto(Section section);
-
-    @Mapping(source = "content.id", target = "id")
-    @Mapping(source = "content.ownerId", target = "ownerId")
-    @Mapping(source = "content.title", target = "title")
-    @Mapping(source = "content.body", target = "body")
-    @Mapping(source = "content.sortOrder", target = "sortOrder")
-    @Mapping(source = "content.isVisible", target = "isVisible")
-    @Mapping(source = "content.version", target = "version")
-    @Mapping(source = "content.status", target = "status")
-    ContentDto toDto(Content content, @Context List<ContentMediaDto> medias);
-
-    ContentMediaDto toDto(Media media);
 }

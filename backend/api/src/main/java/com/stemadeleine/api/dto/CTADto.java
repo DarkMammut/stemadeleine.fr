@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record CTADto(
         UUID id,
-        UUID moduleID,
+        UUID moduleId,
         UUID sectionId,
         String name,
         String type,
@@ -17,4 +17,3 @@ public record CTADto(
         String variant
 ) implements ModuleDtoMarker {
 }
-

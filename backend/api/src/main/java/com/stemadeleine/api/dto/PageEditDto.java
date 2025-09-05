@@ -12,7 +12,7 @@ public record PageEditDto(
         String slug,
         UUID parentPageId,
         String parentPageSlug,
-        MediaDto heroMedia
+        MediaDto heroMedia,
+        Boolean isVisible
 ) {
 }
-

@@ -6,12 +6,15 @@ import com.stemadeleine.api.model.Section;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SectionService {
@@ -35,20 +38,18 @@ public class SectionService {
         return sectionRepository.findTopBySectionIdOrderByVersionDesc(sectionId);
     }
 
-    public Section createSection(Section section) {
-        return sectionRepository.save(section);
-    }
-
     public Section createNewSection(UUID pageId, String name, User author) {
-        Page page = pageService.getLastVersion(pageId)
+        Page parentPage = pageService.getLastVersion(pageId)
                 .orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
 
-        Short maxSortOrder = sectionRepository.findMaxSortOrderByPage(page.getId());
-        if (maxSortOrder == null) maxSortOrder = 0;
+        Integer maxSortOrder = sectionRepository.findMaxSortOrderByPage(parentPage.getId());
+        if (maxSortOrder == null) {
+            maxSortOrder = 0;
+        }
 
         Section section = Section.builder()
                 .sectionId(UUID.randomUUID())
-                .page(page)
+                .page(parentPage)
                 .version(1)
                 .name(name)
                 .title(name)
@@ -61,40 +62,30 @@ public class SectionService {
         return sectionRepository.save(section);
     }
 
-    public Section createNewVersion(UUID sectionId, User author) {
-        Section latest = sectionRepository.findTopBySectionIdOrderByVersionDesc(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found"));
+    public Section updateSection(UUID sectionId, String name, String title, Boolean isVisible, User author) {
+        // D'abord essayer de trouver par sectionId (identifiant de version)
+        Optional<Section> sectionOpt = sectionRepository.findTopBySectionIdOrderByVersionDesc(sectionId);
 
-        Section newVersion = Section.builder()
-                .sectionId(latest.getSectionId())
-                .page(latest.getPage())
-                .version(latest.getVersion() + 1)
-                .name(latest.getName())
-                .title(latest.getTitle())
-                .sortOrder(latest.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(latest.getIsVisible())
-                .build();
+        // Si pas trouvé, essayer de trouver par id direct
+        if (sectionOpt.isEmpty()) {
+            sectionOpt = sectionRepository.findById(sectionId);
+        }
 
-        return sectionRepository.save(newVersion);
+        Section section = sectionOpt.orElseThrow(() -> new RuntimeException("Section not found with id: " + sectionId));
+
+        if (name != null) section.setName(name);
+        if (title != null) section.setTitle(title);
+        if (isVisible != null) section.setIsVisible(isVisible);
+        section.setAuthor(author);
+
+        return sectionRepository.save(section);
     }
 
-    public Section updateSection(UUID id, Section sectionDetails) {
-        return sectionRepository.findById(id)
-                .map(section -> {
-                    section.setTitle(sectionDetails.getTitle());
-                    section.setSortOrder(sectionDetails.getSortOrder());
-                    section.setIsVisible(sectionDetails.getIsVisible());
-                    section.setPage(sectionDetails.getPage());
-                    section.setUpdatedAt(sectionDetails.getUpdatedAt());
-                    return sectionRepository.save(section);
-                })
-                .orElseThrow(() -> new RuntimeException("Section not found"));
-    }
+    @Transactional
+    public void deleteSection(UUID sectionId) {
+        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(sectionId)
+                .orElseThrow(() -> new RuntimeException("Section not found with sectionId: " + sectionId));
 
-
-    public void deleteSection(UUID id) {
-        sectionRepository.softDeleteById(id);
+        sectionRepository.softDeleteById(section.getId());
     }
 }

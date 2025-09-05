@@ -17,7 +17,7 @@ public class FormMapper {
     public FormDto toDto(Form form) {
         return new FormDto(
                 form.getId(),
-                form.getModuleID(),
+                form.getModuleId(),
                 form.getSection() != null ? form.getSection().getId() : null,
                 form.getName(),
                 form.getType(),
@@ -32,4 +32,3 @@ public class FormMapper {
         );
     }
 }
-

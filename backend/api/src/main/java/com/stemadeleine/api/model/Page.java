@@ -44,7 +44,7 @@ public class Page {
     @Column(columnDefinition = "text default ''")
     private String description;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private String slug;
 
     @Column(name = "status", nullable = false)

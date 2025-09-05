@@ -7,16 +7,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MediaMapper {
     public MediaDto toDto(Media media) {
-        if (media == null) return null;
+        if (media == null) {
+            return null;
+        }
+
         return new MediaDto(
                 media.getId(),
                 media.getFileUrl(),
-                media.getFileType(),
                 media.getTitle(),
                 media.getAltText(),
+                media.getFileType(),
                 media.getIsVisible(),
                 media.getSortOrder()
         );
     }
 }
-

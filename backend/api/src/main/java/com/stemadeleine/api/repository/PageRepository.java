@@ -27,6 +27,13 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     @Query("SELECT MAX(p.sortOrder) FROM Page p WHERE (:parentId IS NULL AND p.parentPage IS NULL) OR (p.parentPage.id = :parentId)")
     Integer findMaxSortOrderByParent(@Param("parentId") UUID parentId);
 
+    // Nouvelle méthode pour trouver le sortOrder max par parentPageId
+    @Query("SELECT MAX(p.sortOrder) FROM Page p WHERE (:parentPageId IS NULL AND p.parentPage IS NULL) OR (p.parentPage.pageId = :parentPageId)")
+    Integer findMaxSortOrderByParentPage(@Param("parentPageId") UUID parentPageId);
+
+    // Vérifier si un slug existe déjà
+    boolean existsBySlug(String slug);
+
     @Modifying
     @Query("UPDATE Page p SET p.status = 'DELETED', p.isVisible = false WHERE p.id = :id")
     void softDeleteById(@Param("id") UUID id);

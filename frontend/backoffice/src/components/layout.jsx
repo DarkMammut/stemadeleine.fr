@@ -1,16 +1,12 @@
 import Sidebar from "@/components/Sidebar";
 
-export default function Layout({ children, current, setCurrent }) {
-  return (
-    <div className="bg-gray-100">
-      <header>Hello</header>
-      <main>
-        <div className="flex h-screen bg-gray-500">
-          <Sidebar current={current} setCurrent={setCurrent} />
-          {children}
+export default function Layout({children, current, setCurrent}) {
+    return (
+        <div className="min-h-screen bg-background text-text">
+            <div className="flex h-screen">
+                <Sidebar current={current} setCurrent={setCurrent}/>
+                <main className="flex-1 overflow-auto">{children}</main>
+            </div>
         </div>
-      </main>
-      <footer>Bye</footer>
-    </div>
-  );
+    );
 }

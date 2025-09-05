@@ -11,6 +11,6 @@ public record ModuleDto(
         String status,
         Boolean isVisible,
         Integer version,
-        UUID moduleID
+        UUID moduleId
 ) implements ModuleDtoMarker {
 }

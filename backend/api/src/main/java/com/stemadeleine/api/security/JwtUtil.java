@@ -44,6 +44,11 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateToken(org.springframework.security.core.Authentication authentication) {
+        String username = authentication.getName();
+        return generateToken(username);
+    }
+
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -51,6 +56,10 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String getEmailFromToken(String token) {
+        return extractUsername(token);
     }
 
     public boolean validateToken(String token) {
@@ -61,5 +70,11 @@ public class JwtUtil {
             logger.error("Invalid JWT token: {}", e.getMessage());
             return false;
         }
+    }
+
+    public void invalidateToken(String token) {
+        // Pour l'instant, on log simplement. Dans une vraie app, vous pourriez
+        // utiliser une blacklist Redis ou une base de données
+        logger.info("Token invalidated: {}", token.substring(0, Math.min(token.length(), 10)) + "...");
     }
 }

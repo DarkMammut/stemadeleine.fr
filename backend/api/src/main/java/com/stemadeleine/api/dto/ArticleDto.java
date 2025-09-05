@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record ArticleDto(
         UUID id,
-        UUID moduleID,
+        UUID moduleId,
         UUID sectionId,
         String name,
         String type,
@@ -15,4 +15,5 @@ public record ArticleDto(
         Boolean isVisible,
         Integer version,
         List<ContentDto> contents
-) implements ModuleDtoMarker {}
+) implements ModuleDtoMarker {
+}

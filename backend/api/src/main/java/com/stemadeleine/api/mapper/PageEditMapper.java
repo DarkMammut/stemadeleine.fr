@@ -32,7 +32,8 @@ public class PageEditMapper {
                 page.getSlug(),
                 page.getParentPage() != null ? page.getParentPage().getId() : null,
                 page.getParentPage() != null ? page.getParentPage().getSlug() : null,
-                heroMediaDto
+                heroMediaDto,
+                page.getIsVisible()
         );
     }
 }

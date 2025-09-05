@@ -17,7 +17,7 @@ public class NewsMapper {
     public NewsDto toDto(News news) {
         return new NewsDto(
                 news.getId(),
-                news.getModuleID(),
+                news.getModuleId(),
                 news.getSection() != null ? news.getSection().getId() : null,
                 news.getName(),
                 news.getType(),
@@ -34,4 +34,3 @@ public class NewsMapper {
         );
     }
 }
-

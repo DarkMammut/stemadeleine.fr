@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record FormDto(
         UUID id,
-        UUID moduleID,
+        UUID moduleId,
         UUID sectionId,
         String name,
         String type,
@@ -21,4 +21,3 @@ public record FormDto(
         List<FieldDto> fields
 ) implements ModuleDtoMarker {
 }
-

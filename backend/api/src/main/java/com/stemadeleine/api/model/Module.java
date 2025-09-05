@@ -26,8 +26,8 @@ public class Module {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID moduleID;
+    @Column(name = "module_id", nullable = false)
+    private UUID moduleId;
 
     @Column(nullable = false)
     private Integer version;

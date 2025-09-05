@@ -12,7 +12,8 @@ public record TimelineDto(
         String status,
         Boolean isVisible,
         Integer version,
-        UUID moduleID,
+        UUID moduleId,
         String variant,
         List<ContentDto> contents
-) implements ModuleDtoMarker {}
+) implements ModuleDtoMarker {
+}

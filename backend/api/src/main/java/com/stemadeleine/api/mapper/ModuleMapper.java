@@ -20,14 +20,14 @@ public class ModuleMapper {
                 module.getStatus() != null ? module.getStatus().name() : null,
                 module.getIsVisible(),
                 module.getVersion(),
-                module.getModuleID()
+                module.getModuleId()
         );
     }
 
     public ArticleDto toDto(Article article, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
         return new ArticleDto(
                 article.getId(),
-                article.getModuleID(),
+                article.getModuleId(),
                 article.getSection() != null ? article.getSection().getId() : null,
                 article.getName(),
                 article.getType(),
@@ -50,7 +50,7 @@ public class ModuleMapper {
                 timeline.getStatus() != null ? timeline.getStatus().name() : null,
                 timeline.getIsVisible(),
                 timeline.getVersion(),
-                timeline.getModuleID(),
+                timeline.getModuleId(),
                 timeline.getVariant() != null ? timeline.getVariant().name() : null,
                 timeline.getContents() != null ? timeline.getContents().stream().map(contentMapper).toList() : null
         );
@@ -59,7 +59,7 @@ public class ModuleMapper {
     public ListDto toDto(List list, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
         return new ListDto(
                 list.getId(),
-                list.getModuleID(),
+                list.getModuleId(),
                 list.getSection() != null ? list.getSection().getId() : null,
                 list.getName(),
                 list.getType(),
@@ -75,7 +75,7 @@ public class ModuleMapper {
     public NewsletterDto toDto(Newsletter newsletter, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
         return new NewsletterDto(
                 newsletter.getId(),
-                newsletter.getModuleID(),
+                newsletter.getModuleId(),
                 newsletter.getSection() != null ? newsletter.getSection().getId() : null,
                 newsletter.getName(),
                 newsletter.getType(),
@@ -94,7 +94,7 @@ public class ModuleMapper {
     public NewsDto toDto(News news, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
         return new NewsDto(
                 news.getId(),
-                news.getModuleID(),
+                news.getModuleId(),
                 news.getSection() != null ? news.getSection().getId() : null,
                 news.getName(),
                 news.getType(),
@@ -114,7 +114,7 @@ public class ModuleMapper {
     public CTADto toDto(CTA cta) {
         return new CTADto(
                 cta.getId(),
-                cta.getModuleID(),
+                cta.getModuleId(),
                 cta.getSection() != null ? cta.getSection().getId() : null,
                 cta.getName(),
                 cta.getType(),
@@ -131,7 +131,7 @@ public class ModuleMapper {
     public GalleryDto toDto(Gallery gallery, Function<Media, MediaDto> mediaMapper) {
         return new GalleryDto(
                 gallery.getId(),
-                gallery.getModuleID(),
+                gallery.getModuleId(),
                 gallery.getSection() != null ? gallery.getSection().getId() : null,
                 gallery.getName(),
                 gallery.getType(),
@@ -141,6 +141,24 @@ public class ModuleMapper {
                 gallery.getIsVisible(),
                 gallery.getVersion(),
                 gallery.getMedias() != null ? gallery.getMedias().stream().map(mediaMapper).toList() : null
+        );
+    }
+
+    public FormDto toDto(Form form, Function<Field, FieldDto> fieldMapper) {
+        return new FormDto(
+                form.getId(),
+                form.getModuleId(),
+                form.getSection() != null ? form.getSection().getId() : null,
+                form.getName(),
+                form.getType(),
+                form.getSortOrder(),
+                form.getStatus() != null ? form.getStatus().name() : null,
+                form.getIsVisible(),
+                form.getVersion(),
+                form.getDescription(),
+                form.getMedia(),
+                form.getTitle(),
+                form.getFields() != null ? form.getFields().stream().map(fieldMapper).toList() : null
         );
     }
 

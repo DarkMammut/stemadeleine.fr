@@ -17,7 +17,7 @@ public class NewsletterMapper {
     public NewsletterDto toDto(Newsletter newsletter) {
         return new NewsletterDto(
                 newsletter.getId(),
-                newsletter.getModuleID(),
+                newsletter.getModuleId(),
                 newsletter.getSection() != null ? newsletter.getSection().getId() : null,
                 newsletter.getName(),
                 newsletter.getType(),

@@ -15,10 +15,14 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
     List<Section> findByIsVisibleTrue();
 
     @Query("SELECT MAX(s.sortOrder) FROM Section s WHERE s.page.id = :pageId")
-    Short findMaxSortOrderByPage(@Param("pageId") UUID pageId);
+    Integer findMaxSortOrderByPage(@Param("pageId") UUID pageId);
 
     @Query("SELECT s FROM Section s WHERE s.sectionId = :sectionId ORDER BY s.version DESC")
     Optional<Section> findTopBySectionIdOrderByVersionDesc(@Param("sectionId") UUID sectionId);
+
+    // Récupérer le numéro de version max pour un pageId
+    @Query("SELECT MAX(s.version) FROM Section s WHERE s.sectionId = :sectionId")
+    Optional<Integer> findMaxVersionBySectionId(UUID sectionId);
 
     @Query("""
                 SELECT s

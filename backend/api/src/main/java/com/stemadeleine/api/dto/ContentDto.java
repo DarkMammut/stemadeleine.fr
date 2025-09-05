@@ -1,5 +1,7 @@
 package com.stemadeleine.api.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +11,7 @@ public record ContentDto(
         Integer version,
         String status,
         String title,
-        String body,
+        JsonNode body,
         Integer sortOrder,
         Boolean isVisible,
         List<ContentMediaDto> medias

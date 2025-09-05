@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record NewsDto(
         UUID id,
-        UUID moduleID,
+        UUID moduleId,
         UUID sectionId,
         String name,
         String type,
@@ -24,4 +24,3 @@ public record NewsDto(
         List<ContentDto> contents
 ) implements ModuleDtoMarker {
 }
-

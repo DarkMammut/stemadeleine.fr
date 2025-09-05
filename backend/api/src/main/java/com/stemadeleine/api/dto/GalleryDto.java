@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record GalleryDto(
         UUID id,
-        UUID moduleID,
+        UUID moduleId,
         UUID sectionId,
         String name,
         String type,
@@ -17,4 +17,3 @@ public record GalleryDto(
         List<MediaDto> medias
 ) implements ModuleDtoMarker {
 }
-

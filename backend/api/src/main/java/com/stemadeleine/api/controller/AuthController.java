@@ -1,66 +1,96 @@
 package com.stemadeleine.api.controller;
 
-import com.stemadeleine.api.security.JwtUtil;
+import com.stemadeleine.api.dto.LoginRequest;
+import com.stemadeleine.api.dto.SignupRequest;
+import com.stemadeleine.api.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
+    private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
-        logger.info("Tentative de login pour : {}", request.username());
-
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        log.info("POST /api/auth/login - Tentative de connexion pour l'utilisateur : {}", loginRequest.email());
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.username(), request.password())
-            );
+            var authResponse = authService.authenticateUser(loginRequest);
+
+            // Définir le token JWT dans un cookie HTTPOnly sécurisé
+            Cookie jwtCookie = new Cookie("authToken", authResponse.get("token"));
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false); // true en production avec HTTPS
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60); // 24 heures
+            response.addCookie(jwtCookie);
+
+            log.info("Connexion réussie pour l'utilisateur : {}", loginRequest.email());
+
+            // Retourner seulement un message de succès, pas le token
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Login successful");
+            return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            logger.error("Erreur d'authentification : {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            log.error("Échec de la connexion pour l'utilisateur : {} - Raison : {}",
+                    loginRequest.email(), e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        String token = jwtUtil.generateToken(request.username());
-        logger.info("Token généré : {}", token);
-
-        ResponseCookie cookie = ResponseCookie.from("jwt", token)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(24 * 60 * 60)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return ResponseEntity.ok(Map.of("message", "Connecté"));
     }
 
-}
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
+        log.info("POST /api/auth/signup - Tentative d'inscription pour l'utilisateur : {}", signupRequest.email());
+        try {
+            var response = authService.registerUser(signupRequest);
+            log.info("Inscription réussie pour l'utilisateur : {}", signupRequest.email());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Échec de l'inscription pour l'utilisateur : {} - Raison : {}",
+                    signupRequest.email(), e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
-record LoginRequest(String username, String password) {
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+        log.info("POST /api/auth/validate - Validation du token");
+        try {
+            var response = authService.validateToken(token);
+            log.debug("Token validé avec succès");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Échec de la validation du token - Raison : {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpServletResponse response) {
+        log.info("POST /api/auth/logout - Déconnexion de l'utilisateur");
+
+        // Supprimer le cookie authToken en définissant sa durée à 0
+        Cookie jwtCookie = new Cookie("authToken", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false); // true en production avec HTTPS
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Supprime le cookie
+        response.addCookie(jwtCookie);
+
+        log.info("Déconnexion réussie - Cookie supprimé");
+
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Logout successful");
+        return ResponseEntity.ok(responseBody);
+    }
 }

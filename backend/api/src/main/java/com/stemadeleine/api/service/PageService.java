@@ -45,6 +45,9 @@ public class PageService {
                 .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))))
                 .values()
                 .stream()
+                .sorted(Comparator.comparing(
+                        page -> page.getSortOrder() != null ? page.getSortOrder() : 0
+                )) // Gérer les sortOrder null en les traitant comme 0
                 .toList();
     }
 
@@ -167,6 +170,125 @@ public class PageService {
                 .build());
     }
 
+    public Page createNewPage(UUID parentPageId, String name, User author) {
+        Page parentPage = null;
+        if (parentPageId != null) {
+            parentPage = getLastVersion(parentPageId)
+                    .orElseThrow(() -> new RuntimeException("Parent page not found with id: " + parentPageId));
+        }
+
+        Integer maxSortOrder = pageRepository.findMaxSortOrderByParentPage(parentPageId);
+        if (maxSortOrder == null) {
+            maxSortOrder = 0;
+        }
+
+        // Générer le slug basé sur le nom et le parent
+        String slug = generateSlug(parentPage != null ? parentPage.getSlug() : null, name);
+
+        Page page = Page.builder()
+                .pageId(UUID.randomUUID())
+                .parentPage(parentPage)
+                .version(1)
+                .name(name)
+                .title(name)
+                .slug(slug)
+                .sortOrder(maxSortOrder + 1)
+                .author(author)
+                .status(PublishingStatus.DRAFT)
+                .isVisible(false)
+                .build();
+
+        return pageRepository.save(page);
+    }
+
+    public Page updatePage(UUID pageId, String name, String title, String subTitle, String slug, String description, Boolean isVisible, User author) {
+        Page page = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+
+        if (name != null) {
+            page.setName(name);
+            // Si le nom change, régénérer le slug automatiquement en excluant les autres versions de cette page
+            String newSlug = generateSlugForPage(page.getParentPage() != null ? page.getParentPage().getSlug() : null, name, page.getPageId());
+            page.setSlug(newSlug);
+        }
+        if (title != null) page.setTitle(title);
+        if (subTitle != null) page.setSubTitle(subTitle);
+        // Permettre la modification manuelle du slug si fourni
+        if (slug != null && !slug.isEmpty()) {
+            page.setSlug(ensureUniqueSlug(slug, page.getPageId()));
+        }
+        if (description != null) page.setDescription(description);
+        if (isVisible != null) page.setIsVisible(isVisible);
+        page.setAuthor(author);
+
+        return pageRepository.save(page);
+    }
+
+    private String generateSlug(String parentSlug, String name) {
+        String baseSlug = name.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .trim();
+
+        String fullSlug;
+        if (parentSlug != null && !parentSlug.equals("/")) {
+            fullSlug = parentSlug + "/" + baseSlug;
+        } else {
+            fullSlug = "/" + baseSlug;
+        }
+
+        // Vérifier l'unicité et ajouter un suffixe si nécessaire
+        return ensureUniqueSlug(fullSlug);
+    }
+
+    private String ensureUniqueSlug(String baseSlug) {
+        return ensureUniqueSlug(baseSlug, null);
+    }
+
+    private String ensureUniqueSlug(String baseSlug, UUID excludePageId) {
+        String slug = baseSlug;
+        int counter = 1;
+
+        // Tant qu'un slug existe déjà (en excluant les autres versions de la même page), ajouter un suffixe numérique
+        while (slugExistsForDifferentPage(slug, excludePageId)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+
+        return slug;
+    }
+
+    private String generateSlugForPage(String parentSlug, String name, UUID pageId) {
+        String baseSlug = name.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .trim();
+
+        String fullSlug;
+        if (parentSlug != null && !parentSlug.equals("/")) {
+            fullSlug = parentSlug + "/" + baseSlug;
+        } else {
+            fullSlug = "/" + baseSlug;
+        }
+
+        // Vérifier l'unicité en excluant les autres versions de cette même page
+        return ensureUniqueSlug(fullSlug, pageId);
+    }
+
+    private boolean slugExistsForDifferentPage(String slug, UUID excludePageId) {
+        Optional<Page> existingPage = pageRepository.findBySlug(slug);
+        if (existingPage.isEmpty()) {
+            return false;
+        }
+
+        // Si excludePageId est fourni, vérifier que le slug n'appartient pas à une autre version de la même page
+        if (excludePageId != null) {
+            return !existingPage.get().getPageId().equals(excludePageId);
+        }
+
+        return true;
+    }
+
     public Page setHeroMediaLastVersion(UUID pageId, UUID heroMediaId) {
         Page lastVersion = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
                 .orElseThrow(() -> new RuntimeException("Page not found"));
@@ -178,8 +300,38 @@ public class PageService {
         return pageRepository.save(lastVersion);
     }
 
+    public Page removeHeroMediaLastVersion(UUID pageId) {
+        Page lastVersion = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found"));
+
+        lastVersion.setHeroMedia(null);
+        return pageRepository.save(lastVersion);
+    }
+
     @Transactional
-    public void delete(UUID id) {
-        pageRepository.softDeleteById(id);
+    public void delete(UUID pageId) {
+        // Trouver la page par pageId (identifiant logique) et non par id (identifiant technique)
+        Page page = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+
+        // Supprimer avec l'id technique de l'entité
+        pageRepository.softDeleteById(page.getId());
+    }
+
+    public Page updatePageVisibility(UUID pageId, Boolean isVisible, User author) {
+        // D'abord essayer de trouver par pageId (identifiant de version)
+        Optional<Page> pageOpt = pageRepository.findTopByPageIdOrderByVersionDesc(pageId);
+
+        // Si pas trouvé, essayer de trouver par id direct
+        if (pageOpt.isEmpty()) {
+            pageOpt = pageRepository.findById(pageId);
+        }
+
+        Page page = pageOpt.orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
+
+        page.setIsVisible(isVisible);
+        page.setAuthor(author);
+
+        return pageRepository.save(page);
     }
 }

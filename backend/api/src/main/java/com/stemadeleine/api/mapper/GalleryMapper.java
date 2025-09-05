@@ -17,7 +17,7 @@ public class GalleryMapper {
     public GalleryDto toDto(Gallery gallery) {
         return new GalleryDto(
                 gallery.getId(),
-                gallery.getModuleID(),
+                gallery.getModuleId(),
                 gallery.getSection() != null ? gallery.getSection().getId() : null,
                 gallery.getName(),
                 gallery.getType(),
@@ -30,4 +30,3 @@ public class GalleryMapper {
         );
     }
 }
-

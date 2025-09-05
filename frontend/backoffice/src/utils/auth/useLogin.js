@@ -1,35 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
-import { useAuth } from "@/utils/auth/AuthContext";
+import {useState} from "react";
+import {useAuth} from "@/utils/auth/AuthContext";
+import {useAxiosClient} from "@/utils/axiosClient";
 
 export default function useLogin() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { loginSuccess } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const {loginSuccess} = useAuth();
+    const axiosClient = useAxiosClient();
 
-  const login = async (username, password) => {
-    setLoading(true);
-    setError(null);
+    const login = async (email, password) => {
+        setLoading(true);
+        setError(null);
 
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-        { username, password },
-        { withCredentials: true },
-      );
+        try {
+            const response = await axiosClient.post("/api/auth/login", {
+                email,
+                password,
+            });
 
-      loginSuccess();
-      setLoading(false);
-      return true;
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Erreur inconnue");
-      setLoading(false);
-      return false;
-    }
-  };
+            loginSuccess(); // Juste marquer comme connecté dans le contexte
+            setLoading(false);
+            return true;
+        } catch (err) {
+            console.error("Erreur de connexion:", err);
+            setError(err.response?.data?.message || "Email ou mot de passe incorrect");
+            setLoading(false);
+            return false;
+        }
+    };
 
-  return { login, loading, error };
+    return {login, loading, error};
 }

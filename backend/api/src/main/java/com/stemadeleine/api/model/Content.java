@@ -1,9 +1,12 @@
 package com.stemadeleine.api.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -34,7 +37,8 @@ public class Content {
     private String title;
 
     @Column(columnDefinition = "jsonb")
-    private String body;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private JsonNode body;
 
     @Column(name = "sort_order")
     private Integer sortOrder;
