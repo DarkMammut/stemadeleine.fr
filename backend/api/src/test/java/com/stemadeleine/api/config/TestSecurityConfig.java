@@ -1,27 +1,45 @@
 package com.stemadeleine.api.config;
 
+import com.stemadeleine.api.service.SupabaseStorageClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import static org.mockito.Mockito.mock;
 
 @TestConfiguration
-@EnableWebSecurity
 public class TestSecurityConfig {
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/test/**", "/h2-console/**")  // Applique cette configuration uniquement aux URLs de test
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/test/**", "/h2-console/**").permitAll()
-                        .anyRequest().permitAll()
-                );
+    @Primary
+    public UserDetailsService testUserDetailsService() {
+        // Utiliser directement BCryptPasswordEncoder pour éviter la dépendance circulaire
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return http.build();
+        UserDetails admin = User.builder()
+                .username("admin@test.com")
+                .password(encoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+
+        UserDetails user = User.builder()
+                .username("user@test.com")
+                .password(encoder.encode("password"))
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, user);
+    }
+
+    @Bean
+    @Primary
+    public SupabaseStorageClient mockSupabaseStorageClient() {
+        return mock(SupabaseStorageClient.class);
     }
 }

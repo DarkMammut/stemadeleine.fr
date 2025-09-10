@@ -49,6 +49,21 @@ public class PageController {
         return pageMapper.toDtoList(pages);
     }
 
+    // Routes spécifiques AVANT les routes génériques pour éviter les conflits
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<PageDto> getPageBySlug(@PathVariable String slug) {
+        log.info("GET /api/pages/slug/{} - Récupération d'une page par slug", slug);
+        return pageService.getPublishedPageBySlug(slug)
+                .map(page -> {
+                    log.debug("Page trouvée par slug : {}", page.getId());
+                    return ResponseEntity.ok(pageMapper.toDto(page));
+                })
+                .orElseGet(() -> {
+                    log.warn("Page non trouvée avec le slug : {}", slug);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
     @GetMapping("/{pageId}")
     public ResponseEntity<PageEditDto> getPage(@PathVariable UUID pageId) {
         log.info("GET /api/pages/{} - Récupération d'une page par ID", pageId);
@@ -75,20 +90,6 @@ public class PageController {
                 })
                 .orElseGet(() -> {
                     log.warn("Page non trouvée avec l'ID : {}", pageId);
-                    return ResponseEntity.notFound().build();
-                });
-    }
-
-    @GetMapping("/slug/{slug}")
-    public ResponseEntity<PageDto> getPageBySlug(@PathVariable String slug) {
-        log.info("GET /api/pages/slug/{} - Récupération d'une page par slug", slug);
-        return pageService.getPublishedPageBySlug(slug)
-                .map(page -> {
-                    log.debug("Page trouvée par slug : {}", page.getId());
-                    return ResponseEntity.ok(pageMapper.toDto(page));
-                })
-                .orElseGet(() -> {
-                    log.warn("Page non trouvée avec le slug : {}", slug);
                     return ResponseEntity.notFound().build();
                 });
     }

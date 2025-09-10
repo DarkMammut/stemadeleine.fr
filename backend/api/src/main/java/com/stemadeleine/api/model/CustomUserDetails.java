@@ -11,12 +11,13 @@ public record CustomUserDetails(Account account) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + account.getRole()));
+        // Le rôle contient déjà le préfixe ROLE_ (ex: "ROLE_USER", "ROLE_ADMIN")
+        return List.of(new SimpleGrantedAuthority(account.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return account.getPasswordHash();
+        return account.getPassword();
     }
 
     @Override
@@ -26,12 +27,12 @@ public record CustomUserDetails(Account account) implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return account.getIsActive();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return account.getIsActive();
     }
 
     @Override
@@ -41,6 +42,6 @@ public record CustomUserDetails(Account account) implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return account.getIsActive() && account.getEmailVerified();
     }
 }

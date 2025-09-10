@@ -200,16 +200,20 @@ CREATE TABLE accounts (
     user_id UUID NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255),
-    provider VARCHAR(50) NOT NULL,
+    provider VARCHAR(50) NOT NULL DEFAULT 'local',
     provider_account_id VARCHAR(255),
-    role VARCHAR(50) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER',
+    is_active BOOLEAN DEFAULT true NOT NULL,
+    email_verified BOOLEAN DEFAULT false NOT NULL,
     billing_address_id UUID,
     shipping_address_id UUID,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (billing_address_id) REFERENCES address(id),
-    FOREIGN KEY (shipping_address_id) REFERENCES address(id)
+    FOREIGN KEY (shipping_address_id) REFERENCES address(id),
+    -- Contrainte unique pour éviter les doublons provider/provider_account_id
+    UNIQUE(provider, provider_account_id)
 );
 
 -- =====================

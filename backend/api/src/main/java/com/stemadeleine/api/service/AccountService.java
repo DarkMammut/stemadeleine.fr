@@ -37,7 +37,7 @@ public class AccountService {
         return accountRepository.findById(id)
                 .map(account -> {
                     account.setEmail(accountDetails.getEmail());
-                    account.setPasswordHash(accountDetails.getPasswordHash());
+                    account.setPassword(accountDetails.getPassword());
                     account.setProvider(accountDetails.getProvider());
                     account.setProviderAccountId(accountDetails.getProviderAccountId());
                     account.setUser(accountDetails.getUser());

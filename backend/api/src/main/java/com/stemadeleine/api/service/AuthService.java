@@ -65,7 +65,7 @@ public class AuthService {
         // Créer un nouveau compte
         Account account = Account.builder()
                 .email(request.email())
-                .passwordHash(passwordEncoder.encode(request.password()))
+                .password(passwordEncoder.encode(request.password()))
                 .role("ROLE_USER")
                 .provider("local")
                 .user(user)

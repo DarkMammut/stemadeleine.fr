@@ -15,10 +15,12 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-    private static final long EXPIRATION_TIME = 86400000; // 24h in ms
 
-    @Value("${JWT_SECRET_KEY}")
+    @Value("${jwt.secret}")
     private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
     private SecretKey key;
 
@@ -39,7 +41,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key)
                 .compact();
     }

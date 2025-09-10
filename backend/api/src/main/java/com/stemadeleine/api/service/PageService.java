@@ -146,30 +146,6 @@ public class PageService {
                 });
     }
 
-    public Page createNewPage(String name, User author, Page parentPage) {
-        Integer maxSortOrder = pageRepository.findMaxSortOrderByParent(parentPage != null ? parentPage.getId() : null);
-        if (maxSortOrder == null) {
-            maxSortOrder = 0;
-        }
-
-        String slug = name.toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("(^-|-$)", "");
-
-        return pageRepository.save(Page.builder()
-                .pageId(UUID.randomUUID())
-                .version(1)
-                .name(name)
-                .title(name)
-                .slug(slug)
-                .sortOrder(maxSortOrder + 1)
-                .parentPage(parentPage)
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(false)
-                .build());
-    }
-
     public Page createNewPage(UUID parentPageId, String name, User author) {
         Page parentPage = null;
         if (parentPageId != null) {
