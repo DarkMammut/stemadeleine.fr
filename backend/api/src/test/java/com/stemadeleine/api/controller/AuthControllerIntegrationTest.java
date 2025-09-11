@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("Tests d'intégration du contrôleur AuthController")
+@DisplayName("AuthController Integration Tests")
 class AuthControllerIntegrationTest {
 
     @Autowired
@@ -41,7 +41,7 @@ class AuthControllerIntegrationTest {
     private AuthService authService;
 
     @Test
-    @DisplayName("POST /api/auth/login - Devrait authentifier un utilisateur valide")
+    @DisplayName("POST /api/auth/login - Should authenticate valid user")
     void shouldAuthenticateValidUser() throws Exception {
         // Given
         LoginRequest loginRequest = new LoginRequest("test@example.com", "password123");
@@ -60,7 +60,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/auth/login - Devrait rejeter des identifiants invalides")
+    @DisplayName("POST /api/auth/login - Should reject invalid credentials")
     void shouldRejectInvalidCredentials() throws Exception {
         // Given
         LoginRequest loginRequest = new LoginRequest("test@example.com", "wrongpassword");
@@ -77,7 +77,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/auth/signup - Devrait enregistrer un nouvel utilisateur")
+    @DisplayName("POST /api/auth/signup - Should register new user")
     void shouldRegisterNewUser() throws Exception {
         // Given
         SignupRequest signupRequest = new SignupRequest(
@@ -100,7 +100,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/auth/signup - Devrait rejeter un email déjà existant")
+    @DisplayName("POST /api/auth/signup - Should reject existing email")
     void shouldRejectExistingEmail() throws Exception {
         // Given
         SignupRequest signupRequest = new SignupRequest(
@@ -122,7 +122,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /api/auth/logout - Devrait déconnecter l'utilisateur")
+    @DisplayName("POST /api/auth/logout - Should logout user")
     void shouldLogoutUser() throws Exception {
         // When & Then
         mockMvc.perform(post("/api/auth/logout")

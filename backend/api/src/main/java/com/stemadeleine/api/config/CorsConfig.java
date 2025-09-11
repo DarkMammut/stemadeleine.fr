@@ -19,7 +19,7 @@ public class CorsConfig {
                                 "http://localhost:3001", // backoffice
                                 "https://stemadeleine.fr"
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowCredentials(true)
                         .allowedHeaders("Authorization", "Content-Type", "Cookie");
             }

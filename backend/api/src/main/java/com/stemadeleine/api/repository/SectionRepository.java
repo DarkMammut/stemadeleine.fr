@@ -17,7 +17,7 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
     @Query("SELECT MAX(s.sortOrder) FROM Section s WHERE s.page.id = :pageId")
     Integer findMaxSortOrderByPage(@Param("pageId") UUID pageId);
 
-    @Query("SELECT s FROM Section s WHERE s.sectionId = :sectionId ORDER BY s.version DESC")
+    @Query("SELECT s FROM Section s WHERE s.sectionId = :sectionId ORDER BY s.version DESC LIMIT 1")
     Optional<Section> findTopBySectionIdOrderByVersionDesc(@Param("sectionId") UUID sectionId);
 
     // Récupérer le numéro de version max pour un pageId

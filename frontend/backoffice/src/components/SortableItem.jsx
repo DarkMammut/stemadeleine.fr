@@ -1,88 +1,87 @@
 "use client";
 
-import {useSortable} from "@dnd-kit/sortable";
-import {CSS} from "@dnd-kit/utilities";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 export default function SortableItem({
-                                         item,
-                                         depth = 0,
-                                         childCount = 0,
-                                         onToggle,
-                                         onEdit,
-                                         onDelete,
-                                         onAddChild, // nouvelle prop optionnelle
-                                     }) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({
-        id: item.id,
-    });
+  item,
+  depth = 0,
+  childCount = 0,
+  onToggle,
+  onEdit,
+  onDelete,
+  onAddChild, // nouvelle prop optionnelle
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: item.id,
+  });
 
-    const [visible, setVisible] = useState(item.isVisible);
+  const [visible, setVisible] = useState(item.isVisible);
 
-    useEffect(() => {
-        setVisible(item.isVisible);
-    }, [item.isVisible]);
+  useEffect(() => {
+    setVisible(item.isVisible);
+  }, [item.isVisible]);
 
-    const handleSwitch = (val) => {
-        setVisible(val);
-        onToggle?.(item, val);
-    };
+  const handleSwitch = (val) => {
+    setVisible(val);
+    onToggle?.(item, val);
+  };
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        marginLeft: depth * 100,
-    };
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    marginLeft: depth * 100,
+  };
 
-    return (
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`mb-2 relative ${depth > 0 ? "child-line" : ""}`}
+    >
+      <div className="flex items-center justify-between rounded-xl px-3 py-2 border border-border shadow bg-surface text-text">
+        {/* Draggable */}
         <div
-            ref={setNodeRef}
-            style={style}
-            className={`mb-2 relative ${depth > 0 ? "child-line" : ""}`}
+          className="flex items-center gap-2 flex-1 cursor-move text-text"
+          {...attributes}
+          {...listeners}
         >
-            <div
-                className="flex items-center justify-between rounded-xl px-3 py-2 border border-border shadow bg-surface text-text">
-                {/* Draggable */}
-                <div
-                    className="flex items-center gap-2 flex-1 cursor-move text-text"
-                    {...attributes}
-                    {...listeners}
-                >
-                    <span className="text-text-muted">⋮⋮</span>
-                    <span className="font-medium text-text">{item.name}</span>
-                </div>
-                {/* Bouton Ajouter un enfant si la prop existe */}
-                {onAddChild && (
-                    <button
-                        className="ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors"
-                        onClick={() => onAddChild(item)}
-                        type="button"
-                    >
-                        + Ajouter un module
-                    </button>
-                )}
-
-                {/* Non draggable (buttons & switch) */}
-                <div className="flex items-center gap-2">
-                    <Switch checked={visible} onChange={handleSwitch}/>
-                    <Button variant="secondary" size="sm" onClick={() => onEdit?.(item)}>
-                        Edit
-                    </Button>
-                    <Button variant="danger" size="sm" onClick={() => onDelete?.(item)}>
-                        Suppr
-                    </Button>
-                </div>
-            </div>
+          <span className="text-text-muted">⋮⋮</span>
+          <span className="font-medium text-text">{item.name}</span>
         </div>
-    );
+        {/* Bouton Ajouter un enfant si la prop existe ET si c'est une section */}
+        {onAddChild && item.type === "section" && (
+          <button
+            className="ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors cursor-pointer"
+            onClick={() => onAddChild(item)}
+            type="button"
+          >
+            + Ajouter un module
+          </button>
+        )}
+
+        {/* Non draggable (buttons & switch) */}
+        <div className="flex items-center gap-2">
+          <Switch checked={visible} onChange={handleSwitch} />
+          <Button variant="secondary" size="sm" onClick={() => onEdit?.(item)}>
+            Edit
+          </Button>
+          <Button variant="danger" size="sm" onClick={() => onDelete?.(item)}>
+            Suppr
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }

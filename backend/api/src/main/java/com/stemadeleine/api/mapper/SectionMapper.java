@@ -7,13 +7,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", uses = {ModuleMapper.class})
+@Mapper(componentModel = "spring", uses = {ModuleMapper.class, MediaMapper.class, ContentMapper.class})
 public interface SectionMapper {
 
     @Autowired
     ModuleMapper moduleMapper = null;
 
     @Mapping(target = "modules", expression = "java(mapModules(section))")
+    @Mapping(target = "media", source = "media")
+    @Mapping(target = "contents", source = "contents")
     SectionDto toDto(Section section);
 
     default java.util.List<ModuleDtoMarker> mapModules(Section section) {

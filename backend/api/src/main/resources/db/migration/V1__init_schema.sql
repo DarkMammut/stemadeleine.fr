@@ -72,16 +72,18 @@ CREATE TABLE sections (
     section_id UUID NOT NULL,
     page_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
     sort_order INTEGER,
     is_visible BOOLEAN DEFAULT true NOT NULL,
     status publishing_status DEFAULT 'DRAFT' NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
+    media_id UUID,
     author_id UUID NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE,
-    FOREIGN KEY (author_id) REFERENCES users(id)
+    FOREIGN KEY (author_id) REFERENCES users(id),
+    FOREIGN KEY (media_id) REFERENCES media(id)
 );
 
 -- =====================
@@ -110,6 +112,7 @@ CREATE TABLE modules (
 -- =====================
 CREATE TABLE contents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    content_id UUID NOT NULL,
     title VARCHAR(255),
     description TEXT,
     body JSONB,
@@ -118,9 +121,14 @@ CREATE TABLE contents (
     owner_id UUID,
     status publishing_status DEFAULT 'DRAFT' NOT NULL,
     version INTEGER DEFAULT 1 NOT NULL,
+    author_id UUID NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES users(id)
 );
+
+-- Index for content versioning
+CREATE INDEX idx_contents_content_id_version ON contents(content_id, version DESC);
 
 -- =====================
 -- ARTICLES (extends Module)
@@ -329,6 +337,17 @@ CREATE TABLE content_media (
 
 -- =====================
 -- LISTS (extends Module)
+-- =====================
+-- SECTION CONTENT RELATIONSHIP
+-- =====================
+CREATE TABLE section_content (
+    section_id UUID NOT NULL,
+    content_id UUID NOT NULL,
+    PRIMARY KEY (section_id, content_id),
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
+    FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE
+);
+
 -- =====================
 CREATE TABLE lists (
     id UUID PRIMARY KEY,

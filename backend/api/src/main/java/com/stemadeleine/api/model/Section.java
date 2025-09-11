@@ -22,15 +22,12 @@ public class Section {
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "page_id", foreignKey = @ForeignKey(name = "sections_page_id_fkey"))
-    private Page page;
-
-    @Column(nullable = false)
+    @Column(name = "section_id", nullable = false)
     private UUID sectionId;
 
-    @Column(nullable = false)
-    private Integer version;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "page_id", nullable = false, foreignKey = @ForeignKey(name = "sections_page_id_fkey"))
+    private Page page;
 
     @Column(nullable = false)
     private String name;
@@ -47,6 +44,17 @@ public class Section {
     @Enumerated(EnumType.STRING)
     private PublishingStatus status = PublishingStatus.DRAFT;
 
+    @Column(nullable = false)
+    private Integer version = 1;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "media_id", foreignKey = @ForeignKey(name = "sections_media_id_fkey"))
+    private Media media;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "sections_author_id_fkey"))
+    private User author;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
@@ -55,10 +63,16 @@ public class Section {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
-    private User author;
+    // Many-to-many relationship with Content through section_content table
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "section_content",
+            joinColumns = @JoinColumn(name = "section_id"),
+            inverseJoinColumns = @JoinColumn(name = "content_id")
+    )
+    private List<Content> contents;
 
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    // One-to-many relationship with modules
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Module> modules;
 }

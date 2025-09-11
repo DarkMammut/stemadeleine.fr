@@ -12,7 +12,10 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "contents")
+@Table(
+        name = "contents",
+        indexes = {@Index(name = "idx_contents_content_id_version", columnList = "content_id, version DESC")}
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +26,9 @@ public class Content {
     @Id
     @GeneratedValue
     private UUID id;
+
+    @Column(name = "content_id", nullable = false, updatable = false)
+    private UUID contentId;
 
     @Column(nullable = false)
     private UUID ownerId;
@@ -45,6 +51,10 @@ public class Content {
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "contents_author_id_fkey"))
+    private User author;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

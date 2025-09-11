@@ -13,6 +13,7 @@ public record SectionDto(
         Integer sortOrder,
         Boolean isVisible,
         PublishingStatus status,
+        MediaDto media,
         List<ModuleDtoMarker> modules,
         List<ContentDto> contents
 ) {

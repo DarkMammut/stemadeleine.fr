@@ -46,4 +46,17 @@ public class User {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;
+
+    // Helper method to get username (combination of firstname and lastname)
+    public String getUsername() {
+        if (firstname != null && lastname != null) {
+            return firstname + " " + lastname;
+        } else if (firstname != null) {
+            return firstname;
+        } else if (lastname != null) {
+            return lastname;
+        } else {
+            return "Unknown User";
+        }
+    }
 }

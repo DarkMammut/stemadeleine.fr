@@ -60,8 +60,9 @@ public abstract class PageSectionMapper {
                 section.getSortOrder(),
                 section.getIsVisible(),
                 section.getStatus(),
+                section.getMedia() != null ? mediaMapper.toDto(section.getMedia()) : null, // Add media parameter
                 mapModules(section.getModules()),
-                null // contents - pas de contents dans cette DTO selon le contexte
+                null // contents - no contents in this DTO according to context
         );
     }
 }
