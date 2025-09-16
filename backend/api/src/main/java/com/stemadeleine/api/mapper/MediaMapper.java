@@ -14,9 +14,9 @@ public class MediaMapper {
         return new MediaDto(
                 media.getId(),
                 media.getFileUrl(),
-                media.getTitle(),
-                media.getAltText(),
-                media.getFileType(),
+                media.getFileType(),   // fileType
+                media.getTitle(),      // title
+                media.getAltText(),    // altText
                 media.getIsVisible(),
                 media.getSortOrder()
         );

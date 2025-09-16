@@ -64,7 +64,10 @@ export default function SortableItem({
         {onAddChild && item.type === "section" && (
           <button
             className="ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors cursor-pointer"
-            onClick={() => onAddChild(item)}
+            onClick={() => {
+              console.log("🟢 Add module button clicked for section:", item);
+              onAddChild(item);
+            }}
             type="button"
           >
             + Ajouter un module

@@ -27,7 +27,8 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
      * Find latest versions of all contents for a specific owner (excluding deleted)
      */
     @Query("""
-            SELECT c FROM Content c 
+            SELECT DISTINCT c FROM Content c
+            LEFT JOIN FETCH c.medias m
             WHERE c.ownerId = :ownerId 
             AND c.version = (
                 SELECT MAX(c2.version) 
@@ -79,4 +80,14 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
      * Delete a content by contentId
      */
     void deleteByContentId(UUID contentId);
+
+    /**
+     * Find a content by id with medias
+     */
+    @Query("""
+                SELECT c FROM Content c
+                LEFT JOIN FETCH c.medias
+                WHERE c.id = :id
+            """)
+    Optional<Content> findByIdWithMedias(@Param("id") UUID id);
 }

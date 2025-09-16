@@ -13,12 +13,13 @@ import useAddSection from "@/hooks/useAddSection";
 import DraggableTree from "@/components/DraggableTree";
 import PagesTabs from "@/components/PagesTabs";
 import { useAddModule } from "@/hooks/useAddModule";
-import { useAxiosClient } from "@/utils/axiosClient";
+import { useSectionOperations } from "@/hooks/useSectionOperations";
+import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
+import Button from "@/components/ui/Button";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
-  const axios = useAxiosClient();
   const { page, refetch, loading, error } = useGetPage({
     route: `${pageId}/sections`,
   });
@@ -28,6 +29,8 @@ export default function Sections({ pageId }) {
   const { createSection } = useAddSection();
   const { addModule } = useAddModule();
   const { updateSectionOrder } = useUpdateSectionOrder();
+  const { updateSectionVisibility, deleteSection } = useSectionOperations();
+  const { updateModuleVisibility, deleteModule } = useModuleOperations();
 
   const [treeData, setTreeData] = useState([]);
   // New states for module addition modal
@@ -37,20 +40,94 @@ export default function Sections({ pageId }) {
 
   useEffect(() => {
     if (page?.sections) {
-      const tree = page.sections.map((section) => ({
-        id: section.sectionId,
+      console.log("Raw page data:", page.sections);
+
+      // Dédupliquer les sections par sectionId avant de construire l'arbre
+      const uniqueSections = page.sections.reduce((acc, section) => {
+        // Vérifier si cette section n'existe pas déjà dans l'accumulateur
+        const existingSection = acc.find(
+          (s) => s.sectionId === section.sectionId,
+        );
+        if (!existingSection) {
+          acc.push(section);
+        } else {
+          console.warn(
+            "Duplicate section found and removed:",
+            section.sectionId,
+          );
+        }
+        return acc;
+      }, []);
+
+      console.log("Deduplicated sections:", uniqueSections);
+
+      // Log détaillé de chaque section et de ses modules
+      uniqueSections.forEach((section, idx) => {
+        console.log(`[DEBUG] Section ${idx}:`, section.sectionId, section.name);
+        if (section.modules && section.modules.length > 0) {
+          section.modules.forEach((mod, mIdx) => {
+            console.log(
+              `  [DEBUG]   Module ${mIdx}:`,
+              mod.id,
+              mod.name,
+              mod.type,
+            );
+          });
+        } else {
+          console.log("  [DEBUG]   Aucun module");
+        }
+      });
+
+      const tree = uniqueSections.map((section) => ({
+        id: `section-${section.sectionId}`,
+        sectionId: section.sectionId,
         name: section.name,
         type: "section",
         isVisible: section.isVisible,
         children:
-          section.modules?.map((module) => ({
-            id: module.id,
-            name: module.name,
-            type: "module",
-            moduleType: module.type,
-            children: [],
-          })) || [],
+          section.modules?.reduce((moduleAcc, module) => {
+            // Dédupliquer les modules aussi
+            const existingModule = moduleAcc.find(
+              (m) => m.moduleId === module.id,
+            );
+            if (!existingModule) {
+              moduleAcc.push({
+                id: `module-${module.id}`,
+                moduleId: module.id,
+                name: module.name,
+                type: "module",
+                moduleType: module.type,
+                sectionId: section.sectionId,
+                children: [],
+              });
+            } else {
+              console.warn("Duplicate module found and removed:", module.id);
+            }
+            return moduleAcc;
+          }, []) || [],
       }));
+
+      console.log("Generated tree data:", tree);
+
+      const allIds = [];
+      const collectIds = (items) => {
+        items.forEach((item) => {
+          allIds.push(item.id);
+          if (item.children) {
+            collectIds(item.children);
+          }
+        });
+      };
+      collectIds(tree);
+
+      const duplicates = allIds.filter(
+        (id, index) => allIds.indexOf(id) !== index,
+      );
+      if (duplicates.length > 0) {
+        console.error("Duplicate IDs found after deduplication:", duplicates);
+      } else {
+        console.log("✅ No duplicate IDs found after deduplication");
+      }
 
       setTreeData(tree);
     }
@@ -61,27 +138,28 @@ export default function Sections({ pageId }) {
       setTreeData(newTree);
 
       try {
-        // Automatically save sections and modules order
         await updateSectionOrder(pageId, newTree);
         console.log("Section order saved automatically");
       } catch (error) {
         console.error("Error during automatic order saving:", error);
-        // Optional: show error notification to user
       }
     },
     [pageId, updateSectionOrder],
   );
 
-  // Toggle visible - with axiosClient
+  // Toggle visibility using the new hook
   const handleToggle = useCallback(
     async (item, newVal) => {
       try {
         if (item.type === "section") {
-          await axios.put(`/api/sections/${item.id}/visibility`, {
+          await updateSectionVisibility(item.sectionId, newVal);
+        } else if (item.type === "module") {
+          console.log("Updating module visibility with hook:", {
+            moduleId: item.moduleId,
             isVisible: newVal,
           });
-        } else if (item.type === "module") {
-          await axios.put(`/api/modules/${item.id}/visibility`, newVal);
+
+          await updateModuleVisibility(item.moduleId, newVal);
         }
 
         // Update local state
@@ -105,24 +183,28 @@ export default function Sections({ pageId }) {
         );
       } catch (error) {
         console.error("Error updating visibility:", error);
+        console.error("Error response data:", error.response?.data);
+        console.error("Error status:", error.response?.status);
       }
     },
-    [axios],
+    [updateSectionVisibility, updateModuleVisibility],
   );
 
   // Edit - with intelligent navigation
   const handleEdit = useCallback(
     (item) => {
       if (item.type === "section") {
-        router.push(`/pages/${pageId}/sections/${item.id}`);
+        router.push(`/pages/${pageId}/sections/${item.sectionId}`);
       } else if (item.type === "module") {
-        router.push(`/modules/${item.moduleType.toLowerCase()}/${item.id}`);
+        router.push(
+          `/pages/${pageId}/sections/${item.sectionId}/modules/${item.moduleId}`,
+        );
       }
     },
     [router, pageId],
   );
 
-  // Delete - with axiosClient
+  // Delete using the new hook
   const handleDelete = useCallback(
     async (item) => {
       const itemType = item.type === "section" ? "section" : "module";
@@ -133,9 +215,9 @@ export default function Sections({ pageId }) {
 
       try {
         if (item.type === "section") {
-          await axios.delete(`/api/sections/${item.id}`);
+          await deleteSection(item.sectionId);
         } else if (item.type === "module") {
-          await axios.delete(`/api/modules/${item.id}`);
+          await deleteModule(item.moduleId);
         }
 
         await refetch();
@@ -144,30 +226,59 @@ export default function Sections({ pageId }) {
         console.error("Error during deletion:", error);
       }
     },
-    [refetch, axios],
+    [deleteSection, deleteModule, refetch],
   );
 
   // Function called by "Add module" button
   const handleAddModule = useCallback((section) => {
+    console.log("🔵 handleAddModule called with section:", section);
     setTargetSection(section);
     setShowAddModuleModal(true);
+    console.log("🔵 Modal should now be showing:", true);
   }, []);
 
   // Modal validation function
   const handleConfirmAddModule = async () => {
+    if (!selectedModuleType || !targetSection) {
+      console.error("Missing data for module creation:", {
+        selectedModuleType,
+        targetSection,
+      });
+      return;
+    }
+
+    console.log("Starting module creation with data:", {
+      sectionId: targetSection.sectionId,
+      type: selectedModuleType,
+      name: `New ${selectedModuleType}`,
+    });
+
     try {
-      await addModule({
-        sectionId: targetSection.id,
+      const result = await addModule({
+        sectionId: targetSection.sectionId,
         type: selectedModuleType,
         name: `New ${selectedModuleType}`,
       });
+
+      console.log("Module created successfully:", result);
+
       setShowAddModuleModal(false);
       setTargetSection(null);
       setSelectedModuleType("");
+
+      console.log("Starting refetch...");
       await refetch();
+      console.log("Refetch completed");
+      console.log("[DEBUG] page.sections après refetch:", page.sections);
     } catch (error) {
       console.error("Error adding module:", error);
+      console.error("Error details:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       // TODO: Add error feedback to user
+      alert(`Erreur lors de l'ajout du module: ${error.message}`);
     }
   };
 
@@ -178,7 +289,7 @@ export default function Sections({ pageId }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-6xl mx-auto space-y-6"
     >
       <Title
         label="Content Management"
@@ -262,12 +373,10 @@ export default function Sections({ pageId }) {
               <option value="list">List</option>
             </select>
             <div className="flex gap-2 justify-end">
-              <button
-                className="px-3 py-1 rounded transition-colors"
-                style={{
-                  backgroundColor: "var(--color-border)",
-                  color: "var(--color-text-muted)",
-                }}
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
                 onClick={() => {
                   setShowAddModuleModal(false);
                   setTargetSection(null);
@@ -275,17 +384,16 @@ export default function Sections({ pageId }) {
                 }}
               >
                 Cancel
-              </button>
-              <button
-                className="px-3 py-1 rounded text-white transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: "var(--color-primary)",
-                }}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
                 onClick={handleConfirmAddModule}
                 disabled={!selectedModuleType}
               >
                 Add
-              </button>
+              </Button>
             </div>
           </div>
         </div>

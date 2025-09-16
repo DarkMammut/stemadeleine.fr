@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -53,8 +55,17 @@ public class Content {
     private Boolean isVisible = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "contents_author_id_fkey"))
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "contents_author_id_fkey"))
     private User author;
+
+    // Many-to-many relationship with Media through content_media table
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "content_media",
+            joinColumns = @JoinColumn(name = "content_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "media_id")
+    )
+    private List<Media> medias = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -63,7 +74,4 @@ public class Content {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
-
-    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<ContentMedia> contentMedias = new java.util.ArrayList<>();
 }

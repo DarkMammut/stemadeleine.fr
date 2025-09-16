@@ -6,19 +6,19 @@ import Utilities from "@/components/Utilities";
 import Title from "@/components/Title";
 import useGetSection from "@/hooks/useGetSection";
 import useAddSection from "@/hooks/useAddSection";
+import { useSectionOperations } from "@/hooks/useSectionOperations";
 import MyForm from "@/components/MyForm";
 import MediaPicker from "@/components/MediaPicker";
 import Switch from "@/components/ui/Switch";
 import SectionContentManager from "@/components/SectionContentManager";
-import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function EditSection({ sectionId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
   const { updateSection } = useAddSection();
+  const { updateSectionVisibility, setSectionMedia } = useSectionOperations();
   const [sectionData, setSectionData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const axios = useAxiosClient();
 
   useEffect(() => {
     if (section) setSectionData(section);
@@ -45,10 +45,13 @@ export default function EditSection({ sectionId }) {
   ];
 
   const attachToEntity = async (mediaId) => {
-    await axios.put(`/api/sections/${sectionId}/media`, {
-      mediaId: mediaId,
-    });
-    refetch();
+    try {
+      await setSectionMedia(sectionId, mediaId);
+      refetch();
+    } catch (error) {
+      console.error("Error setting section media:", error);
+      alert("Erreur lors de l'ajout du média");
+    }
   };
 
   const handleFormChange = (name, value, allValues) => {
@@ -78,10 +81,9 @@ export default function EditSection({ sectionId }) {
   const handleVisibilityChange = async (isVisible) => {
     try {
       setSavingVisibility(true);
-      await axios.put(`/api/sections/${sectionId}/visibility`, { isVisible });
+      await updateSectionVisibility(sectionId, isVisible);
       setSavingVisibility(false);
       setSectionData((prev) => ({ ...prev, isVisible }));
-      // Removed refetch() to prevent page flash - local state is already updated
     } catch (err) {
       console.error(err);
       alert("Erreur lors de la mise à jour de la visibilité");
@@ -101,7 +103,7 @@ export default function EditSection({ sectionId }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-6xl mx-auto space-y-6"
     >
       <Title
         label="Édition de section"
@@ -154,7 +156,7 @@ export default function EditSection({ sectionId }) {
           {/* Rich Text Content Editor */}
           <div className="bg-surface border border-border rounded-lg p-6">
             <SectionContentManager
-              sectionId={sectionId}
+              sectionId={section?.sectionId}
               initialContents={sectionData?.contents || []}
             />
           </div>

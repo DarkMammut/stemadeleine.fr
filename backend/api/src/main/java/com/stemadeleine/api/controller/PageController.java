@@ -9,8 +9,10 @@ import com.stemadeleine.api.mapper.PageMapper;
 import com.stemadeleine.api.mapper.PageSectionMapper;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.Section;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.PageService;
+import com.stemadeleine.api.service.SectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PageController {
     private final PageService pageService;
+    private final SectionService sectionService;
     private final PageMapper pageMapper;
     private final PageEditMapper pageEditMapper;
     private final PageSectionMapper pageSectionMapper;
@@ -84,8 +87,8 @@ public class PageController {
         return pageService.getLastVersion(pageId)
                 .map(page -> {
                     log.debug("Page with sections found: {}", page.getId());
-                    // Retrieve filtered sections (without deleted ones) via service
-                    PageSectionDto dto = pageSectionMapper.toDto(page);
+                    List<Section> lastSections = sectionService.getSectionsByPage(pageId);
+                    PageSectionDto dto = pageSectionMapper.toDto(page, lastSections);
                     return ResponseEntity.ok(dto);
                 })
                 .orElseGet(() -> {

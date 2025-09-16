@@ -27,6 +27,9 @@ public abstract class PageSectionMapper {
     @Mapping(target = "sections", expression = "java(mapSections(page.getSections()))")
     public abstract PageSectionDto toDto(Page page);
 
+    @Mapping(target = "sections", expression = "java(mapSections(sections))")
+    public abstract PageSectionDto toDto(Page page, List<Section> sections);
+
     // Méthode pour filtrer les sections non supprimées
     protected List<SectionDto> mapSections(List<Section> sections) {
         if (sections == null) return null;

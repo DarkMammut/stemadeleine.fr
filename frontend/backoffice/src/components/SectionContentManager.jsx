@@ -11,7 +11,8 @@ import {
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
 import RichTextEditor from "@/components/RichTextEditor";
-import { useAxiosClient } from "@/utils/axiosClient";
+import ContentMediaManager from "@/components/ContentMediaManager";
+import { useContentOperations } from "@/hooks/useContentOperations";
 
 const SectionContentManager = ({ sectionId, onContentsChange }) => {
   const [contents, setContents] = useState([]);
@@ -19,7 +20,17 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
   const [loading, setLoading] = useState(false);
   const [savingStates, setSavingStates] = useState({});
   const [editingContent, setEditingContent] = useState({});
-  const axios = useAxiosClient();
+
+  // Use the new content operations hook
+  const {
+    getSectionContents,
+    createContent,
+    updateContent,
+    updateContentVisibility,
+    deleteContent,
+    addMediaToContent,
+    removeMediaFromContent,
+  } = useContentOperations();
 
   // Load contents when component mounts or sectionId changes
   useEffect(() => {
@@ -34,40 +45,17 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
       setLoading(true);
       console.log("Loading contents for section:", sectionId);
 
-      const response = await axios.get(`/api/sections/${sectionId}/contents`);
+      const uniqueContents = await getSectionContents(sectionId);
 
-      // Remove duplicates based on contentId and keep only the latest version
-      const uniqueContents = response.data.reduce((acc, content) => {
-        const existingIndex = acc.findIndex(
-          (c) => c.contentId === content.contentId,
-        );
-        if (existingIndex === -1) {
-          // Content not found, add it
-          acc.push(content);
-        } else {
-          // Content found, keep the one with higher version
-          if (content.version > acc[existingIndex].version) {
-            acc[existingIndex] = content;
-          }
-        }
-        return acc;
-      }, []);
-
-      console.log("Raw contents:", response.data.length);
-      console.log(
-        "Unique contents after deduplication:",
-        uniqueContents.length,
-      );
-
+      console.log("Contents loaded:", uniqueContents.length);
       setContents(uniqueContents);
 
       if (onContentsChange) {
         onContentsChange(uniqueContents);
       }
-
-      console.log("Contents loaded:", uniqueContents);
     } catch (error) {
       console.error("Error loading contents:", error);
+      alert("Error loading contents. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -90,11 +78,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
       setLoading(true);
       console.log("Adding new content for section:", sectionId);
 
-      const response = await axios.post(`/api/sections/${sectionId}/contents`, {
-        title: "New Content",
-      });
-
-      const newContent = response.data;
+      const newContent = await createContent(sectionId, "New Content");
       console.log("New content created:", newContent);
 
       // Reload contents to get the latest state
@@ -118,7 +102,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
       const content = contents.find((c) => c.contentId === contentId);
       if (!content) return;
 
-      await axios.put(`/api/sections/contents/${contentId}`, {
+      await updateContent(contentId, {
         title: newTitle,
         body: content.body || {
           html: "<p>Start writing your content here...</p>",
@@ -168,10 +152,14 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
         content.title,
       );
 
-      await axios.put(`/api/sections/contents/${contentId}`, {
+      await updateContent(contentId, {
         title: content.title,
         body: content.body,
+        medias: content.medias, // Ajout de la liste des médias pour la sauvegarde complète
       });
+
+      // Recharge les contenus pour avoir la version à jour (y compris les médias)
+      await loadContents();
 
       // Update local state to remove the hasLocalChanges flag
       setContents((prev) =>
@@ -195,9 +183,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
 
-      await axios.patch(`/api/sections/contents/${contentId}/visibility`, {
-        isVisible: isVisible,
-      });
+      await updateContentVisibility(contentId, isVisible);
 
       // Update local state
       setContents((prev) =>
@@ -224,7 +210,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
 
-      await axios.delete(`/api/sections/contents/${contentId}`);
+      await deleteContent(contentId);
 
       // Remove from local state
       setContents((prev) => prev.filter((c) => c.contentId !== contentId));
@@ -240,6 +226,39 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
       alert("Error deleting content. Please try again.");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
+    }
+  };
+
+  // Handle media operations
+  const handleAddMediaToContent = async (contentId, mediaId) => {
+    try {
+      const updatedContent = await addMediaToContent(contentId, mediaId);
+
+      // Update local state with the new media
+      setContents((prev) =>
+        prev.map((c) => (c.contentId === contentId ? updatedContent : c)),
+      );
+
+      console.log("Media added to content:", contentId, mediaId);
+    } catch (error) {
+      console.error("Error adding media to content:", error);
+      throw error;
+    }
+  };
+
+  const handleRemoveMediaFromContent = async (contentId, mediaId) => {
+    try {
+      const updatedContent = await removeMediaFromContent(contentId, mediaId);
+
+      // Update local state to remove the media
+      setContents((prev) =>
+        prev.map((c) => (c.contentId === contentId ? updatedContent : c)),
+      );
+
+      console.log("Media removed from content:", contentId, mediaId);
+    } catch (error) {
+      console.error("Error removing media from content:", error);
+      throw error;
     }
   };
 
@@ -436,6 +455,13 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                           />
                         </div>
                       </div>
+
+                      {/* Content Media Manager */}
+                      <ContentMediaManager
+                        content={content}
+                        onMediaAdd={handleAddMediaToContent}
+                        onMediaRemove={handleRemoveMediaFromContent}
+                      />
 
                       {/* Manual save button */}
                       <div className="flex justify-end">

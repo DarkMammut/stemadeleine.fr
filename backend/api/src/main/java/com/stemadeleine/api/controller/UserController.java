@@ -4,6 +4,7 @@ import com.stemadeleine.api.dto.UserDto;
 import com.stemadeleine.api.mapper.UserMapper;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserMapper userMapper; // Inject UserMapper as a bean
 
     @GetMapping
     public List<User> getAll() {
@@ -27,8 +26,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable UUID id) {
-        User user = userService.getUserById(id); // récupère l'entité User
-        return UserMapper.toDto(user);           // mappe vers DTO
+        User user = userService.getUserById(id); // Get User entity
+        return userMapper.toDto(user);           // Use instance method instead of static
     }
 
     @PostMapping
@@ -43,7 +42,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        userService.delete(id); // ✅ appelle bien l’instance, pas la classe
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

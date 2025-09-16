@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/newsletters")
+@RequestMapping("/api/newsletter")
 @RequiredArgsConstructor
 public class NewsletterController {
     private final NewsletterService newsletterService;
@@ -25,7 +25,7 @@ public class NewsletterController {
 
     @GetMapping
     public List<NewsletterDto> getAllNewsletters() {
-        log.info("GET /api/newsletters - Récupération de toutes les newsletters");
+        log.info("GET /api/newsletter - Récupération de toutes les newsletters");
         List<Newsletter> newsletters = newsletterService.getAllNewsletters();
         log.debug("Nombre de newsletters trouvées : {}", newsletters.size());
         return newsletters.stream().map(newsletterMapper::toDto).toList();
@@ -33,7 +33,7 @@ public class NewsletterController {
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsletterDto> getNewsletterById(@PathVariable UUID id) {
-        log.info("GET /api/newsletters/{} - Récupération d'une newsletter par ID", id);
+        log.info("GET /api/newsletter/{} - Récupération d'une newsletter par ID", id);
         return newsletterService.getNewsletterById(id)
                 .map(newsletter -> {
                     log.debug("Newsletter trouvée : {}", newsletter.getId());
@@ -55,7 +55,7 @@ public class NewsletterController {
             throw new RuntimeException("User not authenticated");
         }
 
-        log.info("POST /api/newsletters - Création d'une nouvelle newsletter");
+        log.info("POST /api/newsletter - Création d'une nouvelle newsletter");
         Newsletter newsletter = newsletterService.createNewsletterWithModule(
                 request,
                 currentUserDetails.account().getUser()
@@ -66,7 +66,7 @@ public class NewsletterController {
 
     @PutMapping("/{id}")
     public ResponseEntity<NewsletterDto> updateNewsletter(@PathVariable UUID id, @RequestBody Newsletter newsletterDetails) {
-        log.info("PUT /api/newsletters/{} - Mise à jour d'une newsletter", id);
+        log.info("PUT /api/newsletter/{} - Mise à jour d'une newsletter", id);
         try {
             Newsletter updatedNewsletter = newsletterService.updateNewsletter(id, newsletterDetails);
             log.debug("Newsletter mise à jour : {}", updatedNewsletter.getId());
@@ -79,7 +79,7 @@ public class NewsletterController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNewsletter(@PathVariable UUID id) {
-        log.info("DELETE /api/newsletters/{} - Suppression d'une newsletter", id);
+        log.info("DELETE /api/newsletter/{} - Suppression d'une newsletter", id);
         newsletterService.softDeleteNewsletter(id);
         log.debug("Newsletter supprimée : {}", id);
         return ResponseEntity.noContent().build();

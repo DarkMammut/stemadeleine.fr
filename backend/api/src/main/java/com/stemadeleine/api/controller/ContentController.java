@@ -172,4 +172,38 @@ public class ContentController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PutMapping("/sections/contents/{contentId}")
+    public ResponseEntity<ContentDto> updateContentFull(
+            @PathVariable UUID contentId,
+            @RequestBody ContentDto contentDto,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to update content without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+
+        log.info("PUT /api/sections/contents/{} - Updating content (full) by user: {}", contentId, currentUser.getUsername());
+
+        try {
+            Content currentContent = contentService.getLatestContentVersion(contentId)
+                    .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+
+            // Création d'une nouvelle version avec titre, body et médias
+            Content updatedContent = contentService.createNewVersionWithMedias(
+                    contentId,
+                    contentDto.title(),
+                    contentDto.body(),
+                    contentDto.medias(),
+                    currentUser
+            );
+            log.debug("Content updated (full): {}", contentId);
+            return ResponseEntity.ok(contentMapper.toDto(updatedContent));
+        } catch (RuntimeException e) {
+            log.error("Error updating content (full): {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

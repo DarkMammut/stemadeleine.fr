@@ -236,7 +236,7 @@ public class SectionController {
         }
     }
 
-    @PatchMapping("/contents/{contentId}/visibility")
+    @PutMapping("/contents/{contentId}/visibility")
     public ResponseEntity<ContentDto> updateContentVisibility(
             @PathVariable UUID contentId,
             @RequestBody Map<String, Boolean> body,
@@ -250,7 +250,7 @@ public class SectionController {
         User currentUser = currentUserDetails.account().getUser();
         Boolean isVisible = body.get("isVisible");
 
-        log.info("PATCH /api/sections/contents/{}/visibility - Updating visibility to {} by user: {}",
+        log.info("PUT /api/sections/contents/{}/visibility - Updating visibility to {} by user: {}",
                 contentId, isVisible, currentUser.getUsername());
 
         try {
@@ -397,6 +397,60 @@ public class SectionController {
         } catch (RuntimeException e) {
             log.error("Error updating content sort order: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ----- CONTENT MEDIA MANAGEMENT ROUTES -----
+
+    @PutMapping("/contents/{contentId}/media")
+    public ResponseEntity<ContentDto> addMediaToContent(
+            @PathVariable UUID contentId,
+            @RequestBody Map<String, UUID> body,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to add media to content without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+        UUID mediaId = body.get("mediaId");
+
+        log.info("PUT /api/sections/contents/{}/media - Adding media {} by user: {}",
+                contentId, mediaId, currentUser.getUsername());
+
+        try {
+            Content updatedContent = contentService.addMediaToContent(contentId, mediaId, currentUser);
+            log.debug("Media added to content successfully: {}", contentId);
+            return ResponseEntity.ok(contentMapper.toDto(updatedContent));
+        } catch (RuntimeException e) {
+            log.error("Error adding media to content {}: {}", contentId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/contents/{contentId}/media/{mediaId}")
+    public ResponseEntity<ContentDto> removeMediaFromContent(
+            @PathVariable UUID contentId,
+            @PathVariable UUID mediaId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to remove media from content without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("DELETE /api/sections/contents/{}/media/{} - Removing media by user: {}",
+                contentId, mediaId, currentUser.getUsername());
+
+        try {
+            Content updatedContent = contentService.removeMediaFromContent(contentId, mediaId, currentUser);
+            log.debug("Media removed from content successfully: {}", contentId);
+            return ResponseEntity.ok(contentMapper.toDto(updatedContent));
+        } catch (RuntimeException e) {
+            log.error("Error removing media from content {}: {}", contentId, e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

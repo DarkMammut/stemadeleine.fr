@@ -3,17 +3,21 @@ package com.stemadeleine.api.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stemadeleine.api.model.Content;
+import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.PublishingStatus;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.ContentRepository;
+import com.stemadeleine.api.repository.MediaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,6 +25,7 @@ import java.util.UUID;
 public class ContentService {
 
     private final ContentRepository contentRepository;
+    private final MediaRepository mediaRepository;
     private final ObjectMapper objectMapper;
 
     /**
@@ -36,7 +41,7 @@ public class ContentService {
      */
     public Optional<Content> getContentById(UUID id) {
         log.debug("Retrieving content by ID: {}", id);
-        return contentRepository.findById(id);
+        return contentRepository.findByIdWithMedias(id);
     }
 
     /**
@@ -61,6 +66,9 @@ public class ContentService {
     public List<Content> getLatestContentsByOwner(UUID ownerId) {
         log.debug("Retrieving latest contents by owner: {}", ownerId);
         List<Content> latestContents = contentRepository.findLatestContentsByOwner(ownerId);
+        for (Content c : latestContents) {
+            log.info("Content {} version {} has medias: {}", c.getContentId(), c.getVersion(), c.getMedias().stream().map(m -> m.getId()).toList());
+        }
         log.debug("Found {} latest contents for owner: {}", latestContents.size(), ownerId);
         return latestContents;
     }
@@ -75,17 +83,16 @@ public class ContentService {
         UUID contentId = UUID.randomUUID();
         Integer maxSortOrder = contentRepository.findMaxSortOrderByOwner(ownerId);
 
-        Content content = Content.builder()
-                .contentId(contentId)
-                .ownerId(ownerId)
-                .version(1)
-                .title(title)
-                .body(body)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(true)
-                .sortOrder(maxSortOrder != null ? maxSortOrder + 1 : 1)
-                .author(author)
-                .build();
+        Content content = new Content();
+        content.setContentId(contentId);
+        content.setOwnerId(ownerId);
+        content.setVersion(1);
+        content.setTitle(title);
+        content.setBody(body);
+        content.setStatus(PublishingStatus.DRAFT);
+        content.setIsVisible(true);
+        content.setSortOrder(maxSortOrder != null ? maxSortOrder + 1 : 1);
+        content.setAuthor(author);
 
         Content savedContent = contentRepository.save(content);
         log.debug("Content created with ID: {} and contentId: {}", savedContent.getId(), savedContent.getContentId());
@@ -112,11 +119,48 @@ public class ContentService {
                 .isVisible(latestVersion.getIsVisible())
                 .sortOrder(latestVersion.getSortOrder())
                 .author(author)
+                .medias(new ArrayList<>(latestVersion.getMedias())) // Correction : nouvelle instance de la liste
                 .build();
 
         Content savedContent = contentRepository.save(newVersion);
         log.debug("New content version created: version {} for contentId: {}",
                 savedContent.getVersion(), savedContent.getContentId());
+        return savedContent;
+    }
+
+    /**
+     * Crée une nouvelle version de contenu avec une liste de médias personnalisée
+     */
+    @Transactional
+    public Content createNewVersionWithMedias(UUID contentId, String title, JsonNode body, List<com.stemadeleine.api.dto.MediaDto> mediasDto, User author) {
+        log.info("Creating new version of content (with medias): {} by user: {}", contentId, author.getUsername());
+
+        Content latestVersion = getLatestContentVersion(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+
+        List<Media> medias = new ArrayList<>();
+        if (mediasDto != null && !mediasDto.isEmpty()) {
+            List<UUID> mediaIds = mediasDto.stream()
+                    .map(com.stemadeleine.api.dto.MediaDto::id)
+                    .collect(Collectors.toList());
+            medias = mediaRepository.findAllById(mediaIds);
+        }
+
+        Content newVersion = Content.builder()
+                .contentId(contentId)
+                .ownerId(latestVersion.getOwnerId())
+                .version(latestVersion.getVersion() + 1)
+                .title(title)
+                .body(body)
+                .status(PublishingStatus.DRAFT)
+                .isVisible(latestVersion.getIsVisible())
+                .sortOrder(latestVersion.getSortOrder())
+                .author(author)
+                .medias(new ArrayList<>(medias)) // Correction : nouvelle instance de la liste
+                .build();
+
+        Content savedContent = contentRepository.save(newVersion);
+        log.debug("New content version created (with medias): version {} for contentId: {}", savedContent.getVersion(), savedContent.getContentId());
         return savedContent;
     }
 
@@ -132,17 +176,16 @@ public class ContentService {
                 .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
 
         // Create new version with updated visibility
-        Content newVersion = Content.builder()
-                .contentId(contentId)
-                .ownerId(latestVersion.getOwnerId())
-                .version(latestVersion.getVersion() + 1)
-                .title(latestVersion.getTitle())
-                .body(latestVersion.getBody())
-                .status(latestVersion.getStatus())
-                .isVisible(isVisible)
-                .sortOrder(latestVersion.getSortOrder())
-                .author(author)
-                .build();
+        Content newVersion = new Content();
+        newVersion.setContentId(contentId);
+        newVersion.setOwnerId(latestVersion.getOwnerId());
+        newVersion.setVersion(latestVersion.getVersion() + 1);
+        newVersion.setTitle(latestVersion.getTitle());
+        newVersion.setBody(latestVersion.getBody());
+        newVersion.setStatus(latestVersion.getStatus());
+        newVersion.setIsVisible(isVisible);
+        newVersion.setSortOrder(latestVersion.getSortOrder());
+        newVersion.setAuthor(author);
 
         Content savedContent = contentRepository.save(newVersion);
         log.debug("Content visibility updated: version {} for contentId: {}",
@@ -161,17 +204,16 @@ public class ContentService {
                 .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
 
         // Create new version marked as deleted
-        Content deletedVersion = Content.builder()
-                .contentId(contentId)
-                .ownerId(latestVersion.getOwnerId())
-                .version(latestVersion.getVersion() + 1)
-                .title(latestVersion.getTitle())
-                .body(latestVersion.getBody())
-                .status(PublishingStatus.DELETED)
-                .isVisible(false)
-                .sortOrder(latestVersion.getSortOrder())
-                .author(author)
-                .build();
+        Content deletedVersion = new Content();
+        deletedVersion.setContentId(contentId);
+        deletedVersion.setOwnerId(latestVersion.getOwnerId());
+        deletedVersion.setVersion(latestVersion.getVersion() + 1);
+        deletedVersion.setTitle(latestVersion.getTitle());
+        deletedVersion.setBody(latestVersion.getBody());
+        deletedVersion.setStatus(PublishingStatus.DELETED);
+        deletedVersion.setIsVisible(false);
+        deletedVersion.setSortOrder(latestVersion.getSortOrder());
+        deletedVersion.setAuthor(author);
 
         Content savedContent = contentRepository.save(deletedVersion);
         log.debug("Content marked as deleted: version {} for contentId: {}",
@@ -193,22 +235,100 @@ public class ContentService {
 
             if (!latestVersion.getSortOrder().equals(i + 1)) {
                 // Create new version with updated sort order
-                Content newVersion = Content.builder()
-                        .contentId(contentId)
-                        .ownerId(latestVersion.getOwnerId())
-                        .version(latestVersion.getVersion() + 1)
-                        .title(latestVersion.getTitle())
-                        .body(latestVersion.getBody())
-                        .status(latestVersion.getStatus())
-                        .isVisible(latestVersion.getIsVisible())
-                        .sortOrder(i + 1)
-                        .author(author)
-                        .build();
+                Content newVersion = new Content();
+                newVersion.setContentId(contentId);
+                newVersion.setOwnerId(latestVersion.getOwnerId());
+                newVersion.setVersion(latestVersion.getVersion() + 1);
+                newVersion.setTitle(latestVersion.getTitle());
+                newVersion.setBody(latestVersion.getBody());
+                newVersion.setStatus(latestVersion.getStatus());
+                newVersion.setIsVisible(latestVersion.getIsVisible());
+                newVersion.setSortOrder(i + 1);
+                newVersion.setAuthor(author);
 
                 contentRepository.save(newVersion);
                 log.debug("Content sort order updated: contentId {} to position {}", contentId, i + 1);
             }
         }
+    }
+
+    /**
+     * Add media to content
+     */
+    @Transactional
+    public Content addMediaToContent(UUID contentId, UUID mediaId, User author) {
+        log.info("Adding media {} to content {} by user: {}", mediaId, contentId, author.getUsername());
+
+        Content latestVersion = getLatestContentVersion(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new RuntimeException("Media not found: " + mediaId));
+
+        // Create new version with updated medias list
+        List<Media> updatedMedias = new ArrayList<>();
+        if (latestVersion.getMedias() != null) {
+            updatedMedias.addAll(latestVersion.getMedias());
+        }
+
+        // Add media only if not already present
+        if (!updatedMedias.contains(media)) {
+            updatedMedias.add(media);
+        }
+
+        // Création d'une nouvelle version sans builder
+        Content newVersion = new Content();
+        newVersion.setContentId(contentId);
+        newVersion.setOwnerId(latestVersion.getOwnerId());
+        newVersion.setVersion(latestVersion.getVersion() + 1);
+        newVersion.setTitle(latestVersion.getTitle());
+        newVersion.setBody(latestVersion.getBody());
+        newVersion.setStatus(PublishingStatus.DRAFT);
+        newVersion.setIsVisible(latestVersion.getIsVisible());
+        newVersion.setSortOrder(latestVersion.getSortOrder());
+        newVersion.setAuthor(author);
+        newVersion.setMedias(updatedMedias);
+
+        Content savedContent = contentRepository.save(newVersion);
+        log.debug("Media added to content: version {} for contentId: {}",
+                savedContent.getVersion(), savedContent.getContentId());
+        return savedContent;
+    }
+
+    /**
+     * Remove media from content
+     */
+    @Transactional
+    public Content removeMediaFromContent(UUID contentId, UUID mediaId, User author) {
+        log.info("Removing media {} from content {} by user: {}", mediaId, contentId, author.getUsername());
+
+        Content latestVersion = getLatestContentVersion(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+
+        // Create new version with updated medias list (without the specified media)
+        List<Media> updatedMedias = new ArrayList<>();
+        if (latestVersion.getMedias() != null) {
+            updatedMedias = latestVersion.getMedias().stream()
+                    .filter(media -> !media.getId().equals(mediaId))
+                    .collect(Collectors.toList());
+        }
+
+        Content newVersion = new Content();
+        newVersion.setContentId(contentId);
+        newVersion.setOwnerId(latestVersion.getOwnerId());
+        newVersion.setVersion(latestVersion.getVersion() + 1);
+        newVersion.setTitle(latestVersion.getTitle());
+        newVersion.setBody(latestVersion.getBody());
+        newVersion.setStatus(latestVersion.getStatus());
+        newVersion.setIsVisible(latestVersion.getIsVisible());
+        newVersion.setSortOrder(latestVersion.getSortOrder());
+        newVersion.setAuthor(author);
+        newVersion.setMedias(updatedMedias);
+
+        Content savedContent = contentRepository.save(newVersion);
+        log.debug("Media removed from content: version {} for contentId: {}",
+                savedContent.getVersion(), savedContent.getContentId());
+        return savedContent;
     }
 
     /**

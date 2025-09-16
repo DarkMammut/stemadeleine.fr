@@ -80,7 +80,7 @@ public class NewsService {
                 "NEWS",
                 author
         );
-        log.debug("Module créé avec l'ID : {}", module.getId());
+        log.debug("Module cré�� avec l'ID : {}", module.getId());
 
         Content content = Content.builder()
                 .ownerId(module.getId())

@@ -22,8 +22,17 @@ public interface SectionMapper {
         if (section == null || section.getModules() == null) {
             return null;
         }
-        return section.getModules().stream()
-                .map(module -> moduleMapper.toDto(module))
-                .collect(java.util.stream.Collectors.toList());
+        java.util.List<ModuleDtoMarker> result = new java.util.ArrayList<>();
+        for (var module : section.getModules()) {
+            try {
+                if (module != null) {
+                    result.add(moduleMapper.toDto(module));
+                }
+            } catch (Exception e) {
+                // Log l'erreur et continue
+                System.err.println("Erreur lors du mapping d'un module dans SectionMapper : " + e.getMessage());
+            }
+        }
+        return result;
     }
 }

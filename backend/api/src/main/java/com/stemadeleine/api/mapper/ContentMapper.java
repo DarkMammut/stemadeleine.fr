@@ -36,9 +36,9 @@ public class ContentMapper {
                 content.getAuthor() != null ? content.getAuthor().getUsername() : null,
                 content.getCreatedAt(),
                 content.getUpdatedAt(),
-                content.getContentMedias() != null ?
-                        content.getContentMedias().stream()
-                                .map(cm -> mediaMapper.toDto(cm.getMedia()))
+                content.getMedias() != null ?
+                        content.getMedias().stream()
+                                .map(mediaMapper::toDto)
                                 .toList() :
                         Collections.emptyList()
         );

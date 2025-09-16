@@ -75,11 +75,17 @@ export default function DraggableTree({
     const activeIndex = cloned.findIndex((i) => i.id === event.active.id);
     const overIndex = cloned.findIndex((i) => i.id === event.over.id);
     const activeItem = cloned[activeIndex];
-    const parent = projected.parentId ? cloned.find((i) => i.id === projected.parentId) : null;
+    const parent = projected.parentId
+      ? cloned.find((i) => i.id === projected.parentId)
+      : null;
 
     // Validation générique via canDrop
     if (typeof canDrop === "function") {
-      const isAllowed = canDrop({ dragged: activeItem, targetParent: parent, projected });
+      const isAllowed = canDrop({
+        dragged: activeItem,
+        targetParent: parent,
+        projected,
+      });
       if (!isAllowed) return;
     }
 
@@ -115,9 +121,9 @@ export default function DraggableTree({
         items={flattened.map((i) => i.id)}
         strategy={verticalListSortingStrategy}
       >
-        {flattened.map((item) => (
+        {flattened.map((item, index) => (
           <SortableItem
-            key={item.id}
+            key={`${item.type}-${item.id}`}
             item={item}
             depth={item.depth}
             childCount={getChildCount(tree, item.id)}
