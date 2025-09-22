@@ -18,11 +18,15 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
     Integer findMaxSortOrderByPage(@Param("pageId") UUID pageId);
 
     @Query("""
-                SELECT DISTINCT s
-                FROM Section s
-                LEFT JOIN FETCH s.contents c
-                WHERE s.sectionId = :sectionId
-                ORDER BY s.version DESC
+            SELECT DISTINCT s
+            FROM Section s
+            LEFT JOIN FETCH s.contents c
+            WHERE s.sectionId = :sectionId
+              AND s.version = (
+                SELECT MAX(s2.version)
+                FROM Section s2
+                WHERE s2.sectionId = :sectionId
+              )
             """)
     Optional<Section> findTopBySectionIdOrderByVersionDesc(@Param("sectionId") UUID sectionId);
 

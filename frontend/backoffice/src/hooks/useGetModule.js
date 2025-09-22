@@ -16,7 +16,9 @@ export default function useGetModule({ moduleId }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosClient.get(`/api/modules/${moduleId}`);
+      const response = await axiosClient.get(
+        `/api/modules/by-module-id/${moduleId}`,
+      );
       setModule(response.data);
     } catch (err) {
       console.error("Error fetching module:", err);

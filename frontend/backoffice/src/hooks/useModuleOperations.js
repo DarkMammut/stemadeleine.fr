@@ -4,6 +4,20 @@ import { useAxiosClient } from "@/utils/axiosClient";
 export function useModuleOperations() {
   const axios = useAxiosClient();
 
+  // Update module
+  const updateModule = useCallback(
+    async (module, moduleData) => {
+      try {
+        const response = await axios.post(`/api/${module}/version`, moduleData);
+        return response.data;
+      } catch (error) {
+        console.error("Error updating module:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
+
   // Update module visibility
   const updateModuleVisibility = useCallback(
     async (moduleId, isVisible) => {
@@ -41,6 +55,7 @@ export function useModuleOperations() {
   );
 
   return {
+    updateModule,
     updateModuleVisibility,
     deleteModule,
   };

@@ -1,10 +1,12 @@
 package com.stemadeleine.api.service;
 
-import com.stemadeleine.api.dto.CreateFormRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateFormRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.FieldRepository;
 import com.stemadeleine.api.repository.FormRepository;
+import com.stemadeleine.api.repository.SectionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ public class FormService {
     private final FormRepository formRepository;
     private final ModuleService moduleService;
     private final FieldRepository fieldRepository;
+    private final SectionRepository sectionRepository;
 
     public List<Form> getAllForms() {
         log.info("Récupération de tous les formulaires non supprimés");
@@ -37,41 +40,27 @@ public class FormService {
         return form;
     }
 
-    public Form createFormWithModule(CreateFormRequest request, User author) {
+    public Form createFormWithModule(CreateModuleRequest request, User author) {
         log.info("Création d'un nouveau formulaire pour la section : {}", request.sectionId());
 
-        Module module = moduleService.createNewModule(
-                request.sectionId(),
-                request.name(),
-                "FORM",
-                author
-        );
-        log.debug("Module créé avec l'ID : {}", module.getId());
+        // Récupérer la section à partir de l'UUID
+        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
-        Field field = Field.builder()
-                .label("Name")
-                .inputType(FieldInputType.TEXT)
-                .required(true)
-                .placeholder("Enter your name")
-                .sortOrder(1)
-                .isVisible(true)
-                .build();
-        Field savedField = fieldRepository.save(field);
-        log.debug("Champ par défaut créé avec l'ID : {}", savedField.getId());
-
+        // Créer directement le form (hérite de Module)
         Form form = Form.builder()
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(module.getName())
-                .title(module.getTitle())
-                .type(module.getType())
-                .sortOrder(module.getSortOrder())
-                .isVisible(module.getIsVisible())
-                .status(module.getStatus())
+                .moduleId(UUID.randomUUID())
+                .section(section)
+                .name(request.name())
+                .title(request.name())
+                .type("FORM")
+                .sortOrder(0)
+                .isVisible(false)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
                 .description("New Form")
-                .fields(List.of(savedField))
+                .fields(new java.util.ArrayList<>())
                 .build();
 
         Form savedForm = formRepository.save(form);
@@ -121,5 +110,47 @@ public class FormService {
         List<Field> fields = fieldRepository.findByIsVisibleTrue();
         log.debug("Nombre de champs visibles trouvés : {}", fields.size());
         return fields;
+    }
+
+    public Form createFormVersion(UpdateFormRequest request, User author) {
+        log.info("Création d'une nouvelle version de Form pour le moduleId : {}", request.moduleId());
+
+        // 1. Récupérer le module (pour structure ou fallback)
+        Module module = moduleService.getModuleByModuleId(request.moduleId())
+                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+
+        // 2. Récupérer la dernière version du Form pour ce module
+        Form previousForm = formRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId()).orElse(null);
+
+        // 3. Fusionner les infos du request et de la version précédente
+        String name = request.name() != null ? request.name() : (previousForm != null ? previousForm.getName() : module.getName());
+        String title = request.title() != null ? request.title() : (previousForm != null ? previousForm.getTitle() : module.getTitle());
+        String description = request.description() != null ? request.description() : (previousForm != null ? previousForm.getDescription() : "Nouvelle version de formulaire");
+        Media media = previousForm != null ? previousForm.getMedia() : null;
+        List<Field> fields = previousForm != null ? previousForm.getFields() : List.of();
+        String type = module.getType();
+        Integer sortOrder = module.getSortOrder();
+        Boolean isVisible = module.getIsVisible();
+        PublishingStatus status = PublishingStatus.DRAFT;
+        int newVersion = previousForm != null ? previousForm.getVersion() + 1 : 1;
+
+        Form form = Form.builder()
+                .moduleId(module.getModuleId())
+                .name(name)
+                .title(title)
+                .description(description)
+                .media(media)
+                .fields(fields)
+                .author(author)
+                .type(type)
+                .sortOrder(sortOrder)
+                .isVisible(isVisible)
+                .status(status)
+                .version(newVersion)
+                .build();
+
+        Form savedForm = formRepository.save(form);
+        log.info("Nouvelle version de Form créée avec succès, ID : {}", savedForm.getId());
+        return savedForm;
     }
 }

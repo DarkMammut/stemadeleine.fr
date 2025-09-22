@@ -50,6 +50,9 @@ public class Media {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
+    @Column(name = "owner_id")
+    private UUID ownerId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

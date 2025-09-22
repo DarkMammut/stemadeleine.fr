@@ -1,10 +1,12 @@
 package com.stemadeleine.api.controller;
 
-import com.stemadeleine.api.dto.CreateNewsletterRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.NewsletterDto;
+import com.stemadeleine.api.dto.UpdateNewsRequest;
 import com.stemadeleine.api.mapper.NewsletterMapper;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Newsletter;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.NewsletterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/newsletter")
+@RequestMapping("/api/newsletters")
 @RequiredArgsConstructor
 public class NewsletterController {
     private final NewsletterService newsletterService;
@@ -25,63 +27,77 @@ public class NewsletterController {
 
     @GetMapping
     public List<NewsletterDto> getAllNewsletters() {
-        log.info("GET /api/newsletter - Récupération de toutes les newsletters");
+        log.info("GET /api/newsletter - Retrieving all newsletters");
         List<Newsletter> newsletters = newsletterService.getAllNewsletters();
-        log.debug("Nombre de newsletters trouvées : {}", newsletters.size());
+        log.debug("Number of newsletters found: {}", newsletters.size());
         return newsletters.stream().map(newsletterMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsletterDto> getNewsletterById(@PathVariable UUID id) {
-        log.info("GET /api/newsletter/{} - Récupération d'une newsletter par ID", id);
+        log.info("GET /api/newsletter/{} - Retrieving newsletter by ID", id);
         return newsletterService.getNewsletterById(id)
                 .map(newsletter -> {
-                    log.debug("Newsletter trouvée : {}", newsletter.getId());
+                    log.debug("Newsletter found: {}", newsletter.getId());
                     return ResponseEntity.ok(newsletterMapper.toDto(newsletter));
                 })
                 .orElseGet(() -> {
-                    log.warn("Newsletter non trouvée avec l'ID : {}", id);
+                    log.warn("Newsletter not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
     }
 
     @PostMapping
     public ResponseEntity<NewsletterDto> createNewsletter(
-            @RequestBody CreateNewsletterRequest request,
+            @RequestBody CreateModuleRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUserDetails
     ) {
         if (currentUserDetails == null) {
-            log.error("Tentative de création de newsletter sans authentification");
+            log.error("Attempt to create newsletter without authentication");
             throw new RuntimeException("User not authenticated");
         }
 
-        log.info("POST /api/newsletter - Création d'une nouvelle newsletter");
+        log.info("POST /api/newsletter - Creating a new newsletter");
         Newsletter newsletter = newsletterService.createNewsletterWithModule(
                 request,
                 currentUserDetails.account().getUser()
         );
-        log.debug("Newsletter créée avec l'ID : {}", newsletter.getId());
+        log.debug("Newsletter created with ID: {}", newsletter.getId());
+        return ResponseEntity.ok(newsletterMapper.toDto(newsletter));
+    }
+
+    @PostMapping("/version")
+    public ResponseEntity<NewsletterDto> createNewVersionForModule(
+            @RequestBody UpdateNewsRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("POST /api/newsletters/version - Creating a new version for module: {}", request.moduleId());
+        Newsletter newsletter = newsletterService.createNewsletterVersion(request, currentUser);
+        log.debug("New version created with ID: {}", newsletter.getId());
         return ResponseEntity.ok(newsletterMapper.toDto(newsletter));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NewsletterDto> updateNewsletter(@PathVariable UUID id, @RequestBody Newsletter newsletterDetails) {
-        log.info("PUT /api/newsletter/{} - Mise à jour d'une newsletter", id);
+        log.info("PUT /api/newsletter/{} - Updating a newsletter", id);
         try {
             Newsletter updatedNewsletter = newsletterService.updateNewsletter(id, newsletterDetails);
-            log.debug("Newsletter mise à jour : {}", updatedNewsletter.getId());
+            log.debug("Newsletter updated: {}", updatedNewsletter.getId());
             return ResponseEntity.ok(newsletterMapper.toDto(updatedNewsletter));
         } catch (RuntimeException e) {
-            log.error("Erreur lors de la mise à jour de la newsletter {} : {}", id, e.getMessage());
+            log.error("Error updating newsletter {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNewsletter(@PathVariable UUID id) {
-        log.info("DELETE /api/newsletter/{} - Suppression d'une newsletter", id);
+        log.info("DELETE /api/newsletter/{} - Deleting a newsletter", id);
         newsletterService.softDeleteNewsletter(id);
-        log.debug("Newsletter supprimée : {}", id);
+        log.debug("Newsletter deleted: {}", id);
         return ResponseEntity.noContent().build();
     }
 }

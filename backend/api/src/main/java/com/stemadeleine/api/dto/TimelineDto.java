@@ -5,15 +5,15 @@ import java.util.UUID;
 
 public record TimelineDto(
         UUID id,
+        UUID moduleId,
+        UUID sectionId,
         String name,
         String type,
+        String variant,
         Integer sortOrder,
-        UUID sectionId,
         String status,
         Boolean isVisible,
         Integer version,
-        UUID moduleId,
-        String variant,
         List<ContentDto> contents
 ) implements ModuleDtoMarker {
 }

@@ -48,6 +48,12 @@ public class NewsPublication {
     @Column(name = "published_date")
     private OffsetDateTime publishedDate;
 
+    @Column(name = "start_date", nullable = false)
+    private OffsetDateTime startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private OffsetDateTime endDate;
+
     // Single featured media for the news
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "media_id", foreignKey = @ForeignKey(name = "news_publications_media_id_fkey"))

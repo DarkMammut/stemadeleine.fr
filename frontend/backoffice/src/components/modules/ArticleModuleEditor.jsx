@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
 import Switch from "@/components/ui/Switch";
-import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import ContentManager from "@/components/ContentManager";
 
 export default function ArticleModuleEditor({
   moduleId,
@@ -12,8 +12,7 @@ export default function ArticleModuleEditor({
   setModuleData,
   refetch,
 }) {
-  const { updateModule } = useAddModule();
-  const { updateModuleVisibility } = useModuleOperations();
+  const { updateModule, updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
 
@@ -55,11 +54,11 @@ export default function ArticleModuleEditor({
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
-      await updateModule(moduleId, {
+      await updateModule("articles", {
+        moduleId: moduleId,
         name: values.name,
         title: values.title,
         variant: values.variant,
-        sortOrder: parseInt(values.sortOrder) || 0,
       });
       setSaving(false);
       refetch();
@@ -119,42 +118,18 @@ export default function ArticleModuleEditor({
 
       {/* Gestion des contenus */}
       <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Contenus de l'article
-        </h3>
-        <div className="text-sm text-text-muted mb-4">
-          Gestion des contenus multiples pour ce module article (paragraphes,
-          images, etc.)
-        </div>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
-          onClick={() =>
-            alert(
-              "Fonctionnalité à implémenter : gestionnaire de contenus multiples",
-            )
-          }
-        >
-          Gérer les contenus de l'article
-        </button>
-
-        {/* Affichage des contenus existants */}
-        {moduleData?.contents && moduleData.contents.length > 0 && (
-          <div className="mt-4">
-            <h4 className="font-medium text-text mb-2">Contenus actuels :</h4>
-            <div className="space-y-2">
-              {moduleData.contents.map((content, index) => (
-                <div
-                  key={content.id || index}
-                  className="text-sm bg-gray-50 p-2 rounded"
-                >
-                  Contenu #{index + 1}:{" "}
-                  {content.title || content.text?.substring(0, 50) + "..."}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <ContentManager
+          parentId={moduleId}
+          parentType="module"
+          customLabels={{
+            header: "Contenus de l'article",
+            addButton: "Ajouter un contenu d'article",
+            empty: "Aucun contenu pour cet article.",
+            loading: "Chargement des contenus...",
+            saveContent: "Enregistrer le contenu",
+            bodyLabel: "Contenu de l'article",
+          }}
+        />
       </div>
     </div>
   );

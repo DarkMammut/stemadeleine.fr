@@ -6,6 +6,7 @@ import MediaPicker from "@/components/MediaPicker";
 import Switch from "@/components/ui/Switch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import ContentManager from "@/components/ContentManager";
 
 export default function NewsModuleEditor({
   moduleId,
@@ -54,24 +55,6 @@ export default function NewsModuleEditor({
       placeholder: "Description du module actualités",
       defaultValue: moduleData?.description || "",
     },
-    {
-      name: "startDate",
-      label: "Date de début",
-      type: "datetime-local",
-      required: true,
-      defaultValue: moduleData?.startDate
-        ? new Date(moduleData.startDate).toISOString().slice(0, 16)
-        : new Date().toISOString().slice(0, 16),
-    },
-    {
-      name: "endDate",
-      label: "Date de fin",
-      type: "datetime-local",
-      required: true,
-      defaultValue: moduleData?.endDate
-        ? new Date(moduleData.endDate).toISOString().slice(0, 16)
-        : "",
-    },
   ];
 
   const attachToEntity = async (mediaId) => {
@@ -96,8 +79,6 @@ export default function NewsModuleEditor({
         title: values.title,
         variant: values.variant,
         description: values.description,
-        startDate: values.startDate,
-        endDate: values.endDate,
         sortOrder: parseInt(values.sortOrder) || 0,
       });
       setSaving(false);
@@ -172,24 +153,18 @@ export default function NewsModuleEditor({
 
       {/* Gestion des contenus */}
       <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Contenus associés
-        </h3>
-        <div className="text-sm text-text-muted mb-4">
-          Gestion des contenus multiples pour ce module actualités (à
-          implémenter avec un gestionnaire de contenus)
-        </div>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
-          onClick={() =>
-            alert(
-              "Fonctionnalité à implémenter : gestionnaire de contenus multiples",
-            )
-          }
-        >
-          Gérer les contenus
-        </button>
+        <ContentManager
+          parentId={moduleId}
+          parentType="module"
+          customLabels={{
+            header: "Présentation des actualités",
+            addButton: "Ajouter un contenu",
+            empty: "Aucun contenu pour les actualités.",
+            loading: "Chargement des contenus...",
+            saveContent: "Enregistrer le contenu",
+            bodyLabel: "Ecrivez votre paragraphe ici ...",
+          }}
+        />
       </div>
     </div>
   );

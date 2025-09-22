@@ -1,65 +1,65 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  PlusIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import React, {useEffect, useState} from "react";
+import {AnimatePresence, motion} from "framer-motion";
+import {ChevronDownIcon, ChevronRightIcon, PlusIcon, TrashIcon,} from "@heroicons/react/24/outline";
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
 import RichTextEditor from "@/components/RichTextEditor";
 import ContentMediaManager from "@/components/ContentMediaManager";
-import { useContentOperations } from "@/hooks/useContentOperations";
+import {useContentOperations} from "@/hooks/useContentOperations";
 
-const SectionContentManager = ({ sectionId, onContentsChange }) => {
+/**
+ * Composant générique de gestion de contenus pour section, module, etc.
+ * parentType: "section", "module", ...
+ * parentId: identifiant de la section ou du module
+ */
+const ContentManager = ({
+  parentId,
+  parentType = "section",
+  onContentsChange,
+  customLabels = {},
+}) => {
   const [contents, setContents] = useState([]);
   const [expandedContents, setExpandedContents] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [savingStates, setSavingStates] = useState({});
   const [editingContent, setEditingContent] = useState({});
 
-  // Use the new content operations hook
+  // Utilise le hook d'opérations, adapté pour le parentType
   const {
-    getSectionContents,
+    getContents,
     createContent,
     updateContent,
     updateContentVisibility,
     deleteContent,
     addMediaToContent,
     removeMediaFromContent,
-  } = useContentOperations();
+  } = useContentOperations({ parentType });
 
-  // Load contents when component mounts or sectionId changes
+  // Chargement des contenus
   useEffect(() => {
-    if (sectionId) {
+    if (parentId) {
       loadContents();
     }
-  }, [sectionId]);
+    // eslint-disable-next-line
+  }, [parentId]);
 
-  // Load contents from API with deduplication
   const loadContents = async () => {
     try {
       setLoading(true);
-      console.log("Loading contents for section:", sectionId);
-
-      const uniqueContents = await getSectionContents(sectionId);
-
-      console.log("Contents loaded:", uniqueContents.length);
+      const uniqueContents = await getContents(parentId);
       setContents(uniqueContents);
-
-      if (onContentsChange) {
-        onContentsChange(uniqueContents);
-      }
+      if (onContentsChange) onContentsChange(uniqueContents);
     } catch (error) {
       console.error("Error loading contents:", error);
-      alert("Error loading contents. Please try again.");
+      alert("Erreur lors du chargement des contenus.");
     } finally {
       setLoading(false);
     }
   };
+
+  // ...existing code from SectionContentManager, en remplaçant sectionId par parentId et les labels par customLabels...
 
   // Toggle content expansion
   const toggleContentExpansion = (contentId) => {
@@ -76,45 +76,36 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
   const handleAddContent = async () => {
     try {
       setLoading(true);
-      console.log("Adding new content for section:", sectionId);
-
-      const newContent = await createContent(sectionId, "New Content");
-      console.log("New content created:", newContent);
-
-      // Reload contents to get the latest state
+      const newContent = await createContent(
+        parentId,
+        customLabels.defaultTitle || "Nouveau contenu",
+      );
       await loadContents();
-
-      // Auto-expand the new content
       setExpandedContents((prev) => new Set([...prev, newContent.contentId]));
     } catch (error) {
       console.error("Error adding content:", error);
-      alert("Error adding content. Please try again.");
+      alert("Erreur lors de l'ajout du contenu.");
     } finally {
       setLoading(false);
     }
   };
 
+  // ...le reste du code SectionContentManager, adapté...
+
   // Update content title
   const handleTitleUpdate = async (contentId, newTitle) => {
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
-
       const content = contents.find((c) => c.contentId === contentId);
       if (!content) return;
-
       await updateContent(contentId, {
         title: newTitle,
-        body: content.body || {
-          html: "<p>Start writing your content here...</p>",
-        },
+        body: content.body || { html: "<p>Commencez à écrire...</p>" },
       });
-
-      // Reload contents to get the updated version
       await loadContents();
-      console.log("Content title updated:", contentId);
     } catch (error) {
       console.error("Error updating content title:", error);
-      alert("Error updating content title. Please try again.");
+      alert("Erreur lors de la mise à jour du titre.");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -122,7 +113,6 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
 
   // Update content body - NO AUTO-SAVE
   const handleContentUpdate = (contentId, newBody) => {
-    // Update only the specific content in local state
     setContents((prev) =>
       prev.map((c) =>
         c.contentId === contentId
@@ -130,49 +120,28 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
           : c,
       ),
     );
-
-    console.log("Content body changed locally for contentId:", contentId);
   };
 
-  // Manual save for content body with proper contentId handling
+  // Manual save for content body
   const handleSaveContentBody = async (contentId) => {
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
-
       const content = contents.find((c) => c.contentId === contentId);
-      if (!content) {
-        console.error("Content not found with contentId:", contentId);
-        return;
-      }
-
-      console.log(
-        "Saving content with contentId:",
-        contentId,
-        "title:",
-        content.title,
-      );
-
+      if (!content) return;
       await updateContent(contentId, {
         title: content.title,
         body: content.body,
-        medias: content.medias, // Ajout de la liste des médias pour la sauvegarde complète
+        medias: content.medias,
       });
-
-      // Recharge les contenus pour avoir la version à jour (y compris les médias)
       await loadContents();
-
-      // Update local state to remove the hasLocalChanges flag
       setContents((prev) =>
         prev.map((c) =>
           c.contentId === contentId ? { ...c, hasLocalChanges: false } : c,
         ),
       );
-
-      console.log("Content body saved successfully for contentId:", contentId);
-      alert("Content saved successfully!");
     } catch (error) {
       console.error("Error saving content body:", error);
-      alert("Error saving content body. Please try again.");
+      alert("Erreur lors de la sauvegarde du contenu.");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -182,20 +151,15 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
   const handleVisibilityToggle = async (contentId, isVisible) => {
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
-
       await updateContentVisibility(contentId, isVisible);
-
-      // Update local state
       setContents((prev) =>
         prev.map((c) =>
           c.contentId === contentId ? { ...c, isVisible: isVisible } : c,
         ),
       );
-
-      console.log("Content visibility updated:", contentId, isVisible);
     } catch (error) {
       console.error("Error updating content visibility:", error);
-      alert("Error updating content visibility. Please try again.");
+      alert("Erreur lors de la mise à jour de la visibilité.");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -203,43 +167,31 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
 
   // Delete content
   const handleDeleteContent = async (contentId) => {
-    if (!confirm("Are you sure you want to delete this content?")) {
-      return;
-    }
-
+    if (!confirm("Voulez-vous vraiment supprimer ce contenu ?")) return;
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
-
       await deleteContent(contentId);
-
-      // Remove from local state
       setContents((prev) => prev.filter((c) => c.contentId !== contentId));
       setExpandedContents((prev) => {
         const newSet = new Set(prev);
         newSet.delete(contentId);
         return newSet;
       });
-
-      console.log("Content deleted:", contentId);
     } catch (error) {
       console.error("Error deleting content:", error);
-      alert("Error deleting content. Please try again.");
+      alert("Erreur lors de la suppression du contenu.");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
   };
 
-  // Handle media operations
+  // Media operations
   const handleAddMediaToContent = async (contentId, mediaId) => {
     try {
       const updatedContent = await addMediaToContent(contentId, mediaId);
-
-      // Update local state with the new media
       setContents((prev) =>
         prev.map((c) => (c.contentId === contentId ? updatedContent : c)),
       );
-
-      console.log("Media added to content:", contentId, mediaId);
     } catch (error) {
       console.error("Error adding media to content:", error);
       throw error;
@@ -249,28 +201,22 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
   const handleRemoveMediaFromContent = async (contentId, mediaId) => {
     try {
       const updatedContent = await removeMediaFromContent(contentId, mediaId);
-
-      // Update local state to remove the media
       setContents((prev) =>
         prev.map((c) => (c.contentId === contentId ? updatedContent : c)),
       );
-
-      console.log("Media removed from content:", contentId, mediaId);
     } catch (error) {
       console.error("Error removing media from content:", error);
       throw error;
     }
   };
 
-  // Start editing content
+  // Edition state
   const startEditing = (contentId, field) => {
     setEditingContent((prev) => ({
       ...prev,
       [`${contentId}_${field}`]: true,
     }));
   };
-
-  // Stop editing content
   const stopEditing = (contentId, field) => {
     setEditingContent((prev) => {
       const newState = { ...prev };
@@ -278,43 +224,39 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
       return newState;
     });
   };
-
   const isEditing = (contentId, field) => {
     return editingContent[`${contentId}_${field}`] || false;
   };
 
+  // Rendu UI (labels personnalisables)
   return (
-    <div className="section-content-manager space-y-4">
-      {/* Header */}
+    <div className="content-manager space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-text">Section Contents</h3>
+        <h3 className="text-lg font-semibold text-text">
+          {customLabels.header || "Contenus"}
+        </h3>
         <Button
           onClick={handleAddContent}
           disabled={loading}
           className="flex items-center gap-2"
         >
           <PlusIcon className="w-4 h-4" />
-          Add Content
+          {customLabels.addButton || "Ajouter un contenu"}
         </Button>
       </div>
-
-      {/* Loading state */}
       {loading && contents.length === 0 && (
         <div className="text-center py-8 text-text-muted">
-          Loading contents...
+          {customLabels.loading || "Chargement des contenus..."}
         </div>
       )}
-
-      {/* Empty state */}
       {!loading && contents.length === 0 && (
         <div className="text-center py-8 text-text-muted">
           <p>
-            No contents yet. Click "Add Content" to create your first content.
+            {customLabels.empty ||
+              "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
           </p>
         </div>
       )}
-
-      {/* Contents list */}
       <div className="space-y-3">
         <AnimatePresence>
           {contents.map((content, index) => (
@@ -325,10 +267,8 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
               exit={{ opacity: 0, y: -20 }}
               className="border border-border rounded-lg bg-background shadow-sm"
             >
-              {/* Content header */}
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-3 flex-1">
-                  {/* Expand/collapse button */}
                   <button
                     onClick={() => toggleContentExpansion(content.contentId)}
                     className="p-1 hover:bg-gray-100 rounded-md transition-colors"
@@ -339,8 +279,6 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                       <ChevronRightIcon className="w-4 h-4" />
                     )}
                   </button>
-
-                  {/* Content title */}
                   <div className="flex-1">
                     {isEditing(content.contentId, "title") ? (
                       <form
@@ -369,7 +307,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                           className="px-2 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark"
                           disabled={savingStates[content.contentId]}
                         >
-                          Save
+                          {customLabels.save || "Enregistrer"}
                         </button>
                         <button
                           type="button"
@@ -379,7 +317,7 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                           className="px-2 py-1 text-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                           disabled={savingStates[content.contentId]}
                         >
-                          Cancel
+                          {customLabels.cancel || "Annuler"}
                         </button>
                       </form>
                     ) : (
@@ -387,25 +325,22 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                         className="font-medium text-text cursor-pointer hover:text-primary"
                         onClick={() => startEditing(content.contentId, "title")}
                       >
-                        {content.title || "Untitled Content"}
+                        {content.title ||
+                          customLabels.untitled ||
+                          "Contenu sans titre"}
                       </h4>
                     )}
                   </div>
-
-                  {/* Content info */}
                   <div className="text-xs text-text-muted">
                     v{content.version} • {content.authorUsername}
                     {content.hasLocalChanges && (
                       <span className="text-orange-600 ml-2">
-                        • Unsaved changes
+                        • Modifications non sauvegardées
                       </span>
                     )}
                   </div>
                 </div>
-
-                {/* Actions */}
                 <div className="flex items-center gap-2">
-                  {/* Visibility switch */}
                   <Switch
                     checked={content.isVisible}
                     onChange={(checked) =>
@@ -414,20 +349,16 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                     disabled={savingStates[content.contentId]}
                     size="sm"
                   />
-
-                  {/* Delete button */}
                   <button
                     onClick={() => handleDeleteContent(content.contentId)}
                     disabled={savingStates[content.contentId]}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
-                    title="Delete content"
+                    title={customLabels.delete || "Supprimer le contenu"}
                   >
                     <TrashIcon className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-
-              {/* Expandable content body */}
               <AnimatePresence>
                 {expandedContents.has(content.contentId) && (
                   <motion.div
@@ -438,10 +369,9 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                     className="overflow-hidden"
                   >
                     <div className="p-4 space-y-4">
-                      {/* Rich text editor */}
                       <div>
                         <label className="block text-sm font-medium text-text mb-2">
-                          Content Body
+                          {customLabels.bodyLabel || "Contenu"}
                         </label>
                         <div className="border border-border rounded-lg overflow-hidden">
                           <RichTextEditor
@@ -449,21 +379,21 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                             onChange={(newBody) =>
                               handleContentUpdate(content.contentId, newBody)
                             }
-                            placeholder="Start writing your content here..."
+                            placeholder={
+                              customLabels.bodyPlaceholder ||
+                              "Commencez à écrire..."
+                            }
                             height="200px"
                             disabled={savingStates[content.contentId]}
                           />
                         </div>
                       </div>
-
-                      {/* Content Media Manager */}
                       <ContentMediaManager
                         content={content}
                         onMediaAdd={handleAddMediaToContent}
                         onMediaRemove={handleRemoveMediaFromContent}
+                        onMediaChanged={loadContents}
                       />
-
-                      {/* Manual save button */}
                       <div className="flex justify-end">
                         <Button
                           onClick={() =>
@@ -472,15 +402,13 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
                           disabled={savingStates[content.contentId]}
                           className="px-4 py-2 text-sm"
                         >
-                          Save Content
+                          {customLabels.saveContent || "Enregistrer le contenu"}
                         </Button>
                       </div>
-
-                      {/* Saving indicator */}
                       {savingStates[content.contentId] && (
                         <div className="text-sm text-blue-600 flex items-center gap-2">
                           <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                          Saving...
+                          {customLabels.saving || "Sauvegarde..."}
                         </div>
                       )}
                     </div>
@@ -495,4 +423,4 @@ const SectionContentManager = ({ sectionId, onContentsChange }) => {
   );
 };
 
-export default SectionContentManager;
+export default ContentManager;

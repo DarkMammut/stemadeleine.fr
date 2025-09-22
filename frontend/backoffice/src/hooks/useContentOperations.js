@@ -2,54 +2,51 @@ import {useAxiosClient} from "@/utils/axiosClient";
 import {useCallback} from "react";
 
 /**
- * Hook for managing content operations within sections
- * All API calls use PUT method for consistency (except DELETE and GET)
+ * Hook générique pour la gestion des contenus (section, module, ...)
+ * @param {Object} options - { parentType: "section" | "module" }
  */
-export const useContentOperations = () => {
+export const useContentOperations = ({ parentType = "section" } = {}) => {
   const axios = useAxiosClient();
 
-  // Get contents for a specific section
-  const getSectionContents = useCallback(
-    async (sectionId) => {
-      try {
-        const response = await axios.get(`/api/sections/${sectionId}/contents`);
+  // Génère le préfixe d'URL selon le type de parent
+  const getApiPrefix = (parentId) => {
+    if (parentType === "module") return `/api/modules/${parentId}/contents`;
+    return `/api/sections/${parentId}/contents`;
+  };
 
-        // Remove duplicates based on contentId and keep only the latest version
+  // Récupère les contenus pour un parent (section/module)
+  const getContents = useCallback(
+    async (parentId) => {
+      try {
+        const response = await axios.get(getApiPrefix(parentId));
+        // Déduplication par contentId/version
         const uniqueContents = response.data.reduce((acc, content) => {
           const existingIndex = acc.findIndex(
             (c) => c.contentId === content.contentId,
           );
           if (existingIndex === -1) {
-            // Content not found, add it
             acc.push(content);
           } else {
-            // Content found, keep the one with higher version
             if (content.version > acc[existingIndex].version) {
               acc[existingIndex] = content;
             }
           }
           return acc;
         }, []);
-
         return uniqueContents;
       } catch (error) {
-        console.error("Error fetching section contents:", error);
+        console.error("Error fetching contents:", error);
         throw error;
       }
     },
     [axios],
   );
 
-  // Create new content for a section
+  // Création d'un contenu
   const createContent = useCallback(
-    async (sectionId, title = "New Content") => {
+    async (parentId, title = "Nouveau contenu") => {
       try {
-        const response = await axios.post(
-          `/api/sections/${sectionId}/contents`,
-          {
-            title,
-          },
-        );
+        const response = await axios.post(getApiPrefix(parentId), { title });
         return response.data;
       } catch (error) {
         console.error("Error creating content:", error);
@@ -59,13 +56,13 @@ export const useContentOperations = () => {
     [axios],
   );
 
-  // Update content (creates new version due to versioning system)
+  // Update content
   const updateContent = useCallback(
-    async (contentId, contentData) => {
+    async (contentId, data) => {
       try {
         const response = await axios.put(
           `/api/sections/contents/${contentId}`,
-          contentData,
+          data,
         );
         return response.data;
       } catch (error) {
@@ -82,9 +79,7 @@ export const useContentOperations = () => {
       try {
         const response = await axios.put(
           `/api/sections/contents/${contentId}/visibility`,
-          {
-            isVisible,
-          },
+          { isVisible },
         );
         return response.data;
       } catch (error) {
@@ -108,50 +103,18 @@ export const useContentOperations = () => {
     [axios],
   );
 
-  // Update contents sort order
-  const updateContentsSortOrder = useCallback(
-    async (ownerId, contentIds) => {
-      try {
-        const response = await axios.put(`/api/sections/contents/sort-order`, {
-          ownerId,
-          contentIds,
-        });
-        return response.data;
-      } catch (error) {
-        console.error("Error updating contents sort order:", error);
-        throw error;
-      }
-    },
-    [axios],
-  );
-
-  // Batch update multiple contents
-  const batchUpdateContents = useCallback(
-    async (updates) => {
-      try {
-        const promises = updates.map(({ contentId, contentData }) =>
-          updateContent(contentId, contentData),
-        );
-        const results = await Promise.all(promises);
-        return results;
-      } catch (error) {
-        console.error("Error batch updating contents:", error);
-        throw error;
-      }
-    },
-    [updateContent],
-  );
-
-  // Add media to content
+  // Media operations (POST sur /api/content-media avec clé composite)
   const addMediaToContent = useCallback(
     async (contentId, mediaId) => {
       try {
-        const response = await axios.put(
-          `/api/sections/contents/${contentId}/media`,
-          {
-            mediaId,
+        const response = await axios.post(`/api/content-media`, {
+          id: {
+            contentId: contentId,
+            mediaId: mediaId,
           },
-        );
+          content: { id: contentId },
+          media: { id: mediaId },
+        });
         return response.data;
       } catch (error) {
         console.error("Error adding media to content:", error);
@@ -161,12 +124,11 @@ export const useContentOperations = () => {
     [axios],
   );
 
-  // Remove media from content
   const removeMediaFromContent = useCallback(
     async (contentId, mediaId) => {
       try {
         const response = await axios.delete(
-          `/api/sections/contents/${contentId}/media/${mediaId}`,
+          `/api/content/${contentId}/medias/${mediaId}`,
         );
         return response.data;
       } catch (error) {
@@ -178,13 +140,11 @@ export const useContentOperations = () => {
   );
 
   return {
-    getSectionContents,
+    getContents,
     createContent,
     updateContent,
     updateContentVisibility,
     deleteContent,
-    updateContentsSortOrder,
-    batchUpdateContents,
     addMediaToContent,
     removeMediaFromContent,
   };

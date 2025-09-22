@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,4 +38,6 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     @Modifying
     @Query("UPDATE Page p SET p.status = 'DELETED', p.isVisible = false WHERE p.id = :id")
     void softDeleteById(@Param("id") UUID id);
+
+    List<Page> findByParentPage(Page parentPage);
 }

@@ -16,7 +16,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class List extends Module {
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'CARD'")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ListVariants variant = ListVariants.CARD;
 
     @OneToMany(cascade = CascadeType.ALL)

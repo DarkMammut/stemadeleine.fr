@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -19,17 +18,12 @@ import java.util.List;
 @SuperBuilder
 public class News extends Module {
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'LAST3'")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NewsVariants variant = NewsVariants.LAST3;
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Column(name = "start_date", nullable = false)
-    private OffsetDateTime startDate;
-
-    @Column(name = "end_date", nullable = false)
-    private OffsetDateTime endDate;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "media_id", referencedColumnName = "id")

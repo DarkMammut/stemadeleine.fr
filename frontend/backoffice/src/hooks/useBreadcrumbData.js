@@ -50,7 +50,7 @@ export function useBreadcrumbData({ pageId, sectionId, moduleId }) {
         if (moduleId) {
           try {
             const moduleResponse = await axiosClient.get(
-              `/api/modules/${moduleId}`,
+              `/api/modules/by-module-id/${moduleId}`,
             );
             moduleData = moduleResponse.data;
           } catch (moduleError) {

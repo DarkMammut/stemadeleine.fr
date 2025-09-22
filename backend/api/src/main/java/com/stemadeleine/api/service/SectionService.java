@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.repository.SectionRepository;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -166,6 +168,10 @@ public class SectionService {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found: " + mediaId));
 
+        // Met à jour le ownerId du média
+        media.setOwnerId(sectionId);
+        mediaRepository.save(media);
+
         Section updatedSection = Section.builder()
                 .sectionId(sectionId)
                 .page(currentSection.getPage())
@@ -195,6 +201,12 @@ public class SectionService {
         Section currentSection = getLastVersion(sectionId)
                 .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
 
+        Media media = currentSection.getMedia();
+        if (media != null) {
+            media.setOwnerId(null);
+            mediaRepository.save(media);
+        }
+
         Section updatedSection = Section.builder()
                 .sectionId(sectionId)
                 .page(currentSection.getPage())
@@ -209,8 +221,7 @@ public class SectionService {
                 .build();
 
         Section savedSection = sectionRepository.save(updatedSection);
-        log.debug("Media removed from section: version {} for sectionId: {}",
-                savedSection.getVersion(), savedSection.getSectionId());
+        log.debug("Media removed for section: {}", sectionId);
         return savedSection;
     }
 
@@ -273,5 +284,51 @@ public class SectionService {
                 log.debug("Section sort order updated: sectionId {} to position {}", sectionId, i + 1);
             }
         }
+    }
+
+    /**
+     * Create section version
+     */
+    @Transactional
+    public Section createSectionVersion(UUID sectionId, String name, String title, Boolean isVisible, User author) {
+        // Récupérer la dernière version de la section
+        Section currentSection = getLastVersion(sectionId)
+                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+
+        // Créer la nouvelle version de la section
+        Section newSection = Section.builder()
+                .sectionId(sectionId)
+                .page(currentSection.getPage())
+                .version(currentSection.getVersion() + 1)
+                .name(name != null ? name : currentSection.getName())
+                .title(title != null ? title : currentSection.getTitle())
+                .sortOrder(currentSection.getSortOrder())
+                .author(author)
+                .status(PublishingStatus.DRAFT)
+                .isVisible(isVisible != null ? isVisible : currentSection.getIsVisible())
+                .media(currentSection.getMedia())
+                .build();
+
+        // Attacher les modules existants à la nouvelle version de la section
+        List<Module> modulesToAttach = currentSection.getModules() != null ? new ArrayList<>(currentSection.getModules()) : new ArrayList<>();
+        for (Module module : modulesToAttach) {
+            module.setSection(newSection);
+        }
+        newSection.setModules(modulesToAttach);
+
+        Section savedSection = sectionRepository.save(newSection);
+        // Sauvegarder les modules pour mettre à jour la relation section
+        if (!modulesToAttach.isEmpty()) {
+            moduleService.saveAll(modulesToAttach);
+        }
+        log.debug("Section version created and modules attached: version {} for sectionId: {}", savedSection.getVersion(), savedSection.getSectionId());
+        return savedSection;
+    }
+
+    /**
+     * Save all sections
+     */
+    public List<Section> saveAll(List<Section> sections) {
+        return sectionRepository.saveAll(sections);
     }
 }

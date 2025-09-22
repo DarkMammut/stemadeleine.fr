@@ -18,7 +18,8 @@ import java.util.List;
 @SuperBuilder
 public class Article extends Module {
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'STAGGERED'")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ArticleVariants variant = ArticleVariants.STAGGERED;
 
     @OneToMany(cascade = CascadeType.ALL)

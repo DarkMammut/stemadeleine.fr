@@ -3,28 +3,43 @@ package com.stemadeleine.api.mapper;
 import com.stemadeleine.api.dto.*;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.service.GalleryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class ModuleMapper {
+    private final GalleryService galleryService;
+    private final MediaMapper mediaMapper;
 
     public ModuleDto toDto(Module module) {
+        java.util.List<MediaDto> medias = Collections.emptyList();
+        if ("GALLERY".equalsIgnoreCase(module.getType()) && module.getModuleId() != null) {
+            Gallery gallery = galleryService.getLastVersionByModuleId(module.getModuleId()).orElse(null);
+            if (gallery != null && gallery.getMedias() != null) {
+                medias = gallery.getMedias().stream().map(mediaMapper::toDto).toList();
+            }
+        }
         return new ModuleDto(
                 module.getId(),
                 module.getName(),
+                module.getTitle(),
                 module.getType(),
                 module.getSortOrder(),
                 module.getSection() != null ? module.getSection().getId() : null,
                 module.getStatus() != null ? module.getStatus().name() : null,
                 module.getIsVisible(),
                 module.getVersion(),
-                module.getModuleId()
+                module.getModuleId(),
+                medias
         );
     }
 
-    public ArticleDto toDto(Article article, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public ArticleDto toDto(Article article, Function<Content, ContentDto> contentMapper) {
         return new ArticleDto(
                 article.getId(),
                 article.getModuleId(),
@@ -40,23 +55,23 @@ public class ModuleMapper {
         );
     }
 
-    public TimelineDto toDto(Timeline timeline, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public TimelineDto toDto(Timeline timeline, Function<Content, ContentDto> contentMapper) {
         return new TimelineDto(
                 timeline.getId(),
+                timeline.getModuleId(),
+                timeline.getSection() != null ? timeline.getSection().getId() : null,
                 timeline.getName(),
                 timeline.getType(),
+                timeline.getVariant() != null ? timeline.getVariant().name() : null,
                 timeline.getSortOrder(),
-                timeline.getSection() != null ? timeline.getSection().getId() : null,
                 timeline.getStatus() != null ? timeline.getStatus().name() : null,
                 timeline.getIsVisible(),
                 timeline.getVersion(),
-                timeline.getModuleId(),
-                timeline.getVariant() != null ? timeline.getVariant().name() : null,
                 timeline.getContents() != null ? timeline.getContents().stream().map(contentMapper).toList() : null
         );
     }
 
-    public ListDto toDto(List list, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public ListDto toDto(List list, Function<Content, ContentDto> contentMapper) {
         return new ListDto(
                 list.getId(),
                 list.getModuleId(),
@@ -72,7 +87,7 @@ public class ModuleMapper {
         );
     }
 
-    public NewsletterDto toDto(Newsletter newsletter, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public NewsletterDto toDto(Newsletter newsletter, Function<Content, ContentDto> contentMapper) {
         return new NewsletterDto(
                 newsletter.getId(),
                 newsletter.getModuleId(),
@@ -81,7 +96,6 @@ public class ModuleMapper {
                 newsletter.getType(),
                 newsletter.getVariant() != null ? newsletter.getVariant().name() : null,
                 newsletter.getDescription(),
-                newsletter.getStartDate(),
                 newsletter.getSortOrder(),
                 newsletter.getStatus() != null ? newsletter.getStatus().name() : null,
                 newsletter.getIsVisible(),
@@ -91,7 +105,7 @@ public class ModuleMapper {
         );
     }
 
-    public NewsDto toDto(News news, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper) {
+    public NewsDto toDto(News news, Function<Content, ContentDto> contentMapper) {
         return new NewsDto(
                 news.getId(),
                 news.getModuleId(),
@@ -99,9 +113,8 @@ public class ModuleMapper {
                 news.getName(),
                 news.getType(),
                 news.getVariant() != null ? news.getVariant().name() : null,
-                news.getDescription(),
-                news.getStartDate(),
-                news.getEndDate(),
+                news.getDescription(), null,
+                null,
                 news.getSortOrder(),
                 news.getStatus() != null ? news.getStatus().name() : null,
                 news.getIsVisible(),
@@ -162,7 +175,7 @@ public class ModuleMapper {
         );
     }
 
-    public ModuleDtoMarker toPolymorphicDto(Module module, Function<com.stemadeleine.api.model.Content, ContentDto> contentMapper, Function<Media, MediaDto> mediaMapper) {
+    public ModuleDtoMarker toPolymorphicDto(Module module, Function<Content, ContentDto> contentMapper, Function<Media, MediaDto> mediaMapper) {
         if (module instanceof Article article) {
             return toDto(article, contentMapper);
         } else if (module instanceof Timeline timeline) {
@@ -179,5 +192,18 @@ public class ModuleMapper {
             return toDto(gallery, mediaMapper);
         }
         return toDto(module);
+    }
+
+    public MediaDto toMediaDto(Media media) {
+        if (media == null) return null;
+        return new MediaDto(
+                media.getId(),
+                media.getFileUrl(),
+                media.getFileType(),
+                media.getTitle(),
+                media.getAltText(),
+                media.getIsVisible(),
+                media.getSortOrder()
+        );
     }
 }

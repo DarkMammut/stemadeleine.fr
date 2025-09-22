@@ -11,6 +11,7 @@ CREATE TYPE gallery_variants AS ENUM ('GRID', 'SLIDER', 'CAROUSEL');
 CREATE TYPE cta_variants AS ENUM ('BUTTON', 'LINK');
 CREATE TYPE news_variants AS ENUM ('LAST', 'LAST3', 'LAST5', 'ALL');
 CREATE TYPE timeline_variants AS ENUM ('TABS', 'TEXT');
+CREATE TYPE list_variants AS ENUM ('BULLET', 'CARD');
 
 -- =====================
 -- USERS
@@ -36,7 +37,8 @@ CREATE TABLE media (
     is_visible BOOLEAN DEFAULT true NOT NULL,
     sort_order INTEGER,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    owner_id UUID
 );
 
 -- =====================
@@ -231,12 +233,51 @@ CREATE TABLE news (
     id UUID PRIMARY KEY,
     variant news_variants DEFAULT 'LAST3' NOT NULL,
     description TEXT,
-    start_date TIMESTAMPTZ NOT NULL,
-    end_date TIMESTAMPTZ NOT NULL,
     media_id UUID,
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE,
     FOREIGN KEY (media_id) REFERENCES media(id)
 );
+
+-- =====================
+-- NEWS PUBLICATIONS
+-- =====================
+CREATE TABLE news_publications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    news_id UUID NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_visible BOOLEAN DEFAULT true NOT NULL,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    published_date TIMESTAMPTZ,
+    start_date TIMESTAMPTZ NOT NULL,
+    end_date TIMESTAMPTZ NOT NULL,
+    media_id UUID,
+    author_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT news_publications_media_id_fkey FOREIGN KEY (media_id) REFERENCES media(id),
+    CONSTRAINT news_publications_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- =====================
+-- NEWS CONTENT RELATIONSHIP
+-- =====================
+CREATE TABLE news_content (
+    news_publication_id UUID NOT NULL,
+    content_id UUID NOT NULL,
+    PRIMARY KEY (news_publication_id, content_id),
+    FOREIGN KEY (news_publication_id) REFERENCES news_publications(id) ON DELETE CASCADE,
+    FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE
+);
+
+-- Indexes for news_publications and news_content
+CREATE INDEX idx_news_publications_news_id ON news_publications(news_id);
+CREATE INDEX idx_news_publications_author_id ON news_publications(author_id);
+CREATE INDEX idx_news_publications_status ON news_publications(status);
+CREATE INDEX idx_news_publications_published_date ON news_publications(published_date);
+CREATE INDEX idx_news_content_news_id ON news_content(news_publication_id);
+CREATE INDEX idx_news_content_content_id ON news_content(content_id);
 
 -- =====================
 -- NEWSLETTER (extends Module)
@@ -249,6 +290,45 @@ CREATE TABLE newsletters (
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE,
     FOREIGN KEY (media_id) REFERENCES media(id)
 );
+
+-- =====================
+-- NEWSLETTER PUBLICATIONS
+-- =====================
+CREATE TABLE newsletter_publications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    newsletter_id UUID NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_visible BOOLEAN DEFAULT true NOT NULL,
+    status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    published_date TIMESTAMPTZ,
+    media_id UUID,
+    author_id UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT newsletter_publications_media_id_fkey FOREIGN KEY (media_id) REFERENCES media(id),
+    CONSTRAINT newsletter_publications_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- =====================
+-- NEWSLETTER CONTENT RELATIONSHIP
+-- =====================
+CREATE TABLE newsletter_content (
+    newsletter_publication_id UUID NOT NULL,
+    content_id UUID NOT NULL,
+    PRIMARY KEY (newsletter_publication_id, content_id),
+    FOREIGN KEY (newsletter_publication_id) REFERENCES newsletter_publications(id) ON DELETE CASCADE,
+    FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE
+);
+
+-- Indexes for newsletter_publications and newsletter_content
+CREATE INDEX idx_newsletter_publications_newsletter_id ON newsletter_publications(newsletter_id);
+CREATE INDEX idx_newsletter_publications_author_id ON newsletter_publications(author_id);
+CREATE INDEX idx_newsletter_publications_status ON newsletter_publications(status);
+CREATE INDEX idx_newsletter_publications_published_date ON newsletter_publications(published_date);
+CREATE INDEX idx_newsletter_content_newsletter_id ON newsletter_content(newsletter_publication_id);
+CREATE INDEX idx_newsletter_content_content_id ON newsletter_content(content_id);
 
 -- =====================
 -- GALLERY (extends Module)
@@ -277,7 +357,7 @@ CREATE TABLE gallery_media (
 -- =====================
 CREATE TABLE timelines (
     id UUID PRIMARY KEY,
-    variant VARCHAR(50) DEFAULT 'TABS' NOT NULL,
+    variant timeline_variants DEFAULT 'TABS' NOT NULL,
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
 );
 
@@ -351,7 +431,7 @@ CREATE TABLE section_content (
 -- =====================
 CREATE TABLE lists (
     id UUID PRIMARY KEY,
-    variant VARCHAR(50),
+    variant list_variants DEFAULT 'CARD' NOT NULL,
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
 );
 

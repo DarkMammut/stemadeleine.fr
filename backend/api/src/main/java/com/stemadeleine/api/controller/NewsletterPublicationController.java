@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/newsletters")
+@RequestMapping("/api/newsletter-publication")
 @RequiredArgsConstructor
 public class NewsletterPublicationController {
 

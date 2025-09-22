@@ -12,4 +12,6 @@ public interface MediaRepository extends JpaRepository<Media, UUID> {
     List<Media> findByIsVisibleTrue();
 
     List<Media> findByTitleContainingIgnoreCaseOrAltTextContainingIgnoreCase(String titleQuery, String altTextQuery);
+
+    List<Media> findByOwnerId(UUID ownerId);
 }

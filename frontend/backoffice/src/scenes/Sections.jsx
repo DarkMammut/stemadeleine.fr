@@ -17,6 +17,7 @@ import { useSectionOperations } from "@/hooks/useSectionOperations";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
 import Button from "@/components/ui/Button";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function Sections({ pageId }) {
   const { updateSectionOrder } = useUpdateSectionOrder();
   const { updateSectionVisibility, deleteSection } = useSectionOperations();
   const { updateModuleVisibility, deleteModule } = useModuleOperations();
+  const axiosClient = useAxiosClient();
 
   const [treeData, setTreeData] = useState([]);
   // New states for module addition modal
@@ -85,26 +87,35 @@ export default function Sections({ pageId }) {
         type: "section",
         isVisible: section.isVisible,
         children:
-          section.modules?.reduce((moduleAcc, module) => {
-            // Dédupliquer les modules aussi
-            const existingModule = moduleAcc.find(
-              (m) => m.moduleId === module.id,
-            );
-            if (!existingModule) {
-              moduleAcc.push({
-                id: `module-${module.id}`,
-                moduleId: module.id,
-                name: module.name,
-                type: "module",
-                moduleType: module.type,
-                sectionId: section.sectionId,
-                children: [],
-              });
-            } else {
-              console.warn("Duplicate module found and removed:", module.id);
-            }
-            return moduleAcc;
-          }, []) || [],
+          section.modules
+            ?.filter(
+              (module) =>
+                !module.isDeleted &&
+                !module.deletedAt &&
+                module.status !== "DELETED",
+            )
+            .reduce((moduleAcc, module) => {
+              const existingModule = moduleAcc.find(
+                (m) => m.moduleId === (module.moduleId || module.id),
+              );
+              if (!existingModule) {
+                moduleAcc.push({
+                  id: `module-${module.id}`,
+                  moduleId: module.moduleId || module.id,
+                  name: module.name,
+                  type: "module",
+                  moduleType: module.type,
+                  sectionId: section.sectionId,
+                  children: [],
+                });
+              } else {
+                console.warn(
+                  "Duplicate module found and removed:",
+                  module.moduleId || module.id,
+                );
+              }
+              return moduleAcc;
+            }, []) || [],
       }));
 
       console.log("Generated tree data:", tree);
@@ -247,20 +258,41 @@ export default function Sections({ pageId }) {
       return;
     }
 
-    console.log("Starting module creation with data:", {
-      sectionId: targetSection.sectionId,
-      type: selectedModuleType,
-      name: `New ${selectedModuleType}`,
-    });
+    // Mapping type → endpoint
+    const typeToEndpoint = {
+      article: "/api/articles",
+      news: "/api/news",
+      newsletter: "/api/newsletters",
+      cta: "/api/cta",
+      timeline: "/api/timelines",
+      form: "/api/forms",
+      list: "/api/lists",
+      gallery: "/api/galleries",
+    };
 
     try {
-      const result = await addModule({
-        sectionId: targetSection.sectionId,
-        type: selectedModuleType,
-        name: `New ${selectedModuleType}`,
-      });
-
-      console.log("Module created successfully:", result);
+      let result;
+      if (typeToEndpoint[selectedModuleType]) {
+        // Création uniquement via l'endpoint spécifique
+        const childEndpoint = typeToEndpoint[selectedModuleType];
+        const response = await axiosClient.post(childEndpoint, {
+          sectionId: targetSection.sectionId,
+          name: `New ${selectedModuleType}`,
+        });
+        result = response.data;
+        console.log(`Module spécifique créé dans ${childEndpoint}:`, result);
+      } else {
+        // Création via l'endpoint générique
+        const url = "/api/modules";
+        const payload = {
+          sectionId: targetSection.sectionId,
+          type: selectedModuleType,
+          name: `New ${selectedModuleType}`,
+        };
+        const response = await axiosClient.post(url, payload);
+        result = response.data;
+        console.log("Module générique créé:", result);
+      }
 
       setShowAddModuleModal(false);
       setTargetSection(null);
@@ -277,8 +309,7 @@ export default function Sections({ pageId }) {
         status: error.response?.status,
         data: error.response?.data,
       });
-      // TODO: Add error feedback to user
-      alert(`Erreur lors de l'ajout du module: ${error.message}`);
+      alert(`Error while adding module: ${error.message}`);
     }
   };
 

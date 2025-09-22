@@ -239,4 +239,31 @@ public class PageController {
         log.debug("Page deleted: {}", pageId);
         return ResponseEntity.noContent().build();
     }
+
+    // ----- CREATE PAGE VERSION -----
+    @PostMapping("/{pageId}/version")
+    public ResponseEntity<PageDto> createPageVersion(
+            @PathVariable UUID pageId,
+            @Valid @RequestBody PageRequest request,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        if (customUserDetails == null) {
+            log.error("Attempt to create page version without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = customUserDetails.account().getUser();
+        log.info("POST /api/pages/{}/version - Creating new version", pageId);
+        Page newVersion = pageService.createPageVersion(
+                pageId,
+                request.name(),
+                request.title(),
+                request.subTitle(),
+                request.slug(),
+                request.description(),
+                request.isVisible(),
+                currentUser
+        );
+        log.debug("Page version created successfully: {}", newVersion.getId());
+        return ResponseEntity.ok(pageMapper.toDto(newVersion));
+    }
 }

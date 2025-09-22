@@ -1,17 +1,16 @@
 package com.stemadeleine.api.service;
 
-import com.stemadeleine.api.dto.CreateNewsletterRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateNewsRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
-import com.stemadeleine.api.repository.ContentRepository;
 import com.stemadeleine.api.repository.NewsletterRepository;
-import com.stemadeleine.api.utils.JsonUtils;
+import com.stemadeleine.api.repository.SectionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +21,7 @@ import java.util.UUID;
 public class NewsletterService {
     private final NewsletterRepository newsletterRepository;
     private final ModuleService moduleService;
-    private final ContentRepository contentRepository;
+    private final SectionRepository sectionRepository;
 
     public List<Newsletter> getAllNewsletters() {
         log.info("Récupération de toutes les newsletters non supprimées");
@@ -46,7 +45,6 @@ public class NewsletterService {
                 .map(newsletter -> {
                     newsletter.setDescription(details.getDescription());
                     newsletter.setIsVisible(details.getIsVisible());
-                    newsletter.setStartDate(details.getStartDate());
                     newsletter.setVariant(details.getVariant());
                     newsletter.setMedia(details.getMedia());
                     newsletter.setContents(details.getContents());
@@ -71,47 +69,72 @@ public class NewsletterService {
         });
     }
 
-    public Newsletter createNewsletterWithModule(CreateNewsletterRequest request, User author) {
+    public Newsletter createNewsletterWithModule(CreateModuleRequest request, User author) {
         log.info("Création d'une nouvelle newsletter pour la section : {}", request.sectionId());
 
-        Module module = moduleService.createNewModule(
-                request.sectionId(),
-                request.name(),
-                "NEWSLETTER",
-                author
-        );
-        log.debug("Module créé avec l'ID : {}", module.getId());
+        // Récupérer la section à partir de l'UUID
+        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
-        Content content = Content.builder()
-                .ownerId(module.getId())
-                .version(1)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(false)
-                .title(request.name())
-                .body(JsonUtils.createEmptyJsonNode())
-                .build();
-        Content savedContent = contentRepository.save(content);
-        log.debug("Contenu créé avec l'ID : {}", savedContent.getId());
-
+        // Créer directement la timeline (hérite de Module)
         Newsletter newsletter = Newsletter.builder()
+                .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
-                .contents(List.of(savedContent))
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(module.getName())
-                .title(module.getTitle())
-                .type(module.getType())
-                .sortOrder(module.getSortOrder())
-                .isVisible(module.getIsVisible())
-                .status(module.getStatus())
+                .contents(new java.util.ArrayList<>())
+                .section(section)
+                .name(request.name())
+                .title(request.name())
+                .type("NEWSLETTER")
+                .sortOrder(0)
+                .isVisible(false)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
-                .startDate(OffsetDateTime.now())
-                .description("Nouvelle newsletter")
+                .description("Newsletter description")
                 .build();
 
         Newsletter savedNewsletter = newsletterRepository.save(newsletter);
         log.info("Newsletter créée avec succès, ID : {}", savedNewsletter.getId());
+        return savedNewsletter;
+    }
+
+    public com.stemadeleine.api.model.Newsletter createNewsletterVersion(UpdateNewsRequest request, User author) {
+        log.info("Création d'une nouvelle version d'article pour le moduleId : {}", request.moduleId());
+
+        // 1. Récupérer le module
+        Module module = moduleService.getModuleByModuleId(request.moduleId())
+                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+
+        // 2. Récupérer la dernière version de l'article pour ce module
+        com.stemadeleine.api.model.Newsletter previousNewsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
+                .orElse(null);
+
+        // 3. Fusionner les infos du request et de la version précédente
+        String name = request.name() != null ? request.name() : (previousNewsletter != null ? previousNewsletter.getName() : module.getName());
+        String title = request.title() != null ? request.title() : (previousNewsletter != null ? previousNewsletter.getTitle() : module.getTitle());
+        NewsVariants variant = request.variant() != null ? request.variant() : (previousNewsletter != null ? previousNewsletter.getVariant() : NewsVariants.LAST3);
+        String type = module.getType();
+        Integer sortOrder = module.getSortOrder();
+        Boolean isVisible = module.getIsVisible();
+        PublishingStatus status = PublishingStatus.DRAFT;
+        int newVersion = previousNewsletter != null ? previousNewsletter.getVersion() + 1 : 1;
+
+        com.stemadeleine.api.model.Newsletter newsletter = com.stemadeleine.api.model.Newsletter.builder()
+                .variant(variant)
+                .moduleId(module.getModuleId())
+                .section(module.getSection())
+                .name(name)
+                .title(title)
+                .type(type)
+                .sortOrder(sortOrder)
+                .isVisible(isVisible)
+                .status(status)
+                .author(author)
+                .version(newVersion)
+                .build();
+
+        com.stemadeleine.api.model.Newsletter savedNewsletter = newsletterRepository.save(newsletter);
+        log.info("Nouvelle version de newsletter créée avec succès, ID : {}", savedNewsletter.getId());
         return savedNewsletter;
     }
 }

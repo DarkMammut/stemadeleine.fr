@@ -1,20 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/ui/Button";
 import MediaPicker from "@/components/MediaPicker";
+import MediaGrid from "@/components/MediaGrid";
 
-const ContentMediaManager = ({ content, onMediaAdd, onMediaRemove }) => {
+const ContentMediaManager = ({
+  content,
+  onMediaAdd,
+  onMediaRemove,
+  onMediaChanged,
+}) => {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleAddMedia = async (mediaId) => {
     try {
       setLoading(true);
-      await onMediaAdd(content.contentId, mediaId);
+      await onMediaAdd(content.id, mediaId);
       setShowMediaPicker(false);
+      if (onMediaChanged) onMediaChanged();
     } catch (error) {
       console.error("Error adding media to content:", error);
       alert("Error adding media. Please try again.");
@@ -30,7 +36,8 @@ const ContentMediaManager = ({ content, onMediaAdd, onMediaRemove }) => {
 
     try {
       setLoading(true);
-      await onMediaRemove(content.contentId, mediaId);
+      await onMediaRemove(content.id, mediaId);
+      if (onMediaChanged) onMediaChanged();
     } catch (error) {
       console.error("Error removing media from content:", error);
       alert("Error removing media. Please try again.");
@@ -49,60 +56,34 @@ const ContentMediaManager = ({ content, onMediaAdd, onMediaRemove }) => {
           variant="secondary"
           size="sm"
           onClick={() => setShowMediaPicker(true)}
-          disabled={loading}
+          disabled={loading || !content.id}
           className="flex items-center gap-1"
+          title={
+            !content.id
+              ? "Vous devez d'abord sauvegarder le contenu avant d'ajouter un média."
+              : undefined
+          }
         >
           <PlusIcon className="w-3 h-3" />
           Add Media
         </Button>
       </div>
+      {!content.id && (
+        <div className="text-xs text-orange-600 mb-2">
+          Vous devez d'abord sauvegarder le contenu avant d'ajouter un média.
+        </div>
+      )}
 
       {/* Media Grid */}
       {content.medias && content.medias.length > 0 ? (
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <AnimatePresence>
-            {content.medias.map((media) => (
-              <motion.div
-                key={media.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border border-border"
-              >
-                <img
-                  src={media.fileUrl}
-                  alt={media.altText || media.title}
-                  className="w-full h-full object-cover"
-                />
-
-                {/* Remove button overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <button
-                    onClick={() => handleRemoveMedia(media.id)}
-                    disabled={loading}
-                    className="p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors disabled:opacity-50"
-                    title="Remove media"
-                  >
-                    <XMarkIcon className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Media info tooltip */}
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                  <p className="truncate" title={media.title || "Untitled"}>
-                    {media.title || "Untitled"}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      ) : (
-        <div className="text-center py-6 text-text-muted bg-gray-50 rounded-lg border-2 border-dashed border-border">
-          <p className="text-sm">No media attached</p>
-          <p className="text-xs mt-1">Click "Add Media" to attach images</p>
-        </div>
-      )}
+        <MediaGrid
+          medias={content.medias}
+          onRemove={handleRemoveMedia}
+          loading={loading}
+          columns={3}
+          className="mb-4"
+        />
+      ) : null}
 
       {/* Media Picker Modal */}
       {showMediaPicker && (
@@ -121,7 +102,7 @@ const ContentMediaManager = ({ content, onMediaAdd, onMediaRemove }) => {
             <MediaPicker
               onMediaSelect={handleAddMedia}
               entityType="content"
-              entityId={content.contentId}
+              entityId={content.id}
               attachToEntity={handleAddMedia}
             />
           </div>

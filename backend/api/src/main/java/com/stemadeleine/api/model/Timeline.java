@@ -18,7 +18,8 @@ import java.util.List;
 @SuperBuilder
 public class Timeline extends Module {
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'TABS'")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TimelineVariants variant = TimelineVariants.TABS;
 
     @OneToMany(cascade = CascadeType.ALL)

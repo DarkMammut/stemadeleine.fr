@@ -1,10 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyForm from "@/components/MyForm";
 import Switch from "@/components/ui/Switch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import MediaPicker from "@/components/MediaPicker";
+import Button from "@/components/ui/Button";
+import { PlusIcon } from "@heroicons/react/16/solid";
+import { useGalleriesMediasOperations } from "@/hooks/useGalleriesMediasOperations";
+import MediaGrid from "@/components/MediaGrid";
+import MediaEditor from "@/components/MediaEditor";
 
 export default function GalleryModuleEditor({
   moduleId,
@@ -16,6 +22,11 @@ export default function GalleryModuleEditor({
   const { updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [editingMedia, setEditingMedia] = useState(null); // Pour la modale d'édition
+  const { addMedia, removeMedia, mediaLoading } = useGalleriesMediasOperations({
+    entityType: "gallery",
+  });
 
   // Champs basés sur le modèle Java Gallery
   const fields = [
@@ -84,6 +95,82 @@ export default function GalleryModuleEditor({
     }
   };
 
+  // Gestion des médias de la galerie
+  const mapMedia = (media) => ({
+    ...media,
+    url: media.url || media.fileUrl || "",
+    filename:
+      media.filename || media.title || media.fileUrl?.split("/").pop() || "",
+    type: media.fileType?.startsWith("image")
+      ? "image"
+      : media.fileType?.startsWith("video")
+        ? "video"
+        : "file",
+  });
+
+  const handleAddMedia = async (media) => {
+    console.log("handleAddMedia appelé avec :", media);
+    try {
+      const attachedMedia = await addMedia(moduleId, media);
+      const mappedMedia = mapMedia(attachedMedia);
+      setModuleData((prev) => ({
+        ...prev,
+        medias: [...(prev.medias || []), mappedMedia],
+      }));
+      setShowMediaPicker(false);
+    } catch (err) {
+      alert("Erreur lors de l'ajout du média");
+    }
+  };
+
+  const handleRemoveMedia = async (mediaId) => {
+    if (!window.confirm("Supprimer ce média de la galerie ?")) return;
+    try {
+      await removeMedia(moduleId, mediaId);
+      setModuleData((prev) => ({
+        ...prev,
+        medias: (prev.medias || []).filter((m) => m.id !== mediaId),
+      }));
+    } catch (err) {
+      alert("Erreur lors de la suppression du média");
+    }
+  };
+
+  // Ouvre la modale d'édition
+  const handleEditMedia = (media) => {
+    setEditingMedia(media);
+  };
+
+  // Callback après édition ou annulation
+  const handleMediaEditorClose = (updatedMedia) => {
+    setEditingMedia(null);
+    if (updatedMedia) {
+      // Met à jour le média dans la liste locale
+      setModuleData((prev) => ({
+        ...prev,
+        medias: prev.medias.map((m) =>
+          m.id === updatedMedia.id ? { ...m, ...updatedMedia } : m,
+        ),
+      }));
+    }
+  };
+
+  // Appliquer le mapping des médias à chaque changement de moduleData
+  useEffect(() => {
+    if (moduleData?.medias && Array.isArray(moduleData.medias)) {
+      const mapped = moduleData.medias.map(mapMedia);
+      // Vérifie si un mapping est nécessaire (évite les boucles infinies)
+      const needsUpdate = mapped.some(
+        (m, i) =>
+          m.url !== moduleData.medias[i]?.url ||
+          m.filename !== moduleData.medias[i]?.filename,
+      );
+      if (needsUpdate) {
+        setModuleData((prev) => ({ ...prev, medias: mapped }));
+      }
+    }
+  }, [moduleData?.medias]);
+
   return (
     <div className="space-y-6">
       {/* Section Visibilité */}
@@ -119,45 +206,77 @@ export default function GalleryModuleEditor({
 
       {/* Gestion des médias de la galerie */}
       <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Médias de la galerie
-        </h3>
-        <div className="text-sm text-text-muted mb-4">
-          Gestion des médias multiples pour cette galerie (images, vidéos)
-        </div>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
-          onClick={() =>
-            alert(
-              "Fonctionnalité à implémenter : gestionnaire de médias multiples",
-            )
-          }
-        >
-          Gérer les médias de la galerie
-        </button>
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold text-text mb-4">
+              Médias de la galerie
+            </h3>
+            <div className="text-sm text-text-muted mb-4">
+              Ajoutez ou supprimez des médias pour cette galerie (images,
+              vidéos)
+            </div>
+          </div>
 
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="flex items-center gap-2"
+            onClick={() => setShowMediaPicker(true)}
+            disabled={mediaLoading}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Ajouter un média
+          </Button>
+        </div>
+
+        {showMediaPicker && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="bg-background border border-border rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-text">
+                  Sélectionner un média
+                </h3>
+                <button
+                  onClick={() => setShowMediaPicker(false)}
+                  className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <MediaPicker
+                attachToEntity={handleAddMedia}
+                entityType="gallery"
+                entityId={moduleId}
+                label="Médias de la galerie"
+              />
+            </div>
+          </div>
+        )}
         {/* Affichage des médias existants */}
         {moduleData?.medias && moduleData.medias.length > 0 && (
           <div className="mt-4">
             <h4 className="font-medium text-text mb-2">
               Médias actuels ({moduleData.medias.length}) :
             </h4>
-            <div className="grid grid-cols-4 gap-2">
-              {moduleData.medias.map((media, index) => (
-                <div
-                  key={media.id || index}
-                  className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500"
-                >
-                  {media.type === "image"
-                    ? "🖼️"
-                    : media.type === "video"
-                      ? "🎥"
-                      : "📄"}
-                  <br />
-                  {media.filename || `Média ${index + 1}`}
-                </div>
-              ))}
+            <MediaGrid
+              medias={moduleData.medias}
+              onRemove={handleRemoveMedia}
+              onEdit={handleEditMedia}
+              loading={mediaLoading}
+              columns={4}
+            />
+          </div>
+        )}
+        {/* Modale d'édition de média */}
+        {editingMedia && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="bg-background border border-border rounded-lg p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-auto">
+              <MediaEditor
+                mediaId={editingMedia.id}
+                onCancel={() => handleMediaEditorClose()}
+                onMediaAttached={handleMediaEditorClose}
+              />
             </div>
           </div>
         )}

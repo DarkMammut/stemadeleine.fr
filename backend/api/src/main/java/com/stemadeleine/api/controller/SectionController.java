@@ -453,4 +453,48 @@ public class SectionController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{sectionId}")
+    public ResponseEntity<Void> deleteSection(
+            @PathVariable UUID sectionId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to delete section without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        sectionService.deleteSection(sectionId, currentUser);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{sectionId}/version")
+    public ResponseEntity<SectionDto> createSectionVersion(
+            @PathVariable UUID sectionId,
+            @Valid @RequestBody SectionRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to create section version without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("POST /api/sections/{}/version - Creating new version by user: {}", sectionId, currentUser.getUsername());
+
+        try {
+            Section newVersion = sectionService.createSectionVersion(
+                    sectionId,
+                    request.name(),
+                    request.title(),
+                    request.isVisible(),
+                    currentUser
+            );
+            log.debug("Section version created successfully: {}", newVersion.getId());
+            return ResponseEntity.ok(sectionMapper.toDto(newVersion));
+        } catch (Exception e) {
+            log.error("Error creating section version: {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

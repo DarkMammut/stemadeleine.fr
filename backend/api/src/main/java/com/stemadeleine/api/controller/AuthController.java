@@ -23,26 +23,26 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        log.info("POST /api/auth/login - Tentative de connexion pour l'utilisateur : {}", loginRequest.email());
+        log.info("POST /api/auth/login - Login attempt for user: {}", loginRequest.email());
         try {
             var authResponse = authService.authenticateUser(loginRequest);
 
-            // Définir le token JWT dans un cookie HTTPOnly sécurisé
+            // Set JWT token in a secure HTTPOnly cookie
             Cookie jwtCookie = new Cookie("authToken", authResponse.get("token"));
             jwtCookie.setHttpOnly(true);
-            jwtCookie.setSecure(false); // true en production avec HTTPS
+            jwtCookie.setSecure(false); // true in production with HTTPS
             jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(24 * 60 * 60); // 24 heures
+            jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
             response.addCookie(jwtCookie);
 
-            log.info("Connexion réussie pour l'utilisateur : {}", loginRequest.email());
+            log.info("Login successful for user: {}", loginRequest.email());
 
-            // Retourner seulement un message de succès, pas le token
+            // Return only a success message, not the token
             Map<String, String> responseBody = new HashMap<>();
             responseBody.put("message", "Login successful");
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            log.error("Échec de la connexion pour l'utilisateur : {} - Raison : {}",
+            log.error("Login failed for user: {} - Reason: {}",
                     loginRequest.email(), e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }

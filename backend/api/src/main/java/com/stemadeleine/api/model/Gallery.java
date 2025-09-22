@@ -1,26 +1,30 @@
 package com.stemadeleine.api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "galleries")
+@DiscriminatorValue("gallery")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
-public class Gallery extends Module {
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'GRID'")
-    private GalleryVariants variant = GalleryVariants.GRID;
+public class Gallery extends Module implements MediaAttachable {
+    @ManyToMany
+    @JoinTable(
+            name = "gallery_medias",
+            joinColumns = @JoinColumn(name = "gallery_id"),
+            inverseJoinColumns = @JoinColumn(name = "media_id")
+    )
+    private List<Media> medias = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "gallery_id", referencedColumnName = "id")
-    private List<Media> medias;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GalleryVariants variant = GalleryVariants.GRID;
 }

@@ -100,6 +100,8 @@ public class NewsPublicationService {
                 .isVisible(request.isVisible() != null ? request.isVisible() : true)
                 .status(PublishingStatus.DRAFT)
                 .publishedDate(request.publishedDate())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
                 .media(media)
                 .author(author)
                 .build();
@@ -132,6 +134,12 @@ public class NewsPublicationService {
         }
         if (request.publishedDate() != null) {
             publication.setPublishedDate(request.publishedDate());
+        }
+        if (request.startDate() != null) {
+            publication.setStartDate(request.startDate());
+        }
+        if (request.endDate() != null) {
+            publication.setEndDate(request.endDate());
         }
 
         // Update media if provided

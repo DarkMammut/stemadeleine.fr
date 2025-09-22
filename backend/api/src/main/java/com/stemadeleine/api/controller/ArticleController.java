@@ -1,7 +1,8 @@
 package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.ArticleDto;
-import com.stemadeleine.api.dto.CreateArticleRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateArticleRequest;
 import com.stemadeleine.api.mapper.ArticleMapper;
 import com.stemadeleine.api.model.Article;
 import com.stemadeleine.api.model.CustomUserDetails;
@@ -27,9 +28,9 @@ public class ArticleController {
 
     @GetMapping
     public List<ArticleDto> getAllArticles() {
-        log.info("GET /api/articles - Récupération de tous les articles");
+        log.info("GET /api/articles - Retrieving all articles");
         List<Article> articles = articleService.getAllArticles();
-        log.debug("Nombre d'articles trouvés : {}", articles.size());
+        log.debug("Number of articles found: {}", articles.size());
         return articles.stream()
                 .map(articleMapper::toDto)
                 .toList();
@@ -37,36 +38,36 @@ public class ArticleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ArticleDto> getArticleById(@PathVariable UUID id) {
-        log.info("GET /api/articles/{} - Récupération d'un article par ID", id);
+        log.info("GET /api/articles/{} - Retrieving article by ID", id);
         return articleService.getArticleById(id)
                 .map(article -> {
-                    log.debug("Article trouvé : {}", article.getId());
+                    log.debug("Article found: {}", article.getId());
                     return ResponseEntity.ok(articleMapper.toDto(article));
                 })
                 .orElseGet(() -> {
-                    log.warn("Article non trouvé avec l'ID : {}", id);
+                    log.warn("Article not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
     }
 
     @PostMapping
-    public ResponseEntity<ArticleDto> createArticleWithModule(@RequestBody CreateArticleRequest request, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+    public ResponseEntity<ArticleDto> createArticleWithModule(@RequestBody CreateModuleRequest request, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
         if (currentUserDetails == null) {
             throw new RuntimeException("User not authenticated");
         }
         User currentUser = currentUserDetails.account().getUser();
-        log.info("POST /api/articles - Création d'un nouvel article pour la section : {}", request.sectionId());
+        log.info("POST /api/articles - Creating a new article for section: {}", request.sectionId());
         Article article = articleService.createArticleWithModule(request, currentUser);
-        log.debug("Article créé avec l'ID : {}", article.getId());
+        log.debug("Article created with ID: {}", article.getId());
         return ResponseEntity.ok(articleMapper.toDto(article));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable UUID id, @RequestBody Article articleDetails) {
-        log.info("PUT /api/articles/{} - Mise à jour d'un article", id);
+        log.info("PUT /api/articles/{} - Updating an article", id);
         try {
             Article updated = articleService.updateArticle(id, articleDetails);
-            log.debug("Article mis à jour : {}", updated.getId());
+            log.debug("Article updated: {}", updated.getId());
             return ResponseEntity.ok(articleMapper.toDto(updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -75,9 +76,23 @@ public class ArticleController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable UUID id) {
-        log.info("DELETE /api/articles/{} - Suppression d'un article", id);
+        log.info("DELETE /api/articles/{} - Deleting an article", id);
         articleService.softDeleteArticle(id);
-        log.debug("Article supprimé : {}", id);
+        log.debug("Article deleted: {}", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/version")
+    public ResponseEntity<ArticleDto> createNewVersionForModule(
+            @RequestBody UpdateArticleRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("POST /api/articles/version - Creating a new version for module: {}", request.moduleId());
+        Article article = articleService.createArticleVersion(request, currentUser);
+        log.debug("New version created with ID: {}", article.getId());
+        return ResponseEntity.ok(articleMapper.toDto(article));
     }
 }

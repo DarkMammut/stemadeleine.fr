@@ -1,16 +1,15 @@
 package com.stemadeleine.api.service;
 
-import com.stemadeleine.api.dto.CreateNewsRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateNewsRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
-import com.stemadeleine.api.repository.ContentRepository;
 import com.stemadeleine.api.repository.NewsRepository;
-import com.stemadeleine.api.utils.JsonUtils;
+import com.stemadeleine.api.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,13 +21,13 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final ModuleService moduleService;
-    private final ContentRepository contentRepository;
+    private final SectionRepository sectionRepository;
 
     public List<News> getAllNews() {
         log.info("Récupération de toutes les actualités non supprimées");
-        List<News> newsList = newsRepository.findByStatusNot(PublishingStatus.DELETED);
-        log.debug("Nombre d'actualités trouvées : {}", newsList.size());
-        return newsList;
+        List<News> news = newsRepository.findByStatusNot(PublishingStatus.DELETED);
+        log.debug("Nombre d'actualités trouvées : {}", news.size());
+        return news;
     }
 
     public Optional<News> getNewsById(UUID id) {
@@ -45,8 +44,6 @@ public class NewsService {
                 .map(news -> {
                     news.setDescription(details.getDescription());
                     news.setIsVisible(details.getIsVisible());
-                    news.setStartDate(details.getStartDate());
-                    news.setEndDate(details.getEndDate());
                     news.setVariant(details.getVariant());
                     news.setMedia(details.getMedia());
                     news.setContents(details.getContents());
@@ -71,49 +68,72 @@ public class NewsService {
         });
     }
 
-    public News createNewsWithModule(CreateNewsRequest request, User author) {
+    public News createNewsWithModule(CreateModuleRequest request, User author) {
         log.info("Création d'une nouvelle actualité pour la section : {}", request.sectionId());
 
-        Module module = moduleService.createNewModule(
-                request.sectionId(),
-                request.name(),
-                "NEWS",
-                author
-        );
-        log.debug("Module cré�� avec l'ID : {}", module.getId());
+        // Récupérer la section à partir de l'UUID
+        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
-        Content content = Content.builder()
-                .ownerId(module.getId())
-                .version(1)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(false)
-                .title(request.name())
-                .body(JsonUtils.createEmptyJsonNode())
-                .build();
-        Content savedContent = contentRepository.save(content);
-        log.debug("Contenu créé avec l'ID : {}", savedContent.getId());
-
-        OffsetDateTime now = OffsetDateTime.now();
+        // Créer directement la timeline (hérite de Module)
         News news = News.builder()
+                .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
-                .contents(List.of(savedContent))
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(module.getName())
-                .title(module.getTitle())
-                .type(module.getType())
-                .sortOrder(module.getSortOrder())
-                .isVisible(module.getIsVisible())
-                .status(module.getStatus())
+                .contents(new java.util.ArrayList<>())
+                .section(section)
+                .name(request.name())
+                .title(request.name())
+                .type("NEWS")
+                .sortOrder(0)
+                .isVisible(false)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
-                .startDate(now)
-                .endDate(now.plusMonths(1))
-                .description("Nouvelle actualité")
+                .description("News description")
                 .build();
 
         News savedNews = newsRepository.save(news);
         log.info("Actualité créée avec succès, ID : {}", savedNews.getId());
+        return savedNews;
+    }
+
+    public com.stemadeleine.api.model.News createNewsVersion(UpdateNewsRequest request, User author) {
+        log.info("Création d'une nouvelle version de news pour le moduleId : {}", request.moduleId());
+
+        // 1. Récupérer le module
+        Module module = moduleService.getModuleByModuleId(request.moduleId())
+                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+
+        // 2. Récupérer la dernière version de l'article pour ce module
+        com.stemadeleine.api.model.News previousNews = newsRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
+                .orElse(null);
+
+        // 3. Fusionner les infos du request et de la version précédente
+        String name = request.name() != null ? request.name() : (previousNews != null ? previousNews.getName() : module.getName());
+        String title = request.title() != null ? request.title() : (previousNews != null ? previousNews.getTitle() : module.getTitle());
+        NewsVariants variant = request.variant() != null ? request.variant() : (previousNews != null ? previousNews.getVariant() : NewsVariants.LAST3);
+        String type = module.getType();
+        Integer sortOrder = module.getSortOrder();
+        Boolean isVisible = module.getIsVisible();
+        PublishingStatus status = PublishingStatus.DRAFT;
+        int newVersion = previousNews != null ? previousNews.getVersion() + 1 : 1;
+
+        com.stemadeleine.api.model.News news = com.stemadeleine.api.model.News.builder()
+                .variant(variant)
+                .moduleId(module.getModuleId())
+                .section(module.getSection())
+                .name(name)
+                .title(title)
+                .type(type)
+                .sortOrder(sortOrder)
+                .isVisible(isVisible)
+                .status(status)
+                .author(author)
+                .version(newVersion)
+                .build();
+
+        com.stemadeleine.api.model.News savedNews = newsRepository.save(news);
+        log.info("Nouvelle version de news créée avec succès, ID : {}", savedNews.getId());
         return savedNews;
     }
 }

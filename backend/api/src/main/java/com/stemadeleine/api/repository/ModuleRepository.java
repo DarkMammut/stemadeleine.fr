@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -15,4 +16,8 @@ public interface ModuleRepository extends JpaRepository<Module, UUID> {
 
     @Query("SELECT COALESCE(MAX(m.sortOrder), 0) FROM Module m WHERE m.section.id = :sectionId")
     Short findMaxSortOrderBySection(UUID sectionId);
+
+    Optional<Module> findTopByModuleIdOrderByVersionDesc(UUID moduleId);
+
+    Optional<Module> findByModuleId(UUID moduleId);
 }

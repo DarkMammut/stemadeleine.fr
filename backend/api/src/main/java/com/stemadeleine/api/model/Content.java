@@ -55,7 +55,7 @@ public class Content {
     private Boolean isVisible = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "contents_author_id_fkey"))
+    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "contents_author_id_fkey"))
     private User author;
 
     // Many-to-many relationship with Media through content_media table

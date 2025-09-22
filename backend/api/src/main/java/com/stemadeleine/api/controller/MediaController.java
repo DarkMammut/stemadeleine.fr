@@ -24,76 +24,76 @@ public class MediaController {
 
     @GetMapping
     public ResponseEntity<List<MediaDto>> getAllMedia() {
-        log.info("GET /api/media - Récupération de tous les médias");
+        log.info("GET /api/media - Retrieving all media");
         List<Media> medias = mediaService.getAllMedia();
         List<MediaDto> mediaDtos = medias.stream().map(mediaMapper::toDto).toList();
-        log.debug("Nombre de médias trouvés : {}", mediaDtos.size());
+        log.debug("Number of media found: {}", mediaDtos.size());
         return ResponseEntity.ok(mediaDtos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MediaDto> getMediaById(@PathVariable UUID id) {
-        log.info("GET /api/media/{} - Récupération d'un média par ID", id);
+        log.info("GET /api/media/{} - Retrieving media by ID", id);
         return mediaService.getMediaById(id)
                 .map(media -> {
-                    log.debug("Média trouvé : {}", media.getId());
+                    log.debug("Media found: {}", media.getId());
                     return ResponseEntity.ok(mediaMapper.toDto(media));
                 })
                 .orElseGet(() -> {
-                    log.warn("Média non trouvé avec l'ID : {}", id);
+                    log.warn("Media not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
     }
 
     @PostMapping
     public ResponseEntity<MediaDto> createMedia(@RequestBody CreateMediaRequest request) {
-        log.info("POST /api/media - Création d'un nouveau média");
+        log.info("POST /api/media - Creating a new media");
         Media media = mediaService.createMedia(request);
-        log.debug("Média créé avec l'ID : {}", media.getId());
+        log.debug("Media created with ID: {}", media.getId());
         return ResponseEntity.ok(mediaMapper.toDto(media));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MediaDto> updateMedia(@PathVariable UUID id, @RequestBody Media mediaDetails) {
-        log.info("PUT /api/media/{} - Mise à jour d'un média", id);
+        log.info("PUT /api/media/{} - Updating media", id);
         return mediaService.updateMedia(id, mediaDetails)
                 .map(media -> {
-                    log.debug("Média mis à jour : {}", media.getId());
+                    log.debug("Media updated: {}", media.getId());
                     return ResponseEntity.ok(mediaMapper.toDto(media));
                 })
                 .orElseGet(() -> {
-                    log.warn("Média non trouvé avec l'ID : {}", id);
+                    log.warn("Media not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedia(@PathVariable UUID id) {
-        log.info("DELETE /api/media/{} - Suppression d'un média", id);
+        log.info("DELETE /api/media/{} - Deleting media", id);
         mediaService.deleteMedia(id);
-        log.debug("Média supprimé : {}", id);
+        log.debug("Media deleted: {}", id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<MediaDto>> searchMedia(@RequestParam String query) {
-        log.info("GET /api/media/search - Recherche de médias avec le terme : {}", query);
+        log.info("GET /api/media/search - Searching media with term: {}", query);
         List<Media> medias = mediaService.searchMedia(query);
         List<MediaDto> mediaDtos = medias.stream().map(mediaMapper::toDto).toList();
-        log.debug("Nombre de médias trouvés : {}", mediaDtos.size());
+        log.debug("Number of media found: {}", mediaDtos.size());
         return ResponseEntity.ok(mediaDtos);
     }
 
     @PutMapping("/{id}/sort-order")
     public ResponseEntity<MediaDto> updateSortOrder(@PathVariable UUID id, @RequestBody Integer sortOrder) {
-        log.info("PUT /api/media/{}/sort-order - Mise à jour de l'ordre de tri d'un média", id);
+        log.info("PUT /api/media/{}/sort-order - Updating sort order of media", id);
         return mediaService.updateSortOrder(id, sortOrder)
                 .map(media -> {
-                    log.debug("Ordre de tri mis à jour pour le média : {}", media.getId());
+                    log.debug("Sort order updated for media: {}", media.getId());
                     return ResponseEntity.ok(mediaMapper.toDto(media));
                 })
                 .orElseGet(() -> {
-                    log.warn("Média non trouvé avec l'ID : {}", id);
+                    log.warn("Media not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -103,14 +103,14 @@ public class MediaController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "altText", required = false) String altText) {
-        log.info("POST /api/media/upload - Upload d'un fichier : {}", file.getOriginalFilename());
+        log.info("POST /api/media/upload - Uploading file: {}", file.getOriginalFilename());
 
         try {
             Media media = mediaService.uploadMedia(file, title, altText);
-            log.debug("Fichier uploadé avec succès : {}", media.getId());
+            log.debug("File uploaded successfully: {}", media.getId());
             return ResponseEntity.ok(mediaMapper.toDto(media));
         } catch (Exception e) {
-            log.error("Erreur lors de l'upload du fichier : {}", e.getMessage());
+            log.error("Error uploading file: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

@@ -23,8 +23,8 @@ public class NewsMapper {
                 news.getType(),
                 news.getVariant() != null ? news.getVariant().name() : null,
                 news.getDescription(),
-                news.getStartDate(),
-                news.getEndDate(),
+                null, // startDate supprimé de News
+                null, // endDate supprimé de News
                 news.getSortOrder(),
                 news.getStatus() != null ? news.getStatus().name() : null,
                 news.getIsVisible(),

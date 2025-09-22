@@ -20,6 +20,10 @@ public record CreateNewsPublicationRequest(
 
         OffsetDateTime publishedDate,
 
+        OffsetDateTime startDate,
+
+        OffsetDateTime endDate,
+
         UUID mediaId
 ) {
 }

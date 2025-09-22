@@ -1,15 +1,16 @@
 package com.stemadeleine.api.service;
 
-import com.stemadeleine.api.dto.CreateArticleRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateArticleRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.ArticleRepository;
-import com.stemadeleine.api.repository.ContentRepository;
-import com.stemadeleine.api.utils.JsonUtils;
+import com.stemadeleine.api.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final ModuleService moduleService;
-    private final ContentRepository contentRepository;
+    private final SectionRepository sectionRepository;
 
     public List<Article> getAllArticles() {
         log.info("Récupération de tous les articles non supprimés");
@@ -58,6 +59,48 @@ public class ArticleService {
                 });
     }
 
+    public Article createArticleVersion(UpdateArticleRequest request, User author) {
+        log.info("Création d'une nouvelle version d'article pour le moduleId : {}", request.moduleId());
+
+        // 1. Récupérer le module
+        Module module = moduleService.getModuleByModuleId(request.moduleId())
+                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+
+        // 2. Récupérer la dernière version de l'article pour ce module
+        Article previousArticle = articleRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
+                .orElse(null);
+
+        // 3. Fusionner les infos du request et de la version précédente
+        String name = request.name() != null ? request.name() : (previousArticle != null ? previousArticle.getName() : module.getName());
+        String title = request.title() != null ? request.title() : (previousArticle != null ? previousArticle.getTitle() : module.getTitle());
+        ArticleVariants variant = request.variant() != null ? request.variant() : (previousArticle != null ? previousArticle.getVariant() : ArticleVariants.STAGGERED);
+        List<Content> contents = previousArticle != null ? new ArrayList<>(previousArticle.getContents()) : new ArrayList<>();
+        String type = module.getType();
+        Integer sortOrder = module.getSortOrder();
+        Boolean isVisible = module.getIsVisible();
+        PublishingStatus status = PublishingStatus.DRAFT;
+        int newVersion = previousArticle != null ? previousArticle.getVersion() + 1 : 1;
+
+        Article article = Article.builder()
+                .variant(variant)
+                .contents(contents)
+                .moduleId(module.getModuleId())
+                .section(module.getSection())
+                .name(name)
+                .title(title)
+                .type(type)
+                .sortOrder(sortOrder)
+                .isVisible(isVisible)
+                .status(status)
+                .author(author)
+                .version(newVersion)
+                .build();
+
+        Article savedArticle = articleRepository.save(article);
+        log.info("Nouvelle version d'article créée avec succès, ID : {}", savedArticle.getId());
+        return savedArticle;
+    }
+
     public void softDeleteArticle(UUID id) {
         log.info("Suppression logique de l'article avec l'ID : {}", id);
         articleRepository.findById(id).ifPresent(article -> {
@@ -67,42 +110,25 @@ public class ArticleService {
         });
     }
 
-    public Article createArticleWithModule(CreateArticleRequest request, User author) {
+    public Article createArticleWithModule(CreateModuleRequest request, User author) {
         log.info("Création d'un nouvel article pour la section : {}", request.sectionId());
 
-        // Créer le module de type ARTICLE
-        Module module = moduleService.createNewModule(
-                request.sectionId(),
-                request.name(),
-                "ARTICLE",
-                author
-        );
-        log.debug("Module créé avec l'ID : {}", module.getId());
-
-        // Créer un contenu générique conforme au modèle
-        Content content = Content.builder()
-                .ownerId(module.getId())
-                .version(1)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(false)
-                .title(request.name())
-                .body(JsonUtils.createEmptyJsonNode())
-                .build();
-        contentRepository.save(content);
-        log.debug("Contenu créé avec l'ID : {}", content.getId());
+        // Récupérer la section à partir de l'UUID
+        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
         // Créer l'article et le lier au module
         Article article = Article.builder()
+                .moduleId(UUID.randomUUID())
                 .variant(ArticleVariants.STAGGERED)
-                .contents(List.of(content))
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(module.getName())
-                .title(module.getTitle())
-                .type(module.getType())
-                .sortOrder(module.getSortOrder())
-                .isVisible(module.getIsVisible())
-                .status(module.getStatus())
+                .contents(new java.util.ArrayList<>())
+                .section(section)
+                .name(request.name())
+                .title(request.name())
+                .type("ARTICLE")
+                .sortOrder(0)
+                .isVisible(false)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
                 .build();

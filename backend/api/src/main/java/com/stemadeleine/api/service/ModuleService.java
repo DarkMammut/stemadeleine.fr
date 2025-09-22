@@ -1,13 +1,14 @@
 package com.stemadeleine.api.service;
 
+import com.stemadeleine.api.dto.CreateContentRequest;
 import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.PublishingStatus;
-import com.stemadeleine.api.model.Section;
-import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.repository.ContentRepository;
 import com.stemadeleine.api.repository.ModuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,39 +18,11 @@ import java.util.UUID;
 public class ModuleService {
     private final ModuleRepository moduleRepository;
     private final SectionService sectionService;
+    private final ContentRepository contentRepository;
+    private final MediaGalleryService mediaAttachmentService;
 
     public List<Module> getAllModules() {
         return moduleRepository.findAll();
-    }
-
-    public Module createNewModule(UUID sectionId, String name, String type, User author) {
-        // D'abord essayer de trouver par sectionId (identifiant de version)
-        Optional<Section> sectionOpt = sectionService.getLastVersion(sectionId);
-
-        // Si pas trouvé, essayer de trouver par id direct
-        if (sectionOpt.isEmpty()) {
-            sectionOpt = sectionService.getSectionById(sectionId);
-        }
-
-        Section section = sectionOpt.orElseThrow(() -> new RuntimeException("Section not found with id: " + sectionId));
-
-        Short maxSortOrder = moduleRepository.findMaxSortOrderBySection(section.getId());
-        if (maxSortOrder == null) maxSortOrder = 0;
-
-        Module module = Module.builder()
-                .section(section)
-                .name(name)
-                .title(name)
-                .type(type)
-                .sortOrder(maxSortOrder + 1)
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(false)
-                .version(1)
-                .moduleId(UUID.randomUUID())
-                .build();
-
-        return moduleRepository.save(module);
     }
 
     public List<Module> getModulesBySection(UUID sectionId) {
@@ -61,8 +34,13 @@ public class ModuleService {
                 .filter(module -> module.getStatus() != PublishingStatus.DELETED);
     }
 
-    public Optional<Module> updateModule(UUID id, Module moduleDetails) {
-        return moduleRepository.findById(id)
+    public Optional<Module> getModuleByModuleId(UUID moduleId) {
+        return moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(module -> module.getStatus() != PublishingStatus.DELETED);
+    }
+
+    public Optional<Module> updateModule(UUID moduleId, Module moduleDetails) {
+        return moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
                 .filter(module -> module.getStatus() != PublishingStatus.DELETED)
                 .map(module -> {
                     module.setName(moduleDetails.getName());
@@ -73,8 +51,8 @@ public class ModuleService {
                 });
     }
 
-    public void softDeleteModule(UUID id) {
-        moduleRepository.findById(id).ifPresent(module -> {
+    public void softDeleteModule(UUID moduleId) {
+        moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId).ifPresent(module -> {
             module.setStatus(PublishingStatus.DELETED);
             moduleRepository.save(module);
         });
@@ -89,12 +67,53 @@ public class ModuleService {
                 });
     }
 
-    public Optional<Module> updateVisibility(UUID id, Boolean isVisible) {
-        return moduleRepository.findById(id)
+    public Optional<Module> updateVisibility(UUID moduleId, Boolean isVisible) {
+        return moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
                 .filter(module -> module.getStatus() != PublishingStatus.DELETED)
                 .map(module -> {
                     module.setIsVisible(isVisible);
                     return moduleRepository.save(module);
                 });
+    }
+
+    public List<Content> getContentsByModuleId(UUID moduleId) {
+        return contentRepository.findByOwnerIdOrderBySortOrderAsc(moduleId);
+    }
+
+    public Content createContentForModule(UUID moduleId, CreateContentRequest request, User author) {
+        // Vérifier que le module existe
+        Module module = moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found with id: " + moduleId));
+
+        Content content = Content.builder()
+                .contentId(UUID.randomUUID())
+                .ownerId(moduleId)
+                .version(1)
+                .status(PublishingStatus.DRAFT)
+                .title(request.getTitle())
+                .body(request.getBody())
+                .sortOrder(request.getSortOrder())
+                .isVisible(request.getIsVisible() != null ? request.getIsVisible() : true)
+                .author(author)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+        return contentRepository.save(content);
+    }
+
+    public List<Media> getMediasByModuleId(UUID moduleId) {
+        return mediaAttachmentService.getMediasByOwnerId(moduleId);
+    }
+
+    public Media attachMediaToModule(UUID moduleId, UUID mediaId, User user) {
+        return mediaAttachmentService.attachMediaToOwner(moduleId, mediaId, user);
+    }
+
+    public void detachMediaFromModule(UUID moduleId, UUID mediaId) {
+        mediaAttachmentService.detachMediaFromOwner(moduleId, mediaId);
+    }
+
+    public List<Module> saveAll(List<Module> modules) {
+        return moduleRepository.saveAll(modules);
     }
 }

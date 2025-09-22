@@ -33,6 +33,8 @@ public class NewsPublicationMapper {
                 .isVisible(publication.getIsVisible())
                 .status(publication.getStatus())
                 .publishedDate(publication.getPublishedDate())
+                .startDate(publication.getStartDate())
+                .endDate(publication.getEndDate())
                 .media(publication.getMedia() != null ? mediaMapper.toDto(publication.getMedia()) : null)
                 .author(publication.getAuthor() != null ? userMapper.toDto(publication.getAuthor()) : null)
                 .contents(publication.getContents() != null ?

@@ -10,7 +10,7 @@ import { useSectionOperations } from "@/hooks/useSectionOperations";
 import MyForm from "@/components/MyForm";
 import MediaPicker from "@/components/MediaPicker";
 import Switch from "@/components/ui/Switch";
-import SectionContentManager from "@/components/SectionContentManager";
+import ContentManager from "@/components/ContentManager";
 
 export default function EditSection({ sectionId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
@@ -155,9 +155,17 @@ export default function EditSection({ sectionId }) {
 
           {/* Rich Text Content Editor */}
           <div className="bg-surface border border-border rounded-lg p-6">
-            <SectionContentManager
-              sectionId={section?.sectionId}
-              initialContents={sectionData?.contents || []}
+            <ContentManager
+              parentId={section?.sectionId}
+              parentType="section"
+              customLabels={{
+                header: "Contenus de la section",
+                addButton: "Ajouter un contenu",
+                empty: "Aucun contenu pour cette section.",
+                loading: "Chargement des contenus...",
+                saveContent: "Enregistrer le contenu",
+                bodyLabel: "Contenu de la section",
+              }}
             />
           </div>
         </div>

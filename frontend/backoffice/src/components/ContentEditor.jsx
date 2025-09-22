@@ -1,15 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import RichTextEditor from "./RichTextEditor";
-import { useAxiosClient } from "@/utils/axiosClient";
+import {useContentOperations} from "@/hooks/useContentOperations";
 
-const SectionContentEditor = ({
-  sectionId,
+/**
+ * Composant générique d'édition de contenu pour section, module, etc.
+ * parentType: "section", "module", ...
+ * parentId: identifiant de la section ou du module
+ */
+const ContentEditor = ({
+  parentId,
+  parentType = "section",
   contentId = null,
-  initialTitle = "New Content",
+  initialTitle = "Nouveau contenu",
   initialContent = "",
   onContentSaved,
+  customLabels = {},
 }) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
@@ -17,9 +24,10 @@ const SectionContentEditor = ({
   const [lastSaved, setLastSaved] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [currentContentId, setCurrentContentId] = useState(contentId);
-  const axios = useAxiosClient();
 
-  // Initialize content when props change
+  // Utilise le hook d'opérations, adapté pour le parentType
+  const { createContent, updateContent } = useContentOperations({ parentType });
+
   useEffect(() => {
     setTitle(initialTitle);
     setContent(initialContent);
@@ -28,63 +36,42 @@ const SectionContentEditor = ({
   }, [initialTitle, initialContent, contentId]);
 
   const handleTitleChange = (newTitle) => {
-    console.log("Title changed:", newTitle);
     setTitle(newTitle);
     setHasUnsavedChanges(true);
   };
 
   const handleContentChange = (newContent) => {
-    console.log("Content changed");
     setContent(newContent);
     setHasUnsavedChanges(true);
   };
 
   const handleSave = async () => {
-    if (!hasUnsavedChanges || isSaving) {
-      console.log("Skipping save - no changes or already saving");
-      return;
-    }
-
+    if (!hasUnsavedChanges || isSaving) return;
     try {
-      console.log("Starting manual save...");
       setIsSaving(true);
-
       let response;
-
       if (currentContentId) {
-        // Update existing content (creates new version)
-        console.log("Updating existing content with ID:", currentContentId);
-        response = await axios.put(
-          `/api/sections/contents/${currentContentId}`,
-          {
-            title: title,
-            body: { html: content },
-          },
-        );
-      } else {
-        // Create new content
-        console.log("Creating new content for section:", sectionId);
-        response = await axios.post(`/api/sections/${sectionId}/contents`, {
+        // Mise à jour d'un contenu existant
+        await updateContent(currentContentId, {
           title: title,
+          body: { html: content },
         });
-
-        // Set the contentId for future updates
-        setCurrentContentId(response.data.contentId);
-        console.log("New content created with ID:", response.data.contentId);
-
-        // Update the content body if it's not empty
+        response = { data: { contentId: currentContentId } };
+      } else {
+        // Création d'un nouveau contenu
+        const newContent = await createContent(parentId, title);
+        setCurrentContentId(newContent.contentId);
+        response = { data: { contentId: newContent.contentId } };
+        // Mise à jour du body si besoin
         if (content && content.trim() !== "") {
-          console.log("Updating content body...");
-          await axios.put(`/api/sections/contents/${response.data.contentId}`, {
+          await updateContent(newContent.contentId, {
             title: title,
             body: { html: content },
           });
         }
       }
-
       setHasUnsavedChanges(false);
       setLastSaved(new Date());
-
       if (onContentSaved) {
         onContentSaved({
           contentId: currentContentId || response.data.contentId,
@@ -92,11 +79,9 @@ const SectionContentEditor = ({
           content: content,
         });
       }
-
-      console.log("Content saved successfully");
     } catch (error) {
-      console.error("Error saving content:", error);
-      alert("Error saving content. Please try again.");
+      console.error("Erreur lors de la sauvegarde du contenu:", error);
+      alert("Erreur lors de la sauvegarde du contenu.");
     } finally {
       setIsSaving(false);
     }
@@ -112,25 +97,27 @@ const SectionContentEditor = ({
   };
 
   return (
-    <div className="section-content-editor space-y-4">
-      {/* Header with save status */}
+    <div className="content-editor space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-text">Content Editor</h3>
+        <h3 className="text-lg font-semibold text-text">
+          {customLabels.header || "Éditeur de contenu"}
+        </h3>
         <div className="flex items-center gap-4">
-          {/* Save status */}
           <div className="text-sm text-text-muted">
-            {isSaving && <span className="text-blue-600">💾 Saving...</span>}
+            {isSaving && (
+              <span className="text-blue-600">💾 Sauvegarde...</span>
+            )}
             {!isSaving && hasUnsavedChanges && (
-              <span className="text-orange-600">⚠️ Unsaved changes</span>
+              <span className="text-orange-600">
+                ⚠️ Modifications non sauvegardées
+              </span>
             )}
             {!isSaving && !hasUnsavedChanges && lastSaved && (
               <span className="text-green-600">
-                ✅ Saved at {formatLastSaved(lastSaved)}
+                ✅ Sauvegardé à {formatLastSaved(lastSaved)}
               </span>
             )}
           </div>
-
-          {/* Manual save button - ALWAYS VISIBLE */}
           <button
             onClick={handleSave}
             disabled={isSaving || !hasUnsavedChanges}
@@ -139,71 +126,64 @@ const SectionContentEditor = ({
             {isSaving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Saving...
+                {customLabels.saving || "Sauvegarde..."}
               </>
             ) : (
-              <>💾 Save Content</>
+              <>💾 {customLabels.saveButton || "Enregistrer le contenu"}</>
             )}
           </button>
         </div>
       </div>
-
-      {/* Title input */}
       <div className="space-y-2">
         <label
           htmlFor="content-title"
           className="block text-sm font-medium text-text"
         >
-          Content Title
+          {customLabels.titleLabel || "Titre du contenu"}
         </label>
         <input
           id="content-title"
           type="text"
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder="Enter content title..."
+          placeholder={customLabels.titlePlaceholder || "Titre..."}
           disabled={isSaving}
           className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>
-
-      {/* Rich text editor */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-text">
-          Content Body
+          {customLabels.bodyLabel || "Contenu"}
         </label>
         <div className="border border-border rounded-lg overflow-hidden">
           <RichTextEditor
             value={content}
             onChange={handleContentChange}
-            placeholder="Start writing your content here..."
+            placeholder={
+              customLabels.bodyPlaceholder || "Commencez à écrire..."
+            }
             height="300px"
             disabled={isSaving}
           />
         </div>
       </div>
-
-      {/* Info text */}
       <div className="text-sm text-text-muted">
         <p>
-          💡 Click "Save Content" to save your changes manually.{" "}
-          {currentContentId
-            ? `(Content ID: ${currentContentId})`
-            : "(New content)"}
+          💡 Cliquez sur "{customLabels.saveButton || "Enregistrer le contenu"}"
+          pour sauvegarder.{" "}
+          {currentContentId ? `(ID: ${currentContentId})` : "(Nouveau contenu)"}
         </p>
         {hasUnsavedChanges && (
           <p className="text-orange-600 mt-1">
-            ⚠️ You have unsaved changes. Don't forget to save!
+            ⚠️ Modifications non sauvegardées
           </p>
         )}
       </div>
-
-      {/* Keyboard shortcut hint */}
       <div className="text-xs text-text-muted opacity-75">
-        💡 Tip: Use Ctrl+S (or Cmd+S) to save quickly
+        💡 Astuce : Ctrl+S pour sauvegarder rapidement
       </div>
     </div>
   );
 };
 
-export default SectionContentEditor;
+export default ContentEditor;

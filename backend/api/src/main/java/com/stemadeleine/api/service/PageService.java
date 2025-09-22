@@ -1,30 +1,33 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.PageDto;
-import com.stemadeleine.api.model.Media;
-import com.stemadeleine.api.model.Page;
-import com.stemadeleine.api.model.PublishingStatus;
-import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.repository.PageRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
 public class PageService {
 
     private final MediaRepository mediaRepository;
     private final PageRepository pageRepository;
+    private final SectionService sectionService;
+
+    public PageService(MediaRepository mediaRepository, PageRepository pageRepository, @Lazy SectionService sectionService) {
+        this.mediaRepository = mediaRepository;
+        this.pageRepository = pageRepository;
+        this.sectionService = sectionService;
+    }
 
     public Optional<Page> getPublishedPage(UUID pageId) {
         return pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(pageId, PublishingStatus.PUBLISHED);
@@ -39,16 +42,29 @@ public class PageService {
         return pageRepository.findTopByPageIdOrderByVersionDesc(pageId);
     }
 
+    private void filterDeletedChildren(Page page) {
+        if (page.getChildren() != null) {
+            page.setChildren(
+                    page.getChildren().stream()
+                            .filter(child -> child.getStatus() != PublishingStatus.DELETED)
+                            .peek(this::filterDeletedChildren)
+                            .toList()
+            );
+        }
+    }
+
     public List<Page> getLatestPagesForTree() {
-        return pageRepository.findAll().stream()
+        Map<UUID, Page> latestPages = pageRepository.findAll().stream()
                 .filter(p -> p.getStatus() != PublishingStatus.DELETED)
-                .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))))
-                .values()
-                .stream()
-                .sorted(Comparator.comparing(
-                        page -> page.getSortOrder() != null ? page.getSortOrder() : 0
-                )) // Gérer les sortOrder null en les traitant comme 0
+                .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
+        // Ne garder que les pages sans parent à la racine
+        List<Page> roots = latestPages.values().stream()
+                .filter(page -> page.getParentPage() == null)
+                .sorted(Comparator.comparing(page -> page.getSortOrder() != null ? page.getSortOrder() : 0))
                 .toList();
+        // Filtrer récursivement les enfants supprimés
+        roots.forEach(this::filterDeletedChildren);
+        return roots;
     }
 
     public Page getPageById(UUID pageId) {
@@ -200,6 +216,54 @@ public class PageService {
         return pageRepository.save(page);
     }
 
+    @Transactional
+    public Page createPageVersion(UUID pageId, String name, String title, String subTitle, String slug, String description, Boolean isVisible, User author) {
+        Page currentPage = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+
+        // Création de la nouvelle version de la page
+        Page newPage = Page.builder()
+                .pageId(pageId)
+                .version(currentPage.getVersion() + 1)
+                .name(name != null ? name : currentPage.getName())
+                .title(title != null ? title : currentPage.getTitle())
+                .subTitle(subTitle != null ? subTitle : currentPage.getSubTitle())
+                .slug(slug != null && !slug.isEmpty() ? ensureUniqueSlug(slug, pageId) : currentPage.getSlug())
+                .description(description != null ? description : currentPage.getDescription())
+                .status(PublishingStatus.DRAFT)
+                .sortOrder(currentPage.getSortOrder())
+                .parentPage(currentPage.getParentPage())
+                .heroMedia(currentPage.getHeroMedia())
+                .author(author)
+                .isVisible(isVisible != null ? isVisible : currentPage.getIsVisible())
+                .build();
+
+        // Attacher les sections existantes à la nouvelle version de la page (sans duplication)
+        List<Section> sectionsToAttach = currentPage.getSections() != null ? new ArrayList<>(currentPage.getSections()) : new ArrayList<>();
+        for (Section section : sectionsToAttach) {
+            section.setPage(newPage);
+        }
+        newPage.setSections(sectionsToAttach);
+
+        Page savedPage = pageRepository.save(newPage);
+        if (!sectionsToAttach.isEmpty()) {
+            sectionService.saveAll(sectionsToAttach);
+        }
+
+        // Rattacher dynamiquement tous les enfants à la nouvelle version
+        List<Page> children = pageRepository.findByParentPage(currentPage);
+        for (Page child : children) {
+            child.setParentPage(savedPage);
+        }
+        if (!children.isEmpty()) {
+            pageRepository.saveAll(children);
+        }
+        savedPage.setChildren(children);
+
+        log.debug("Page version created, sections and children re-attached: version {} for pageId: {}", savedPage.getVersion(), savedPage.getPageId());
+        return savedPage;
+    }
+
     private String generateSlug(String parentSlug, String name) {
         String baseSlug = name.toLowerCase()
                 .replaceAll("[^a-z0-9\\s-]", "")
@@ -272,6 +336,10 @@ public class PageService {
         Media media = mediaRepository.findById(heroMediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found"));
 
+        // Met à jour le ownerId du média
+        media.setOwnerId(pageId);
+        mediaRepository.save(media);
+
         lastVersion.setHeroMedia(media);
         return pageRepository.save(lastVersion);
     }
@@ -279,6 +347,12 @@ public class PageService {
     public Page removeHeroMediaLastVersion(UUID pageId) {
         Page lastVersion = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
                 .orElseThrow(() -> new RuntimeException("Page not found"));
+
+        Media media = lastVersion.getHeroMedia();
+        if (media != null) {
+            media.setOwnerId(null);
+            mediaRepository.save(media);
+        }
 
         lastVersion.setHeroMedia(null);
         return pageRepository.save(lastVersion);

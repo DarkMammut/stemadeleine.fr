@@ -1,11 +1,13 @@
 package com.stemadeleine.api.controller;
 
-import com.stemadeleine.api.dto.CreateFormRequest;
+import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.FormDto;
+import com.stemadeleine.api.dto.UpdateFormRequest;
 import com.stemadeleine.api.mapper.FormMapper;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.Field;
 import com.stemadeleine.api.model.Form;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.FormService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +50,7 @@ public class FormController {
 
     @PostMapping
     public ResponseEntity<FormDto> createForm(
-            @RequestBody CreateFormRequest request,
+            @RequestBody CreateModuleRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUserDetails
     ) {
         if (currentUserDetails == null) {
@@ -62,6 +64,20 @@ public class FormController {
                 currentUserDetails.account().getUser()
         );
         log.debug("Formulaire créé avec l'ID : {}", form.getId());
+        return ResponseEntity.ok(formMapper.toDto(form));
+    }
+
+    @PostMapping("/version")
+    public ResponseEntity<FormDto> createNewVersionForModule(
+            @RequestBody UpdateFormRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("POST /api/form/version - Création d'une nouvelle version pour le module : {}", request.moduleId());
+        Form form = formService.createFormVersion(request, currentUser);
+        log.debug("Nouvelle version créée avec l'ID : {}", form.getId());
         return ResponseEntity.ok(formMapper.toDto(form));
     }
 

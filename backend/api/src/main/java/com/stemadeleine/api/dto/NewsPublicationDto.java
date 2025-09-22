@@ -17,6 +17,8 @@ public record NewsPublicationDto(
         Boolean isVisible,
         PublishingStatus status,
         OffsetDateTime publishedDate,
+        OffsetDateTime startDate,
+        OffsetDateTime endDate,
         MediaDto media,
         UserDto author,
         List<ContentDto> contents,
