@@ -11,6 +11,7 @@ import MyForm from "@/components/MyForm";
 import MediaPicker from "@/components/MediaPicker";
 import Switch from "@/components/ui/Switch";
 import ContentManager from "@/components/ContentManager";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function EditSection({ sectionId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
@@ -19,6 +20,7 @@ export default function EditSection({ sectionId }) {
   const [sectionData, setSectionData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const axios = useAxiosClient();
 
   useEffect(() => {
     if (section) setSectionData(section);
@@ -91,6 +93,12 @@ export default function EditSection({ sectionId }) {
     }
   };
 
+  // Fonction pour publier la section courante
+  const handlePublishSection = async () => {
+    await axios.put(`/api/sections/${sectionId}/publish`);
+    await refetch();
+  };
+
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error)
     return (
@@ -105,11 +113,7 @@ export default function EditSection({ sectionId }) {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-6xl mx-auto space-y-6"
     >
-      <Title
-        label="Édition de section"
-        apiUrl={`/api/sections/${sectionId}`}
-        data={section}
-      />
+      <Title label="Gestion de la section" onPublish={handlePublishSection} />
 
       <Utilities actions={[]} />
 

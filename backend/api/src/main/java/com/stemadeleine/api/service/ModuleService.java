@@ -47,6 +47,9 @@ public class ModuleService {
                     module.setTitle(moduleDetails.getTitle());
                     module.setIsVisible(moduleDetails.getIsVisible());
                     module.setSortOrder(moduleDetails.getSortOrder());
+                    if (moduleDetails.getStatus() != null) {
+                        module.setStatus(moduleDetails.getStatus());
+                    }
                     return moduleRepository.save(module);
                 });
     }
@@ -115,5 +118,24 @@ public class ModuleService {
 
     public List<Module> saveAll(List<Module> modules) {
         return moduleRepository.saveAll(modules);
+    }
+
+    public Module publishModule(UUID moduleId, User author) {
+        Module module = moduleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found: " + moduleId));
+        module.setStatus(PublishingStatus.PUBLISHED);
+        module.setAuthor(author);
+        module.setUpdatedAt(OffsetDateTime.now());
+        // Publier les contenus si le module en possède
+        List<Content> contents = getContentsByModuleId(moduleId);
+        if (contents != null && !contents.isEmpty()) {
+            for (Content content : contents) {
+                content.setStatus(PublishingStatus.PUBLISHED);
+                content.setAuthor(author);
+                content.setUpdatedAt(OffsetDateTime.now());
+                contentRepository.save(content);
+            }
+        }
+        return moduleRepository.save(module);
     }
 }

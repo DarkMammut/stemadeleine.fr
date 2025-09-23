@@ -266,4 +266,20 @@ public class PageController {
         log.debug("Page version created successfully: {}", newVersion.getId());
         return ResponseEntity.ok(pageMapper.toDto(newVersion));
     }
+
+    // ----- PUBLISH PAGE -----
+    @PutMapping("/{pageId}/publish")
+    public ResponseEntity<PageDto> publishPage(
+            @PathVariable UUID pageId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to publish page without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("PUT /api/pages/{}/publish - Publishing page by user: {}", pageId, currentUser.getUsername());
+        Page publishedPage = pageService.publishPage(pageId, currentUser);
+        return ResponseEntity.ok(pageMapper.toDto(publishedPage));
+    }
 }

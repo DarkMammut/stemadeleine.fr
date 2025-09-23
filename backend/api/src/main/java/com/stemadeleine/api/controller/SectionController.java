@@ -137,14 +137,10 @@ public class SectionController {
                 sectionId, isVisible, currentUser.getUsername());
 
         try {
-            // Get current section data to preserve other fields
-            Section currentSection = sectionService.getLastVersion(sectionId)
-                    .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-
             Section section = sectionService.updateSection(
                     sectionId,
-                    currentSection.getName(),
-                    currentSection.getTitle(),
+                    null,
+                    null,
                     isVisible,
                     currentUser
             );
@@ -496,5 +492,17 @@ public class SectionController {
             log.error("Error creating section version: {}", e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PutMapping("/{sectionId}/publish")
+    public ResponseEntity<SectionDto> publishSection(@PathVariable UUID sectionId, @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to publish section without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("PUT /api/sections/{}/publish - Publishing section by user: {}", sectionId, currentUser.getUsername());
+        Section publishedSection = sectionService.publishSection(sectionId, currentUser);
+        return ResponseEntity.ok(sectionMapper.toDto(publishedSection));
     }
 }

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Title from "@/components/Title";
 import useGetModule from "@/hooks/useGetModule";
 import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
+import axios from "axios";
 
 // Import des composants spécialisés par type de module (basés sur votre backend Java)
 import NewsModuleEditor from "@/components/modules/NewsModuleEditor";
@@ -43,6 +44,12 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
     if (module) setModuleData(module);
   }, [module]);
 
+  // Fonction pour publier le module courant (et ses contenus si présents)
+  const handlePublishModule = async () => {
+    await axios.put(`/api/modules/${moduleId}/publish`);
+    await refetch();
+  };
+
   if (loading) return <div className="text-center py-8">Chargement...</div>;
   if (error)
     return (
@@ -69,11 +76,7 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-6xl mx-auto space-y-6"
       >
-        <Title
-          label="Édition de module"
-          apiUrl={`/api/modules/${moduleId}`}
-          data={module}
-        />
+        <Title label="Édition de module" onPublish={handlePublishModule} />
         <div className="text-center py-8 text-red-600">
           Type de module non supporté: {moduleData.type}
           <br />
@@ -93,8 +96,7 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
     >
       <Title
         label={`Édition de module - ${moduleData.type}`}
-        apiUrl={`/api/modules/${moduleId}`}
-        data={module}
+        onPublish={handlePublishModule}
       />
 
       <ModuleComponent

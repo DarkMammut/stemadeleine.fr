@@ -2,19 +2,16 @@ import { useState } from "react";
 import Flag from "@/components/ui/Flag";
 import Button from "@/components/ui/Button";
 import { CloudArrowUpIcon } from "@heroicons/react/24/solid";
-import { useAxiosClient } from "@/utils/axiosClient";
 
-export default function Title({ label = "Title", apiUrl, data }) {
-  const axios = useAxiosClient();
+export default function Title({ label = "Title", onPublish }) {
   const [loading, setLoading] = useState(false);
   const [published, setPublished] = useState(false);
 
   const handlePublish = async () => {
-    if (!data || !apiUrl) return;
+    if (!onPublish) return;
     try {
       setLoading(true);
-      const updatedData = data.map((p) => ({ ...p, status: "PUBLISHED" }));
-      await axios.put(apiUrl, updatedData);
+      await onPublish();
       setPublished(true);
     } catch (err) {
       console.error("Erreur publication :", err);

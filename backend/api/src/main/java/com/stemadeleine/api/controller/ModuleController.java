@@ -163,4 +163,16 @@ public class ModuleController {
         moduleService.detachMediaFromModule(moduleId, mediaId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{moduleId}/publish")
+    public ResponseEntity<ModuleDto> publishModule(
+            @PathVariable UUID moduleId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        Module publishedModule = moduleService.publishModule(moduleId, currentUser);
+        return ResponseEntity.ok(moduleMapper.toDto(publishedModule));
+    }
 }

@@ -82,21 +82,23 @@ public class PageService {
     }
 
     @Transactional
-    public Page publishPage(UUID draftId) {
-        Page draft = pageRepository.findById(draftId)
-                .orElseThrow(() -> new RuntimeException("Draft not found"));
+    public Page publishPage(UUID pageId, User author) {
+        Page page = getLastVersion(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found: " + pageId));
+        publishPageRecursive(page, author);
+        return pageRepository.save(page);
+    }
 
-        pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(draft.getPageId(), PublishingStatus.PUBLISHED)
-                .ifPresent(p -> {
-                    p.setStatus(PublishingStatus.ARCHIVED);
-                    p.setIsVisible(false);
-                    pageRepository.save(p);
-                });
-
-        draft.setStatus(PublishingStatus.PUBLISHED);
-        draft.setIsVisible(true);
-
-        return pageRepository.save(draft);
+    private void publishPageRecursive(Page page, User author) {
+        page.setStatus(PublishingStatus.PUBLISHED);
+        page.setAuthor(author);
+        page.setUpdatedAt(java.time.OffsetDateTime.now());
+        if (page.getChildren() != null) {
+            for (Page child : page.getChildren()) {
+                publishPageRecursive(child, author);
+                pageRepository.save(child);
+            }
+        }
     }
 
     public List<Page> getAllPages() {

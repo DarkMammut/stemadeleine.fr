@@ -119,6 +119,15 @@ export default function Pages() {
     }
   }, [createPage, refetch]);
 
+  // Fonction pour publier toutes les pages (et enfants) via la nouvelle route backend
+  const handlePublishPages = async () => {
+    if (!treeData || treeData.length === 0) return;
+    await Promise.all(
+      treeData.map((page) => axios.put(`/api/pages/${page.pageId}/publish`)),
+    );
+    await refetch();
+  };
+
   if (loading) return <p>Chargement…</p>;
   if (error) return <p>Erreur: {error.message}</p>;
 
@@ -128,11 +137,7 @@ export default function Pages() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-6xl mx-auto p-6 space-y-6"
     >
-      <Title
-        label="Gestion des pages"
-        apiUrl="/api/pages/tree"
-        data={treeData}
-      />
+      <Title label="Gestion des pages" onPublish={handlePublishPages} />
 
       <Utilities
         actions={[

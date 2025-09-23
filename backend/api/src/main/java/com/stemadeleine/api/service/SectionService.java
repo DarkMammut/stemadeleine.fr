@@ -99,26 +99,18 @@ public class SectionService {
      */
     @Transactional
     public Section updateSection(UUID sectionId, String name, String title, Boolean isVisible, User author) {
-        log.info("Updating section {} by user: {}", sectionId, author.getUsername());
+        log.info("Updating section {} by user: {} (in-place update)", sectionId, author.getUsername());
 
         Section currentSection = getLastVersion(sectionId)
                 .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
 
-        Section updatedSection = Section.builder()
-                .sectionId(sectionId)
-                .page(currentSection.getPage())
-                .version(currentSection.getVersion() + 1)
-                .name(name != null ? name : currentSection.getName())
-                .title(title != null ? title : currentSection.getTitle())
-                .sortOrder(currentSection.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(isVisible != null ? isVisible : currentSection.getIsVisible())
-                .media(currentSection.getMedia())
-                .build();
+        if (name != null) currentSection.setName(name);
+        if (title != null) currentSection.setTitle(title);
+        if (isVisible != null) currentSection.setIsVisible(isVisible);
+        if (author != null) currentSection.setAuthor(author);
 
-        Section savedSection = sectionRepository.save(updatedSection);
-        log.debug("Section updated successfully: version {} for sectionId: {}",
+        Section savedSection = sectionRepository.save(currentSection);
+        log.debug("Section updated in-place: version {} for sectionId: {}",
                 savedSection.getVersion(), savedSection.getSectionId());
         return savedSection;
     }
@@ -309,17 +301,20 @@ public class SectionService {
                 .media(currentSection.getMedia())
                 .build();
 
-        // Attacher les modules existants à la nouvelle version de la section
-        List<Module> modulesToAttach = currentSection.getModules() != null ? new ArrayList<>(currentSection.getModules()) : new ArrayList<>();
-        for (Module module : modulesToAttach) {
-            module.setSection(newSection);
+        // Correction : déclaration de clonedModules avant le if
+        List<Module> clonedModules = new ArrayList<>();
+        if (currentSection.getModules() != null) {
+            for (Module module : currentSection.getModules()) {
+                module.setSection(newSection);
+                clonedModules.add(module);
+            }
+            newSection.setModules(clonedModules);
         }
-        newSection.setModules(modulesToAttach);
 
         Section savedSection = sectionRepository.save(newSection);
         // Sauvegarder les modules pour mettre à jour la relation section
-        if (!modulesToAttach.isEmpty()) {
-            moduleService.saveAll(modulesToAttach);
+        if (!clonedModules.isEmpty()) {
+            moduleService.saveAll(clonedModules);
         }
         log.debug("Section version created and modules attached: version {} for sectionId: {}", savedSection.getVersion(), savedSection.getSectionId());
         return savedSection;
@@ -330,5 +325,26 @@ public class SectionService {
      */
     public List<Section> saveAll(List<Section> sections) {
         return sectionRepository.saveAll(sections);
+    }
+
+    /**
+     * Publish section
+     */
+    @Transactional
+    public Section publishSection(UUID sectionId, User author) {
+        Section section = getLastVersion(sectionId)
+                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+        section.setStatus(PublishingStatus.PUBLISHED);
+        section.setAuthor(author);
+        section.setUpdatedAt(java.time.OffsetDateTime.now());
+        // Publier les modules si besoin
+        if (section.getModules() != null) {
+            for (Module module : section.getModules()) {
+                module.setStatus(PublishingStatus.PUBLISHED);
+                module.setAuthor(author);
+                module.setUpdatedAt(java.time.OffsetDateTime.now());
+            }
+        }
+        return sectionRepository.save(section);
     }
 }

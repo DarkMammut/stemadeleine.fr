@@ -12,7 +12,6 @@ import Title from "@/components/Title";
 import useAddSection from "@/hooks/useAddSection";
 import DraggableTree from "@/components/DraggableTree";
 import PagesTabs from "@/components/PagesTabs";
-import { useAddModule } from "@/hooks/useAddModule";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
@@ -25,62 +24,20 @@ export default function Sections({ pageId }) {
     route: `${pageId}/sections`,
   });
 
-  console.log(page);
-
   const { createSection } = useAddSection();
-  const { addModule } = useAddModule();
   const { updateSectionOrder } = useUpdateSectionOrder();
   const { updateSectionVisibility, deleteSection } = useSectionOperations();
   const { updateModuleVisibility, deleteModule } = useModuleOperations();
   const axiosClient = useAxiosClient();
 
   const [treeData, setTreeData] = useState([]);
-  // New states for module addition modal
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [targetSection, setTargetSection] = useState(null);
   const [selectedModuleType, setSelectedModuleType] = useState("");
 
   useEffect(() => {
     if (page?.sections) {
-      console.log("Raw page data:", page.sections);
-
-      // Dédupliquer les sections par sectionId avant de construire l'arbre
-      const uniqueSections = page.sections.reduce((acc, section) => {
-        // Vérifier si cette section n'existe pas déjà dans l'accumulateur
-        const existingSection = acc.find(
-          (s) => s.sectionId === section.sectionId,
-        );
-        if (!existingSection) {
-          acc.push(section);
-        } else {
-          console.warn(
-            "Duplicate section found and removed:",
-            section.sectionId,
-          );
-        }
-        return acc;
-      }, []);
-
-      console.log("Deduplicated sections:", uniqueSections);
-
-      // Log détaillé de chaque section et de ses modules
-      uniqueSections.forEach((section, idx) => {
-        console.log(`[DEBUG] Section ${idx}:`, section.sectionId, section.name);
-        if (section.modules && section.modules.length > 0) {
-          section.modules.forEach((mod, mIdx) => {
-            console.log(
-              `  [DEBUG]   Module ${mIdx}:`,
-              mod.id,
-              mod.name,
-              mod.type,
-            );
-          });
-        } else {
-          console.log("  [DEBUG]   Aucun module");
-        }
-      });
-
-      const tree = uniqueSections.map((section) => ({
+      const tree = page.sections.map((section) => ({
         id: `section-${section.sectionId}`,
         sectionId: section.sectionId,
         name: section.name,
@@ -88,12 +45,7 @@ export default function Sections({ pageId }) {
         isVisible: section.isVisible,
         children:
           section.modules
-            ?.filter(
-              (module) =>
-                !module.isDeleted &&
-                !module.deletedAt &&
-                module.status !== "DELETED",
-            )
+            ?.filter((module) => module.status !== "DELETED")
             .reduce((moduleAcc, module) => {
               const existingModule = moduleAcc.find(
                 (m) => m.moduleId === (module.moduleId || module.id),
@@ -106,40 +58,13 @@ export default function Sections({ pageId }) {
                   type: "module",
                   moduleType: module.type,
                   sectionId: section.sectionId,
+                  isVisible: module.isVisible,
                   children: [],
                 });
-              } else {
-                console.warn(
-                  "Duplicate module found and removed:",
-                  module.moduleId || module.id,
-                );
               }
               return moduleAcc;
             }, []) || [],
       }));
-
-      console.log("Generated tree data:", tree);
-
-      const allIds = [];
-      const collectIds = (items) => {
-        items.forEach((item) => {
-          allIds.push(item.id);
-          if (item.children) {
-            collectIds(item.children);
-          }
-        });
-      };
-      collectIds(tree);
-
-      const duplicates = allIds.filter(
-        (id, index) => allIds.indexOf(id) !== index,
-      );
-      if (duplicates.length > 0) {
-        console.error("Duplicate IDs found after deduplication:", duplicates);
-      } else {
-        console.log("✅ No duplicate IDs found after deduplication");
-      }
-
       setTreeData(tree);
     }
   }, [page]);
@@ -147,33 +72,27 @@ export default function Sections({ pageId }) {
   const handleTreeChange = useCallback(
     async (newTree) => {
       setTreeData(newTree);
-
       try {
         await updateSectionOrder(pageId, newTree);
-        console.log("Section order saved automatically");
       } catch (error) {
-        console.error("Error during automatic order saving:", error);
+        console.error(
+          "Erreur lors du changement d'ordre des sections :",
+          error,
+        );
+        alert("Erreur lors du changement d'ordre des sections.");
       }
     },
     [pageId, updateSectionOrder],
   );
 
-  // Toggle visibility using the new hook
   const handleToggle = useCallback(
     async (item, newVal) => {
       try {
         if (item.type === "section") {
           await updateSectionVisibility(item.sectionId, newVal);
         } else if (item.type === "module") {
-          console.log("Updating module visibility with hook:", {
-            moduleId: item.moduleId,
-            isVisible: newVal,
-          });
-
           await updateModuleVisibility(item.moduleId, newVal);
         }
-
-        // Update local state
         setTreeData((prev) =>
           prev.map((section) => {
             if (section.id === item.id) {
@@ -193,15 +112,13 @@ export default function Sections({ pageId }) {
           }),
         );
       } catch (error) {
-        console.error("Error updating visibility:", error);
-        console.error("Error response data:", error.response?.data);
-        console.error("Error status:", error.response?.status);
+        console.error("Erreur lors du changement de visibilité :", error);
+        alert("Erreur lors du changement de visibilité.");
       }
     },
     [updateSectionVisibility, updateModuleVisibility],
   );
 
-  // Edit - with intelligent navigation
   const handleEdit = useCallback(
     (item) => {
       if (item.type === "section") {
@@ -215,7 +132,6 @@ export default function Sections({ pageId }) {
     [router, pageId],
   );
 
-  // Delete using the new hook
   const handleDelete = useCallback(
     async (item) => {
       const itemType = item.type === "section" ? "section" : "module";
@@ -223,42 +139,31 @@ export default function Sections({ pageId }) {
         `Are you sure you want to delete this ${itemType}?`,
       );
       if (!confirmDelete) return;
-
       try {
         if (item.type === "section") {
           await deleteSection(item.sectionId);
         } else if (item.type === "module") {
           await deleteModule(item.moduleId);
         }
-
         await refetch();
         setTreeData((prev) => removeItem(prev, item.id));
       } catch (error) {
-        console.error("Error during deletion:", error);
+        console.error("Erreur lors de la suppression :", error);
+        alert("Erreur lors de la suppression.");
       }
     },
     [deleteSection, deleteModule, refetch],
   );
 
-  // Function called by "Add module" button
   const handleAddModule = useCallback((section) => {
-    console.log("🔵 handleAddModule called with section:", section);
     setTargetSection(section);
     setShowAddModuleModal(true);
-    console.log("🔵 Modal should now be showing:", true);
   }, []);
 
-  // Modal validation function
   const handleConfirmAddModule = async () => {
     if (!selectedModuleType || !targetSection) {
-      console.error("Missing data for module creation:", {
-        selectedModuleType,
-        targetSection,
-      });
       return;
     }
-
-    // Mapping type → endpoint
     const typeToEndpoint = {
       article: "/api/articles",
       news: "/api/news",
@@ -269,48 +174,41 @@ export default function Sections({ pageId }) {
       list: "/api/lists",
       gallery: "/api/galleries",
     };
-
     try {
-      let result;
       if (typeToEndpoint[selectedModuleType]) {
-        // Création uniquement via l'endpoint spécifique
         const childEndpoint = typeToEndpoint[selectedModuleType];
-        const response = await axiosClient.post(childEndpoint, {
+        await axiosClient.post(childEndpoint, {
           sectionId: targetSection.sectionId,
           name: `New ${selectedModuleType}`,
         });
-        result = response.data;
-        console.log(`Module spécifique créé dans ${childEndpoint}:`, result);
       } else {
-        // Création via l'endpoint générique
         const url = "/api/modules";
         const payload = {
           sectionId: targetSection.sectionId,
           type: selectedModuleType,
           name: `New ${selectedModuleType}`,
         };
-        const response = await axiosClient.post(url, payload);
-        result = response.data;
-        console.log("Module générique créé:", result);
+        await axiosClient.post(url, payload);
       }
-
       setShowAddModuleModal(false);
       setTargetSection(null);
       setSelectedModuleType("");
-
-      console.log("Starting refetch...");
       await refetch();
-      console.log("Refetch completed");
-      console.log("[DEBUG] page.sections après refetch:", page.sections);
     } catch (error) {
-      console.error("Error adding module:", error);
-      console.error("Error details:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
-      alert(`Error while adding module: ${error.message}`);
+      console.error("Erreur lors de l'ajout du module :", error);
+      alert("Erreur lors de l'ajout du module.");
     }
+  };
+
+  // Fonction pour publier toutes les sections de la page
+  const handlePublishSections = async () => {
+    if (!page?.sections) return;
+    await Promise.all(
+      page.sections.map((section) =>
+        axiosClient.put(`/api/sections/${section.sectionId}/publish`),
+      ),
+    );
+    await refetch();
   };
 
   if (loading) return <p>Loading…</p>;
@@ -322,11 +220,7 @@ export default function Sections({ pageId }) {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-6xl mx-auto space-y-6"
     >
-      <Title
-        label="Content Management"
-        apiUrl="/api/pages/tree"
-        data={treeData}
-      />
+      <Title label="Content Management" onPublish={handlePublishSections} />
 
       <PagesTabs pageId={pageId} />
 

@@ -116,17 +116,19 @@ export default function EditPage({ pageId }) {
     }
   };
 
+  // Fonction pour publier la page courante
+  const handlePublishPage = async () => {
+    await axios.put(`/api/pages/${pageId}/publish`);
+    await refetch();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-6xl mx-auto p-6 space-y-6"
     >
-      <Title
-        label="Gestion des pages"
-        apiUrl={`/api/pages/${pageId}`}
-        data={page}
-      />
+      <Title label="Gestion des pages" onPublish={handlePublishPage} />
 
       <PagesTabs pageId={pageId} />
 
