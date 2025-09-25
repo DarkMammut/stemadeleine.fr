@@ -8,6 +8,7 @@ import {
   InboxIcon,
   NewspaperIcon,
   UserCircleIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Sidebar({ current, setCurrent }) {
@@ -42,6 +43,12 @@ export default function Sidebar({ current, setCurrent }) {
       icon: <InboxIcon className="w-5 h-5" />,
       url: "/contacts",
       key: "contacts",
+    },
+    {
+      label: "Adhérents",
+      icon: <UserGroupIcon className="w-5 h-5" />,
+      url: "/users",
+      key: "users",
     },
     {
       label: "Settings",

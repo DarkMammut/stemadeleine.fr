@@ -20,6 +20,11 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     firstname VARCHAR(255),
     lastname VARCHAR(255),
+    email VARCHAR(255),
+    phone_mobile VARCHAR(50),
+    phone_landline VARCHAR(50),
+    newsletter BOOLEAN,
+    birth_date DATE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -433,6 +438,17 @@ CREATE TABLE lists (
     id UUID PRIMARY KEY,
     variant list_variants DEFAULT 'CARD' NOT NULL,
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+-- =====================
+-- MEMBERSHIPS
+-- =====================
+CREATE TABLE memberships (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    date_adhesion DATE NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true,
+    date_fin DATE
 );
 
 -- Add indexes for performance

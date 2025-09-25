@@ -24,6 +24,15 @@ public class User {
     private String firstname;
     private String lastname;
 
+    private String email;
+    @Column(name = "phone_mobile")
+    private String phoneMobile;
+    @Column(name = "phone_landline")
+    private String phoneLandline;
+    private Boolean newsletter;
+    @Column(name = "birth_date")
+    private java.time.LocalDate birthDate;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
@@ -36,6 +45,11 @@ public class User {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Account> accounts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Membership> memberships;
 
     @ManyToMany
     @JoinTable(

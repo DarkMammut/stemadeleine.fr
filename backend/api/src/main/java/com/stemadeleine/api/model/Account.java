@@ -35,7 +35,7 @@ public class Account {
     private String email;
 
     @Column(name = "password_hash")
-    private String password; // Renommé pour plus de clarté
+    private String password;
 
     @Column(nullable = false)
     @Builder.Default

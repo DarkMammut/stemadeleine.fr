@@ -20,24 +20,31 @@ export default function Title({ label = "Title", onPublish }) {
     }
   };
 
-  return (
-    <div className="w-full flex justify-between items-center mb-10">
-      <h2 className="text-2xl font-semibold mb-4">{label}</h2>
-      {published ? (
+  function PublishButton() {
+    if (published) {
+      return (
         <Flag variant="primary" size="md">
           A jour
         </Flag>
-      ) : (
-        <Button
-          onClick={handlePublish}
-          variant="primary"
-          size="md"
-          loading={loading}
-        >
-          <CloudArrowUpIcon className="w-4 h-4 mr-1" />
-          Publier
-        </Button>
-      )}
+      );
+    }
+    return (
+      <Button
+        onClick={handlePublish}
+        variant="primary"
+        size="md"
+        loading={loading}
+      >
+        <CloudArrowUpIcon className="w-4 h-4 mr-1" />
+        Publier
+      </Button>
+    );
+  }
+
+  return (
+    <div className="w-full flex justify-between items-center mb-10">
+      <h2 className="text-2xl font-semibold mb-4">{label}</h2>
+      {onPublish && <PublishButton />}
     </div>
   );
 }

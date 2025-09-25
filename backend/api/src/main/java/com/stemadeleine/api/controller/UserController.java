@@ -1,48 +1,102 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.UserBackofficeDto;
 import com.stemadeleine.api.dto.UserDto;
-import com.stemadeleine.api.mapper.UserMapper;
+import com.stemadeleine.api.mapper.UserBackofficeMapper;
 import com.stemadeleine.api.model.User;
-import com.stemadeleine.api.service.UserService;
+import com.stemadeleine.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
-    private final UserService userService;
-    private final UserMapper userMapper; // Inject UserMapper as a bean
+    private final UserRepository userRepository;
+    private final UserBackofficeMapper userBackofficeMapper;
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable UUID id) {
-        User user = userService.getUserById(id); // Get User entity
-        return userMapper.toDto(user);           // Use instance method instead of static
+    public java.util.List<UserBackofficeDto> getAllUsers() {
+        return userBackofficeMapper.toDtoList(userRepository.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User user) {
-        return ResponseEntity.ok(userService.save(user));
+    public UserDto createUser(@RequestBody UserDto dto) {
+        User user = new User();
+        user.setFirstname(dto.firstname());
+        user.setLastname(dto.lastname());
+        user.setEmail(dto.email());
+        user.setPhoneMobile(dto.phoneMobile());
+        user.setPhoneLandline(dto.phoneLandline());
+        user.setNewsletter(dto.newsletter());
+        if (dto.birthDate() != null) {
+            user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
+        }
+        user = userRepository.save(user);
+        OffsetDateTime now = OffsetDateTime.now();
+        return new UserDto(
+                user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmail(),
+                user.getPhoneMobile(),
+                user.getPhoneLandline(),
+                user.getNewsletter(),
+                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
+                false,
+                null,
+                null,
+                now,
+                now
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable UUID id, @RequestBody User user) {
-        return ResponseEntity.ok(userService.update(id, user));
+    public UserDto updateUser(@PathVariable("id") java.util.UUID id, @RequestBody UserDto dto) {
+        User user = userRepository.findById(id).orElseThrow();
+        user.setFirstname(dto.firstname());
+        user.setLastname(dto.lastname());
+        user.setEmail(dto.email());
+        user.setPhoneMobile(dto.phoneMobile());
+        user.setPhoneLandline(dto.phoneLandline());
+        user.setNewsletter(dto.newsletter());
+        if (dto.birthDate() != null) {
+            user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
+        }
+        user = userRepository.save(user);
+        OffsetDateTime now = OffsetDateTime.now();
+        return new UserDto(
+                user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmail(),
+                user.getPhoneMobile(),
+                user.getPhoneLandline(),
+                user.getNewsletter(),
+                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
+                false,
+                null,
+                null,
+                user.getCreatedAt() != null ? user.getCreatedAt() : now,
+                now
+        );
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/{id}")
+    public UserBackofficeDto getUser(@PathVariable("id") java.util.UUID id) {
+        return userBackofficeMapper.toDto(userRepository.findById(id).orElseThrow());
+    }
+
+    @GetMapping("/adherents")
+    public ResponseEntity<List<User>> getAdherents() {
+        int currentYear = java.time.LocalDate.now().getYear();
+        List<User> adherents = userRepository.findAll().stream()
+                .filter(u -> u.getMemberships() != null && u.getMemberships().stream().anyMatch(m -> Boolean.TRUE.equals(m.getActive()) && m.getDateFin() != null && m.getDateFin().getYear() == currentYear))
+                .toList();
+        return ResponseEntity.ok(adherents);
     }
 }

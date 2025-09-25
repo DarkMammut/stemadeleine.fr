@@ -48,4 +48,10 @@ public class UserService {
     public void delete(UUID id) {
         userRepository.deleteById(id);
     }
+
+    public List<User> findAdherents() {
+        return userRepository.findAll().stream()
+                .filter(u -> u.getMemberships() != null && u.getMemberships().stream().anyMatch(m -> Boolean.TRUE.equals(m.getActive())))
+                .toList();
+    }
 }

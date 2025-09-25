@@ -45,9 +45,16 @@ public class UserMapper {
                 user.getId(),
                 user.getFirstname(),
                 user.getLastname(),
+                user.getEmail(),
+                user.getPhoneMobile(),
+                user.getPhoneLandline(),
+                user.getNewsletter(),
+                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
+                false,
+                null,
+                accountsDto,
                 user.getCreatedAt(),
-                user.getUpdatedAt(),
-                accountsDto
+                user.getUpdatedAt()
         );
     }
 
