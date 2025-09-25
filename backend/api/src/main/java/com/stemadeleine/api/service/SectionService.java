@@ -50,9 +50,18 @@ public class SectionService {
     /**
      * Get sections by page ID
      */
-    public List<Section> getSectionsByPage(UUID pageId) {
-        log.debug("Retrieving sections for page: {}", pageId);
-        return sectionRepository.findLastVersionsByPageId(pageId);
+    public List<Section> getSectionsByPageId(UUID pageId) {
+        // Récupérer la dernière version de la page métier
+        Optional<Page> lastPageOpt = pageService.getLastVersion(pageId);
+        if (lastPageOpt.isEmpty()) {
+            log.warn("No page found for business pageId: {}", pageId);
+            return List.of();
+        }
+        Page lastPage = lastPageOpt.get();
+        // Utiliser l'id technique pour récupérer les sections
+        List<Section> sections = sectionRepository.findLastVersionsByPageId(lastPage.getId());
+        log.info("Sections retrieved for business pageId {} (technical id {}): {}", pageId, lastPage.getId(), sections.stream().map(s -> String.format("[id=%s, name=%s, status=%s, pageId=%s]", s.getId(), s.getName(), s.getStatus(), s.getPage().getId())).toList());
+        return sections;
     }
 
     /**

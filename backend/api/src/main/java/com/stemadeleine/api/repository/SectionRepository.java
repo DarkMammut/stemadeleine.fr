@@ -2,7 +2,6 @@ package com.stemadeleine.api.repository;
 
 import com.stemadeleine.api.model.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -30,10 +29,6 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
             """)
     Optional<Section> findTopBySectionIdOrderByVersionDesc(@Param("sectionId") UUID sectionId);
 
-    // Récupérer le numéro de version max pour un pageId
-    @Query("SELECT MAX(s.version) FROM Section s WHERE s.sectionId = :sectionId")
-    Optional<Integer> findMaxVersionBySectionId(UUID sectionId);
-
     @Query("""
                 SELECT s
                 FROM Section s
@@ -47,7 +42,6 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
             """)
     List<Section> findLastVersionsByPageId(@Param("pageId") UUID pageId);
 
-    @Modifying
-    @Query("UPDATE Section s SET s.status = 'DELETED', s.isVisible = false WHERE s.id = :id")
-    void softDeleteById(@Param("id") UUID id);
+    @Query("SELECT s FROM Section s WHERE s.page.id = :pageId ORDER BY s.sortOrder ASC")
+    List<Section> findByPageId(@Param("pageId") UUID pageId);
 }

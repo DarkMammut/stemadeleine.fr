@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -82,19 +83,17 @@ public class PageController {
     }
 
     @GetMapping("/{pageId}/sections")
-    public ResponseEntity<PageSectionDto> getPageWithSections(@PathVariable UUID pageId) {
-        log.info("GET /api/pages/{}/sections - Retrieving page with sections", pageId);
-        return pageService.getLastVersion(pageId)
-                .map(page -> {
-                    log.debug("Page with sections found: {}", page.getId());
-                    List<Section> lastSections = sectionService.getSectionsByPage(pageId);
-                    PageSectionDto dto = pageSectionMapper.toDto(page, lastSections);
-                    return ResponseEntity.ok(dto);
-                })
-                .orElseGet(() -> {
-                    log.warn("Page not found with ID: {}", pageId);
-                    return ResponseEntity.notFound().build();
-                });
+    public ResponseEntity<PageSectionDto> getPageWithSectionsByBusinessPageId(@PathVariable UUID pageId) {
+        log.info("GET /api/pages/{}/sections (pageId) - Retrieving sections", pageId);
+        Optional<Page> lastPageOpt = pageService.getLastVersion(pageId);
+        if (lastPageOpt.isEmpty()) {
+            log.warn("No page found for pageId: {}", pageId);
+            return ResponseEntity.notFound().build();
+        }
+        Page lastPage = lastPageOpt.get();
+        List<Section> sections = sectionService.getSectionsByPageId(pageId);
+        PageSectionDto dto = pageSectionMapper.toDto(lastPage, sections);
+        return ResponseEntity.ok(dto);
     }
 
     // ----- CREATE NEW PAGE (simplified logic like sections) -----

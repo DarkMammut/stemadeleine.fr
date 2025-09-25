@@ -45,8 +45,8 @@ public class SectionController {
 
     @GetMapping("/page/{pageId}")
     public List<Section> getSectionsByPage(@PathVariable UUID pageId) {
-        log.info("GET /api/sections/page/{} - Retrieving sections for page", pageId);
-        return sectionService.getSectionsByPage(pageId);
+        log.info("GET /api/sections/page/{} - Retrieving sections for page (business pageId)", pageId);
+        return sectionService.getSectionsByPageId(pageId);
     }
 
     @GetMapping("/{sectionId}")
