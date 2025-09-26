@@ -9,17 +9,28 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "donation_campaigns")
+@Table(name = "campaigns")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DonationCampaign {
-
+public class Campaign {
     @Id
     @GeneratedValue
     private UUID id;
+
+    @Column(name = "form_slug")
+    private String formSlug;
+
+    @Column(name = "form_type")
+    private String formType;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "currency")
+    private String currency;
 
     @Column(nullable = false)
     private String title;
@@ -27,14 +38,8 @@ public class DonationCampaign {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column
-    private Integer goal;
-
     @Column(nullable = false)
     private String url;
-
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

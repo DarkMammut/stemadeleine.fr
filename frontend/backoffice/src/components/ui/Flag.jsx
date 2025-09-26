@@ -1,4 +1,4 @@
-// components/ui/Button.jsx
+// components/ui/Flag.jsx
 
 import clsx from "clsx";
 

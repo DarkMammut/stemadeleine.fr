@@ -367,17 +367,17 @@ CREATE TABLE timelines (
 );
 
 -- =====================
--- DONATION CAMPAIGNS
+-- CAMPAIGNS
 -- =====================
-CREATE TABLE donation_campaigns (
+CREATE TABLE campaigns (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_slug VARCHAR(255),
+    form_type VARCHAR(255),
+    state VARCHAR(255),
+    currency VARCHAR(10),
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    goal_amount DECIMAL(10,2) NOT NULL,
-    current_amount DECIMAL(10,2) DEFAULT 0,
-    start_date DATE NOT NULL,
-    end_date DATE,
-    is_active BOOLEAN DEFAULT true,
+    url VARCHAR(1000) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

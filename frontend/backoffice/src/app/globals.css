@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-    /* Couleurs mode clair */
+
     --color-primary: #3b82f6;
     --color-primary-hover: #2563eb;
     --color-secondary: #6b7280;
@@ -21,7 +21,6 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Couleurs mode sombre */
         --color-primary: #60a5fa;
         --color-primary-hover: #3b82f6;
         --color-secondary: #9ca3af;
@@ -42,7 +41,6 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Ligne de connexion pour les éléments enfants dans l'arbre */
 .child-line::before {
     content: "";
     position: absolute;
@@ -51,4 +49,36 @@ body {
     height: 70%;
     border-left: 2px solid var(--color-border);
     border-bottom: 2px solid var(--color-border);
+}
+
+.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.hover\:bg-primary:hover {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.hover\:bg-secondary:hover {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.hover\:bg-danger:hover {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-success {
+    background-color: var(--color-success) !important;
+}
+
+.hover\:bg-success:hover {
+    background-color: var(--color-success) !important;
 }

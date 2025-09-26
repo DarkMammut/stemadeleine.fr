@@ -1,15 +1,17 @@
 package com.stemadeleine.api.service;
 
+import com.stemadeleine.api.dto.HelloAssoFormDto;
 import com.stemadeleine.api.dto.HelloAssoMembershipItemDto;
 import com.stemadeleine.api.model.Address;
+import com.stemadeleine.api.model.Campaign;
 import com.stemadeleine.api.model.Membership;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.AddressRepository;
+import com.stemadeleine.api.repository.CampaignRepository;
 import com.stemadeleine.api.repository.MembershipRepository;
 import com.stemadeleine.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,14 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HelloAssoImportService {
-    private static final Logger log = LoggerFactory.getLogger(HelloAssoImportService.class);
     private final HelloAssoService helloAssoService;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final MembershipRepository membershipRepository;
+    private final CampaignRepository campaignRepository;
 
     @Transactional
     public void importMembershipUsers(String orgSlug, String formSlug) {
@@ -87,7 +90,9 @@ public class HelloAssoImportService {
      */
     @Scheduled(cron = "0 0 3 * * *") // Tous les jours à 3h du matin
     public void scheduledImport() {
-        importMembershipUsers("les-amis-de-sainte-madeleine-de-la-jarrie", "formulaire-d-adhesion");
+        String orgSlug = "les-amis-de-sainte-madeleine-de-la-jarrie";
+        importMembershipUsers(orgSlug, "formulaire-d-adhesion");
+        importCampaigns(orgSlug);
     }
 
     private Address findOrCreateAddress(Address address) {
@@ -171,5 +176,40 @@ public class HelloAssoImportService {
     private Boolean parseNewsletter(String value) {
         if (value == null) return null;
         return value.trim().equalsIgnoreCase("oui") || value.trim().equalsIgnoreCase("yes");
+    }
+
+    @Transactional
+    public void importCampaigns(String orgSlug) {
+        log.info("Début de l'import des campagnes HelloAsso pour orgSlug='{}'", orgSlug);
+        List<HelloAssoFormDto> forms = helloAssoService.getForms(orgSlug).block();
+        log.info("Formulaires HelloAsso récupérés : {}", forms != null ? forms.stream().map(HelloAssoFormDto::getFormSlug).toList() : "Aucun");
+        if (forms == null) {
+            log.warn("Aucun formulaire récupéré depuis HelloAsso pour orgSlug='{}'", orgSlug);
+            return;
+        }
+        int ajout = 0, maj = 0;
+        for (HelloAssoFormDto form : forms) {
+            String formSlug = form.getFormSlug();
+            Campaign campaign = campaignRepository.findByFormSlug(formSlug)
+                    .orElse(null);
+            boolean isNew = (campaign == null);
+            if (isNew) {
+                campaign = Campaign.builder().formSlug(formSlug).build();
+                ajout++;
+            } else {
+                if (campaign.getFormSlug() == null || campaign.getFormSlug().isBlank()) {
+                    campaign.setFormSlug(formSlug);
+                }
+                maj++;
+            }
+            campaign.setTitle(form.getTitle());
+            campaign.setDescription(form.getDescription());
+            campaign.setUrl(form.getUrl());
+            campaign.setFormType(form.getFormType());
+            campaign.setState(form.getState());
+            campaign.setCurrency(form.getCurrency());
+            campaignRepository.save(campaign);
+        }
+        log.info("Import des campagnes terminé: {} ajout(s), {} mise(s) à jour", ajout, maj);
     }
 }
