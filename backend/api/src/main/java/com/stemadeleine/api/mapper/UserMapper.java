@@ -54,7 +54,8 @@ public class UserMapper {
                 null,
                 accountsDto,
                 user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getUpdatedAt(),
+                user.getAddresses() != null && !user.getAddresses().isEmpty() ? user.getAddresses().get(0) : null
         );
     }
 

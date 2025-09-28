@@ -2,14 +2,9 @@ package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.HelloAssoFormDto;
 import com.stemadeleine.api.dto.HelloAssoMembershipItemDto;
-import com.stemadeleine.api.model.Address;
-import com.stemadeleine.api.model.Campaign;
-import com.stemadeleine.api.model.Membership;
-import com.stemadeleine.api.model.User;
-import com.stemadeleine.api.repository.AddressRepository;
-import com.stemadeleine.api.repository.CampaignRepository;
-import com.stemadeleine.api.repository.MembershipRepository;
-import com.stemadeleine.api.repository.UserRepository;
+import com.stemadeleine.api.dto.HelloAssoPaymentDto;
+import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +23,7 @@ public class HelloAssoImportService {
     private final AddressRepository addressRepository;
     private final MembershipRepository membershipRepository;
     private final CampaignRepository campaignRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public void importMembershipUsers(String orgSlug, String formSlug) {
@@ -41,29 +37,44 @@ public class HelloAssoImportService {
         for (HelloAssoMembershipItemDto item : items) {
             User user = mapToUser(item);
             // Vérification des champs obligatoires
-            if (user.getFirstname() == null || user.getFirstname().isBlank() || user.getLastname() == null || user.getLastname().isBlank()) {
-                log.warn("Utilisateur ignoré (incomplet): prénom ou nom manquant dans l'import HelloAsso");
+            if (user.getEmail() == null || user.getEmail().isBlank()) {
+                log.warn("Utilisateur ignoré (email manquant): {} {}", user.getFirstname(), user.getLastname());
                 incomplets++;
                 continue;
             }
-            // Vérifier si un utilisateur existe déjà avec le même prénom et nom
-            boolean exists = userRepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(
-                    user.getFirstname(), user.getLastname()
-            ).isPresent();
-            if (exists) {
-                log.info("Utilisateur ignoré (déjà existant): {} {}", user.getFirstname(), user.getLastname());
-                ignores++;
-                continue;
+            // Recherche par email
+            User existingUser = userRepository.findByEmailIgnoreCase(user.getEmail()).orElse(null);
+            if (existingUser != null) {
+                // Mise à jour des infos
+                existingUser.setFirstname(user.getFirstname());
+                existingUser.setLastname(user.getLastname());
+                existingUser.setBirthDate(user.getBirthDate());
+                existingUser.setPhoneMobile(user.getPhoneMobile());
+                existingUser.setPhoneLandline(user.getPhoneLandline());
+                existingUser.setNewsletter(user.getNewsletter());
+                user = existingUser;
+                log.info("Utilisateur mis à jour: {} {}", user.getFirstname(), user.getLastname());
+            } else {
+                log.info("Nouvel utilisateur importé: {} {}", user.getFirstname(), user.getLastname());
             }
             Address address = mapToAddress(item);
             if (address != null) {
                 Address linkedAddress = findOrCreateAddress(address);
-                user.setAddresses(List.of(linkedAddress));
+                // Vérifier si l'adresse est déjà liée
+                boolean alreadyLinked = user.getAddresses() != null && user.getAddresses().stream().anyMatch(a -> a.getId().equals(linkedAddress.getId()));
+                if (!alreadyLinked) {
+                    if (user.getAddresses() != null) {
+                        user.getAddresses().add(linkedAddress);
+                    } else {
+                        user.setAddresses(List.of(linkedAddress));
+                    }
+                }
             }
             userRepository.save(user);
             int currentYear = java.time.LocalDate.now().getYear();
+            final java.util.UUID userId = user.getId();
             boolean existsMembership = membershipRepository.findAll().stream()
-                    .anyMatch(m -> m.getUser().getId().equals(user.getId()) && m.getDateFin() != null && m.getDateFin().getYear() == currentYear);
+                    .anyMatch(m -> m.getUser().getId().equals(userId) && m.getDateFin() != null && m.getDateFin().getYear() == currentYear);
             if (existsMembership) {
                 log.info("Adhésion ignorée (déjà existante pour l'année en cours): {} {}", user.getFirstname(), user.getLastname());
                 ignores++;
@@ -93,6 +104,7 @@ public class HelloAssoImportService {
         String orgSlug = "les-amis-de-sainte-madeleine-de-la-jarrie";
         importMembershipUsers(orgSlug, "formulaire-d-adhesion");
         importCampaigns(orgSlug);
+        importPayments(orgSlug);
     }
 
     private Address findOrCreateAddress(Address address) {
@@ -211,5 +223,53 @@ public class HelloAssoImportService {
             campaignRepository.save(campaign);
         }
         log.info("Import des campagnes terminé: {} ajout(s), {} mise(s) à jour", ajout, maj);
+    }
+
+    @Transactional
+    public void importPayments(String orgSlug) {
+        log.info("Début de l'import des paiements HelloAsso pour orgSlug='{}'", orgSlug);
+        List<HelloAssoPaymentDto> payments = helloAssoService.getPayments(orgSlug).block();
+        log.info("Paiements HelloAsso récupérés : {}", payments != null ? payments.stream().map(HelloAssoPaymentDto::getPaymentId).toList() : "Aucun");
+        if (payments == null) {
+            log.warn("Aucun paiement récupéré depuis HelloAsso pour orgSlug='{}'", orgSlug);
+            return;
+        }
+        int ajout = 0, ignores = 0;
+        for (HelloAssoPaymentDto dto : payments) {
+            // Recherche du User
+            User user = userRepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCaseAndEmailIgnoreCase(
+                    dto.getPayerFirstname(), dto.getPayerLastname(), dto.getPayerEmail()
+            ).orElse(null);
+            if (user == null) {
+                // Création du User si non trouvé
+                user = User.builder()
+                        .firstname(dto.getPayerFirstname())
+                        .lastname(dto.getPayerLastname())
+                        .email(dto.getPayerEmail())
+                        .birthDate(dto.getPayerBirthDate())
+                        .build();
+                user = userRepository.save(user);
+            }
+            // Vérifie si le paiement existe déjà
+            boolean exists = paymentRepository.findAll().stream()
+                    .anyMatch(p -> p.getHelloAssoPaymentId().equals(dto.getPaymentId()));
+            if (exists) {
+                ignores++;
+                continue;
+            }
+            Payment payment = new Payment();
+            payment.setHelloAssoPaymentId(dto.getPaymentId());
+            payment.setUser(user);
+            payment.setAmount(dto.getAmount());
+            payment.setCurrency(dto.getCurrency());
+            payment.setPaymentDate(dto.getPaymentDate());
+            payment.setStatus(dto.getStatus());
+            payment.setFormSlug(dto.getFormSlug());
+            payment.setType(dto.getType());
+            payment.setReceiptUrl(dto.getReceiptUrl());
+            paymentRepository.save(payment);
+            ajout++;
+        }
+        log.info("Import des paiements terminé: {} ajout(s), {} ignoré(s)", ajout, ignores);
     }
 }

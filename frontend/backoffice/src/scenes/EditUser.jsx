@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import Switch from "@/components/ui/Switch";
+import Addresses from "@/components/Addresses";
 
 export default function EditUser() {
   const { id } = useParams();
@@ -142,6 +143,20 @@ export default function EditUser() {
     }
   };
 
+  // Méthodes pour gérer les adresses
+  const handleAddAddress = async (address) => {
+    await axios.post(`/api/users/${id}/addresses`, address);
+    await loadUser();
+  };
+  const handleEditAddress = async (addressId, address) => {
+    await axios.put(`/api/addresses/${addressId}`, address);
+    await loadUser();
+  };
+  const handleDeleteAddress = async (addressId) => {
+    await axios.delete(`/api/addresses/${addressId}`);
+    await loadUser();
+  };
+
   // Champs du formulaire utilisateur
   const userFields = [
     {
@@ -240,6 +255,15 @@ export default function EditUser() {
           onChange={setUserForm}
           loading={savingUser}
           submitButtonLabel="Enregistrer les infos utilisateur"
+        />
+      </div>
+      <div className="bg-surface border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-text mb-4">Adresses</h3>
+        <Addresses
+          addresses={user?.addresses || []}
+          onAdd={handleAddAddress}
+          onEdit={handleEditAddress}
+          onDelete={handleDeleteAddress}
         />
       </div>
       <div className="bg-surface border border-border rounded-lg p-6">

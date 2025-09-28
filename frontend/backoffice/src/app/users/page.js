@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Layout from "@/components/layout";
+import Layout from "@/components/Layout";
 import Users from "@/scenes/Users";
 
 export default function UsersPage() {

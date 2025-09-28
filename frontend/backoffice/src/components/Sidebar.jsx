@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import {
   Cog6ToothIcon,
+  CreditCardIcon,
   DocumentTextIcon,
   EnvelopeIcon,
   HomeIcon,
@@ -21,10 +22,10 @@ export default function Sidebar({ current, setCurrent }) {
       key: "dashboard",
     },
     {
-      label: "Pages",
+      label: "Website",
       icon: <DocumentTextIcon className="w-5 h-5" />,
       url: "/pages",
-      key: "pages",
+      key: "website",
     },
     {
       label: "Actualités",
@@ -49,6 +50,12 @@ export default function Sidebar({ current, setCurrent }) {
       icon: <UserGroupIcon className="w-5 h-5" />,
       url: "/users",
       key: "users",
+    },
+    {
+      label: "Paiements",
+      icon: <CreditCardIcon className="w-5 h-5" />,
+      url: "/payments",
+      key: "payments",
     },
     {
       label: "Settings",

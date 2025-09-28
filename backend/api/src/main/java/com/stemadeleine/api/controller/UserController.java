@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -22,6 +21,25 @@ public class UserController {
     @GetMapping
     public java.util.List<UserBackofficeDto> getAllUsers() {
         return userBackofficeMapper.toDtoList(userRepository.findAll());
+    }
+
+    private UserDto toUserDto(User user) {
+        return new UserDto(
+                user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmail(),
+                user.getPhoneMobile(),
+                user.getPhoneLandline(),
+                user.getNewsletter(),
+                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
+                false,
+                null,
+                null,
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getAddresses() != null && !user.getAddresses().isEmpty() ? user.getAddresses().get(0) : null
+        );
     }
 
     @PostMapping
@@ -37,22 +55,7 @@ public class UserController {
             user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
         }
         user = userRepository.save(user);
-        OffsetDateTime now = OffsetDateTime.now();
-        return new UserDto(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getEmail(),
-                user.getPhoneMobile(),
-                user.getPhoneLandline(),
-                user.getNewsletter(),
-                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
-                false,
-                null,
-                null,
-                now,
-                now
-        );
+        return toUserDto(user);
     }
 
     @PutMapping("/{id}")
@@ -68,22 +71,7 @@ public class UserController {
             user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
         }
         user = userRepository.save(user);
-        OffsetDateTime now = OffsetDateTime.now();
-        return new UserDto(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getEmail(),
-                user.getPhoneMobile(),
-                user.getPhoneLandline(),
-                user.getNewsletter(),
-                user.getBirthDate() != null ? user.getBirthDate().toString() : null,
-                false,
-                null,
-                null,
-                user.getCreatedAt() != null ? user.getCreatedAt() : now,
-                now
-        );
+        return toUserDto(user);
     }
 
     @GetMapping("/{id}")

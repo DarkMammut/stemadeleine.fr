@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
-import Layout from "@/components/layout";
+import Layout from "@/components/Layout";
 import EditModule from "@/scenes/EditModule";
 
 export default function EditModulePage() {
   const { pageId, sectionId, moduleId } = useParams();
-  const [current, setCurrent] = useState("sections");
+  const [current, setCurrent] = useState("website");
 
   if (!moduleId) {
     return (

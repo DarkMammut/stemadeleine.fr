@@ -2,13 +2,12 @@
 
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
-import Layout from "@/components/layout";
+import Layout from "@/components/Layout";
 import Sections from "@/scenes/Sections";
-import PagesTabs from "@/components/PagesTabs";
 
 export default function SectionsPage() {
   const { pageId } = useParams();
-  const [current, setCurrent] = useState("pages");
+  const [current, setCurrent] = useState("website");
 
   if (!pageId) {
     return (

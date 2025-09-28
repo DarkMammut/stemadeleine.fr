@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Layout from "@/components/layout";
+import Layout from "@/components/Layout";
 import Pages from "@/scenes/Pages";
 
 export default function PagesPage() {
-  const [current, setCurrent] = useState("pages");
+  const [current, setCurrent] = useState("website");
 
   return (
     <Layout current={current} setCurrent={setCurrent}>

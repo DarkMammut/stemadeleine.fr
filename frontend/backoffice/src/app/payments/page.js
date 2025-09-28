@@ -1,14 +1,15 @@
 "use client";
+
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import Dashboard from "@/scenes/Dashboard";
+import Payments from "@/scenes/Payments";
 
-export default function DashboardPage() {
-  const [current, setCurrent] = useState("dashboard");
+export default function UsersPage() {
+  const [current, setCurrent] = useState("payments");
 
   return (
     <Layout current={current} setCurrent={setCurrent}>
-      <Dashboard />
+      <Payments />
     </Layout>
   );
 }

@@ -1,5 +1,7 @@
 package com.stemadeleine.api.dto;
 
+import com.stemadeleine.api.model.Address;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public record UserDto(
         List<MembershipDto> memberships,
         List<AccountDto> accounts,
         OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+        Address address
 ) {
 }

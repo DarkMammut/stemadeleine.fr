@@ -451,6 +451,27 @@ CREATE TABLE memberships (
     date_fin DATE
 );
 
+-- =====================
+-- PAYMENTS
+-- =====================
+CREATE TABLE payments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    hello_asso_payment_id VARCHAR(255),
+    user_id UUID,
+    amount DOUBLE PRECISION,
+    currency VARCHAR(10),
+    payment_date DATE,
+    status VARCHAR(50),
+    form_slug VARCHAR(255),
+    type VARCHAR(50),
+    receipt_url VARCHAR(1000),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+-- Index pour accélérer les recherches par hello_asso_payment_id
+CREATE INDEX idx_payments_hello_asso_payment_id ON payments(hello_asso_payment_id);
+
 -- Add indexes for performance
 CREATE INDEX idx_modules_section_id ON modules(section_id);
 CREATE INDEX idx_pages_page_id ON pages(page_id);
