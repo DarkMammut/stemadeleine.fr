@@ -1,15 +1,9 @@
 "use client";
 
 import React from "react";
-import Button from "@/components/ui/Button";
 import Flag from "@/components/ui/Flag";
 
-export default function ListUsers({
-  users,
-  onEdit,
-  onDelete,
-  showAdherentFlag,
-}) {
+export default function ListUsers({ users, onUserClick, showAdherentFlag }) {
   return (
     <div className="bg-surface border border-border rounded-lg">
       {!users || users.length === 0 ? (
@@ -24,7 +18,8 @@ export default function ListUsers({
           {users.map((user) => (
             <div
               key={user.id}
-              className="p-4 hover:bg-surface-hover transition-colors"
+              className="p-4 hover:bg-surface-hover transition-colors cursor-pointer"
+              onClick={() => onUserClick(user.id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -56,22 +51,6 @@ export default function ListUsers({
                       )}
                     </span>
                   </div>
-                </div>
-                <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => onEdit && onEdit(user)}
-                  >
-                    Éditer
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => onDelete && onDelete(user)}
-                  >
-                    Suppr
-                  </Button>
                 </div>
               </div>
             </div>

@@ -202,10 +202,14 @@ CREATE TABLE form_fields (
 -- =====================
 CREATE TABLE address (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    street_address VARCHAR(255) NOT NULL,
-    postal_code VARCHAR(10) NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    country VARCHAR(100) NOT NULL,
+    owner_id UUID,
+    name VARCHAR(255),
+    address_line_1 VARCHAR(255),
+    address_line_2 VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(100),
+    post_code VARCHAR(20),
+    country VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -391,19 +395,6 @@ CREATE TABLE cta (
     label VARCHAR(255) NOT NULL,
     url VARCHAR(1000) NOT NULL,
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
-);
-
--- =====================
--- USER ADDRESSES
--- =====================
-CREATE TABLE user_addresses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL,
-    address_id UUID NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (address_id) REFERENCES address(id)
 );
 
 -- =====================

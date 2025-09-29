@@ -3,9 +3,9 @@ import { useParams } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { motion } from "framer-motion";
 import Title from "@/components/Title";
-import Utilities from "@/components/Utilities";
 import MyForm from "@/components/MyForm";
-import UserLink from "@/components/UserLink";
+import DetailsPayment from "@/components/DetailsPayment";
+import LinkUser from "@/components/LinkUser";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -14,6 +14,7 @@ export default function EditPayment() {
   const [paymentForm, setPaymentForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
     loadPayment();
@@ -56,6 +57,38 @@ export default function EditPayment() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEdit = () => setShowEditForm(true);
+  const handleDelete = async () => {
+    if (window.confirm("Supprimer ce paiement ?")) {
+      await axios.delete(`/api/payments/${id}`);
+      alert("Paiement supprimé");
+      // Redirection ou autre logique ici
+    }
+  };
+  const handleUserNavigate = () => {
+    if (payment?.user?.id) {
+      window.location.href = `/users/${payment.user.id}`;
+    }
+  };
+  const handleCancelEdit = () => setShowEditForm(false);
+
+  const handleLinkUser = async (userId) => {
+    setSaving(true);
+    try {
+      await axios.put(`/api/payments/${id}`, { ...paymentForm, userId });
+      await loadPayment();
+      alert("Utilisateur lié au paiement");
+    } catch (e) {
+      alert("Erreur lors de la liaison de l'utilisateur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCreateAndLinkUser = async (userId) => {
+    await handleLinkUser(userId);
   };
 
   const paymentFields = [
@@ -105,6 +138,17 @@ export default function EditPayment() {
 
   if (loading) return <div>Chargement...</div>;
 
+  if (!showEditForm) {
+    return (
+      <DetailsPayment
+        payment={payment}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onUserNavigate={handleUserNavigate}
+      />
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -112,27 +156,27 @@ export default function EditPayment() {
       className="w-full max-w-4xl mx-auto space-y-6"
     >
       <Title label="Modifier le paiement" />
-      <Utilities actions={[]} />
       <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Informations du paiement
-        </h3>
         <MyForm
           fields={paymentFields}
           onSubmit={handleSave}
           onChange={handleChange}
           loading={saving}
           submitButtonLabel="Enregistrer le paiement"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
       </div>
-      {payment?.user && (
-        <div className="bg-surface border border-border rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-text mb-4">
-            Utilisateur associé
-          </h3>
-          <UserLink user={payment.user} />
-        </div>
-      )}
+      <div className="bg-surface border border-border rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-text mb-4">
+          Lier un utilisateur
+        </h3>
+        <LinkUser
+          onLink={handleLinkUser}
+          onCreateAndLink={handleCreateAndLinkUser}
+          loading={saving}
+        />
+      </div>
     </motion.div>
   );
 }

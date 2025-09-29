@@ -51,12 +51,7 @@ public class User {
     @EqualsAndHashCode.Exclude
     private List<Membership> memberships;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_addresses",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id")
-    )
+    @OneToMany(cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Address> addresses;

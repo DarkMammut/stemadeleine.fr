@@ -1,15 +1,19 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.AddressDto;
 import com.stemadeleine.api.dto.UserBackofficeDto;
 import com.stemadeleine.api.dto.UserDto;
 import com.stemadeleine.api.mapper.UserBackofficeMapper;
+import com.stemadeleine.api.model.Address;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.UserRepository;
+import com.stemadeleine.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,6 +21,7 @@ import java.util.List;
 public class UserController {
     private final UserRepository userRepository;
     private final UserBackofficeMapper userBackofficeMapper;
+    private final UserService userService;
 
     @GetMapping
     public java.util.List<UserBackofficeDto> getAllUsers() {
@@ -24,6 +29,22 @@ public class UserController {
     }
 
     private UserDto toUserDto(User user) {
+        java.util.List<AddressDto> addressesDto = null;
+        if (user.getAddresses() != null) {
+            addressesDto = user.getAddresses().stream()
+                    .map(a -> new AddressDto(
+                            a.getId(),
+                            a.getOwnerId(),
+                            a.getName(),
+                            a.getAddressLine1(),
+                            a.getAddressLine2(),
+                            a.getCity(),
+                            a.getState(),
+                            a.getPostCode(),
+                            a.getCountry()
+                    ))
+                    .collect(java.util.stream.Collectors.toList());
+        }
         return new UserDto(
                 user.getId(),
                 user.getFirstname(),
@@ -38,13 +59,13 @@ public class UserController {
                 null,
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getAddresses() != null && !user.getAddresses().isEmpty() ? user.getAddresses().get(0) : null
+                addressesDto
         );
     }
 
-    @PostMapping
-    public UserDto createUser(@RequestBody UserDto dto) {
+    private User toUserEntity(UserDto dto) {
         User user = new User();
+        user.setId(dto.id());
         user.setFirstname(dto.firstname());
         user.setLastname(dto.lastname());
         user.setEmail(dto.email());
@@ -54,12 +75,33 @@ public class UserController {
         if (dto.birthDate() != null) {
             user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
         }
+        if (dto.addresses() != null) {
+            java.util.List<Address> addresses = new java.util.ArrayList<>();
+            for (AddressDto addressDto : dto.addresses()) {
+                Address address = new Address();
+                address.setName(addressDto.getName());
+                address.setAddressLine1(addressDto.getAddressLine1());
+                address.setAddressLine2(addressDto.getAddressLine2());
+                address.setCity(addressDto.getCity());
+                address.setPostCode(addressDto.getPostCode());
+                address.setCountry(addressDto.getCountry());
+                address.setOwnerId(user.getId());
+                addresses.add(address);
+            }
+            user.setAddresses(addresses);
+        }
+        return user;
+    }
+
+    @PostMapping
+    public UserDto createUser(@RequestBody UserDto dto) {
+        User user = toUserEntity(dto);
         user = userRepository.save(user);
         return toUserDto(user);
     }
 
     @PutMapping("/{id}")
-    public UserDto updateUser(@PathVariable("id") java.util.UUID id, @RequestBody UserDto dto) {
+    public UserDto updateUser(@PathVariable UUID id, @RequestBody UserDto dto) {
         User user = userRepository.findById(id).orElseThrow();
         user.setFirstname(dto.firstname());
         user.setLastname(dto.lastname());
@@ -70,13 +112,15 @@ public class UserController {
         if (dto.birthDate() != null) {
             user.setBirthDate(java.time.LocalDate.parse(dto.birthDate()));
         }
+        // On ne modifie plus les adresses ici
         user = userRepository.save(user);
         return toUserDto(user);
     }
 
     @GetMapping("/{id}")
-    public UserBackofficeDto getUser(@PathVariable("id") java.util.UUID id) {
-        return userBackofficeMapper.toDto(userRepository.findById(id).orElseThrow());
+    public UserBackofficeDto getUser(@PathVariable UUID id) {
+        User user = userService.getUserById(id);
+        return userBackofficeMapper.toDto(user);
     }
 
     @GetMapping("/adherents")

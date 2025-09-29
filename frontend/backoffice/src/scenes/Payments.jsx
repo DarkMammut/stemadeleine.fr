@@ -79,6 +79,10 @@ export default function Payments() {
     }
   };
 
+  const handlePaymentClick = (paymentId) => {
+    router.push(`/payments/${paymentId}`);
+  };
+
   if (loading) {
     return <div className="text-center py-8">Chargement des paiements...</div>;
   }
@@ -87,10 +91,9 @@ export default function Payments() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-6"
     >
-      <Title label="Gestion des Paiements" />
-
+      <Title label="Paiements" />
       <Utilities
         actions={[
           {
@@ -106,11 +109,7 @@ export default function Payments() {
         ]}
       />
 
-      <ListPayments
-        payments={payments}
-        onEdit={handleEditPayment}
-        onDelete={handleDeletePayment}
-      />
+      <ListPayments payments={payments} onPaymentClick={handlePaymentClick} />
     </motion.div>
   );
 }

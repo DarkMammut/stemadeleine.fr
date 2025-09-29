@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import Button from "@/components/ui/Button";
 
-export default function ListPayments({ payments, onEdit, onDelete }) {
+export default function ListPayments({ payments, onPaymentClick }) {
   return (
     <div className="bg-surface border border-border rounded-lg">
       {!payments || payments.length === 0 ? (
@@ -18,7 +17,8 @@ export default function ListPayments({ payments, onEdit, onDelete }) {
           {payments.map((payment) => (
             <div
               key={payment.id}
-              className="p-4 hover:bg-surface-hover transition-colors"
+              className="p-4 hover:bg-surface-hover transition-colors cursor-pointer"
+              onClick={() => onPaymentClick(payment.id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -43,22 +43,6 @@ export default function ListPayments({ payments, onEdit, onDelete }) {
                     </span>
                     <span>Type : {payment.type || "Non renseigné"}</span>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => onEdit(payment)}
-                  >
-                    Éditer
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => onDelete(payment)}
-                  >
-                    Supprimer
-                  </Button>
                 </div>
               </div>
             </div>

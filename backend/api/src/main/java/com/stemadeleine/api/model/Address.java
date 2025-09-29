@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "address")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,9 +23,17 @@ public class Address {
     @GeneratedValue
     private UUID id;
 
-    private String street;
+    @Column(name = "owner_id")
+    private UUID ownerId;
+    private String name;
+    @Column(name = "address_line_1")
+    private String addressLine1;
+    @Column(name = "address_line_2")
+    private String addressLine2;
     private String city;
-    private String zipcode;
+    private String state;
+    @Column(name = "post_code")
+    private String postCode;
     private String country;
 
     @CreationTimestamp
@@ -36,3 +44,4 @@ public class Address {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 }
+

@@ -26,16 +26,26 @@ public class AddressService {
     }
 
     public Address save(Address address) {
+        if (address.getName() == null || address.getName().isEmpty()) {
+            address.setName("Principal");
+        }
         return addressRepository.save(address);
     }
 
     public Address update(UUID id, Address addressDetails) {
         return addressRepository.findById(id)
                 .map(address -> {
-                    address.setStreet(addressDetails.getStreet());
+                    address.setAddressLine1(addressDetails.getAddressLine1());
+                    address.setAddressLine2(addressDetails.getAddressLine2());
                     address.setCity(addressDetails.getCity());
-                    address.setZipcode(addressDetails.getZipcode());
+                    address.setState(addressDetails.getState());
+                    address.setPostCode(addressDetails.getPostCode());
                     address.setCountry(addressDetails.getCountry());
+                    address.setName(
+                            addressDetails.getName() == null || addressDetails.getName().isEmpty()
+                                    ? "Principal"
+                                    : addressDetails.getName()
+                    );
                     return addressRepository.save(address);
                 })
                 .orElseThrow(() -> new RuntimeException("Address not found with id " + id));

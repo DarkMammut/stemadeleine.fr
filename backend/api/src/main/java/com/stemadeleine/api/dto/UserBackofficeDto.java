@@ -22,6 +22,6 @@ public class UserBackofficeDto {
     private Boolean isAdherent;
     private List<MembershipDto> memberships;
     private List<AccountDto> accounts;
+    private List<AddressDto> addresses;
 }
 // ...fin du fichier, aucune autre classe ou package ici...
-

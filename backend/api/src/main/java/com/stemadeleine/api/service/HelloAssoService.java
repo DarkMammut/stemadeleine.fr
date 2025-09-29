@@ -243,7 +243,6 @@ public class HelloAssoService {
                                         if (birthDateObj != null && !String.valueOf(birthDateObj).equals("null")) {
                                             String birthDateStr = String.valueOf(birthDateObj);
                                             try {
-                                                // Gestion des formats ISO (ex: "yyyy-MM-dd" ou "yyyy-MM-ddTHH:mm:ss")
                                                 if (birthDateStr.length() >= 10) {
                                                     dto.setPayerBirthDate(LocalDate.parse(birthDateStr.substring(0, 10)));
                                                 } else {
@@ -253,6 +252,12 @@ public class HelloAssoService {
                                                 log.warn("Erreur lors du parsing de birthDate: {}", birthDateStr);
                                             }
                                         }
+                                        dto.setPayerAddressLine1(payerMap.get("address") != null ? String.valueOf(payerMap.get("address")) : null);
+                                        dto.setPayerAddressLine2(payerMap.get("address2") != null ? String.valueOf(payerMap.get("address2")) : null);
+                                        dto.setPayerState(payerMap.get("state") != null ? String.valueOf(payerMap.get("state")) : null);
+                                        dto.setPayerCity(payerMap.get("city") != null ? String.valueOf(payerMap.get("city")) : null);
+                                        dto.setPayerPostCode(payerMap.get("zipCode") != null ? String.valueOf(payerMap.get("zipCode")) : null);
+                                        dto.setPayerCountry(payerMap.get("country") != null ? String.valueOf(payerMap.get("country")) : "France");
                                     }
                                     // Items (pour type, currency, amount)
                                     List<Map<String, Object>> items = (List<Map<String, Object>>) paymentMap.get("items");

@@ -1,12 +1,12 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.repository.AddressRepository;
 import com.stemadeleine.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -26,7 +26,9 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
+    @Mock
+    private AddressRepository addressRepository;
+
     private UserService userService;
 
     private User testUser;
@@ -40,6 +42,7 @@ class UserServiceTest {
                 .firstname("John")
                 .lastname("Doe")
                 .build();
+        userService = new UserService(userRepository, addressRepository);
     }
 
     @Test
@@ -166,14 +169,15 @@ class UserServiceTest {
     void getUserByIdShouldReturnUser() {
         // Given
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-
+        when(addressRepository.findByOwnerId(testUserId)).thenReturn(List.of());
         // When
         User result = userService.getUserById(testUserId);
-
         // Then
         assertEquals(testUser.getId(), result.getId());
         assertEquals(testUser.getFirstname(), result.getFirstname());
         assertEquals(testUser.getLastname(), result.getLastname());
+        assertEquals(0, result.getAddresses().size());
         verify(userRepository).findById(testUserId);
+        verify(addressRepository).findByOwnerId(testUserId);
     }
 }

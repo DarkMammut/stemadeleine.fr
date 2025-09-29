@@ -1,6 +1,7 @@
 package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.AccountDto;
+import com.stemadeleine.api.dto.AddressDto;
 import com.stemadeleine.api.dto.UserDto;
 import com.stemadeleine.api.model.User;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,23 @@ public class UserMapper {
             log.warn("Could not access user accounts for user: {} - {}", user.getId(), e.getMessage());
         }
 
+        List<AddressDto> addressesDto = null;
+        if (user.getAddresses() != null && Hibernate.isInitialized(user.getAddresses())) {
+            addressesDto = user.getAddresses().stream()
+                    .map(a -> new AddressDto(
+                            a.getId(),
+                            a.getOwnerId(),
+                            a.getName(),
+                            a.getAddressLine1(),
+                            a.getAddressLine2(),
+                            a.getCity(),
+                            a.getState(),
+                            a.getPostCode(),
+                            a.getCountry()
+                    ))
+                    .collect(Collectors.toList());
+        }
+
         return new UserDto(
                 user.getId(),
                 user.getFirstname(),
@@ -55,7 +73,7 @@ public class UserMapper {
                 accountsDto,
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getAddresses() != null && !user.getAddresses().isEmpty() ? user.getAddresses().get(0) : null
+                addressesDto
         );
     }
 

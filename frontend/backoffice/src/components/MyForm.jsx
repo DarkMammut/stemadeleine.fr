@@ -1,39 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "@/components/ui/Button";
 
 export default function MyForm({
   fields,
+  initialValues = {},
   onSubmit,
   onChange: onChangeExternal,
   loading,
-  submitButtonLabel = "Sauvegarder", // nouvelle prop
-  showSubmitButton = true, // nouvelle prop
+  submitButtonLabel = "Sauvegarder",
+  showSubmitButton = true,
+  onCancel,
+  cancelButtonLabel = "Annuler",
 }) {
-  const initialValues = fields.reduce((acc, field) => {
-    acc[field.name] =
-      field.defaultValue !== undefined
-        ? field.defaultValue
-        : field.type === "checkbox"
-          ? false
-          : "";
-    return acc;
-  }, {});
-
-  const [formValues, setFormValues] = useState(initialValues);
+  // Initialisation du state à partir de initialValues uniquement au montage
+  const [formValues, setFormValues] = useState(() => ({ ...initialValues }));
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    const updatedValues = fields.reduce((acc, field) => {
-      acc[field.name] =
-        field.defaultValue !== undefined
-          ? field.defaultValue
-          : field.type === "checkbox"
-            ? false
-            : "";
-      return acc;
-    }, {});
-    setFormValues(updatedValues);
-  }, [fields]);
 
   const hasChanges = () => {
     return Object.keys(formValues).some(
@@ -60,7 +41,6 @@ export default function MyForm({
       [name]: type === "checkbox" ? checked : value,
     };
     setFormValues(updatedValues);
-
     if (onChangeExternal) {
       onChangeExternal(name, updatedValues[name], updatedValues);
     }
@@ -68,7 +48,6 @@ export default function MyForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newErrors = {};
     fields.forEach((field) => {
       if (field.required && field.type !== "readonly") {
@@ -78,12 +57,10 @@ export default function MyForm({
         }
       }
     });
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     setErrors({});
     onSubmit(formValues);
   };
@@ -94,7 +71,6 @@ export default function MyForm({
         {fields.map((field) => (
           <div key={field.name} className="flex flex-col">
             {field.type === "checkbox" ? (
-              // Structure spéciale pour les checkboxes
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -106,14 +82,12 @@ export default function MyForm({
                 <span className="font-medium text-text">{field.label}</span>
               </label>
             ) : (
-              // Structure normale pour les autres champs
               <>
                 {field.label && (
                   <label className="mb-2 font-medium text-text">
                     {field.label}
                   </label>
                 )}
-
                 {field.type === "textarea" ? (
                   <textarea
                     name={field.name}
@@ -164,7 +138,6 @@ export default function MyForm({
                 )}
               </>
             )}
-
             {errors[field.name] && (
               <span className="text-danger text-sm mt-2 flex items-center gap-1">
                 <span>⚠️</span>
@@ -173,18 +146,26 @@ export default function MyForm({
             )}
           </div>
         ))}
-
-        <div className="flex justify-end pt-4 border-t border-border">
+        <div className="flex gap-4 mt-6">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onCancel}
+              loading={loading}
+              className=""
+            >
+              {cancelButtonLabel}
+            </Button>
+          )}
           {showSubmitButton && (
             <Button
               type="submit"
               variant="primary"
-              size="md"
               loading={loading}
-              disabled={!isValid() || loading}
-              className="min-w-[120px]"
+              className=""
             >
-              {loading ? "Sauvegarde..." : submitButtonLabel}
+              {submitButtonLabel}
             </Button>
           )}
         </div>

@@ -85,6 +85,10 @@ export default function Users() {
     setShowAdherentsOnly((prev) => !prev);
   };
 
+  const handleUserClick = (userId) => {
+    router.push(`/users/${userId}`);
+  };
+
   if (loading) {
     return (
       <div className="text-center py-8">Chargement des utilisateurs...</div>
@@ -95,10 +99,9 @@ export default function Users() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-6"
     >
-      <Title label="Gestion des Utilisateurs" />
-
+      <Title label="Utilisateurs" />
       <Utilities
         actions={[
           {
@@ -121,9 +124,8 @@ export default function Users() {
 
       <ListUsers
         users={users}
-        onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
-        showAdherentFlag={true}
+        onUserClick={handleUserClick}
+        showAdherentFlag={showAdherentsOnly}
       />
     </motion.div>
   );

@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.repository.AddressRepository;
 import com.stemadeleine.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +12,11 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
     }
 
     public List<User> findAll() {
@@ -25,8 +28,11 @@ public class UserService {
     }
 
     public User getUserById(UUID id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        List<com.stemadeleine.api.model.Address> addresses = addressRepository.findByOwnerId(user.getId());
+        user.setAddresses(addresses);
+        return user;
     }
 
     public User save(User user) {
@@ -38,7 +44,10 @@ public class UserService {
                 .map(user -> {
                     user.setFirstname(updatedUser.getFirstname());
                     user.setLastname(updatedUser.getLastname());
-                    user.setAddresses(updatedUser.getAddresses());
+                    if (updatedUser.getAddresses() != null) {
+                        updatedUser.getAddresses().forEach(address -> address.setOwnerId(user.getId()));
+                        user.setAddresses(updatedUser.getAddresses());
+                    }
                     user.setAccounts(updatedUser.getAccounts());
                     return userRepository.save(user);
                 })

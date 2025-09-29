@@ -1,6 +1,7 @@
 package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.AccountDto;
+import com.stemadeleine.api.dto.AddressDto;
 import com.stemadeleine.api.dto.MembershipDto;
 import com.stemadeleine.api.dto.UserBackofficeDto;
 import com.stemadeleine.api.model.User;
@@ -39,6 +40,23 @@ public class UserBackofficeMapper {
                     a.getUpdatedAt()
             )).collect(Collectors.toList());
         }
+        List<AddressDto> addressesDto;
+        if (user.getAddresses() != null && Hibernate.isInitialized(user.getAddresses())) {
+            addressesDto = user.getAddresses().stream()
+                    .map(a -> new AddressDto(
+                            a.getId(),
+                            a.getOwnerId(),
+                            a.getName(),
+                            a.getAddressLine1(),
+                            a.getAddressLine2(),
+                            a.getCity(),
+                            a.getState(),
+                            a.getPostCode(),
+                            a.getCountry()
+                    )).collect(Collectors.toList());
+        } else {
+            addressesDto = java.util.Collections.emptyList();
+        }
         return new UserBackofficeDto(
                 user.getId(),
                 user.getFirstname(),
@@ -50,7 +68,8 @@ public class UserBackofficeMapper {
                 user.getBirthDate() != null ? user.getBirthDate().toString() : null,
                 isAdherent,
                 membershipsDto,
-                accountsDto
+                accountsDto,
+                addressesDto
         );
     }
 
