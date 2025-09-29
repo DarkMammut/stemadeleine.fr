@@ -72,7 +72,7 @@ export default function Users() {
 
   const handleImportHelloAsso = async () => {
     try {
-      await axios.post("/api/helloasso/import");
+      await axios.post("/api/users/import");
       await loadUsers();
       alert("Import HelloAsso terminé avec succès.");
     } catch (error) {

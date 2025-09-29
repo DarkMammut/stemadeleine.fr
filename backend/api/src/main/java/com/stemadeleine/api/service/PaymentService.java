@@ -1,5 +1,6 @@
 package com.stemadeleine.api.service;
 
+import com.stemadeleine.api.dto.PaymentUpdateDto;
 import com.stemadeleine.api.model.Payment;
 import com.stemadeleine.api.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,22 +30,27 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment updatePayment(Long id, Payment paymentDetails) {
+    public Payment updatePayment(UUID id, PaymentUpdateDto dto) {
         Payment payment = paymentRepository.findById(id).orElseThrow();
-        payment.setHelloAssoPaymentId(paymentDetails.getHelloAssoPaymentId());
-        payment.setUser(paymentDetails.getUser());
-        payment.setAmount(paymentDetails.getAmount());
-        payment.setCurrency(paymentDetails.getCurrency());
-        payment.setPaymentDate(paymentDetails.getPaymentDate());
-        payment.setStatus(paymentDetails.getStatus());
-        payment.setFormSlug(paymentDetails.getFormSlug());
-        payment.setType(paymentDetails.getType());
-        payment.setReceiptUrl(paymentDetails.getReceiptUrl());
+        payment.setAmount(dto.getAmount());
+        payment.setPaymentDate(dto.getPaymentDate());
+        payment.setStatus(dto.getStatus());
+        payment.setCurrency(dto.getCurrency() != null ? dto.getCurrency() : "EUR");
+        if (dto.getType() != null) payment.setType(dto.getType());
+        if (dto.getFormSlug() != null) payment.setFormSlug(dto.getFormSlug());
+        if (dto.getReceiptUrl() != null) payment.setReceiptUrl(dto.getReceiptUrl());
         return paymentRepository.save(payment);
     }
 
     @Transactional
     public void deletePayment(Long id) {
         paymentRepository.deleteById(id);
+    }
+
+    public double getTotalAmountByFormSlug(String formSlug) {
+        return paymentRepository.findAll().stream()
+                .filter(p -> formSlug.equals(p.getFormSlug()))
+                .mapToDouble(Payment::getAmount)
+                .sum();
     }
 }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "@/components/ui/Button";
+import CurrencyInput from "@/components/CurrencyInput";
 
 export default function MyForm({
   fields,
@@ -81,6 +82,30 @@ export default function MyForm({
                 />
                 <span className="font-medium text-text">{field.label}</span>
               </label>
+            ) : field.name === "amount" ? (
+              <>
+                {field.label && (
+                  <label className="mb-2 font-medium text-text">
+                    {field.label}
+                  </label>
+                )}
+                <CurrencyInput
+                  value={formValues.amount}
+                  onChange={(val) => {
+                    const updatedValues = { ...formValues, amount: val };
+                    setFormValues(updatedValues);
+                    if (onChangeExternal) {
+                      onChangeExternal("amount", val, updatedValues);
+                    }
+                  }}
+                  currency={field.currency || "EUR"}
+                />
+                {errors.amount && (
+                  <span className="text-danger text-xs mt-1">
+                    {errors.amount}
+                  </span>
+                )}
+              </>
             ) : (
               <>
                 {field.label && (

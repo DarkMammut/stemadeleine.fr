@@ -3,16 +3,35 @@ import Flag from "@/components/ui/Flag";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/Utilities";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import Currency from "@/components/Currency";
 
 export default function Campaigns() {
   const axios = useAxiosClient();
   const [campaigns, setCampaigns] = useState([]);
 
-  const fetchCampaigns = () => {
-    axios
-      .get("/api/campaigns")
-      .then((res) => setCampaigns(res.data))
-      .catch(() => setCampaigns([]));
+  const fetchCampaigns = async () => {
+    try {
+      const res = await axios.get("/api/campaigns");
+      const campaignsData = res.data;
+      // Récupérer le montant collecté pour chaque campagne
+      const campaignsWithAmount = await Promise.all(
+        campaignsData.map(async (campaign) => {
+          if (campaign.title === "Checkout" || !campaign.formSlug)
+            return { ...campaign, collectedAmount: 0 };
+          try {
+            const amountRes = await axios.get(
+              `/api/payments/total/${campaign.formSlug}`,
+            );
+            return { ...campaign, collectedAmount: amountRes.data };
+          } catch {
+            return { ...campaign, collectedAmount: 0 };
+          }
+        }),
+      );
+      setCampaigns(campaignsWithAmount);
+    } catch {
+      setCampaigns([]);
+    }
   };
 
   useEffect(() => {
@@ -21,7 +40,7 @@ export default function Campaigns() {
 
   const handleImportHelloAsso = async () => {
     try {
-      await axios.post("/api/campaigns/import");
+      await axios.post("/api/helloasso/import");
       fetchCampaigns();
       alert("Import HelloAsso terminé avec succès.");
     } catch (error) {
@@ -33,7 +52,7 @@ export default function Campaigns() {
   function getFlagVariant(state) {
     if (state === "Public") return "primary";
     if (state === "Private") return "danger";
-    return "secondary"; // ou autre valeur par défaut
+    return "secondary";
   }
 
   return (
@@ -42,7 +61,7 @@ export default function Campaigns() {
         actions={[
           {
             icon: ArrowPathIcon,
-            label: "Actualiser les campagnes",
+            label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
           },
         ]}
@@ -63,7 +82,11 @@ export default function Campaigns() {
                 </Flag>
               </div>
               <div className="text-sm text-gray-600 mb-1">
-                Montant collecté : {campaign.collectedAmount} €
+                Montant collecté :{" "}
+                <Currency
+                  value={campaign.collectedAmount}
+                  currency={campaign.currency}
+                />
               </div>
             </div>
           ))}

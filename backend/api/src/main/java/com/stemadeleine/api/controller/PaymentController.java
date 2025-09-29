@@ -1,6 +1,9 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.PaymentUpdateDto;
 import com.stemadeleine.api.model.Payment;
+import com.stemadeleine.api.model.PaymentStatus;
+import com.stemadeleine.api.model.PaymentType;
 import com.stemadeleine.api.service.HelloAssoImportService;
 import com.stemadeleine.api.service.PaymentService;
 import com.stemadeleine.api.service.UserService;
@@ -8,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -39,12 +41,12 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable Long id, @RequestBody Payment paymentDetails) {
+    public ResponseEntity<Payment> updatePayment(@PathVariable UUID id, @RequestBody PaymentUpdateDto paymentDetails) {
         try {
             Payment updated = paymentService.updatePayment(id, paymentDetails);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(null);
         }
     }
 
@@ -63,5 +65,19 @@ public class PaymentController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erreur lors de l'import des paiements : " + e.getMessage());
         }
+    }
+
+    @GetMapping("/total/{formSlug}")
+    public ResponseEntity<Double> getTotalAmountByFormSlug(@PathVariable String formSlug) {
+        double total = paymentService.getTotalAmountByFormSlug(formSlug);
+        return ResponseEntity.ok(total);
+    }
+
+    @GetMapping("/enums")
+    public Map<String, Object> getPaymentEnums() {
+        Map<String, Object> enums = new HashMap<>();
+        enums.put("status", Arrays.stream(PaymentStatus.values()).map(Enum::name).toList());
+        enums.put("type", Arrays.stream(PaymentType.values()).map(Enum::name).toList());
+        return enums;
     }
 }

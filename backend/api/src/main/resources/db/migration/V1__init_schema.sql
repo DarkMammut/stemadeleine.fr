@@ -12,6 +12,8 @@ CREATE TYPE cta_variants AS ENUM ('BUTTON', 'LINK');
 CREATE TYPE news_variants AS ENUM ('LAST', 'LAST3', 'LAST5', 'ALL');
 CREATE TYPE timeline_variants AS ENUM ('TABS', 'TEXT');
 CREATE TYPE list_variants AS ENUM ('BULLET', 'CARD');
+CREATE TYPE payment_status AS ENUM ('PENDING','AUTHORIZED', 'PAID', 'REFUNDED', 'CANCELED', 'FAILED', 'DELETED', 'ARCHIVED');
+CREATE TYPE payment_type AS ENUM ('DONATION', 'MEMBERSHIP', 'EVENT', 'OTHER');
 
 -- =====================
 -- USERS
@@ -447,19 +449,17 @@ CREATE TABLE memberships (
 -- =====================
 CREATE TABLE payments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
     hello_asso_payment_id VARCHAR(255),
-    user_id UUID,
     amount DOUBLE PRECISION,
-    currency VARCHAR(10),
+    currency VARCHAR(10) DEFAULT 'EUR',
     payment_date DATE,
-    status VARCHAR(50),
+    status payment_status NOT NULL DEFAULT 'PENDING',
     form_slug VARCHAR(255),
-    type VARCHAR(50),
-    receipt_url VARCHAR(1000),
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    type payment_type NOT NULL DEFAULT 'MEMBERSHIP',
+    receipt_url VARCHAR(1000)
 );
+
 -- Index pour accélérer les recherches par hello_asso_payment_id
 CREATE INDEX idx_payments_hello_asso_payment_id ON payments(hello_asso_payment_id);
 

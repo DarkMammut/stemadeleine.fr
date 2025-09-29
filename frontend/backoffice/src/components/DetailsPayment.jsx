@@ -1,6 +1,7 @@
 import React from "react";
 import Utilities from "@/components/Utilities";
 import UserLink from "@/components/UserLink";
+import Currency from "@/components/Currency";
 
 export default function DetailsPayment({
   payment,
@@ -26,7 +27,10 @@ export default function DetailsPayment({
   return (
     <div className="details-payment p-4 border rounded">
       <h2 className="text-xl font-bold mb-2">Paiement #{payment.id}</h2>
-      <div>Montant : {payment.amount} €</div>
+      <div>
+        Montant :{" "}
+        <Currency value={payment.amount} currency={payment.currency} />
+      </div>
       <div>Type : {payment.type}</div>
       <div>Statut : {payment.status}</div>
       <div>Date : {payment.paymentDate}</div>

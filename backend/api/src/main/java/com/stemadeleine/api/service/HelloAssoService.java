@@ -4,6 +4,8 @@ import com.stemadeleine.api.config.HelloAssoProperties;
 import com.stemadeleine.api.dto.HelloAssoFormDto;
 import com.stemadeleine.api.dto.HelloAssoMembershipItemDto;
 import com.stemadeleine.api.dto.HelloAssoPaymentDto;
+import com.stemadeleine.api.model.PaymentStatus;
+import com.stemadeleine.api.model.PaymentType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -261,27 +263,18 @@ public class HelloAssoService {
                                     }
                                     // Items (pour type, currency, amount)
                                     List<Map<String, Object>> items = (List<Map<String, Object>>) paymentMap.get("items");
+                                    // Conversion utilitaire pour PaymentType
                                     if (items != null && !items.isEmpty()) {
                                         Map<String, Object> item = items.get(0);
                                         dto.setAmount(item.get("amount") != null ? Double.valueOf(String.valueOf(item.get("amount"))) : null);
                                         dto.setCurrency(item.get("currency") != null ? String.valueOf(item.get("currency")) : "EUR");
-                                        dto.setType(item.get("type") != null ? String.valueOf(item.get("type")) : "Unknown"); // type
+                                        dto.setType(parsePaymentType(item.get("type")));
                                     } else {
                                         dto.setAmount(paymentMap.get("amount") != null ? Double.valueOf(String.valueOf(paymentMap.get("amount"))) : null);
                                         dto.setCurrency("EUR");
-                                        dto.setType("Unknown");
+                                        dto.setType(PaymentType.OTHER);
                                     }
-                                    // form_slug
-                                    Map<String, Object> orderMap = (Map<String, Object>) paymentMap.get("order");
-                                    if (orderMap != null) {
-                                        dto.setFormSlug(orderMap.get("formSlug") != null ? String.valueOf(orderMap.get("formSlug")) : "");
-                                    } else {
-                                        dto.setFormSlug("");
-                                    }
-                                    // receipt_url
-                                    dto.setReceiptUrl(paymentMap.get("paymentReceiptUrl") != null ? String.valueOf(paymentMap.get("paymentReceiptUrl")) : "");
-                                    // status
-                                    dto.setStatus(String.valueOf(paymentMap.get("state")));
+                                    dto.setStatus(parsePaymentStatus(paymentMap.get("state")));
                                     // date
                                     String dateStr = String.valueOf(paymentMap.get("date"));
                                     if (dateStr != null && !dateStr.equals("null")) {
@@ -291,6 +284,11 @@ public class HelloAssoService {
                                             log.warn("Format de date inattendu: {}", dateStr);
                                         }
                                     }
+                                    Map<String, Object> orderMap = (Map<String, Object>) paymentMap.get("order");
+                                    dto.setPaymentId(paymentMap.get("id") != null ? String.valueOf(paymentMap.get("id")) : null);
+                                    dto.setFormSlug(orderMap != null && orderMap.get("formSlug") != null ? String.valueOf(orderMap.get("formSlug")) : null);
+                                    dto.setReceiptUrl(paymentMap.get("paymentReceiptUrl") != null ? String.valueOf(paymentMap.get("paymentReceiptUrl")) : null);
+                                    dto.setStatus(parsePaymentStatus(paymentMap.get("state")));
                                     return dto;
                                 }).toList();
                             }
@@ -325,5 +323,28 @@ public class HelloAssoService {
                             }
                         })
         );
+    }
+
+    // Méthodes utilitaires pour conversion String -> Enum
+    private PaymentType parsePaymentType(Object typeObj) {
+        if (typeObj == null) return PaymentType.OTHER;
+        String raw = String.valueOf(typeObj).trim().toUpperCase();
+        try {
+            return PaymentType.valueOf(raw);
+        } catch (Exception e) {
+            log.warn("Type HelloAsso non reconnu: '{}', valeur par défaut OTHER", raw);
+            return PaymentType.OTHER;
+        }
+    }
+
+    private PaymentStatus parsePaymentStatus(Object statusObj) {
+        if (statusObj == null) return PaymentStatus.PENDING;
+        String raw = String.valueOf(statusObj).trim().toUpperCase();
+        try {
+            return PaymentStatus.valueOf(raw);
+        } catch (Exception e) {
+            log.warn("Status HelloAsso non reconnu: '{}', valeur par défaut PENDING", raw);
+            return PaymentStatus.PENDING;
+        }
     }
 }

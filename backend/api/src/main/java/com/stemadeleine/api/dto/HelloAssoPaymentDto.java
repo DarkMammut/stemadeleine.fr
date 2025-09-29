@@ -1,5 +1,7 @@
 package com.stemadeleine.api.dto;
 
+import com.stemadeleine.api.model.PaymentStatus;
+import com.stemadeleine.api.model.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +22,9 @@ public class HelloAssoPaymentDto {
     private Double amount;
     private String currency;
     private LocalDate paymentDate;
-    private String status;
+    private PaymentStatus status;
     private String formSlug;
-    private String type;
+    private PaymentType type;
     private String receiptUrl;
     private String payerAddressLine1;
     private String payerAddressLine2;

@@ -7,6 +7,7 @@ import com.stemadeleine.api.mapper.UserBackofficeMapper;
 import com.stemadeleine.api.model.Address;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.UserRepository;
+import com.stemadeleine.api.service.HelloAssoImportService;
 import com.stemadeleine.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserBackofficeMapper userBackofficeMapper;
     private final UserService userService;
+    private final HelloAssoImportService helloAssoImportService;
 
     @GetMapping
     public java.util.List<UserBackofficeDto> getAllUsers() {
@@ -130,5 +132,16 @@ public class UserController {
                 .filter(u -> u.getMemberships() != null && u.getMemberships().stream().anyMatch(m -> Boolean.TRUE.equals(m.getActive()) && m.getDateFin() != null && m.getDateFin().getYear() == currentYear))
                 .toList();
         return ResponseEntity.ok(adherents);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<String> importMembers(@RequestParam(value = "orgSlug", required = false) String orgSlug) {
+        String slug = (orgSlug != null && !orgSlug.isBlank()) ? orgSlug : "les-amis-de-sainte-madeleine-de-la-jarrie";
+        String formSlug = "formulaire-d-adhesion";
+        helloAssoImportService.importMembershipUsers(
+                slug,
+                formSlug
+        );
+        return ResponseEntity.ok("Import members from HelloAsso successfull");
     }
 }

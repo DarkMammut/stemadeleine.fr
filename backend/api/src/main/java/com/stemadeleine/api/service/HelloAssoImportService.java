@@ -37,7 +37,7 @@ public class HelloAssoImportService {
         for (HelloAssoMembershipItemDto item : items) {
             User user = mapToUser(item);
             user = userRepository.save(user);
-            userRepository.flush(); // Force la génération de l'id
+            userRepository.flush();
             log.info("user.getId() avant création adresse : {}", user.getId());
             Address address = mapToAddress(item);
             if (address != null) {

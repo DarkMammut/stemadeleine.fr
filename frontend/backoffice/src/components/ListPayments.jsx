@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Currency from "@/components/Currency";
 
 export default function ListPayments({ payments, onPaymentClick }) {
   return (
@@ -28,7 +29,13 @@ export default function ListPayments({ payments, onPaymentClick }) {
                     </h3>
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center gap-2 text-sm text-text-muted mb-3">
-                    <span>Montant : {payment.amount} €</span>
+                    <span>
+                      Montant :{" "}
+                      <Currency
+                        value={payment.amount}
+                        currency={payment.currency}
+                      />
+                    </span>
                     <span>
                       Date :{" "}
                       {payment.paymentDate

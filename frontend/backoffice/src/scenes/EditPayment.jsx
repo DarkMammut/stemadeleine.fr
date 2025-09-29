@@ -15,9 +15,11 @@ export default function EditPayment() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [paymentEnums, setPaymentEnums] = useState({ status: [], type: [] });
 
   useEffect(() => {
     loadPayment();
+    loadEnums();
   }, [id]);
 
   const loadPayment = async () => {
@@ -26,7 +28,10 @@ export default function EditPayment() {
       const res = await axios.get(`/api/payments/${id}`);
       setPayment(res.data);
       setPaymentForm({
-        amount: res.data.amount || "",
+        amount:
+          typeof res.data.amount === "number"
+            ? res.data.amount
+            : Number(res.data.amount) || 0,
         type: res.data.type || "",
         status: res.data.status || "",
         formSlug: res.data.formSlug || "",
@@ -40,16 +45,33 @@ export default function EditPayment() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentForm((f) => ({ ...f, [name]: value }));
+  const loadEnums = async () => {
+    try {
+      const res = await axios.get("/api/payments/enums");
+      setPaymentEnums(res.data);
+    } catch (e) {
+      // Optionnel : gestion d'erreur
+    }
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleChange = (nameOrEvent, value, allValues) => {
+    if (typeof nameOrEvent === "string") {
+      // Appel direct depuis CurrencyInput ou MyForm
+      setPaymentForm((f) => ({ ...f, [nameOrEvent]: value }));
+    } else if (nameOrEvent && nameOrEvent.target) {
+      // Appel depuis un input classique
+      const { name, value: val, type, checked } = nameOrEvent.target;
+      setPaymentForm((f) => ({
+        ...f,
+        [name]: type === "checkbox" ? checked : val,
+      }));
+    }
+  };
+
+  const handleSave = async (formValues) => {
     setSaving(true);
     try {
-      await axios.put(`/api/payments/${id}`, paymentForm);
+      await axios.put(`/api/payments/${id}`, formValues);
       await loadPayment();
       alert("Paiement modifié");
     } catch (e) {
@@ -102,16 +124,18 @@ export default function EditPayment() {
     {
       name: "type",
       label: "Type",
-      type: "text",
+      type: "select",
       required: true,
       defaultValue: paymentForm.type,
+      options: paymentEnums.type.map((v) => ({ label: v, value: v })),
     },
     {
       name: "status",
       label: "Statut",
-      type: "text",
+      type: "select",
       required: true,
       defaultValue: paymentForm.status,
+      options: paymentEnums.status.map((v) => ({ label: v, value: v })),
     },
     {
       name: "formSlug",
@@ -159,6 +183,7 @@ export default function EditPayment() {
       <div className="bg-surface border border-border rounded-lg p-6">
         <MyForm
           fields={paymentFields}
+          initialValues={paymentForm}
           onSubmit={handleSave}
           onChange={handleChange}
           loading={saving}

@@ -24,12 +24,27 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "helloasso_payment_id", unique = true)
     private String helloAssoPaymentId;
+
     private Double amount;
+
     private String currency;
+
+    @Column(name = "payment_date")
     private LocalDate paymentDate;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    private PaymentStatus status = PaymentStatus.PENDING;
+
+    @Column(name = "form_slug")
     private String formSlug;
-    private String type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type")
+    private PaymentType type = PaymentType.MEMBERSHIP;
+
+    @Column(name = "receipt_url")
     private String receiptUrl;
 }
