@@ -45,6 +45,7 @@ public class HelloAssoImportService {
                     address.setName("Principal");
                 }
                 address.setOwnerId(user.getId());
+                address.setOwnerType("USER");
                 log.info("ownerId renseigné dans l'adresse : {}", address.getOwnerId());
                 address = addressRepository.save(address);
                 log.warn("TEST LOG WARN : userId={}, ownerId={} (doit s'afficher)", user.getId(), address != null ? address.getOwnerId() : null);
@@ -232,6 +233,7 @@ public class HelloAssoImportService {
                         .name("Principal")
                         .build();
                 address.setOwnerId(user.getId());
+                address.setOwnerType("USER");
                 log.warn("[PAYMENT] Création adresse : userId={}, ownerId={}", user.getId(), address.getOwnerId());
                 Address existingAddress = addressRepository.findByAddressLine1AndCityAndPostCodeAndCountry(
                         address.getAddressLine1(), address.getCity(), address.getPostCode(), address.getCountry()

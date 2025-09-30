@@ -205,6 +205,7 @@ CREATE TABLE form_fields (
 CREATE TABLE address (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     owner_id UUID,
+    owner_type VARCHAR(50),
     name VARCHAR(255),
     address_line_1 VARCHAR(255),
     address_line_2 VARCHAR(255),
@@ -471,3 +472,24 @@ CREATE INDEX idx_accounts_user_id ON accounts(user_id);
 CREATE INDEX idx_content_media_content_id ON content_media(content_id);
 CREATE INDEX idx_content_media_media_id ON content_media(media_id);
 CREATE INDEX idx_gallery_media_sort ON gallery_media(sort_order);
+
+-- =====================
+-- ORGANIZATION SETTINGS
+-- =====================
+CREATE TABLE organizations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    legal_form VARCHAR(100),
+    siret VARCHAR(20),
+    siren VARCHAR(20),
+    vat_number VARCHAR(50),
+    ape_code VARCHAR(20),
+    creation_date DATE,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    logo_media_id UUID REFERENCES media(id),
+    primary_color VARCHAR(20),
+    secondary_color VARCHAR(20),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);

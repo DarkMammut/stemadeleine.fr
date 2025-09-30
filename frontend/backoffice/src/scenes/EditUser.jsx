@@ -94,6 +94,7 @@ export default function EditUser() {
             <AddressManager
               addresses={user.addresses || []}
               ownerId={user.id}
+              ownerType="USER"
               refreshAddresses={fetchUser}
               editable={true}
             />

@@ -12,6 +12,8 @@ export default function MediaPicker({
   entityType = "pages",
   entityId,
   label = "Image",
+  allowMultiple = false,
+  mediaIdToRemove = null,
 }) {
   const axios = useAxiosClient();
   const { removeMedia, loading: removeLoading } = useRemoveMedia();
@@ -30,11 +32,13 @@ export default function MediaPicker({
     if (!selectedMedia || !entityId) return;
 
     try {
-      await removeMedia(entityType, entityId);
+      await removeMedia(entityType, entityId, {
+        allowMultiple,
+        mediaId: mediaIdToRemove || selectedMedia?.id,
+      });
       setSelectedMedia(null);
-      // Optionnel : callback pour notifier le parent que le média a été supprimé
       if (attachToEntity) {
-        window.location.reload(); // Ou utiliser un callback plus élégant
+        window.location.reload();
       }
     } catch (error) {
       alert("Erreur lors de la suppression du média");

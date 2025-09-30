@@ -37,6 +37,7 @@ public class UserController {
                     .map(a -> new AddressDto(
                             a.getId(),
                             a.getOwnerId(),
+                            a.getOwnerType(),
                             a.getName(),
                             a.getAddressLine1(),
                             a.getAddressLine2(),
@@ -88,6 +89,7 @@ public class UserController {
                 address.setPostCode(addressDto.getPostCode());
                 address.setCountry(addressDto.getCountry());
                 address.setOwnerId(user.getId());
+                address.setOwnerType("USER");
                 addresses.add(address);
             }
             user.setAddresses(addresses);

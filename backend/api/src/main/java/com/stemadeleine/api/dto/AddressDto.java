@@ -12,6 +12,7 @@ import java.util.UUID;
 public class AddressDto {
     private UUID id;
     private UUID ownerId;
+    private String ownerType;
     private String name;
     private String addressLine1;
     private String addressLine2;

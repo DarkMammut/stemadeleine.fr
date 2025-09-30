@@ -46,6 +46,7 @@ public class UserBackofficeMapper {
                     .map(a -> new AddressDto(
                             a.getId(),
                             a.getOwnerId(),
+                            a.getOwnerType(),
                             a.getName(),
                             a.getAddressLine1(),
                             a.getAddressLine2(),

@@ -1,5 +1,6 @@
 import React from "react";
 import AddressManager from "@/components/AddressManager";
+import Button from "@/components/ui/Button";
 
 export default function UserDetails({ user, onEdit, onDelete }) {
   if (!user) return null;
@@ -38,12 +39,12 @@ export default function UserDetails({ user, onEdit, onDelete }) {
         )}
       </div>
       <div className="flex gap-2 mt-4">
-        <button className="btn btn-primary" onClick={onEdit}>
+        <Button variant="primary" onClick={onEdit}>
           Modifier
-        </button>
-        <button className="btn btn-danger" onClick={onDelete}>
+        </Button>
+        <Button variant="danger" onClick={onDelete}>
           Supprimer
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -169,7 +169,7 @@ class UserServiceTest {
     void getUserByIdShouldReturnUser() {
         // Given
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(addressRepository.findByOwnerId(testUserId)).thenReturn(List.of());
+        when(addressRepository.findByOwnerIdAndOwnerType(testUserId, "USER")).thenReturn(List.of());
         // When
         User result = userService.getUserById(testUserId);
         // Then
@@ -178,6 +178,6 @@ class UserServiceTest {
         assertEquals(testUser.getLastname(), result.getLastname());
         assertEquals(0, result.getAddresses().size());
         verify(userRepository).findById(testUserId);
-        verify(addressRepository).findByOwnerId(testUserId);
+        verify(addressRepository).findByOwnerIdAndOwnerType(testUserId, "USER");
     }
 }

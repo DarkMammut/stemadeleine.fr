@@ -10,5 +10,7 @@ import java.util.UUID;
 public interface AddressRepository extends JpaRepository<Address, UUID> {
     Optional<Address> findByAddressLine1AndCityAndPostCodeAndCountry(String addressLine1, String city, String postCode, String country);
 
+    List<Address> findByOwnerIdAndOwnerType(UUID ownerId, String ownerType);
+
     List<Address> findByOwnerId(UUID ownerId);
 }

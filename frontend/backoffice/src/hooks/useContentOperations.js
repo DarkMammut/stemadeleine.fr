@@ -128,7 +128,7 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
     async (contentId, mediaId) => {
       try {
         const response = await axios.delete(
-          `/api/content/${contentId}/medias/${mediaId}`,
+          `/api/content-media/${contentId}/medias/${mediaId}`,
         );
         return response.data;
       } catch (error) {

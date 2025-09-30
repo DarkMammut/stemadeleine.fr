@@ -4,25 +4,21 @@ import Button from "@/components/ui/Button";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function AddressManager({
+  label = "Adresses",
   addresses,
   ownerId,
+  ownerType,
   refreshAddresses,
   editable = true,
+  newAddressName = "Nouvelle adresse",
+  maxAddresses = undefined,
 }) {
-  if (editable) {
-    console.log("ownerId dans Addresses:", ownerId);
-    console.log("Props reçues dans Addresses:", {
-      addresses,
-      ownerId,
-      refreshAddresses,
-    });
-  }
   const axios = useAxiosClient();
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [adding, setAdding] = useState(false);
   const [addForm, setAddForm] = useState({
-    name: "Nouvelle adresse",
+    name: newAddressName,
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -30,6 +26,9 @@ export default function AddressManager({
     state: "",
     country: "",
   });
+
+  const isLimitReached =
+    typeof maxAddresses === "number" && addresses.length >= maxAddresses;
 
   const addressFields = [
     { name: "name", label: "Nom", type: "text", required: true },
@@ -43,11 +42,12 @@ export default function AddressManager({
 
   // Ajout d'une adresse
   const handleAddSubmit = async (formValues) => {
-    if (!editable || !ownerId || !refreshAddresses) return;
+    if (!editable || !ownerId || !refreshAddresses || isLimitReached) return;
     try {
       await axios.post("/api/addresses", {
         ...formValues,
         ownerId,
+        ownerType,
       });
       setAddForm({
         name: "Nouvelle adresse",
@@ -86,6 +86,7 @@ export default function AddressManager({
       await axios.put(`/api/addresses/${editingId}`, {
         ...formValues,
         ownerId,
+        ownerType,
       });
       setEditingId(null);
       await refreshAddresses();
@@ -109,6 +110,7 @@ export default function AddressManager({
 
   return (
     <div className="bg-surface border border-border rounded-lg p-4">
+      <h3 className="text-xl font-bold mb-2">{label}</h3>
       <ul className="divide-y divide-border mb-4">
         {addresses.map((address) => (
           <li
@@ -116,16 +118,18 @@ export default function AddressManager({
             className="flex items-center justify-between py-2"
           >
             {editable && editingId === address.id ? (
-              <MyForm
-                key={editingId}
-                fields={addressFields}
-                initialValues={editForm}
-                onSubmit={handleEditSubmit}
-                onChange={setEditForm}
-                submitButtonLabel="Enregistrer"
-                onCancel={() => setEditingId(null)}
-                cancelButtonLabel="Annuler"
-              />
+              <div className="flex-1">
+                <MyForm
+                  key={editingId}
+                  fields={addressFields}
+                  initialValues={editForm}
+                  onSubmit={handleEditSubmit}
+                  onChange={setEditForm}
+                  submitButtonLabel="Enregistrer"
+                  onCancel={() => setEditingId(null)}
+                  cancelButtonLabel="Annuler"
+                />
+              </div>
             ) : (
               <>
                 <div
@@ -174,6 +178,7 @@ export default function AddressManager({
         ))}
       </ul>
       {editable &&
+        !isLimitReached &&
         (adding ? (
           <MyForm
             key="add"

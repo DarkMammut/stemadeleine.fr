@@ -25,6 +25,8 @@ public class Address {
 
     @Column(name = "owner_id")
     private UUID ownerId;
+    @Column(name = "owner_type")
+    private String ownerType;
     private String name;
     @Column(name = "address_line_1")
     private String addressLine1;

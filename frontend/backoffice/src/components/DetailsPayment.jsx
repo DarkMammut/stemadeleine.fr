@@ -1,7 +1,7 @@
 import React from "react";
-import Utilities from "@/components/Utilities";
 import UserLink from "@/components/UserLink";
 import Currency from "@/components/Currency";
+import Button from "@/components/ui/Button";
 
 export default function DetailsPayment({
   payment,
@@ -10,19 +10,6 @@ export default function DetailsPayment({
   onUserNavigate,
 }) {
   if (!payment) return null;
-
-  const actions = [
-    {
-      label: "Modifier",
-      icon: null,
-      callback: onEdit,
-    },
-    {
-      label: "Supprimer",
-      icon: null,
-      callback: onDelete,
-    },
-  ];
 
   return (
     <div className="details-payment p-4 border rounded">
@@ -45,7 +32,14 @@ export default function DetailsPayment({
           <UserLink user={payment.user} onClick={onUserNavigate} />
         </div>
       )}
-      <Utilities actions={actions} />
+      <div className="flex gap-2 mt-4">
+        <Button variant="primary" onClick={onEdit}>
+          Modifier
+        </Button>
+        <Button variant="danger" onClick={onDelete}>
+          Supprimer
+        </Button>
+      </div>
     </div>
   );
 }

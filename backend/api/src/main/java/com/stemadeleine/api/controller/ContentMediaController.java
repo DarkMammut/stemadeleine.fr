@@ -23,7 +23,7 @@ public class ContentMediaController {
         return contentMediaService.findAll();
     }
 
-    @GetMapping("/{contentId}/{mediaId}")
+    @GetMapping("/{contentId}/medias/{mediaId}")
     public ResponseEntity<ContentMedia> getById(
             @PathVariable("contentId") String contentId,
             @PathVariable("mediaId") String mediaId
@@ -42,7 +42,7 @@ public class ContentMediaController {
         return contentMediaService.save(contentMedia);
     }
 
-    @PutMapping("/{contentId}/{mediaId}")
+    @PutMapping("/{contentId}/medias/{mediaId}")
     public ResponseEntity<ContentMedia> update(
             @PathVariable("contentId") String contentId,
             @PathVariable("mediaId") String mediaId,
@@ -59,7 +59,7 @@ public class ContentMediaController {
         }
     }
 
-    @DeleteMapping("/{contentId}/{mediaId}")
+    @DeleteMapping("/{contentId}/medias/{mediaId}")
     public ResponseEntity<Void> delete(
             @PathVariable("contentId") String contentId,
             @PathVariable("mediaId") String mediaId

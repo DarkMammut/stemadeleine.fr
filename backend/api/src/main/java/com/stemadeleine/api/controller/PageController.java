@@ -192,7 +192,7 @@ public class PageController {
     }
 
     // ----- REMOVE BANNER MEDIA -----
-    @DeleteMapping("/{pageId}/hero-media")
+    @DeleteMapping("/{pageId}/media")
     public ResponseEntity<PageDto> removeHeroMedia(@PathVariable UUID pageId) {
         log.info("DELETE /api/pages/{}/hero-media - Removing hero media", pageId);
         try {

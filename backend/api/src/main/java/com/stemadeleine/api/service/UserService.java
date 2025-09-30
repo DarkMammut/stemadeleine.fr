@@ -1,5 +1,6 @@
 package com.stemadeleine.api.service;
 
+import com.stemadeleine.api.model.Address;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.AddressRepository;
 import com.stemadeleine.api.repository.UserRepository;
@@ -30,7 +31,7 @@ public class UserService {
     public User getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<com.stemadeleine.api.model.Address> addresses = addressRepository.findByOwnerId(user.getId());
+        List<Address> addresses = addressRepository.findByOwnerIdAndOwnerType(user.getId(), "USER");
         user.setAddresses(addresses);
         return user;
     }
@@ -46,6 +47,7 @@ public class UserService {
                     user.setLastname(updatedUser.getLastname());
                     if (updatedUser.getAddresses() != null) {
                         updatedUser.getAddresses().forEach(address -> address.setOwnerId(user.getId()));
+                        updatedUser.getAddresses().forEach(address -> address.setOwnerType("USER"));
                         user.setAddresses(updatedUser.getAddresses());
                     }
                     user.setAccounts(updatedUser.getAccounts());

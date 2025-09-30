@@ -26,7 +26,6 @@ export default function EditPage({ pageId }) {
     if (page) setPageData(page);
   }, [page]);
 
-  // Champs du formulaire SANS isVisible
   const fields = [
     {
       name: "name",

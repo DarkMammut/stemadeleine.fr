@@ -14,6 +14,7 @@ const ContentMediaManager = ({
 }) => {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mediaIdToRemove, setMediaIdToRemove] = useState(null);
 
   const handleAddMedia = async (mediaId) => {
     try {
@@ -36,6 +37,7 @@ const ContentMediaManager = ({
 
     try {
       setLoading(true);
+      setMediaIdToRemove(mediaId);
       await onMediaRemove(content.id, mediaId);
       if (onMediaChanged) onMediaChanged();
     } catch (error) {
@@ -101,9 +103,11 @@ const ContentMediaManager = ({
 
             <MediaPicker
               onMediaSelect={handleAddMedia}
-              entityType="content"
+              entityType="content-media"
               entityId={content.id}
               attachToEntity={handleAddMedia}
+              allowMultiple={true}
+              mediaIdToRemove={mediaIdToRemove}
             />
           </div>
         </div>

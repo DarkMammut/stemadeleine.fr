@@ -24,4 +24,3 @@ public class UserBackofficeDto {
     private List<AccountDto> accounts;
     private List<AddressDto> addresses;
 }
-// ...fin du fichier, aucune autre classe ou package ici...
