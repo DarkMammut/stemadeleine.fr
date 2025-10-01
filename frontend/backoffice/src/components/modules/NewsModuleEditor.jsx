@@ -18,6 +18,7 @@ export default function NewsModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs basés sur le modèle Java News
   const fields = [
@@ -27,7 +28,6 @@ export default function NewsModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -35,25 +35,19 @@ export default function NewsModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [
-        { value: "LAST3", label: "Les 3 dernières actualités" },
-        // Ajoutez d'autres variantes si elles existent dans NewsVariants
-      ],
-      defaultValue: moduleData?.variant || "LAST3",
+      options: [{ value: "LAST3", label: "Les 3 dernières actualités" }],
     },
     {
       name: "description",
       label: "Description",
       type: "textarea",
       placeholder: "Description du module actualités",
-      defaultValue: moduleData?.description || "",
     },
   ];
 
@@ -67,8 +61,9 @@ export default function NewsModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -79,7 +74,7 @@ export default function NewsModuleEditor({
         title: values.title,
         variant: values.variant,
         description: values.description,
-        sortOrder: parseInt(values.sortOrder) || 0,
+        order: parseInt(values.order) || 0,
       });
       setSaving(false);
       refetch();
@@ -89,6 +84,11 @@ export default function NewsModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -127,29 +127,19 @@ export default function NewsModuleEditor({
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module actualités"
-      />
-
-      {/* Média du module */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Média du module
-        </h3>
-        <MediaPicker
-          mediaId={moduleData?.media?.id}
-          attachToEntity={attachToEntity}
-          entityType="modules"
-          entityId={moduleId}
-          acceptedTypes="image/*,video/*"
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "news-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module actualités"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
-      </div>
+      )}
 
       {/* Gestion des contenus */}
       <div className="bg-surface border border-border rounded-lg p-6">
@@ -157,15 +147,24 @@ export default function NewsModuleEditor({
           parentId={moduleId}
           parentType="module"
           customLabels={{
-            header: "Présentation des actualités",
-            addButton: "Ajouter un contenu",
-            empty: "Aucun contenu pour les actualités.",
+            header: "Contenus du module actualités",
+            addButton: "Ajouter un contenu d'actualité",
+            empty: "Aucun contenu pour ce module actualités.",
             loading: "Chargement des contenus...",
             saveContent: "Enregistrer le contenu",
-            bodyLabel: "Ecrivez votre paragraphe ici ...",
+            bodyLabel: "Contenu de l'actualité",
           }}
         />
       </div>
+
+      {/* Sélecteur de média */}
+      <MediaPicker
+        mediaId={moduleData?.media?.id}
+        attachToEntity={attachToEntity}
+        entityType="modules"
+        entityId={moduleId}
+        label="Image du module actualités"
+      />
     </div>
   );
 }

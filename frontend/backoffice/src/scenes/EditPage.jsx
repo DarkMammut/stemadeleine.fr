@@ -14,12 +14,13 @@ import Switch from "@/components/ui/Switch";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function EditPage({ pageId }) {
-  const { page, refetch, loading, error } = useGetPage({ route: pageId });
+  const { page, refetch } = useGetPage({ route: pageId });
   const { updatePage } = useAddPage();
   const { updatePageVisibility } = useUpdatePageVisibility();
   const [pageData, setPageData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
   const axios = useAxiosClient();
 
   useEffect(() => {
@@ -33,7 +34,6 @@ export default function EditPage({ pageId }) {
       type: "text",
       placeholder: "Entrez le nom de page",
       required: true,
-      defaultValue: pageData?.name || "",
     },
     {
       name: "title",
@@ -41,7 +41,6 @@ export default function EditPage({ pageId }) {
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: pageData?.title || "",
     },
     {
       name: "subTitle",
@@ -49,7 +48,6 @@ export default function EditPage({ pageId }) {
       type: "text",
       placeholder: "Entrez le sous-titre",
       required: false,
-      defaultValue: pageData?.subTitle || "",
     },
     {
       name: "slug",
@@ -57,7 +55,6 @@ export default function EditPage({ pageId }) {
       type: "readonly",
       placeholder: "Le slug sera généré automatiquement",
       required: true,
-      defaultValue: pageData?.slug || "",
     },
     {
       name: "description",
@@ -65,7 +62,6 @@ export default function EditPage({ pageId }) {
       type: "textarea",
       placeholder: "Entrez une description",
       required: false,
-      defaultValue: pageData?.description || "",
     },
   ];
 
@@ -76,8 +72,9 @@ export default function EditPage({ pageId }) {
     refetch();
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setPageData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -99,6 +96,11 @@ export default function EditPage({ pageId }) {
       alert("Erreur lors de la sauvegarde de la page");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setPageData(page);
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -162,16 +164,20 @@ export default function EditPage({ pageId }) {
             </p>
           </div>
 
-          {/* Formulaire principal */}
-          <MyForm
-            fields={fields}
-            formValues={pageData}
-            setFormValues={setPageData}
-            onSubmit={handleSubmit}
-            onChange={handleFormChange}
-            loading={saving}
-            submitButtonLabel="Enregistrer la page"
-          />
+          {/* Formulaire principal - Ne s'affiche que quand pageData est complètement chargé */}
+          {pageData && Object.keys(pageData).length > 0 && (
+            <MyForm
+              key={`${pageData.id || "page-form"}-${formKey}`} // Clé combinée pour forcer le remontage
+              fields={fields}
+              initialValues={pageData}
+              onSubmit={handleSubmit}
+              onChange={handleFormChange}
+              loading={saving}
+              submitButtonLabel="Enregistrer la page"
+              onCancel={handleCancelEdit}
+              cancelButtonLabel="Annuler"
+            />
+          )}
         </div>
       )}
 

@@ -17,6 +17,7 @@ export default function FormModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   // Champs basés sur le modèle Java Form
   const fields = [
@@ -26,7 +27,6 @@ export default function FormModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -34,15 +34,12 @@ export default function FormModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "description",
       label: "Description",
       type: "textarea",
       placeholder: "Description du formulaire (max 1000 caractères)",
-      maxLength: 1000,
-      defaultValue: moduleData?.description || "",
     },
   ];
 
@@ -56,8 +53,9 @@ export default function FormModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -77,6 +75,11 @@ export default function FormModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -115,85 +118,28 @@ export default function FormModuleEditor({
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module formulaire"
-      />
-
-      {/* Média du formulaire */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Média du formulaire
-        </h3>
-        <MediaPicker
-          mediaId={moduleData?.media?.id}
-          attachToEntity={attachToEntity}
-          entityType="modules"
-          entityId={moduleId}
-          acceptedTypes="image/*"
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "form-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module formulaire"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
-        <p className="text-sm text-text-muted mt-2">
-          Image optionnelle à afficher avec le formulaire
-        </p>
-      </div>
+      )}
 
-      {/* Gestion des champs du formulaire */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Champs du formulaire
-        </h3>
-        <div className="text-sm text-text-muted mb-4">
-          Gestion des champs personnalisés de ce formulaire
-        </div>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80"
-          onClick={() =>
-            alert(
-              "Fonctionnalité à implémenter : éditeur de champs de formulaire",
-            )
-          }
-        >
-          Gérer les champs du formulaire
-        </button>
-
-        {/* Affichage des champs existants */}
-        {moduleData?.fields && moduleData.fields.length > 0 && (
-          <div className="mt-4">
-            <h4 className="font-medium text-text mb-2">
-              Champs actuels ({moduleData.fields.length}) :
-            </h4>
-            <div className="space-y-2">
-              {moduleData.fields.map((field, index) => (
-                <div
-                  key={field.id || index}
-                  className="flex items-center justify-between bg-gray-50 p-3 rounded"
-                >
-                  <div>
-                    <span className="font-medium">
-                      {field.label || field.name}
-                    </span>
-                    <span className="text-sm text-text-muted ml-2">
-                      ({field.type || "text"})
-                    </span>
-                    {field.required && (
-                      <span className="text-red-500 ml-1">*</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-text-muted">
-                    Ordre: {field.order || index + 1}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Sélecteur de média */}
+      <MediaPicker
+        mediaId={moduleData?.media?.id}
+        attachToEntity={attachToEntity}
+        entityType="modules"
+        entityId={moduleId}
+        label="Image du formulaire"
+      />
     </div>
   );
 }

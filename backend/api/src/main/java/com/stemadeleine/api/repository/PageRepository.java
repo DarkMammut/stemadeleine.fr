@@ -35,7 +35,7 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     // Vérifier si un slug existe déjà
     boolean existsBySlug(String slug);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Page p SET p.status = 'DELETED', p.isVisible = false WHERE p.id = :id")
     void softDeleteById(@Param("id") UUID id);
 

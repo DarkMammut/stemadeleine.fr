@@ -111,9 +111,23 @@ public class PageController {
 
         if (request.isNewPage()) {
             log.info("POST /api/pages - Creating new page");
+            // Créer la page de base avec le nom seulement
             Page page = pageService.createNewPage(request.parentPageId(), request.name(), currentUser);
-            log.debug("Page created successfully: {}", page.getId());
-            return ResponseEntity.ok(pageMapper.toDto(page));
+
+            // Ensuite mettre à jour tous les autres champs
+            Page updatedPage = pageService.updatePage(
+                    page.getPageId(),
+                    request.name(),
+                    request.title(),
+                    request.subTitle(),
+                    request.slug(),
+                    request.description(),
+                    request.isVisible(),
+                    currentUser
+            );
+
+            log.debug("Page created successfully: {}", updatedPage.getId());
+            return ResponseEntity.ok(pageMapper.toDto(updatedPage));
         } else {
             log.error("Attempt to create page with existing pageId - use PUT instead");
             throw new RuntimeException("Use PUT for updating existing pages");
@@ -232,7 +246,15 @@ public class PageController {
 
     // ----- DELETE (simplified logic) -----
     @DeleteMapping("/{pageId}")
-    public ResponseEntity<Void> deletePage(@PathVariable UUID pageId) {
+    public ResponseEntity<Void> deletePage(
+            @PathVariable UUID pageId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        if (customUserDetails == null) {
+            log.error("Attempt to delete page without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
         log.info("DELETE /api/pages/{} - Logical page deletion", pageId);
         pageService.delete(pageId);
         log.debug("Page deleted: {}", pageId);

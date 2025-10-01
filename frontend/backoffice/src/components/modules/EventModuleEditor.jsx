@@ -17,6 +17,7 @@ export default function EventModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   const fields = [
     {
@@ -25,7 +26,6 @@ export default function EventModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -33,35 +33,29 @@ export default function EventModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "description",
       label: "Description",
-      type: "richtext",
+      type: "textarea",
       placeholder: "Description de l'événement",
-      defaultValue: moduleData?.description || "",
     },
     {
       name: "startDate",
       label: "Date et heure de début",
       type: "datetime-local",
       required: true,
-      defaultValue:
-        moduleData?.startDate || new Date().toISOString().slice(0, 16),
     },
     {
       name: "endDate",
       label: "Date et heure de fin",
       type: "datetime-local",
-      defaultValue: moduleData?.endDate || "",
     },
     {
       name: "location",
       label: "Lieu",
       type: "text",
       placeholder: "Adresse ou nom du lieu",
-      defaultValue: moduleData?.location || "",
     },
     {
       name: "price",
@@ -70,7 +64,6 @@ export default function EventModuleEditor({
       step: "0.01",
       min: "0",
       placeholder: "0.00",
-      defaultValue: moduleData?.price || "",
     },
     {
       name: "maxAttendees",
@@ -78,13 +71,6 @@ export default function EventModuleEditor({
       type: "number",
       min: "1",
       placeholder: "Illimité si vide",
-      defaultValue: moduleData?.maxAttendees || "",
-    },
-    {
-      name: "registrationRequired",
-      label: "Inscription requise",
-      type: "checkbox",
-      defaultValue: moduleData?.registrationRequired || false,
     },
   ];
 
@@ -98,8 +84,9 @@ export default function EventModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -112,11 +99,8 @@ export default function EventModuleEditor({
         startDate: values.startDate,
         endDate: values.endDate,
         location: values.location,
-        price: values.price ? parseFloat(values.price) : null,
-        maxAttendees: values.maxAttendees
-          ? parseInt(values.maxAttendees)
-          : null,
-        registrationRequired: values.registrationRequired,
+        price: parseFloat(values.price) || 0,
+        maxAttendees: parseInt(values.maxAttendees) || null,
         order: parseInt(values.order) || 0,
       });
       setSaving(false);
@@ -127,6 +111,11 @@ export default function EventModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -144,6 +133,7 @@ export default function EventModuleEditor({
 
   return (
     <div className="space-y-6">
+      {/* Section Visibilité */}
       <div className="bg-surface border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold text-text mb-4">
           Visibilité du module
@@ -156,32 +146,36 @@ export default function EventModuleEditor({
           />
           <span className="font-medium text-text">
             Module visible sur le site
+            {savingVisibility && (
+              <span className="text-text-muted ml-2">(Sauvegarde...)</span>
+            )}
           </span>
         </label>
       </div>
 
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module événement"
-      />
-
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Image de l'événement
-        </h3>
-        <MediaPicker
-          mediaId={moduleData?.media?.id}
-          attachToEntity={attachToEntity}
-          entityType="modules"
-          entityId={moduleId}
-          acceptedTypes="image/*"
+      {/* Formulaire principal */}
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "event-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module événement"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
-      </div>
+      )}
+
+      {/* Sélecteur de média */}
+      <MediaPicker
+        mediaId={moduleData?.media?.id}
+        attachToEntity={attachToEntity}
+        entityType="modules"
+        entityId={moduleId}
+        label="Image de l'événement"
+      />
     </div>
   );
 }

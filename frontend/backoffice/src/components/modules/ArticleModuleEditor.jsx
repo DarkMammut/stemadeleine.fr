@@ -15,6 +15,7 @@ export default function ArticleModuleEditor({
   const { updateModule, updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs basés sur le modèle Java Article
   const fields = [
@@ -24,7 +25,6 @@ export default function ArticleModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -32,24 +32,17 @@ export default function ArticleModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [
-        { value: "STAGGERED", label: "Affichage décalé" },
-        // Ajoutez d'autres variantes si elles existent dans ArticleVariants
-      ],
-      defaultValue: moduleData?.variant || "STAGGERED",
+      options: [{ value: "STAGGERED", label: "Affichage décalé" }],
     },
   ];
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
-  };
+  const handleFormChange = () => {};
 
   const handleSubmit = async (values) => {
     try {
@@ -68,6 +61,10 @@ export default function ArticleModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -106,15 +103,19 @@ export default function ArticleModuleEditor({
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module article"
-      />
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "article-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module article"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
+        />
+      )}
 
       {/* Gestion des contenus */}
       <div className="bg-surface border border-border rounded-lg p-6">

@@ -17,6 +17,7 @@ export default function VideoModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs spécifiques au module vidéo
   const fields = [
@@ -26,40 +27,34 @@ export default function VideoModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
       label: "Titre de la vidéo",
       type: "text",
       placeholder: "Entrez le titre",
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "videoUrl",
       label: "URL de la vidéo",
       type: "url",
       placeholder: "https://www.youtube.com/watch?v=... ou lien direct",
-      defaultValue: moduleData?.videoUrl || "",
     },
     {
       name: "description",
       label: "Description",
       type: "textarea",
       placeholder: "Description de la vidéo",
-      defaultValue: moduleData?.description || "",
     },
     {
       name: "autoplay",
       label: "Lecture automatique",
       type: "checkbox",
-      defaultValue: moduleData?.autoplay || false,
     },
     {
       name: "controls",
       label: "Afficher les contrôles",
       type: "checkbox",
-      defaultValue: moduleData?.controls !== false, // true par défaut
     },
   ];
 
@@ -73,9 +68,7 @@ export default function VideoModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
-  };
+  const handleFormChange = () => {};
 
   const handleSubmit = async (values) => {
     try {
@@ -97,6 +90,11 @@ export default function VideoModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -135,32 +133,28 @@ export default function VideoModuleEditor({
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module vidéo"
-      />
-
-      {/* Image de couverture optionnelle */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Image de couverture (optionnelle)
-        </h3>
-        <MediaPicker
-          mediaId={moduleData?.media?.id}
-          attachToEntity={attachToEntity}
-          entityType="modules"
-          entityId={moduleId}
-          acceptedTypes="image/*"
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "video-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module vidéo"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
-        <p className="text-sm text-text-muted mt-2">
-          Image qui sera affichée avant le lancement de la vidéo
-        </p>
-      </div>
+      )}
+
+      {/* Sélecteur de média */}
+      <MediaPicker
+        mediaId={moduleData?.media?.id}
+        attachToEntity={attachToEntity}
+        entityType="modules"
+        entityId={moduleId}
+        label="Vignette de la vidéo"
+      />
     </div>
   );
 }

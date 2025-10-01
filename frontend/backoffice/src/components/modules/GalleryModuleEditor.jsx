@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
 import Switch from "@/components/ui/Switch";
 import { useAddModule } from "@/hooks/useAddModule";
@@ -23,7 +23,8 @@ export default function GalleryModuleEditor({
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
-  const [editingMedia, setEditingMedia] = useState(null); // Pour la modale d'édition
+  const [editingMedia, setEditingMedia] = useState(null);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
   const { addMedia, removeMedia, mediaLoading } = useGalleriesMediasOperations({
     entityType: "gallery",
   });
@@ -36,7 +37,6 @@ export default function GalleryModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -44,23 +44,19 @@ export default function GalleryModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [
-        { value: "GRID", label: "Grille" },
-        // Ajoutez d'autres variantes si elles existent dans GalleryVariants
-      ],
-      defaultValue: moduleData?.variant || "GRID",
+      options: [{ value: "GRID", label: "Grille" }],
     },
   ];
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -82,6 +78,11 @@ export default function GalleryModuleEditor({
     }
   };
 
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
+  };
+
   const handleVisibilityChange = async (isVisible) => {
     try {
       setSavingVisibility(true);
@@ -95,81 +96,26 @@ export default function GalleryModuleEditor({
     }
   };
 
-  // Gestion des médias de la galerie
-  const mapMedia = (media) => ({
-    ...media,
-    url: media.url || media.fileUrl || "",
-    filename:
-      media.filename || media.title || media.fileUrl?.split("/").pop() || "",
-    type: media.fileType?.startsWith("image")
-      ? "image"
-      : media.fileType?.startsWith("video")
-        ? "video"
-        : "file",
-  });
-
-  const handleAddMedia = async (media) => {
-    console.log("handleAddMedia appelé avec :", media);
+  const handleAddMedia = async (mediaId) => {
     try {
-      const attachedMedia = await addMedia(moduleId, media);
-      const mappedMedia = mapMedia(attachedMedia);
-      setModuleData((prev) => ({
-        ...prev,
-        medias: [...(prev.medias || []), mappedMedia],
-      }));
+      await addMedia(moduleId, mediaId);
       setShowMediaPicker(false);
-    } catch (err) {
+      refetch();
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du média :", error);
       alert("Erreur lors de l'ajout du média");
     }
   };
 
   const handleRemoveMedia = async (mediaId) => {
-    if (!window.confirm("Supprimer ce média de la galerie ?")) return;
     try {
       await removeMedia(moduleId, mediaId);
-      setModuleData((prev) => ({
-        ...prev,
-        medias: (prev.medias || []).filter((m) => m.id !== mediaId),
-      }));
-    } catch (err) {
+      refetch();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du média :", error);
       alert("Erreur lors de la suppression du média");
     }
   };
-
-  // Ouvre la modale d'édition
-  const handleEditMedia = (media) => {
-    setEditingMedia(media);
-  };
-
-  // Callback après édition ou annulation
-  const handleMediaEditorClose = (updatedMedia) => {
-    setEditingMedia(null);
-    if (updatedMedia) {
-      // Met à jour le média dans la liste locale
-      setModuleData((prev) => ({
-        ...prev,
-        medias: prev.medias.map((m) =>
-          m.id === updatedMedia.id ? { ...m, ...updatedMedia } : m,
-        ),
-      }));
-    }
-  };
-
-  // Appliquer le mapping des médias à chaque changement de moduleData
-  useEffect(() => {
-    if (moduleData?.medias && Array.isArray(moduleData.medias)) {
-      const mapped = moduleData.medias.map(mapMedia);
-      // Vérifie si un mapping est nécessaire (évite les boucles infinies)
-      const needsUpdate = mapped.some(
-        (m, i) =>
-          m.url !== moduleData.medias[i]?.url ||
-          m.filename !== moduleData.medias[i]?.filename,
-      );
-      if (needsUpdate) {
-        setModuleData((prev) => ({ ...prev, medias: mapped }));
-      }
-    }
-  }, [moduleData?.medias]);
 
   return (
     <div className="space-y-6">
@@ -194,93 +140,67 @@ export default function GalleryModuleEditor({
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module galerie"
-      />
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "gallery-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module galerie"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
+        />
+      )}
 
       {/* Gestion des médias de la galerie */}
       <div className="bg-surface border border-border rounded-lg p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Médias de la galerie
-            </h3>
-            <div className="text-sm text-text-muted mb-4">
-              Ajoutez ou supprimez des médias pour cette galerie (images,
-              vidéos)
-            </div>
-          </div>
-
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-text">
+            Médias de la galerie
+          </h3>
           <Button
-            type="button"
-            variant="primary"
-            size="md"
-            className="flex items-center gap-2"
             onClick={() => setShowMediaPicker(true)}
-            disabled={mediaLoading}
+            variant="primary"
+            size="sm"
+            loading={mediaLoading}
           >
-            <PlusIcon className="w-4 h-4" />
+            <PlusIcon className="w-4 h-4 mr-2" />
             Ajouter un média
           </Button>
         </div>
 
-        {showMediaPicker && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-background border border-border rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-text">
-                  Sélectionner un média
-                </h3>
-                <button
-                  onClick={() => setShowMediaPicker(false)}
-                  className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-              <MediaPicker
-                attachToEntity={handleAddMedia}
-                entityType="gallery"
-                entityId={moduleId}
-                label="Médias de la galerie"
-              />
-            </div>
-          </div>
-        )}
-        {/* Affichage des médias existants */}
-        {moduleData?.medias && moduleData.medias.length > 0 && (
-          <div className="mt-4">
-            <h4 className="font-medium text-text mb-2">
-              Médias actuels ({moduleData.medias.length}) :
-            </h4>
-            <MediaGrid
-              medias={moduleData.medias}
-              onRemove={handleRemoveMedia}
-              onEdit={handleEditMedia}
-              loading={mediaLoading}
-              columns={4}
-            />
-          </div>
-        )}
-        {/* Modale d'édition de média */}
-        {editingMedia && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-background border border-border rounded-lg p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-auto">
-              <MediaEditor
-                mediaId={editingMedia.id}
-                onCancel={() => handleMediaEditorClose()}
-                onMediaAttached={handleMediaEditorClose}
-              />
-            </div>
-          </div>
-        )}
+        <MediaGrid
+          medias={moduleData?.medias || []}
+          onEdit={setEditingMedia}
+          onRemove={handleRemoveMedia}
+          entityType="gallery"
+          entityId={moduleId}
+        />
       </div>
+
+      {/* Sélecteur de média */}
+      {showMediaPicker && (
+        <MediaPicker
+          attachToEntity={handleAddMedia}
+          entityType="gallery"
+          entityId={moduleId}
+          onClose={() => setShowMediaPicker(false)}
+        />
+      )}
+
+      {/* Éditeur de média */}
+      {editingMedia && (
+        <MediaEditor
+          media={editingMedia}
+          onClose={() => setEditingMedia(null)}
+          onSave={() => {
+            setEditingMedia(null);
+            refetch();
+          }}
+        />
+      )}
     </div>
   );
 }

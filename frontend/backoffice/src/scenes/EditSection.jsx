@@ -20,6 +20,7 @@ export default function EditSection({ sectionId }) {
   const [sectionData, setSectionData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
   const axios = useAxiosClient();
 
   useEffect(() => {
@@ -34,7 +35,6 @@ export default function EditSection({ sectionId }) {
       type: "text",
       placeholder: "Entrez le nom de la section",
       required: true,
-      defaultValue: sectionData?.name || "",
     },
     {
       name: "title",
@@ -42,7 +42,6 @@ export default function EditSection({ sectionId }) {
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: sectionData?.title || "",
     },
   ];
 
@@ -56,8 +55,9 @@ export default function EditSection({ sectionId }) {
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setSectionData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -78,6 +78,11 @@ export default function EditSection({ sectionId }) {
       alert("Erreur lors de la sauvegarde de la section");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setSectionData(section);
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -146,16 +151,20 @@ export default function EditSection({ sectionId }) {
             </p>
           </div>
 
-          {/* Formulaire principal */}
-          <MyForm
-            fields={fields}
-            formValues={sectionData}
-            setFormValues={setSectionData}
-            onSubmit={handleSubmit}
-            onChange={handleFormChange}
-            loading={saving}
-            submitButtonLabel="Enregistrer la section"
-          />
+          {/* Formulaire principal - Ne s'affiche que quand sectionData est complètement chargé */}
+          {sectionData && Object.keys(sectionData).length > 0 && (
+            <MyForm
+              key={`${sectionData.sectionId || "section-form"}-${formKey}`} // Clé combinée pour forcer le remontage
+              fields={fields}
+              initialValues={sectionData}
+              onSubmit={handleSubmit}
+              onChange={handleFormChange}
+              loading={saving}
+              submitButtonLabel="Enregistrer la section"
+              onCancel={handleCancelEdit}
+              cancelButtonLabel="Annuler"
+            />
+          )}
 
           {/* Rich Text Content Editor */}
           <div className="bg-surface border border-border rounded-lg p-6">

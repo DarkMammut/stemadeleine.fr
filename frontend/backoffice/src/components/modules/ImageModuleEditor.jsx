@@ -17,6 +17,7 @@ export default function ImageModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs spécifiques au module image
   const fields = [
@@ -26,14 +27,12 @@ export default function ImageModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
       label: "Titre de l'image",
       type: "text",
       placeholder: "Entrez le titre",
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "altText",
@@ -41,21 +40,18 @@ export default function ImageModuleEditor({
       type: "text",
       placeholder: "Description de l'image pour l'accessibilité",
       required: true,
-      defaultValue: moduleData?.altText || "",
     },
     {
       name: "caption",
       label: "Légende",
       type: "text",
       placeholder: "Légende de l'image",
-      defaultValue: moduleData?.caption || "",
     },
     {
       name: "link",
       label: "Lien (optionnel)",
       type: "url",
       placeholder: "https://...",
-      defaultValue: moduleData?.link || "",
     },
   ];
 
@@ -69,8 +65,9 @@ export default function ImageModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -92,6 +89,11 @@ export default function ImageModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -127,41 +129,31 @@ export default function ImageModuleEditor({
             )}
           </span>
         </label>
-        <p className="text-sm text-text-muted mt-2">
-          Cette option se sauvegarde automatiquement
-        </p>
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module image"
-      />
-
-      {/* Sélecteur d'image - primordial pour ce type de module */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Image du module
-        </h3>
-        <MediaPicker
-          mediaId={moduleData?.media?.id}
-          attachToEntity={attachToEntity}
-          entityType="modules"
-          entityId={moduleId}
-          acceptedTypes="image/*"
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "image-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module image"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
         />
-        {!moduleData?.media && (
-          <p className="text-sm text-amber-600 mt-2">
-            ⚠️ Aucune image sélectionnée. Veuillez choisir une image pour ce
-            module.
-          </p>
-        )}
-      </div>
+      )}
+
+      {/* Sélecteur de média */}
+      <MediaPicker
+        mediaId={moduleData?.media?.id}
+        attachToEntity={attachToEntity}
+        entityType="modules"
+        entityId={moduleId}
+        label="Image du module"
+      />
     </div>
   );
 }

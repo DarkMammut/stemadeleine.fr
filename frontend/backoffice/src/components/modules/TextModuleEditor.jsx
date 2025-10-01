@@ -17,6 +17,7 @@ export default function TextModuleEditor({
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs spécifiques au module texte
   const fields = [
@@ -26,7 +27,6 @@ export default function TextModuleEditor({
       type: "text",
       placeholder: "Entrez le nom du module",
       required: true,
-      defaultValue: moduleData?.name || "",
     },
     {
       name: "title",
@@ -34,14 +34,12 @@ export default function TextModuleEditor({
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
-      defaultValue: moduleData?.title || "",
     },
     {
       name: "content",
       label: "Contenu texte",
-      type: "richtext",
+      type: "textarea",
       placeholder: "Entrez le contenu",
-      defaultValue: moduleData?.content || "",
     },
   ];
 
@@ -55,8 +53,9 @@ export default function TextModuleEditor({
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setModuleData((prev) => ({ ...prev, ...allValues }));
+  const handleFormChange = () => {
+    // MyForm gère déjà son état interne
+    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -76,6 +75,11 @@ export default function TextModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Force le remontage du formulaire pour revenir aux valeurs initiales
+    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -111,21 +115,22 @@ export default function TextModuleEditor({
             )}
           </span>
         </label>
-        <p className="text-sm text-text-muted mt-2">
-          Cette option se sauvegarde automatiquement
-        </p>
       </div>
 
       {/* Formulaire principal */}
-      <MyForm
-        fields={fields}
-        formValues={moduleData}
-        setFormValues={setModuleData}
-        onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module texte"
-      />
+      {moduleData && Object.keys(moduleData).length > 0 && (
+        <MyForm
+          key={`${moduleId || "text-module"}-${formKey}`}
+          fields={fields}
+          initialValues={moduleData}
+          onSubmit={handleSubmit}
+          onChange={handleFormChange}
+          loading={saving}
+          submitButtonLabel="Enregistrer le module texte"
+          onCancel={handleCancelEdit}
+          cancelButtonLabel="Annuler"
+        />
+      )}
 
       {/* Sélecteur de média */}
       <MediaPicker
@@ -133,6 +138,7 @@ export default function TextModuleEditor({
         attachToEntity={attachToEntity}
         entityType="modules"
         entityId={moduleId}
+        label="Image d'illustration"
       />
     </div>
   );
