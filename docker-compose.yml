@@ -16,7 +16,7 @@ services:
       - db
 
   frontoffice:
-    build: ./frontend/frontoffice
+    build: frontend/to_delete
     container_name: frontoffice
     ports:
       - "3000:3000"
