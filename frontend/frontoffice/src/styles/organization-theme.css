@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Organization Theme CSS Variables and Custom Classes */
 
 /* Default fallback colors if organization colors are not loaded yet */
@@ -277,7 +273,172 @@
         color: var(--color-secondary);
     }
 
-    /* Gradient utilities using organization colors */
+    /* ===== ORIGINAL LONGER NAMES (kept for compatibility) ===== */
+    /* Primary color utilities with org- prefix */
+    .bg-org-primary {
+        background-color: var(--color-primary);
+    }
+
+    .bg-org-primary-50 {
+        background-color: var(--color-primary-50, #eff6ff);
+    }
+
+    .bg-org-primary-100 {
+        background-color: var(--color-primary-100, #dbeafe);
+    }
+
+    .bg-org-primary-200 {
+        background-color: var(--color-primary-200, #bfdbfe);
+    }
+
+    .bg-org-primary-300 {
+        background-color: var(--color-primary-300, #93c5fd);
+    }
+
+    .bg-org-primary-400 {
+        background-color: var(--color-primary-400, #60a5fa);
+    }
+
+    .bg-org-primary-500 {
+        background-color: var(--color-primary-500, var(--color-primary));
+    }
+
+    .bg-org-primary-600 {
+        background-color: var(--color-primary-600, #2563eb);
+    }
+
+    .bg-org-primary-700 {
+        background-color: var(--color-primary-700, #1d4ed8);
+    }
+
+    .bg-org-primary-800 {
+        background-color: var(--color-primary-800, #1e40af);
+    }
+
+    .bg-org-primary-900 {
+        background-color: var(--color-primary-900, #1e3a8a);
+    }
+
+    /* Secondary color utilities with org- prefix */
+    .bg-org-secondary {
+        background-color: var(--color-secondary);
+    }
+
+    .bg-org-secondary-50 {
+        background-color: var(--color-secondary-50, #ecfdf5);
+    }
+
+    .bg-org-secondary-100 {
+        background-color: var(--color-secondary-100, #d1fae5);
+    }
+
+    .bg-org-secondary-200 {
+        background-color: var(--color-secondary-200, #a7f3d0);
+    }
+
+    .bg-org-secondary-300 {
+        background-color: var(--color-secondary-300, #6ee7b7);
+    }
+
+    .bg-org-secondary-400 {
+        background-color: var(--color-secondary-400, #34d399);
+    }
+
+    .bg-org-secondary-500 {
+        background-color: var(--color-secondary-500, var(--color-secondary));
+    }
+
+    .bg-org-secondary-600 {
+        background-color: var(--color-secondary-600, #059669);
+    }
+
+    .bg-org-secondary-700 {
+        background-color: var(--color-secondary-700, #047857);
+    }
+
+    .bg-org-secondary-800 {
+        background-color: var(--color-secondary-800, #065f46);
+    }
+
+    .bg-org-secondary-900 {
+        background-color: var(--color-secondary-900, #064e3b);
+    }
+
+    .text-org-primary {
+        color: var(--color-primary);
+    }
+
+    .text-org-primary-600 {
+        color: var(--color-primary-600, #2563eb);
+    }
+
+    .text-org-primary-700 {
+        color: var(--color-primary-700, #1d4ed8);
+    }
+
+    .text-org-secondary {
+        color: var(--color-secondary);
+    }
+
+    .text-org-secondary-600 {
+        color: var(--color-secondary-600, #059669);
+    }
+
+    .text-org-secondary-700 {
+        color: var(--color-secondary-700, #047857);
+    }
+
+    .border-org-primary {
+        border-color: var(--color-primary);
+    }
+
+    .border-org-secondary {
+        border-color: var(--color-secondary);
+    }
+
+    .ring-org-primary {
+        --tw-ring-color: var(--color-primary);
+    }
+
+    .ring-org-secondary {
+        --tw-ring-color: var(--color-secondary);
+    }
+
+    .hover\:bg-org-primary:hover {
+        background-color: var(--color-primary);
+    }
+
+    .hover\:bg-org-primary-600:hover {
+        background-color: var(--color-primary-600, #2563eb);
+    }
+
+    .hover\:bg-org-primary-700:hover {
+        background-color: var(--color-primary-700, #1d4ed8);
+    }
+
+    .hover\:bg-org-secondary:hover {
+        background-color: var(--color-secondary);
+    }
+
+    .hover\:bg-org-secondary-600:hover {
+        background-color: var(--color-secondary-600, #059669);
+    }
+
+    .hover\:bg-org-secondary-700:hover {
+        background-color: var(--color-secondary-700, #047857);
+    }
+
+    .hover\:text-org-primary:hover {
+        color: var(--color-primary);
+    }
+
+    .hover\:text-org-secondary:hover {
+        color: var(--color-secondary);
+    }
+}
+
+/* Gradient utilities using organization colors */
+@layer utilities {
     .bg-gradient-primary {
         background: linear-gradient(135deg, var(--color-primary), var(--color-primary-600, #2563eb));
     }
@@ -289,18 +450,17 @@
     .bg-gradient-mixed {
         background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     }
-}
 
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+    /* Keep original longer names for compatibility */
+    .bg-gradient-org-primary {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-600, #2563eb));
+    }
 
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    .bg-gradient-org-secondary {
+        background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-600, #059669));
+    }
+
+    .bg-gradient-org-mixed {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    }
 }
