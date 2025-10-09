@@ -16,14 +16,16 @@ services:
       - db
 
   frontoffice:
-    build: frontend/to_delete
+    build: frontend/frontoffice
     container_name: frontoffice
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8080
+      REACT_APP_API_URL: http://backend:8080
     stdin_open: true
     tty: true
+    depends_on:
+      - backend
 
   backoffice:
     build: ./frontend/backoffice

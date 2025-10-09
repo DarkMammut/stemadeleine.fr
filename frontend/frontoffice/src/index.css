@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import de la police Fjord One */
+@import url('https://fonts.googleapis.com/css2?family=Fjord+One&display=swap');
+
+/* Application globale de la police */
+@layer base {
+    * {
+        font-family: 'Fjord One', serif;
+    }
+
+    body {
+        font-family: 'Fjord One', serif;
+    }
+}
+
 /* Organization Theme CSS Variables and Custom Classes */
 
 /* Default fallback colors if organization colors are not loaded yet */

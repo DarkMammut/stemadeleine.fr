@@ -13,6 +13,7 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                // Unified configuration for all API endpoints
                 registry.addMapping("/api/**")
                         .allowedOrigins(
                                 "http://localhost:3000", // frontoffice

@@ -48,9 +48,10 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalide ou absent");
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing token");
                         })
                 )
+                // Apply JWT filter only on authenticated endpoints
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

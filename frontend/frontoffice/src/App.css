@@ -1,38 +1,142 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Styles pour le contenu HTML des pages dynamiques */
+.content-html {
+    @apply leading-relaxed;
+}
+
+.content-html h1 {
+    @apply text-3xl font-bold mb-6 text-gray-900;
+}
+
+.content-html h2 {
+    @apply text-2xl font-bold mb-4 text-gray-900;
+}
+
+.content-html h3 {
+    @apply text-xl font-semibold mb-3 text-gray-900;
+}
+
+.content-html p {
+    @apply mb-4 text-gray-700 leading-relaxed;
+}
+
+.content-html ul, .content-html ol {
+    @apply mb-4 pl-6;
+}
+
+.content-html ul {
+    @apply list-disc;
+}
+
+.content-html ol {
+    @apply list-decimal;
+}
+
+.content-html li {
+    @apply mb-2;
+}
+
+.content-html a {
+    @apply text-blue-600 hover:text-blue-800 underline;
+}
+
+.content-html img {
+    @apply max-w-full h-auto rounded-lg shadow-md my-6;
+}
+
+.content-html blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic my-6 text-gray-600;
+}
+
+.content-html table {
+    @apply w-full border-collapse border border-gray-300 my-6;
+}
+
+.content-html th, .content-html td {
+    @apply border border-gray-300 px-4 py-2 text-left;
+}
+
+.content-html th {
+    @apply bg-gray-100 font-semibold;
+}
+
+/* Classe utilitaire pour limiter les lignes */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Le thème est maintenant entièrement géré par useOrganizationTheme */
+
+/* Styles pour les boutons personnalisés */
+.custom-button:hover:not(:disabled) {
+    background-color: var(--hover-bg) !important;
+    box-shadow: var(--hover-shadow) !important;
+}
+
+.custom-button:active:not(:disabled) {
+    background-color: var(--active-bg) !important;
+    transform: translateY(1px);
+    box-shadow: var(--hover-shadow) !important;
+}
+
+/* Focus ring avec couleurs dynamiques */
+.custom-button--primary:focus:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-500), 0.3);
+}
+
+.custom-button--secondary:focus:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(var(--color-secondary-500), 0.3);
+}
+
+.custom-button--outline:focus:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-500), 0.3);
+}
+
+.custom-button--danger:focus:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
+}
+
+.custom-button--ghost:focus:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(var(--color-secondary-500), 0.3);
 }

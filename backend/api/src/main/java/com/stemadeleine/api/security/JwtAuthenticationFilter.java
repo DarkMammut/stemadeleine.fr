@@ -35,9 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-        logger.debug("[JWT FILTER] Request URI: {}", requestURI);
+        String method = request.getMethod();
+        logger.debug("[JWT FILTER] Request URI: {} Method: {}", requestURI, method);
 
-        if (requestURI.startsWith("/api/auth/")) {
+        // Ignorer complètement les endpoints publics
+        if (requestURI.startsWith("/api/auth/") ||
+                requestURI.startsWith("/api/public/")) {
+            logger.debug("[JWT FILTER] Endpoint public détecté, pas de vérification JWT");
             filterChain.doFilter(request, response);
             return;
         }

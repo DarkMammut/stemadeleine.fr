@@ -84,9 +84,7 @@ export default function EditPage({ pageId }) {
         name: values.name,
         title: values.title,
         subTitle: values.subTitle,
-        slug: values.slug,
         description: values.description,
-        // Retire isVisible du formulaire principal
       });
       setSaving(false);
       refetch();

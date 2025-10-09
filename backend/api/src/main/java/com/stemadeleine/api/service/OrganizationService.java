@@ -96,4 +96,48 @@ public class OrganizationService {
         dto.setLogo(org.getLogo());
         return dto;
     }
+
+    // ==== PUBLIC METHODS ====
+
+    /**
+     * Gets organization settings for public access (including logo)
+     */
+    public OrganizationSettingsDTO getPublicOrganizationSettings() {
+        Organization org = organizationRepository.findTopByOrderByCreatedAtDesc()
+                .orElseThrow(() -> new EntityNotFoundException("No organization found"));
+
+        OrganizationSettingsDTO dto = new OrganizationSettingsDTO();
+        dto.setSlug(org.getSlug());
+        dto.setDescription(org.getDescription());
+        dto.setPrimaryColor(org.getPrimaryColor());
+        dto.setSecondaryColor(org.getSecondaryColor());
+        if (org.getLogo() != null) {
+            dto.setLogoMedia(org.getLogo().getId());
+        }
+        return dto;
+    }
+
+    /**
+     * Gets organization information for public access (including address)
+     */
+    public OrganizationDto getPublicOrganizationInfo() {
+        Organization org = organizationRepository.findTopByOrderByCreatedAtDesc()
+                .orElseThrow(() -> new EntityNotFoundException("No organization found"));
+
+        OrganizationDto dto = new OrganizationDto();
+        dto.setId(org.getId());
+        dto.setName(org.getName());
+        dto.setDescription(org.getDescription());
+        dto.setSlug(org.getSlug());
+        dto.setCreationDate(org.getCreationDate());
+
+        // Add address if exists
+        addressRepository.findByOwnerIdAndOwnerType(org.getId(), "ORGANIZATION")
+                .stream().findFirst().ifPresent(dto::setAddress);
+
+        // Add legal info if exists (public information)
+        dto.setLegalInfo(org.getLegalInfo());
+
+        return dto;
+    }
 }
