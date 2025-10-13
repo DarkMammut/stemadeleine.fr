@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useGetPages from "../hooks/useGetPages";
 import HeroHome from "../components/HeroHome";
+import Meta from "../components/Meta";
 
 const HomePage = () => {
   const [page, setPage] = useState(null);
@@ -11,9 +12,6 @@ const HomePage = () => {
       const slug = "/";
       const pageData = await fetchPageBySlug(slug);
       setPage(pageData);
-      if (pageData) {
-        document.title = `${pageData.name} - Sainte-Madeleine`;
-      }
     };
 
     loadPage();
@@ -39,13 +37,31 @@ const HomePage = () => {
   }
 
   return (
-    <div className="pt-16 md:pt-20 lg:pt-24 min-h-screen">
-      <HeroHome
-        title={page?.title}
-        mediaId={page?.heroMedia?.id}
-        subtitle={page?.subtitle}
+    <>
+      {/* Métadonnées pour la page d'accueil */}
+      <Meta
+        title={page?.name || "Accueil"}
+        description={
+          page?.description ||
+          "Bienvenue sur le site des amis de Sainte-Madeleine de la Jarrie. Découvrez nos actualités et nos activités."
+        }
+        keywords={
+          page?.keywords
+            ? page.keywords.split(",")
+            : ["accueil", "paroisse", "actualités", "newsletters"]
+        }
+        type="website"
+        url={window.location.href}
       />
-    </div>
+
+      <div className="pt-16 md:pt-20 lg:pt-24 min-h-screen">
+        <HeroHome
+          title={page?.title}
+          mediaId={page?.heroMedia?.id}
+          subtitle={page?.subtitle}
+        />
+      </div>
+    </>
   );
 };
 
