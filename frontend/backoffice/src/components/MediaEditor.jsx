@@ -199,22 +199,24 @@ export default function MediaEditor({
                     label: "Titre",
                     type: "text",
                     required: true,
-                    defaultValue: media?.title || "",
                   },
                   {
                     name: "altText",
                     label: "Texte alternatif",
                     type: "text",
                     required: true,
-                    defaultValue: media?.altText || "",
                   },
                   {
                     name: "isVisible",
                     label: "Visible",
                     type: "checkbox",
-                    defaultValue: media?.isVisible || false,
                   },
                 ]}
+                initialValues={{
+                  title: media?.title || "",
+                  altText: media?.altText || "",
+                  isVisible: media?.isVisible || false,
+                }}
                 onChange={(name, value, allValues) => {
                   setHasUnsavedChanges(checkForChanges(allValues));
                 }}

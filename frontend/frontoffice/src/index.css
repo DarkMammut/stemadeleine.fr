@@ -20,8 +20,12 @@
 
 /* Default fallback colors if organization colors are not loaded yet */
 :root {
-    --color-primary: #3B82F6; /* Default blue */
-    --color-secondary: #10B981; /* Default green */
+    --color-primary: #90cab4;
+    --color-secondary: #e2832b;
+    --color-primary-light: color-mix(in srgb, var(--color-primary), white 60%);
+    --color-primary-dark: color-mix(in srgb, var(--color-primary), black 40%);
+    --color-secondary-light: color-mix(in srgb, var(--color-secondary), white 60%);
+    --color-secondary-dark: color-mix(in srgb, var(--color-secondary), black 40%);
     --color-primary-rgb: 59, 130, 246;
     --color-secondary-rgb: 16, 185, 129;
 }
@@ -291,17 +295,22 @@
         color: var(--color-secondary);
     }
 
-    /* Gradient utilities using organization colors */
     .bg-gradient-primary {
-        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-600, #2563eb));
+        background: linear-gradient(
+                180deg,
+                var(--color-primary-dark) 0%,
+                var(--color-primary) 50%,
+                var(--color-primary-light) 100%
+        ) !important;
     }
 
     .bg-gradient-secondary {
-        background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-600, #059669));
-    }
-
-    .bg-gradient-mixed {
-        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        background: linear-gradient(
+                180deg,
+                var(--color-secondary-dark) 0%,
+                var(--color-secondary, #a7f3d0) 50%,
+                var(--color-secondary-light) 100%
+        ) !important;
     }
 }
 

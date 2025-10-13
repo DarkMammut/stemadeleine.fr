@@ -18,6 +18,8 @@ module.exports = {
           700: "rgb(var(--color-primary-700) / <alpha-value>)",
           800: "rgb(var(--color-primary-800) / <alpha-value>)",
           900: "rgb(var(--color-primary-900) / <alpha-value>)",
+          light: "var(--color-primary-light)",
+          dark: "var(--color-primary-dark)",
           DEFAULT: "var(--color-primary)",
         },
         secondary: {
@@ -31,6 +33,8 @@ module.exports = {
           700: "rgb(var(--color-secondary-700) / <alpha-value>)",
           800: "rgb(var(--color-secondary-800) / <alpha-value>)",
           900: "rgb(var(--color-secondary-900) / <alpha-value>)",
+          light: "var(--color-secondary-light)",
+          dark: "var(--color-secondary-dark)",
           DEFAULT: "var(--color-secondary)",
         },
         accent: "var(--color-primary)", // Alias pour $accent-color
@@ -45,6 +49,9 @@ module.exports = {
       textShadow: {
         light: "1px 1px 5px rgba(102, 102, 102, 0.6)",
         dark: "0 0 10px rgba(0, 0, 0, 1)",
+      },
+      height: {
+        30: "7.5rem",
       },
     },
   },

@@ -7,7 +7,7 @@ import useGetOrganization from "../hooks/useGetOrganization";
 import useGetMedia from "../hooks/useGetMedia";
 
 function Header() {
-  const { settings, loading, error } = useGetOrganization();
+  const { settings } = useGetOrganization();
   const { mediaUrl: logoUrl } = useGetMedia(settings?.logoMedia);
 
   // URL du logo avec fallback
@@ -16,14 +16,15 @@ function Header() {
   return (
     <header>
       {/* Header principal */}
-      <div className="fixed top-0 left-0 w-full h-16 md:h-20 lg:h-24 flex justify-center items-center bg-gradient-mixed z-40 shadow-xl">
+      <div className="fixed top-0 left-0 w-full h-24 flex justify-center items-center bg-gradient-primary z-40 shadow-xl">
         {/* Logo */}
         <Link to="/">
-          <div
-            className="fixed top-0 left-0 w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-tr-lg rounded-br-lg bg-contain bg-no-repeat bg-transparent z-20"
-            style={{
-              backgroundImage: `url(${finalLogoUrl})`,
-            }}
+          <img
+            src={finalLogoUrl}
+            alt="Logo"
+            loading="lazy"
+            className="fixed top-0 left-0 h-14 md:h-24 w-auto rounded-tr-lg rounded-br-lg bg-transparent z-20"
+            style={{ objectFit: "contain" }}
           />
         </Link>
 
@@ -37,7 +38,7 @@ function Header() {
           icon={HeartIcon}
           label="Don"
           variant="secondary"
-          className="hidden lg:flex absolute top-3 right-5 xl:top-3 xl:right-5 uppercase"
+          className="hidden lg:flex absolute right-5 xl:right-5 uppercase"
         />
       </div>
     </header>

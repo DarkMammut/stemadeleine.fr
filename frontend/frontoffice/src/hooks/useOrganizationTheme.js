@@ -123,9 +123,7 @@ const useOrganizationTheme = () => {
 
   // Initialiser les couleurs par défaut au montage du composant
   useEffect(() => {
-    if (!themeLoaded) {
-      initializeDefaultColors();
-    }
+    initializeDefaultColors();
   }, []);
 
   useEffect(() => {

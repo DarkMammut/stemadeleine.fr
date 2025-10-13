@@ -382,43 +382,48 @@ public class PageService {
     // ==== METHODS FOR PUBLIC ENDPOINTS ====
 
     /**
-     * Retrieves the tree of visible pages for public navigation
+     * Nouvelle méthode : récupère la hiérarchie des pages visibles et publiées (dernière version)
      */
     public List<Page> findVisiblePagesHierarchy() {
-        Map<UUID, Page> publishedPages = pageRepository.findAll().stream()
+        // Récupérer toutes les pages visibles et publiées, dernière version uniquement
+        Map<UUID, Page> latestPages = pageRepository.findAll().stream()
                 .filter(p -> p.getStatus() == PublishingStatus.PUBLISHED && p.getIsVisible())
                 .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
 
-        // Keep only root pages (without parent)
-        List<Page> roots = publishedPages.values().stream()
-                .filter(page -> page.getParentPage() == null)
-                .sorted(Comparator.comparing(page -> page.getSortOrder() != null ? page.getSortOrder() : 0))
-                .toList();
+        // Nettoyer les enfants
+        latestPages.values().forEach(page -> page.setChildren(new ArrayList<>()));
 
-        // Build hierarchy with only visible pages
-        roots.forEach(page -> buildVisibleHierarchy(page, publishedPages));
+        // Construire la hiérarchie
+        List<Page> roots = new ArrayList<>();
+        for (Page page : latestPages.values()) {
+            Page parent = page.getParentPage();
+            if (parent == null || parent.getPageId() == null || !latestPages.containsKey(parent.getPageId())) {
+                roots.add(page);
+            } else {
+                latestPages.get(parent.getPageId()).getChildren().add(page);
+            }
+        }
+
+        // Trier les racines
+        roots.sort(Comparator.comparing(p -> p.getSortOrder() != null ? p.getSortOrder() : 0));
         return roots;
     }
 
-    /**
-     * Recursively builds the hierarchy of visible pages
-     */
-    private void buildVisibleHierarchy(Page page, Map<UUID, Page> allPages) {
-        List<Page> visibleChildren = allPages.values().stream()
-                .filter(child -> page.getPageId().equals(child.getParentPage()))
-                .sorted(Comparator.comparing(child -> child.getSortOrder() != null ? child.getSortOrder() : 0))
-                .toList();
-
-        page.setChildren(visibleChildren);
-        visibleChildren.forEach(child -> buildVisibleHierarchy(child, allPages));
-    }
 
     /**
      * Finds a published and visible page by its slug
      */
     public Optional<Page> findBySlugAndVisible(String slug, boolean visible) {
-        return pageRepository.findBySlug(slug)
-                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED && page.getIsVisible() == visible);
+        // D'abord trouver toutes les pages avec ce slug
+        List<Page> pagesWithSlug = pageRepository.findAll().stream()
+                .filter(page -> slug.equals(page.getSlug()))
+                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED)
+                .filter(page -> page.getIsVisible() == visible)
+                .collect(Collectors.toList());
+
+        // Si plusieurs versions, prendre la plus récente
+        return pagesWithSlug.stream()
+                .max(Comparator.comparingInt(Page::getVersion));
     }
 
     /**
@@ -445,5 +450,34 @@ public class PageService {
                 )
                 .sorted(Comparator.comparing(Page::getTitle))
                 .toList();
+    }
+
+    /**
+     * Convertit une entité Page en PageDto, récursivement pour les enfants, sans inclure le parent
+     */
+    public PageDto toPageDto(Page page) {
+        List<PageDto> childrenDto = page.getChildren() != null ?
+                page.getChildren().stream().map(this::toPageDto).toList() : List.of();
+        return new PageDto(
+                page.getId(),
+                page.getPageId(),
+                page.getName(),
+                page.getTitle(),
+                page.getSubTitle(),
+                page.getSlug(),
+                page.getDescription(),
+                page.getStatus(),
+                page.getSortOrder(),
+                page.getIsVisible(),
+                childrenDto
+        );
+    }
+
+    /**
+     * Expose la hiérarchie des pages visibles et publiées sous forme de PageDto
+     */
+    public List<PageDto> findVisiblePagesHierarchyDto() {
+        List<Page> roots = findVisiblePagesHierarchy();
+        return roots.stream().map(this::toPageDto).toList();
     }
 }

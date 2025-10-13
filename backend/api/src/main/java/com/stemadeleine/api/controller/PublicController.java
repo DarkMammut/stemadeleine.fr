@@ -2,6 +2,7 @@ package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.OrganizationDto;
 import com.stemadeleine.api.dto.OrganizationSettingsDTO;
+import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.Page;
 import com.stemadeleine.api.service.MediaService;
@@ -34,16 +35,16 @@ public class PublicController {
      * Retrieves the tree of visible pages for public navigation
      */
     @GetMapping("/pages/tree")
-    public ResponseEntity<List<Page>> getPagesTree() {
-        List<Page> visiblePages = pageService.findVisiblePagesHierarchy();
+    public ResponseEntity<List<PageDto>> getPagesTree() {
+        List<PageDto> visiblePages = pageService.findVisiblePagesHierarchyDto();
         return ResponseEntity.ok(visiblePages);
     }
 
     /**
      * Retrieves a public page by its slug
      */
-    @GetMapping("/pages/slug/{slug}")
-    public ResponseEntity<Page> getPageBySlug(@PathVariable String slug) {
+    @GetMapping("/pages/slug")
+    public ResponseEntity<Page> getPageBySlug(@RequestParam String slug) {
         Optional<Page> page = pageService.findBySlugAndVisible(slug, true);
         return page.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -99,22 +100,35 @@ public class PublicController {
     // ==== PUBLIC MEDIA ====
 
     /**
-     * Redirects to the public URL of a media file by its ID
+     * Proxy le fichier média depuis Supabase pour éviter les problèmes CORS côté public
      */
     @GetMapping("/media/{mediaId}")
-    public ResponseEntity<Void> getMediaById(@PathVariable UUID mediaId) {
+    public ResponseEntity<byte[]> proxyMediaById(@PathVariable UUID mediaId) {
         try {
             Optional<Media> media = mediaService.getMediaById(mediaId);
             if (media.isPresent()) {
-                // Redirection vers l'URL publique du fichier dans Supabase
-                return ResponseEntity.status(302)
-                        .header("Location", media.get().getFileUrl())
-                        .build();
+                String fileUrl = media.get().getFileUrl();
+                java.net.URL url = new java.net.URL(fileUrl);
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.connect();
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    String contentType = conn.getContentType();
+                    java.io.InputStream is = conn.getInputStream();
+                    byte[] bytes = is.readAllBytes();
+                    is.close();
+                    return ResponseEntity.ok()
+                            .header("Content-Type", contentType)
+                            .body(bytes);
+                } else {
+                    return ResponseEntity.status(responseCode).build();
+                }
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération du média {}: {}", mediaId, e.getMessage());
+            log.error("Erreur lors du proxy du média {}: {}", mediaId, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
