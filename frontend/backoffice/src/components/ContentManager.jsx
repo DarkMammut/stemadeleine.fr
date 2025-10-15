@@ -1,13 +1,14 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
-import {AnimatePresence, motion} from "framer-motion";
-import {ChevronDownIcon, ChevronRightIcon, PlusIcon, TrashIcon,} from "@heroicons/react/24/outline";
-import Button from "@/components/ui/Button";
-import Switch from "@/components/ui/Switch";
-import RichTextEditor from "@/components/RichTextEditor";
-import ContentMediaManager from "@/components/ContentMediaManager";
-import {useContentOperations} from "@/hooks/useContentOperations";
+import React, { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDownIcon, ChevronRightIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import Button from '@/components/ui/Button';
+import Switch from '@/components/ui/Switch';
+import RichTextEditor from '@/components/RichTextEditor';
+import ContentMediaManager from '@/components/ContentMediaManager';
+import { useContentOperations } from '@/hooks/useContentOperations';
+import PublishButton from '@/components/ui/PublishButton';
 
 /**
  * Composant générique de gestion de contenus pour section, module, etc.
@@ -59,8 +60,6 @@ const ContentManager = ({
     }
   };
 
-  // ...existing code from SectionContentManager, en remplaçant sectionId par parentId et les labels par customLabels...
-
   // Toggle content expansion
   const toggleContentExpansion = (contentId) => {
     const newExpanded = new Set(expandedContents);
@@ -89,8 +88,6 @@ const ContentManager = ({
       setLoading(false);
     }
   };
-
-  // ...le reste du code SectionContentManager, adapté...
 
   // Update content title
   const handleTitleUpdate = async (contentId, newTitle) => {
@@ -185,6 +182,49 @@ const ContentManager = ({
     }
   };
 
+  // Fonction pour publier tous les contenus
+  const handlePublishAllContents = async () => {
+    if (
+      !confirm(
+        "Voulez-vous vraiment publier tous les contenus de ce " +
+          parentType +
+          " ?",
+      )
+    )
+      return;
+
+    try {
+      setLoading(true);
+      // Utilise l'endpoint de publication en lot
+      const response = await fetch(`/api/content/owner/${parentId}/publish`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la publication");
+      }
+
+      const result = await response.json();
+
+      // Recharger les contenus pour voir les nouveaux statuts
+      await loadContents();
+
+      // Afficher le résultat
+      alert(
+        `Publication terminée : ${result.publishedCount} contenu(s) publié(s), ${result.skippedCount} ignoré(s)`,
+      );
+    } catch (error) {
+      console.error("Error publishing all contents:", error);
+      alert("Erreur lors de la publication des contenus.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Media operations
   const handleAddMediaToContent = async (contentId, mediaId) => {
     try {
@@ -235,14 +275,24 @@ const ContentManager = ({
         <h3 className="text-lg font-semibold text-text">
           {customLabels.header || "Contenus"}
         </h3>
-        <Button
-          onClick={handleAddContent}
-          disabled={loading}
-          className="flex items-center gap-2"
-        >
-          <PlusIcon className="w-4 h-4" />
-          {customLabels.addButton || "Ajouter un contenu"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <PublishButton
+            onPublish={handlePublishAllContents}
+            disabled={loading || contents.length === 0}
+            publishLabel={customLabels.publishButton || "Publier tous"}
+            publishedLabel="Tous publiés"
+            size="md"
+            resetAfterDelay={true}
+          />
+          <Button
+            onClick={handleAddContent}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <PlusIcon className="w-4 h-4" />
+            {customLabels.addButton || "Ajouter un contenu"}
+          </Button>
+        </div>
       </div>
       {loading && contents.length === 0 && (
         <div className="text-center py-8 text-text-muted">

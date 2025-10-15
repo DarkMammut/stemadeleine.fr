@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAxiosClient } from "../utils/axiosClient";
 
 const useGetPages = () => {
@@ -8,7 +8,7 @@ const useGetPages = () => {
   const [error, setError] = useState(null);
   const axiosClient = useAxiosClient();
 
-  const fetchPages = async () => {
+  const fetchPages = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -23,9 +23,9 @@ const useGetPages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosClient]);
 
-  const fetchPagesTree = async () => {
+  const fetchPagesTree = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -40,69 +40,78 @@ const useGetPages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosClient]);
 
-  const fetchPageById = async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosClient.get(`/api/public/pages/${id}`);
-      return response.data;
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Erreur lors du chargement de la page",
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchPageById = useCallback(
+    async (id) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosClient.get(`/api/public/pages/${id}`);
+        return response.data;
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Erreur lors du chargement de la page",
+        );
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [axiosClient],
+  );
 
-  const fetchPageBySlug = async (slug) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosClient.get(
-        `/api/public/pages/slug?slug=${encodeURIComponent(slug)}`,
-      );
-      return response.data;
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Erreur lors du chargement de la page",
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchPageBySlug = useCallback(
+    async (slug) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosClient.get(
+          `/api/public/pages/slug?slug=${encodeURIComponent(slug)}`,
+        );
+        return response.data;
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Erreur lors du chargement de la page",
+        );
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [axiosClient],
+  );
 
-  const searchPages = async (query) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosClient.get(
-        `/api/public/pages/search?query=${encodeURIComponent(query)}`,
-      );
-      return response.data;
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Erreur lors de la recherche",
-      );
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
+  const searchPages = useCallback(
+    async (query) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axiosClient.get(
+          `/api/public/pages/search?query=${encodeURIComponent(query)}`,
+        );
+        return response.data;
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Erreur lors de la recherche",
+        );
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [axiosClient],
+  );
 
   useEffect(() => {
     fetchPagesTree();
-  }, []);
+  }, [fetchPagesTree]);
 
   return {
     pages,

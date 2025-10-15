@@ -72,7 +72,6 @@ public class Page {
     @OneToMany(mappedBy = "page", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Section> sections = new ArrayList<>();
 
-
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = false;
 

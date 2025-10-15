@@ -51,8 +51,8 @@ export default function Button({
 
   const hoverStyles = {
     primary: {
-      "--hover-bg": "rgb(var(--color-primary-700))",
-      "--active-bg": "rgb(var(--color-primary-800))",
+      "--hover-bg": "rgb(var(--color-primary-800))",
+      "--active-bg": "rgb(var(--color-primary-900))",
       "--hover-shadow": "0 4px 8px rgba(0, 0, 0, 0.15)",
     },
     secondary: {

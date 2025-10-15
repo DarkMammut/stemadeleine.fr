@@ -409,21 +409,32 @@ public class PageService {
         return roots;
     }
 
-
     /**
-     * Finds a published and visible page by its slug
+     * Finds a published and visible page by its slug (without sections)
      */
     public Optional<Page> findBySlugAndVisible(String slug, boolean visible) {
-        // D'abord trouver toutes les pages avec ce slug
+        log.info("Finding published and visible page by slug: {}", slug);
+
+        // Get all pages with this slug
         List<Page> pagesWithSlug = pageRepository.findAll().stream()
                 .filter(page -> slug.equals(page.getSlug()))
                 .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED)
                 .filter(page -> page.getIsVisible() == visible)
-                .collect(Collectors.toList());
+                .toList();
 
-        // Si plusieurs versions, prendre la plus récente
-        return pagesWithSlug.stream()
+        // If multiple versions exist, get the most recent one
+        Optional<Page> latestPage = pagesWithSlug.stream()
                 .max(Comparator.comparingInt(Page::getVersion));
+
+        if (latestPage.isPresent()) {
+            Page page = latestPage.get();
+            log.debug("Found published page: {} (version {}) for slug: {}",
+                    page.getTitle(), page.getVersion(), slug);
+            return latestPage;
+        }
+
+        log.warn("No published and visible page found for slug: {}", slug);
+        return Optional.empty();
     }
 
     /**

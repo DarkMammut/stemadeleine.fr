@@ -188,9 +188,6 @@ public class ContentController {
         log.info("PUT /api/sections/contents/{} - Updating content (full) by user: {}", contentId, currentUser.getUsername());
 
         try {
-            Content currentContent = contentService.getLatestContentVersion(contentId)
-                    .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
-
             // Création d'une nouvelle version avec titre, body et médias
             Content updatedContent = contentService.createNewVersionWithMedias(
                     contentId,
@@ -204,6 +201,72 @@ public class ContentController {
         } catch (RuntimeException e) {
             log.error("Error updating content (full): {}", e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/owner/{ownerId}/publish")
+    public ResponseEntity<Map<String, Object>> publishAllContentsByOwnerId(
+            @PathVariable UUID ownerId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to publish contents without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("POST /api/content/owner/{}/publish - Publishing all contents by user: {}",
+                ownerId, currentUser.getUsername());
+
+        try {
+            // Récupérer toutes les dernières versions des contenus pour cet ownerId
+            var latestContents = contentService.getLatestContentsByOwner(ownerId);
+
+            int publishedCount = 0;
+            int skippedCount = 0;
+
+            for (Content content : latestContents) {
+                try {
+                    // Publier seulement si le contenu n'est pas déjà publié et n'est pas supprimé
+                    if (!content.getStatus().equals(com.stemadeleine.api.model.PublishingStatus.PUBLISHED)) {
+                        contentService.updateContentStatus(
+                                content.getContentId(),
+                                com.stemadeleine.api.model.PublishingStatus.PUBLISHED,
+                                currentUser
+                        );
+                        publishedCount++;
+                        log.debug("Content published: {} (contentId: {})", content.getId(), content.getContentId());
+                    } else {
+                        skippedCount++;
+                        log.debug("Content already published, skipped: {} (contentId: {})", content.getId(), content.getContentId());
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to publish content {} (contentId: {}): {}",
+                            content.getId(), content.getContentId(), e.getMessage());
+                    skippedCount++;
+                }
+            }
+
+            Map<String, Object> response = Map.of(
+                    "ownerId", ownerId,
+                    "totalContents", latestContents.size(),
+                    "publishedCount", publishedCount,
+                    "skippedCount", skippedCount,
+                    "message", String.format("Published %d out of %d contents for owner %s",
+                            publishedCount, latestContents.size(), ownerId)
+            );
+
+            log.info("Bulk publish completed for owner {}: {} published, {} skipped",
+                    ownerId, publishedCount, skippedCount);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            log.error("Error publishing contents for owner {}: {}", ownerId, e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Failed to publish contents",
+                    "message", e.getMessage(),
+                    "ownerId", ownerId
+            ));
         }
     }
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Meta from "../components/Meta";
+import Button from "../components/Button";
 
 const NotFoundPage = () => {
   return (
@@ -21,14 +22,11 @@ const NotFoundPage = () => {
             Page non trouvée
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
-            La page que vous recherchez n'existe pas ou a été déplacée.
+            La page que vous recherchez n&apos;existe pas ou a été déplacée.
           </p>
-          <Link
-            to="/"
-            className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-semibold transition-colors"
-          >
+          <Button as={Link} to="/" variant="primary">
             Retour à l'accueil
-          </Link>
+          </Button>
         </div>
       </div>
     </>

@@ -332,6 +332,31 @@ public class ContentService {
     }
 
     /**
+     * Update content status (publish, draft, etc.)
+     */
+    @Transactional
+    public Content updateContentStatus(UUID contentId, PublishingStatus status, User author) {
+        log.info("Updating content status: {} to {} by user: {}", contentId, status, author.getUsername());
+
+        Content latestVersion = getLatestContentVersion(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+
+        // Si le statut est déjà le même, on retourne le contenu existant
+        if (latestVersion.getStatus().equals(status)) {
+            log.debug("Content {} already has status {}, no update needed", contentId, status);
+            return latestVersion;
+        }
+
+        // Mettre à jour directement le statut de la version courante
+        latestVersion.setStatus(status);
+        Content savedContent = contentRepository.save(latestVersion);
+
+        log.debug("Content status updated: contentId: {} -> {} (same version: {})",
+                savedContent.getContentId(), status, savedContent.getVersion());
+        return savedContent;
+    }
+
+    /**
      * Create default content body
      */
     public JsonNode createDefaultBody() {

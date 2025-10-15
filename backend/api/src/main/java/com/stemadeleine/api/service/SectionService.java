@@ -356,4 +356,41 @@ public class SectionService {
         }
         return sectionRepository.save(section);
     }
+
+    /**
+     * Get published and visible sections by business pageId for public access
+     */
+    public List<Section> getPublishedVisibleSectionsByPageId(UUID pageId) {
+        log.info("Retrieving published and visible sections for business pageId: {}", pageId);
+
+        // Get the published version of the page
+        Optional<Page> publishedPageOpt = pageService.getPublishedPage(pageId);
+        if (publishedPageOpt.isEmpty()) {
+            log.warn("No published page found for business pageId: {}", pageId);
+            return List.of();
+        }
+
+        Page publishedPage = publishedPageOpt.get();
+        log.debug("Found published page with technical id: {} for business pageId: {}", publishedPage.getId(), pageId);
+
+        // Get sections for this page that are published and visible
+        List<Section> allSections = sectionRepository.findLastVersionsByPageId(publishedPage.getId());
+        List<Section> visibleSections = allSections.stream()
+                .filter(section -> section.getStatus() == PublishingStatus.PUBLISHED)
+                .filter(Section::getIsVisible)
+                .sorted((s1, s2) -> {
+                    Integer order1 = s1.getSortOrder() != null ? s1.getSortOrder() : 0;
+                    Integer order2 = s2.getSortOrder() != null ? s2.getSortOrder() : 0;
+                    return order1.compareTo(order2);
+                })
+                .toList();
+
+        log.info("Found {} published and visible sections for business pageId: {}", visibleSections.size(), pageId);
+        log.debug("Visible sections: {}", visibleSections.stream()
+                .map(s -> String.format("[id=%s, name=%s, sortOrder=%s]",
+                        s.getId(), s.getName(), s.getSortOrder()))
+                .toList());
+
+        return visibleSections;
+    }
 }

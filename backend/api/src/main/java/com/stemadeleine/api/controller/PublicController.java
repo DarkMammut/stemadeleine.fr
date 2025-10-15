@@ -3,11 +3,8 @@ package com.stemadeleine.api.controller;
 import com.stemadeleine.api.dto.OrganizationDto;
 import com.stemadeleine.api.dto.OrganizationSettingsDTO;
 import com.stemadeleine.api.dto.PageDto;
-import com.stemadeleine.api.model.Media;
-import com.stemadeleine.api.model.Page;
-import com.stemadeleine.api.service.MediaService;
-import com.stemadeleine.api.service.OrganizationService;
-import com.stemadeleine.api.service.PageService;
+import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,8 @@ public class PublicController {
     private final PageService pageService;
     private final MediaService mediaService;
     private final OrganizationService organizationService;
+    private final SectionService sectionService;
+    private final ContentService contentService;
 
     // ==== PUBLIC PAGES ====
 
@@ -67,6 +66,49 @@ public class PublicController {
     public ResponseEntity<List<Page>> searchPages(@RequestParam String query) {
         List<Page> pages = pageService.searchInVisiblePages(query);
         return ResponseEntity.ok(pages);
+    }
+
+    /**
+     * Retrieves published and visible sections for a page by its business pageId
+     */
+    @GetMapping("/pages/{pageId}/sections")
+    public ResponseEntity<List<Section>> getPageSections(@PathVariable UUID pageId) {
+        log.info("GET /api/public/pages/{}/sections - Retrieving published and visible sections", pageId);
+
+        try {
+            List<Section> sections = sectionService.getPublishedVisibleSectionsByPageId(pageId);
+            log.debug("Found {} published sections for pageId: {}", sections.size(), pageId);
+            return ResponseEntity.ok(sections);
+        } catch (Exception e) {
+            log.error("Error retrieving sections for pageId {}: {}", pageId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ==== PUBLIC CONTENTS ====
+
+    /**
+     * Retrieves published and visible contents by ownerId (sectionId, moduleId, etc.)
+     */
+    @GetMapping("/contents/{ownerId}")
+    public ResponseEntity<List<Content>> getContentsByOwnerId(@PathVariable UUID ownerId) {
+        log.info("GET /api/public/contents/{} - Retrieving published and visible contents", ownerId);
+
+        try {
+            List<Content> contents = contentService.getLatestContentsByOwner(ownerId);
+
+            // Filter only published and visible contents for public access
+            List<Content> publicContents = contents.stream()
+                    .filter(content -> content.getStatus() == PublishingStatus.PUBLISHED)
+                    .filter(Content::getIsVisible)
+                    .toList();
+
+            log.debug("Found {} published contents for ownerId: {}", publicContents.size(), ownerId);
+            return ResponseEntity.ok(publicContents);
+        } catch (Exception e) {
+            log.error("Error retrieving contents for ownerId {}: {}", ownerId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // ==== PUBLIC ORGANIZATION ====

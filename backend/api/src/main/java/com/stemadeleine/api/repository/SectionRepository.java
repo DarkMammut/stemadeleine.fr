@@ -20,6 +20,7 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
             SELECT DISTINCT s
             FROM Section s
             LEFT JOIN FETCH s.contents c
+            LEFT JOIN FETCH s.media
             WHERE s.sectionId = :sectionId
               AND s.version = (
                 SELECT MAX(s2.version)
@@ -32,6 +33,7 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
     @Query("""
                 SELECT s
                 FROM Section s
+                LEFT JOIN FETCH s.media
                 WHERE s.page.id = :pageId
                   AND s.version = (
                     SELECT MAX(s2.version)
