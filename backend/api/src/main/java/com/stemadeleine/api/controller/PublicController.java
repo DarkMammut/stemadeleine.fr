@@ -3,6 +3,7 @@ package com.stemadeleine.api.controller;
 import com.stemadeleine.api.dto.OrganizationDto;
 import com.stemadeleine.api.dto.OrganizationSettingsDTO;
 import com.stemadeleine.api.dto.PageDto;
+import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.service.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +28,7 @@ public class PublicController {
     private final OrganizationService organizationService;
     private final SectionService sectionService;
     private final ContentService contentService;
+    private final ModuleService moduleService; // Ajout du service Module
 
     // ==== PUBLIC PAGES ====
 
@@ -81,6 +83,25 @@ public class PublicController {
             return ResponseEntity.ok(sections);
         } catch (Exception e) {
             log.error("Error retrieving sections for pageId {}: {}", pageId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ==== PUBLIC MODULES ====
+
+    /**
+     * Retrieves published and visible modules for a section by its sectionId
+     */
+    @GetMapping("/sections/{sectionId}/modules")
+    public ResponseEntity<List<Module>> getSectionModules(@PathVariable UUID sectionId) {
+        log.info("GET /api/public/sections/{}/modules - Retrieving published and visible modules", sectionId);
+
+        try {
+            List<Module> modules = moduleService.getPublishedVisibleModulesBySectionId(sectionId);
+            log.debug("Found {} published modules for sectionId: {}", modules.size(), sectionId);
+            return ResponseEntity.ok(modules);
+        } catch (Exception e) {
+            log.error("Error retrieving modules for sectionId {}: {}", sectionId, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }

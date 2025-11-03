@@ -29,7 +29,7 @@ const HomePage = () => {
     };
 
     loadPage();
-  }, []);
+  }, [fetchPageBySlug, fetchSectionsByPageId]);
 
   const isLoading = loading || sectionsLoading;
   const hasError = error || sectionsError;

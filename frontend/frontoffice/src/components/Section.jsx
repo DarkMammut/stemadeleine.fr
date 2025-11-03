@@ -4,15 +4,16 @@ import clsx from "clsx";
 import useGetMedia from "../hooks/useGetMedia";
 import useGetContents from "../hooks/useGetContents";
 import Contents from "./Contents";
+import ModulesList from "./ModulesList";
 
 const Section = ({
   sectionId,
   title,
   mediaId,
   contents: staticContents = [],
-  children,
   align = "left",
   className = "",
+  showModules = true, // New prop to control module display
 }) => {
   const { mediaUrl } = useGetMedia(mediaId);
   const {
@@ -65,11 +66,11 @@ const Section = ({
           />
           <div className="border-b-2"></div>
 
-          {children && (
-            <>
-              <hr className="my-10 border-gray-200 dark:border-gray-700" />
-              <div>{children}</div>
-            </>
+          {/* Modules Section */}
+          {sectionId && showModules && (
+            <div className="mt-10">
+              <ModulesList sectionId={sectionId} />
+            </div>
           )}
         </div>
       </div>
@@ -82,9 +83,9 @@ Section.propTypes = {
   title: PropTypes.string,
   mediaId: PropTypes.string,
   contents: PropTypes.array,
-  children: PropTypes.node,
   align: PropTypes.oneOf(["left", "center", "right"]),
   className: PropTypes.string,
+  showModules: PropTypes.bool,
 };
 
 export default Section;

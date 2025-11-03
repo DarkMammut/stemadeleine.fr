@@ -14,6 +14,17 @@ import java.util.UUID;
 public interface ModuleRepository extends JpaRepository<Module, UUID> {
     List<Module> findBySectionIdAndStatusNot(UUID sectionId, PublishingStatus status);
 
+    /**
+     * Retrieves modules with their inherited class data for a specific section
+     * This query ensures that subclass-specific fields are loaded (News, Gallery, Article, etc.)
+     */
+    @Query("SELECT m FROM Module m " +
+            "LEFT JOIN FETCH m.section " +
+            "WHERE m.section.id = :sectionId " +
+            "AND m.status != :status " +
+            "ORDER BY m.sortOrder ASC")
+    List<Module> findBySectionIdAndStatusNotWithInheritedData(UUID sectionId, PublishingStatus status);
+
     @Query("SELECT COALESCE(MAX(m.sortOrder), 0) FROM Module m WHERE m.section.id = :sectionId")
     Short findMaxSortOrderBySection(UUID sectionId);
 
