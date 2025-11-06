@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAxiosClient } from "../utils/axiosClient";
 
 const useGetOrganization = () => {
@@ -8,7 +8,7 @@ const useGetOrganization = () => {
   const [error, setError] = useState(null);
   const axiosClient = useAxiosClient();
 
-  const fetchOrganizationSettings = async () => {
+  const fetchOrganizationSettings = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -27,9 +27,9 @@ const useGetOrganization = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosClient]);
 
-  const fetchOrganizationInfo = async () => {
+  const fetchOrganizationInfo = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -46,9 +46,9 @@ const useGetOrganization = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosClient]);
 
-  const fetchAllOrganizationData = async () => {
+  const fetchAllOrganizationData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -74,12 +74,12 @@ const useGetOrganization = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axiosClient]);
 
   // Auto-fetch all organization data on hook initialization
   useEffect(() => {
     fetchAllOrganizationData();
-  }, []);
+  }, [fetchAllOrganizationData]);
 
   return {
     settings,

@@ -5,6 +5,7 @@ import useGetSections from "../hooks/useGetSections";
 import Meta from "../components/Meta";
 import Hero from "../components/Hero";
 import Section from "../components/Section";
+import StaticPageContent from "../components/StaticPageContent";
 
 const DynamicPage = () => {
   const location = useLocation();
@@ -98,6 +99,9 @@ const DynamicPage = () => {
         <Hero mediaId={page.heroMedia?.id} title={page.name} />
 
         <main className="container mx-auto px-4 py-8">
+          {/* Contenu fixe spécifique à certaines pages */}
+          <StaticPageContent pageSlug={page.slug} />
+
           {/* Page sections - now loaded separately */}
           {sections && sections.length > 0 && (
             <div className="mt-12">

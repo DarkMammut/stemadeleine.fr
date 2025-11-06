@@ -11,9 +11,11 @@ import {
   UserCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import { useContactsContext } from "@/contexts/ContactsContext";
 
 export default function Sidebar({ current, setCurrent }) {
   const router = useRouter();
+  const { unreadCount } = useContactsContext();
   const items = [
     {
       label: "Dashboard",
@@ -86,7 +88,12 @@ export default function Sidebar({ current, setCurrent }) {
             }`}
           >
             {item.icon}
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.key === "contacts" && unreadCount > 0 && (
+              <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                {unreadCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>

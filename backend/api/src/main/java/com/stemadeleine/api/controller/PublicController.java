@@ -1,5 +1,6 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.CreateContactRequest;
 import com.stemadeleine.api.dto.OrganizationDto;
 import com.stemadeleine.api.dto.OrganizationSettingsDTO;
 import com.stemadeleine.api.dto.PageDto;
@@ -7,12 +8,15 @@ import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.service.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +32,9 @@ public class PublicController {
     private final OrganizationService organizationService;
     private final SectionService sectionService;
     private final ContentService contentService;
-    private final ModuleService moduleService; // Ajout du service Module
+    private final ModuleService moduleService;
+    private final ContactService contactService;
+    private final RecaptchaService recaptchaService;
 
     // ==== PUBLIC PAGES ====
 
@@ -163,7 +169,7 @@ public class PublicController {
     // ==== PUBLIC MEDIA ====
 
     /**
-     * Proxy le fichier média depuis Supabase pour éviter les problèmes CORS côté public
+     * Proxies media file from Supabase to avoid CORS issues on public side
      */
     @GetMapping("/media/{mediaId}")
     public ResponseEntity<byte[]> proxyMediaById(@PathVariable UUID mediaId) {
@@ -191,8 +197,46 @@ public class PublicController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("Erreur lors du proxy du média {}: {}", mediaId, e.getMessage());
+            log.error("Error proxying media {}: {}", mediaId, e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ==== PUBLIC CONTACT ====
+
+    /**
+     * Creates a new contact from a public form
+     */
+    @PostMapping("/contact")
+    public ResponseEntity<?> createContact(@Valid @RequestBody CreateContactRequest request) {
+        log.info("New contact received from {} {} - {}", request.getFirstName(), request.getLastName(), request.getEmail());
+
+        try {
+            // Validate reCAPTCHA token first
+            if (!recaptchaService.validateToken(request.getRecaptchaToken())) {
+                log.warn("Invalid reCAPTCHA token for contact from {}", request.getEmail());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Invalid reCAPTCHA verification"));
+            }
+
+            // Convert DTO to entity
+            Contact contact = Contact.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .email(request.getEmail())
+                    .subject(request.getSubject())
+                    .message(request.getMessage())
+                    .build();
+
+            // Create contact with automatic linking to user if found
+            Contact savedContact = contactService.createContact(contact);
+
+            log.info("Contact created successfully - ID: {}", savedContact.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (Exception e) {
+            log.error("Error creating contact: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

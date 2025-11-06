@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import useGetOrganization from "./useGetOrganization";
+/* eslint-disable no-undef */
+import { useEffect, useState } from 'react';
+import useGetOrganization from './useGetOrganization';
 
 const useOrganizationTheme = () => {
   const [themeLoaded, setThemeLoaded] = useState(false);
@@ -37,7 +38,7 @@ const useOrganizationTheme = () => {
     const rgb = hexToRgb(baseColor);
 
     if (rgb) {
-      // Variable principale avec la couleur hex
+      // Variable principale avec la couleur hex (pour les classes CSS personnalisées)
       root.style.setProperty(`--color-${colorPrefix}`, baseColor);
 
       // Variables RGB pour Tailwind (format: "r, g, b" sans rgb())
@@ -81,6 +82,22 @@ const useOrganizationTheme = () => {
         `--color-${colorPrefix}-900`,
         createShade(rgb, 0.5, true),
       );
+
+      // Variables pour color-mix (compatibilité avec le CSS existant)
+      root.style.setProperty(
+        `--color-${colorPrefix}-light`,
+        `color-mix(in srgb, ${baseColor}, white 60%)`,
+      );
+      root.style.setProperty(
+        `--color-${colorPrefix}-dark`,
+        `color-mix(in srgb, ${baseColor}, black 40%)`,
+      );
+
+      console.log(`🎨 Couleurs ${colorPrefix} appliquées:`, {
+        base: baseColor,
+        rgb500: `${rgb.r}, ${rgb.g}, ${rgb.b}`,
+        rgb700: createShade(rgb, 0.7, true),
+      });
     }
   };
 

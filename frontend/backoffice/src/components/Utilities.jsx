@@ -33,8 +33,9 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             <Button
               key={idx}
               onClick={action.callback}
-              variant="primary"
+              variant={action.variant || "primary"}
               size="sm"
+              disabled={action.disabled || false}
             >
               {Icon && <Icon className="w-4 h-4 mr-1" />}
               {action.label}

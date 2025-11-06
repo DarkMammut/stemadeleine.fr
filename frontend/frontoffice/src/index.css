@@ -18,16 +18,40 @@
 
 /* Organization Theme CSS Variables and Custom Classes */
 
-/* Default fallback colors if organization colors are not loaded yet */
+/* Variables CSS - seront définies dynamiquement par le backend */
 :root {
+    /* Couleurs par défaut - seront remplacées par les couleurs du backend */
     --color-primary: #90cab4;
     --color-secondary: #e2832b;
     --color-primary-light: color-mix(in srgb, var(--color-primary), white 60%);
     --color-primary-dark: color-mix(in srgb, var(--color-primary), black 40%);
     --color-secondary-light: color-mix(in srgb, var(--color-secondary), white 60%);
     --color-secondary-dark: color-mix(in srgb, var(--color-secondary), black 40%);
-    --color-primary-rgb: 59, 130, 246;
-    --color-secondary-rgb: 16, 185, 129;
+    --color-primary-rgb: 144, 202, 180;
+    --color-secondary-rgb: 226, 131, 43;
+
+    /* Nuances par défaut en format RGB qui seront remplacées dynamiquement */
+    --color-primary-50: 240, 249, 245;
+    --color-primary-100: 220, 242, 231;
+    --color-primary-200: 188, 229, 209;
+    --color-primary-300: 144, 202, 180;
+    --color-primary-400: 107, 179, 153;
+    --color-primary-500: 144, 202, 180;
+    --color-primary-600: 61, 128, 102;
+    --color-primary-700: 50, 102, 84;
+    --color-primary-800: 42, 82, 69;
+    --color-primary-900: 35, 68, 57;
+
+    --color-secondary-50: 253, 246, 240;
+    --color-secondary-100: 251, 233, 214;
+    --color-secondary-200: 246, 209, 173;
+    --color-secondary-300: 240, 176, 121;
+    --color-secondary-400: 233, 146, 74;
+    --color-secondary-500: 226, 131, 43;
+    --color-secondary-600: 201, 109, 32;
+    --color-secondary-700: 168, 87, 28;
+    --color-secondary-800: 135, 71, 28;
+    --color-secondary-900: 110, 59, 26;
 }
 
 /* Custom Tailwind utilities using organization colors */
@@ -39,43 +63,43 @@
     }
 
     .bg-primary-50 {
-        background-color: var(--color-primary-50, #eff6ff);
+        background-color: rgb(var(--color-primary-50));
     }
 
     .bg-primary-100 {
-        background-color: var(--color-primary-100, #dbeafe);
+        background-color: rgb(var(--color-primary-100));
     }
 
     .bg-primary-200 {
-        background-color: var(--color-primary-200, #bfdbfe);
+        background-color: rgb(var(--color-primary-200));
     }
 
     .bg-primary-300 {
-        background-color: var(--color-primary-300, #93c5fd);
+        background-color: rgb(var(--color-primary-300));
     }
 
     .bg-primary-400 {
-        background-color: var(--color-primary-400, #60a5fa);
+        background-color: rgb(var(--color-primary-400));
     }
 
     .bg-primary-500 {
-        background-color: var(--color-primary-500, var(--color-primary));
+        background-color: rgb(var(--color-primary-500));
     }
 
     .bg-primary-600 {
-        background-color: var(--color-primary-600, #2563eb);
+        background-color: rgb(var(--color-primary-600));
     }
 
     .bg-primary-700 {
-        background-color: var(--color-primary-700, #1d4ed8);
+        background-color: rgb(var(--color-primary-700));
     }
 
     .bg-primary-800 {
-        background-color: var(--color-primary-800, #1e40af);
+        background-color: rgb(var(--color-primary-800));
     }
 
     .bg-primary-900 {
-        background-color: var(--color-primary-900, #1e3a8a);
+        background-color: rgb(var(--color-primary-900));
     }
 
     /* Secondary color utilities - shorter syntax */
@@ -84,43 +108,43 @@
     }
 
     .bg-secondary-50 {
-        background-color: var(--color-secondary-50, #ecfdf5);
+        background-color: rgb(var(--color-secondary-50));
     }
 
     .bg-secondary-100 {
-        background-color: var(--color-secondary-100, #d1fae5);
+        background-color: rgb(var(--color-secondary-100));
     }
 
     .bg-secondary-200 {
-        background-color: var(--color-secondary-200, #a7f3d0);
+        background-color: rgb(var(--color-secondary-200));
     }
 
     .bg-secondary-300 {
-        background-color: var(--color-secondary-300, #6ee7b7);
+        background-color: rgb(var(--color-secondary-300));
     }
 
     .bg-secondary-400 {
-        background-color: var(--color-secondary-400, #34d399);
+        background-color: rgb(var(--color-secondary-400));
     }
 
     .bg-secondary-500 {
-        background-color: var(--color-secondary-500, var(--color-secondary));
+        background-color: rgb(var(--color-secondary-500));
     }
 
     .bg-secondary-600 {
-        background-color: var(--color-secondary-600, #059669);
+        background-color: rgb(var(--color-secondary-600));
     }
 
     .bg-secondary-700 {
-        background-color: var(--color-secondary-700, #047857);
+        background-color: rgb(var(--color-secondary-700));
     }
 
     .bg-secondary-800 {
-        background-color: var(--color-secondary-800, #065f46);
+        background-color: rgb(var(--color-secondary-800));
     }
 
     .bg-secondary-900 {
-        background-color: var(--color-secondary-900, #064e3b);
+        background-color: rgb(var(--color-secondary-900));
     }
 
     /* Text color utilities - shorter syntax */
@@ -129,43 +153,43 @@
     }
 
     .text-primary-50 {
-        color: var(--color-primary-50, #eff6ff);
+        color: rgb(var(--color-primary-50));
     }
 
     .text-primary-100 {
-        color: var(--color-primary-100, #dbeafe);
+        color: rgb(var(--color-primary-100));
     }
 
     .text-primary-200 {
-        color: var(--color-primary-200, #bfdbfe);
+        color: rgb(var(--color-primary-200));
     }
 
     .text-primary-300 {
-        color: var(--color-primary-300, #93c5fd);
+        color: rgb(var(--color-primary-300));
     }
 
     .text-primary-400 {
-        color: var(--color-primary-400, #60a5fa);
+        color: rgb(var(--color-primary-400));
     }
 
     .text-primary-500 {
-        color: var(--color-primary-500, var(--color-primary));
+        color: rgb(var(--color-primary-500));
     }
 
     .text-primary-600 {
-        color: var(--color-primary-600, #2563eb);
+        color: rgb(var(--color-primary-600));
     }
 
     .text-primary-700 {
-        color: var(--color-primary-700, #1d4ed8);
+        color: rgb(var(--color-primary-700));
     }
 
     .text-primary-800 {
-        color: var(--color-primary-800, #1e40af);
+        color: rgb(var(--color-primary-800));
     }
 
     .text-primary-900 {
-        color: var(--color-primary-900, #1e3a8a);
+        color: rgb(var(--color-primary-900));
     }
 
     .text-secondary {
@@ -173,43 +197,43 @@
     }
 
     .text-secondary-50 {
-        color: var(--color-secondary-50, #ecfdf5);
+        color: rgb(var(--color-secondary-50));
     }
 
     .text-secondary-100 {
-        color: var(--color-secondary-100, #d1fae5);
+        color: rgb(var(--color-secondary-100));
     }
 
     .text-secondary-200 {
-        color: var(--color-secondary-200, #a7f3d0);
+        color: rgb(var(--color-secondary-200));
     }
 
     .text-secondary-300 {
-        color: var(--color-secondary-300, #6ee7b7);
+        color: rgb(var(--color-secondary-300));
     }
 
     .text-secondary-400 {
-        color: var(--color-secondary-400, #34d399);
+        color: rgb(var(--color-secondary-400));
     }
 
     .text-secondary-500 {
-        color: var(--color-secondary-500, var(--color-secondary));
+        color: rgb(var(--color-secondary-500));
     }
 
     .text-secondary-600 {
-        color: var(--color-secondary-600, #059669);
+        color: rgb(var(--color-secondary-600));
     }
 
     .text-secondary-700 {
-        color: var(--color-secondary-700, #047857);
+        color: rgb(var(--color-secondary-700));
     }
 
     .text-secondary-800 {
-        color: var(--color-secondary-800, #065f46);
+        color: rgb(var(--color-secondary-800));
     }
 
     .text-secondary-900 {
-        color: var(--color-secondary-900, #064e3b);
+        color: rgb(var(--color-secondary-900));
     }
 
     /* Border color utilities - shorter syntax */
@@ -218,19 +242,19 @@
     }
 
     .border-primary-200 {
-        border-color: var(--color-primary-200, #bfdbfe);
+        border-color: rgb(var(--color-primary-200));
     }
 
     .border-primary-300 {
-        border-color: var(--color-primary-300, #93c5fd);
+        border-color: rgb(var(--color-primary-300));
     }
 
     .border-primary-500 {
-        border-color: var(--color-primary-500, var(--color-primary));
+        border-color: rgb(var(--color-primary-500));
     }
 
     .border-primary-600 {
-        border-color: var(--color-primary-600, #2563eb);
+        border-color: rgb(var(--color-primary-600));
     }
 
     .border-secondary {
@@ -238,19 +262,19 @@
     }
 
     .border-secondary-200 {
-        border-color: var(--color-secondary-200, #a7f3d0);
+        border-color: rgb(var(--color-secondary-200));
     }
 
     .border-secondary-300 {
-        border-color: var(--color-secondary-300, #6ee7b7);
+        border-color: rgb(var(--color-secondary-300));
     }
 
     .border-secondary-500 {
-        border-color: var(--color-secondary-500, var(--color-secondary));
+        border-color: rgb(var(--color-secondary-500));
     }
 
     .border-secondary-600 {
-        border-color: var(--color-secondary-600, #059669);
+        border-color: rgb(var(--color-secondary-600));
     }
 
     /* Ring color utilities for focus states - shorter syntax */
@@ -268,11 +292,11 @@
     }
 
     .hover\:bg-primary-600:hover {
-        background-color: var(--color-primary-600, #2563eb);
+        background-color: rgb(var(--color-primary-600));
     }
 
     .hover\:bg-primary-700:hover {
-        background-color: var(--color-primary-700, #1d4ed8);
+        background-color: rgb(var(--color-primary-700));
     }
 
     .hover\:bg-secondary:hover {
@@ -280,11 +304,11 @@
     }
 
     .hover\:bg-secondary-600:hover {
-        background-color: var(--color-secondary-600, #059669);
+        background-color: rgb(var(--color-secondary-600));
     }
 
     .hover\:bg-secondary-700:hover {
-        background-color: var(--color-secondary-700, #047857);
+        background-color: rgb(var(--color-secondary-700));
     }
 
     .hover\:text-primary:hover {
@@ -308,7 +332,7 @@
         background: linear-gradient(
                 180deg,
                 var(--color-secondary-dark) 0%,
-                var(--color-secondary, #a7f3d0) 50%,
+                var(--color-secondary) 50%,
                 var(--color-secondary-light) 100%
         ) !important;
     }

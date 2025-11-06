@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stemadeleine.api.security.JwtAuthenticationFilter;
 import com.stemadeleine.api.security.JwtUtil;
 import com.stemadeleine.api.service.CustomUserDetailsService;
+import com.stemadeleine.api.service.RecaptchaService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +21,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @TestConfiguration
 @EnableWebSecurity
@@ -48,6 +51,15 @@ public class TestConfig implements WebMvcConfigurer {
     @Primary
     public CustomUserDetailsService testCustomUserDetailsService() {
         return mock(CustomUserDetailsService.class);
+    }
+
+    @Bean
+    @Primary
+    public RecaptchaService testRecaptchaService() {
+        RecaptchaService mockService = mock(RecaptchaService.class);
+        // Configure mock to always return true for tests
+        when(mockService.validateToken(any())).thenReturn(true);
+        return mockService;
     }
 
     @Bean

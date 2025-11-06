@@ -1,11 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["Fjord One", "serif"],
-      },
       colors: {
         primary: {
           50: "rgb(var(--color-primary-50) / <alpha-value>)",
@@ -37,39 +34,10 @@ module.exports = {
           dark: "var(--color-secondary-dark)",
           DEFAULT: "var(--color-secondary)",
         },
+        // Aliases pour compatibilité
         accent: "var(--color-primary)", // Alias pour $accent-color
-      },
-      backgroundSize: {
-        "200-100": "200% 100%",
-      },
-      backgroundPosition: {
-        left: "0 0",
-        "right-slide": "-100% 0",
-      },
-      textShadow: {
-        light: "1px 1px 5px rgba(102, 102, 102, 0.6)",
-        dark: "0 0 10px rgba(0, 0, 0, 1)",
-      },
-      height: {
-        30: "7.5rem",
       },
     },
   },
-  plugins: [
-    // Plugin pour text-shadow
-    function ({ addUtilities }) {
-      const newUtilities = {
-        ".text-shadow-light": {
-          textShadow: "1px 1px 5px rgba(102, 102, 102, 0.6)",
-        },
-        ".text-shadow-dark": {
-          textShadow: "0 0 10px rgba(0, 0, 0, 1)",
-        },
-        ".text-shadow-none": {
-          textShadow: "none",
-        },
-      };
-      addUtilities(newUtilities, ["responsive", "hover"]);
-    },
-  ],
+  plugins: [],
 };
