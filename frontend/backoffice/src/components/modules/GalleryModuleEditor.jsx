@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
-import Switch from "@/components/ui/Switch";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import MediaPicker from "@/components/MediaPicker";
@@ -10,7 +10,9 @@ import Button from "@/components/ui/Button";
 import { PlusIcon } from "@heroicons/react/16/solid";
 import { useGalleriesMediasOperations } from "@/hooks/useGalleriesMediasOperations";
 import MediaGrid from "@/components/MediaGrid";
-import MediaEditor from "@/components/MediaEditor";
+import MediaModifier from "@/components/MediaModifier";
+import IconButton from "@/components/ui/IconButton";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function GalleryModuleEditor({
   moduleId,
@@ -120,24 +122,13 @@ export default function GalleryModuleEditor({
   return (
     <div className="space-y-6">
       {/* Section Visibilité */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Visibilité du module
-        </h3>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Switch
-            checked={moduleData?.isVisible || false}
-            onChange={handleVisibilityChange}
-            disabled={savingVisibility}
-          />
-          <span className="font-medium text-text">
-            Module visible sur le site
-            {savingVisibility && (
-              <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-            )}
-          </span>
-        </label>
-      </div>
+      <VisibilitySwitch
+        title="Visibilité du module"
+        label="Module visible sur le site"
+        isVisible={moduleData?.isVisible || false}
+        onChange={handleVisibilityChange}
+        savingVisibility={savingVisibility}
+      />
 
       {/* Formulaire principal */}
       {moduleData && Object.keys(moduleData).length > 0 && (
@@ -175,8 +166,6 @@ export default function GalleryModuleEditor({
           medias={moduleData?.medias || []}
           onEdit={setEditingMedia}
           onRemove={handleRemoveMedia}
-          entityType="gallery"
-          entityId={moduleId}
         />
       </div>
 
@@ -192,14 +181,34 @@ export default function GalleryModuleEditor({
 
       {/* Éditeur de média */}
       {editingMedia && (
-        <MediaEditor
-          media={editingMedia}
-          onClose={() => setEditingMedia(null)}
-          onSave={() => {
-            setEditingMedia(null);
-            refetch();
-          }}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Modifier le média
+              </h3>
+              <IconButton
+                icon={XMarkIcon}
+                label="Fermer"
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditingMedia(null)}
+              />
+            </div>
+
+            <MediaModifier
+              mediaId={editingMedia.id}
+              onMediaUpdated={() => {
+                refetch();
+              }}
+              onConfirm={() => {
+                setEditingMedia(null);
+                refetch();
+              }}
+              onCancel={() => setEditingMedia(null)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

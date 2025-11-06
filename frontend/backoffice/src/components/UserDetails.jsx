@@ -1,6 +1,7 @@
 import React from "react";
 import AddressManager from "@/components/AddressManager";
-import Button from "@/components/ui/Button";
+import IconButton from "@/components/ui/IconButton";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function UserDetails({ user, onEdit, onDelete }) {
   if (!user) return null;
@@ -39,12 +40,20 @@ export default function UserDetails({ user, onEdit, onDelete }) {
         )}
       </div>
       <div className="flex gap-2 mt-4">
-        <Button variant="primary" onClick={onEdit}>
-          Modifier
-        </Button>
-        <Button variant="danger" onClick={onDelete}>
-          Supprimer
-        </Button>
+        <IconButton
+          icon={PencilIcon}
+          label="Modifier"
+          variant="secondary"
+          size="md"
+          onClick={onEdit}
+        />
+        <IconButton
+          icon={TrashIcon}
+          label="Supprimer"
+          variant="danger"
+          size="md"
+          onClick={onDelete}
+        />
       </div>
     </div>
   );

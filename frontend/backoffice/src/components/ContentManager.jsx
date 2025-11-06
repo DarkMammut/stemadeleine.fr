@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDownIcon, ChevronRightIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
 import Switch from '@/components/ui/Switch';
 import RichTextEditor from '@/components/RichTextEditor';
-import ContentMediaManager from '@/components/ContentMediaManager';
-import { useContentOperations } from '@/hooks/useContentOperations';
+import MediaManager from '@/components/MediaManager';
 import PublishButton from '@/components/ui/PublishButton';
+import { useContentOperations } from '@/hooks/useContentOperations';
 
 /**
  * Composant générique de gestion de contenus pour section, module, etc.
@@ -270,66 +271,76 @@ const ContentManager = ({
 
   // Rendu UI (labels personnalisables)
   return (
-    <div className="content-manager space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-text">
-          {customLabels.header || "Contenus"}
-        </h3>
-        <div className="flex items-center gap-2">
-          <PublishButton
-            onPublish={handlePublishAllContents}
-            disabled={loading || contents.length === 0}
-            publishLabel={customLabels.publishButton || "Publier tous"}
-            publishedLabel="Tous publiés"
-            size="md"
-            resetAfterDelay={true}
-          />
-          <Button
-            onClick={handleAddContent}
-            disabled={loading}
-            className="flex items-center gap-2"
-          >
-            <PlusIcon className="w-4 h-4" />
-            {customLabels.addButton || "Ajouter un contenu"}
-          </Button>
-        </div>
-      </div>
-      {loading && contents.length === 0 && (
-        <div className="text-center py-8 text-text-muted">
-          {customLabels.loading || "Chargement des contenus..."}
-        </div>
-      )}
-      {!loading && contents.length === 0 && (
-        <div className="text-center py-8 text-text-muted">
-          <p>
-            {customLabels.empty ||
-              "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
-          </p>
-        </div>
-      )}
-      <div className="space-y-3">
-        <AnimatePresence>
-          {contents.map((content, index) => (
-            <motion.div
-              key={`content-${content.contentId}-${content.version}-${index}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="border border-border rounded-lg bg-background shadow-sm"
+    <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="content-manager space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {customLabels.header || "Contenus"}
+          </h3>
+          <div className="flex items-center gap-2">
+            <PublishButton
+              onPublish={handlePublishAllContents}
+              disabled={loading || contents.length === 0}
+              publishLabel={customLabels.publishButton || "Publier tous"}
+              publishedLabel="Tous publiés"
+              size="md"
+              resetAfterDelay={true}
+            />
+            <Button
+              onClick={handleAddContent}
+              disabled={loading}
+              className="flex items-center gap-2"
             >
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div className="flex items-center gap-3 flex-1">
+              <PlusIcon className="w-4 h-4" />
+              {customLabels.addButton || "Ajouter un contenu"}
+            </Button>
+          </div>
+        </div>
+        {loading && contents.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            {customLabels.loading || "Chargement des contenus..."}
+          </div>
+        )}
+        {!loading && contents.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>
+              {customLabels.empty ||
+                "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
+            </p>
+          </div>
+        )}
+        <div className="space-y-3">
+          <AnimatePresence>
+            {contents.map((content, index) => (
+              <motion.div
+                key={`content-${content.contentId}-${content.version}-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm"
+              >
+                <div className="flex items-center gap-3 p-4">
                   <button
                     onClick={() => toggleContentExpansion(content.contentId)}
-                    className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                    className="p-1 hover:bg-gray-100 rounded-md transition-colors flex-shrink-0"
                   >
                     {expandedContents.has(content.contentId) ? (
-                      <ChevronDownIcon className="w-4 h-4" />
+                      <ChevronDownIcon className="w-5 h-5 text-gray-600" />
                     ) : (
-                      <ChevronRightIcon className="w-4 h-4" />
+                      <ChevronRightIcon className="w-5 h-5 text-gray-600" />
                     )}
                   </button>
-                  <div className="flex-1">
+
+                  <Switch
+                    checked={content.isVisible}
+                    onChange={(checked) =>
+                      handleVisibilityToggle(content.contentId, checked)
+                    }
+                    disabled={savingStates[content.contentId]}
+                    size="sm"
+                  />
+
+                  <div className="flex-1 min-w-0">
                     {isEditing(content.contentId, "title") ? (
                       <form
                         onSubmit={(e) => {
@@ -344,7 +355,7 @@ const ContentManager = ({
                         <input
                           name="title"
                           defaultValue={content.title}
-                          className="flex-1 px-2 py-1 border border-border rounded focus:ring-2 focus:ring-primary focus:border-transparent"
+                          className="flex-1 px-3 py-1.5 text-base text-gray-900 border border-gray-300 rounded-md focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                           autoFocus
                           onKeyDown={(e) => {
                             if (e.key === "Escape") {
@@ -352,122 +363,124 @@ const ContentManager = ({
                             }
                           }}
                         />
-                        <button
+                        <Button
                           type="submit"
-                          className="px-2 py-1 text-sm bg-primary text-white rounded hover:bg-primary-dark"
+                          size="sm"
                           disabled={savingStates[content.contentId]}
                         >
                           {customLabels.save || "Enregistrer"}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
+                          variant="secondary"
+                          size="sm"
                           onClick={() =>
                             stopEditing(content.contentId, "title")
                           }
-                          className="px-2 py-1 text-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                           disabled={savingStates[content.contentId]}
                         >
                           {customLabels.cancel || "Annuler"}
-                        </button>
+                        </Button>
                       </form>
                     ) : (
-                      <h4
-                        className="font-medium text-text cursor-pointer hover:text-primary"
-                        onClick={() => startEditing(content.contentId, "title")}
-                      >
-                        {content.title ||
-                          customLabels.untitled ||
-                          "Contenu sans titre"}
-                      </h4>
+                      <div className="flex items-center gap-2">
+                        <h4
+                          className="font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors truncate"
+                          onClick={() =>
+                            startEditing(content.contentId, "title")
+                          }
+                          title={
+                            content.title ||
+                            customLabels.untitled ||
+                            "Contenu sans titre"
+                          }
+                        >
+                          {content.title ||
+                            customLabels.untitled ||
+                            "Contenu sans titre"}
+                        </h4>
+                        <div className="text-xs text-gray-500 flex-shrink-0">
+                          v{content.version} • {content.authorUsername}
+                          {content.hasLocalChanges && (
+                            <span className="text-orange-600 ml-2">
+                              • Modifications non sauvegardées
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
-                  <div className="text-xs text-text-muted">
-                    v{content.version} • {content.authorUsername}
-                    {content.hasLocalChanges && (
-                      <span className="text-orange-600 ml-2">
-                        • Modifications non sauvegardées
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={content.isVisible}
-                    onChange={(checked) =>
-                      handleVisibilityToggle(content.contentId, checked)
-                    }
-                    disabled={savingStates[content.contentId]}
+
+                  <IconButton
+                    icon={TrashIcon}
+                    label="Supprimer"
+                    variant="danger"
                     size="sm"
-                  />
-                  <button
                     onClick={() => handleDeleteContent(content.contentId)}
                     disabled={savingStates[content.contentId]}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
-                    title={customLabels.delete || "Supprimer le contenu"}
-                  >
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
+                  />
                 </div>
-              </div>
-              <AnimatePresence>
-                {expandedContents.has(content.contentId) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-4 space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-text mb-2">
-                          {customLabels.bodyLabel || "Contenu"}
-                        </label>
-                        <div className="border border-border rounded-lg overflow-hidden">
-                          <RichTextEditor
-                            value={content.body?.html || ""}
-                            onChange={(newBody) =>
-                              handleContentUpdate(content.contentId, newBody)
+
+                <AnimatePresence>
+                  {expandedContents.has(content.contentId) && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden border-t border-gray-200"
+                    >
+                      <div className="p-6 space-y-6">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            {customLabels.bodyLabel || "Contenu"}
+                          </label>
+                          <div className="border border-gray-300 rounded-lg overflow-hidden">
+                            <RichTextEditor
+                              value={content.body?.html || ""}
+                              onChange={(newBody) =>
+                                handleContentUpdate(content.contentId, newBody)
+                              }
+                              placeholder={
+                                customLabels.bodyPlaceholder ||
+                                "Commencez à écrire..."
+                              }
+                              height="200px"
+                              disabled={savingStates[content.contentId]}
+                            />
+                          </div>
+                        </div>
+                        <MediaManager
+                          content={content}
+                          onMediaAdd={handleAddMediaToContent}
+                          onMediaRemove={handleRemoveMediaFromContent}
+                          onMediaChanged={loadContents}
+                        />
+                        <div className="flex justify-end">
+                          <Button
+                            onClick={() =>
+                              handleSaveContentBody(content.contentId)
                             }
-                            placeholder={
-                              customLabels.bodyPlaceholder ||
-                              "Commencez à écrire..."
-                            }
-                            height="200px"
                             disabled={savingStates[content.contentId]}
-                          />
+                          >
+                            {customLabels.saveContent ||
+                              "Enregistrer le contenu"}
+                          </Button>
                         </div>
+                        {savingStates[content.contentId] && (
+                          <div className="text-sm text-blue-600 flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                            {customLabels.saving || "Sauvegarde..."}
+                          </div>
+                        )}
                       </div>
-                      <ContentMediaManager
-                        content={content}
-                        onMediaAdd={handleAddMediaToContent}
-                        onMediaRemove={handleRemoveMediaFromContent}
-                        onMediaChanged={loadContents}
-                      />
-                      <div className="flex justify-end">
-                        <Button
-                          onClick={() =>
-                            handleSaveContentBody(content.contentId)
-                          }
-                          disabled={savingStates[content.contentId]}
-                          className="px-4 py-2 text-sm"
-                        >
-                          {customLabels.saveContent || "Enregistrer le contenu"}
-                        </Button>
-                      </div>
-                      {savingStates[content.contentId] && (
-                        <div className="text-sm text-blue-600 flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                          {customLabels.saving || "Sauvegarde..."}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

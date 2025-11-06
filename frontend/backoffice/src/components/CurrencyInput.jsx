@@ -29,7 +29,6 @@ export default function CurrencyInput({
     setDisplayValue(val);
     if (val === "") {
       onChange(0);
-      return;
     }
   };
 
@@ -48,7 +47,7 @@ export default function CurrencyInput({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
       <input
         type="text"
         inputMode="decimal"
@@ -57,9 +56,11 @@ export default function CurrencyInput({
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
-        className="border rounded px-2 py-1 w-24 text-right"
+        className="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 text-right placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
       />
-      <span>{currency}</span>
+      <div className="shrink-0 text-base text-gray-500 select-none pr-3 sm:text-sm/6">
+        {currency}
+      </div>
     </div>
   );
 }

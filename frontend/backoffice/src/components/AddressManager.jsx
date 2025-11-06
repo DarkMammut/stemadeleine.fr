@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
 import Button from "@/components/ui/Button";
+import DeleteModal from "@/components/DeleteModal";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function AddressManager({
@@ -26,6 +27,8 @@ export default function AddressManager({
     state: "",
     country: "",
   });
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
 
   const isLimitReached =
     typeof maxAddresses === "number" && addresses.length >= maxAddresses;
@@ -96,27 +99,36 @@ export default function AddressManager({
   };
 
   // Suppression d'une adresse
-  const handleDelete = async (id) => {
+  const handleDeleteClick = (address) => {
     if (!editable || !refreshAddresses) return;
-    if (window.confirm("Supprimer cette adresse ?")) {
-      try {
-        await axios.delete(`/api/addresses/${id}`);
-        await refreshAddresses();
-      } catch (err) {
-        alert("Erreur lors de la suppression");
-      }
+    setAddressToDelete(address);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!addressToDelete) return;
+    try {
+      await axios.delete(`/api/addresses/${addressToDelete.id}`);
+      await refreshAddresses();
+      setDeleteModalOpen(false);
+      setAddressToDelete(null);
+    } catch (err) {
+      alert("Erreur lors de la suppression");
     }
   };
 
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setAddressToDelete(null);
+  };
+
   return (
-    <div className="bg-surface border border-border rounded-lg p-4">
-      <h3 className="text-xl font-bold mb-2">{label}</h3>
-      <ul className="divide-y divide-border mb-4">
+    <div className="space-y-6">
+      <h3 className="text-xl font-bold text-gray-900">{label}</h3>
+
+      <div className="space-y-4">
         {addresses.map((address) => (
-          <li
-            key={address.id}
-            className="flex items-center justify-between py-2"
-          >
+          <div key={address.id} className="border-t border-gray-200 pt-4">
             {editable && editingId === address.id ? (
               <div className="flex-1">
                 <MyForm
@@ -131,70 +143,85 @@ export default function AddressManager({
                 />
               </div>
             ) : (
-              <>
+              <div className="flex items-start justify-between gap-4">
                 <div
                   className={editable ? "cursor-pointer flex-1" : "flex-1"}
                   onClick={editable ? () => handleEdit(address) : undefined}
                 >
-                  <div className="flex flex-col gap-1 p-3 rounded-md bg-muted hover:bg-accent transition-colors">
-                    <span className="font-semibold text-lg text-primary mb-1">
+                  <div className="space-y-2">
+                    <span className="text-lg font-semibold text-gray-900 block">
                       {address.name}
                     </span>
-                    <span className="text-base text-secondary">
-                      {address.addressLine1}
-                    </span>
-                    {address.addressLine2 && (
-                      <span className="text-base text-secondary">
-                        {address.addressLine2}
-                      </span>
-                    )}
-                    <div className="flex flex-row gap-2 items-center text-base text-secondary">
-                      <span className="inline-block px-2 py-1 bg-surface rounded-full border text-xs font-medium text-muted mr-2">
-                        {address.postCode}
-                      </span>
-                      <span>{address.city}</span>
-                    </div>
-                    {(address.state || address.country) && (
-                      <div className="flex flex-row gap-2 mt-1 text-sm text-muted">
-                        {address.state && <span>{address.state}</span>}
-                        {address.state && address.country && <span>•</span>}
-                        {address.country && <span>{address.country}</span>}
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <div>{address.addressLine1}</div>
+                      {address.addressLine2 && (
+                        <div>{address.addressLine2}</div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-700">
+                          {address.postCode}
+                        </span>
+                        <span>{address.city}</span>
                       </div>
-                    )}
+                      {(address.state || address.country) && (
+                        <div className="flex items-center gap-2 text-gray-500">
+                          {address.state && <span>{address.state}</span>}
+                          {address.state && address.country && <span>•</span>}
+                          {address.country && <span>{address.country}</span>}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {editable && (
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(address.id)}
+                    onClick={() => handleDeleteClick(address)}
                   >
                     Supprimer
                   </Button>
                 )}
-              </>
+              </div>
             )}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
+
       {editable &&
         !isLimitReached &&
         (adding ? (
-          <MyForm
-            key="add"
-            fields={addressFields}
-            initialValues={addForm}
-            onSubmit={handleAddSubmit}
-            onChange={setAddForm}
-            submitButtonLabel="Ajouter"
-            onCancel={() => setAdding(false)}
-            cancelButtonLabel="Annuler"
-          />
+          <div className="border-t border-gray-200 pt-4">
+            <MyForm
+              key="add"
+              fields={addressFields}
+              initialValues={addForm}
+              onSubmit={handleAddSubmit}
+              onChange={setAddForm}
+              submitButtonLabel="Ajouter"
+              onCancel={() => setAdding(false)}
+              cancelButtonLabel="Annuler"
+            />
+          </div>
         ) : (
-          <Button variant="primary" size="sm" onClick={() => setAdding(true)}>
-            Ajouter une adresse
-          </Button>
+          <div className="border-t border-gray-200 pt-4">
+            <Button variant="primary" size="sm" onClick={() => setAdding(true)}>
+              Ajouter une adresse
+            </Button>
+          </div>
         ))}
+
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer l'adresse"
+        message={
+          addressToDelete
+            ? `Êtes-vous sûr de vouloir supprimer l'adresse "${addressToDelete.name}" ?`
+            : "Êtes-vous sûr de vouloir supprimer cette adresse ?"
+        }
+      />
     </div>
   );
 }

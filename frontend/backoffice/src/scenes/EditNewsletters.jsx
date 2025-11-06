@@ -18,6 +18,9 @@ export default function EditNewsletters({ newsletterId }) {
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [error, setError] = useState(null);
+  const [showDeleteMediaModal, setShowDeleteMediaModal] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     getNewsletter,
@@ -113,12 +116,10 @@ export default function EditNewsletters({ newsletterId }) {
   };
 
   const handlePublish = async () => {
-    if (
-      !window.confirm("Êtes-vous sûr de vouloir publier cette newsletter ?")
-    ) {
-      return;
-    }
+    setShowPublishModal(true);
+  };
 
+  const confirmPublish = async () => {
     try {
       setSaving(true);
       await publishNewsletter(newsletterId);
@@ -129,6 +130,7 @@ export default function EditNewsletters({ newsletterId }) {
       alert("Erreur lors de la publication");
     } finally {
       setSaving(false);
+      setShowPublishModal(false);
     }
   };
 
@@ -143,16 +145,20 @@ export default function EditNewsletters({ newsletterId }) {
   };
 
   const removeMedia = async () => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer le média ?")) {
-      return;
-    }
+    setShowDeleteMediaModal(true);
+  };
 
+  const confirmRemoveMedia = async () => {
+    setIsDeleting(true);
     try {
       await removeNewsletterMedia(newsletterId);
       await loadNewsletter(); // Reload to get updated data
     } catch (error) {
       console.error("Error removing newsletter media:", error);
       alert("Erreur lors de la suppression du média");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteMediaModal(false);
     }
   };
 
@@ -319,6 +325,25 @@ export default function EditNewsletters({ newsletterId }) {
           </div>
         </div>
       )}
+
+      <DeleteModal
+        open={showDeleteMediaModal}
+        onClose={() => setShowDeleteMediaModal(false)}
+        onConfirm={confirmRemoveMedia}
+        title="Supprimer le média"
+        message="Êtes-vous sûr de vouloir supprimer le média ? Cette action est irréversible."
+        isDeleting={isDeleting}
+      />
+
+      <DeleteModal
+        open={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onConfirm={confirmPublish}
+        title="Publier la newsletter"
+        message="Êtes-vous sûr de vouloir publier cette newsletter ?"
+        confirmLabel="Publier"
+        isDeleting={saving}
+      />
     </motion.div>
   );
 }

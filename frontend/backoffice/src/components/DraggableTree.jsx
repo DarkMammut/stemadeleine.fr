@@ -14,12 +14,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import {
-  buildTree,
-  flattenTree,
-  getChildCount,
-  getProjection,
-} from "@/utils/treeHelpers";
+import { buildTree, flattenTree, getProjection } from "@/utils/treeHelpers";
 import SortableItem from "@/components/SortableItem";
 
 export default function DraggableTree({
@@ -126,7 +121,6 @@ export default function DraggableTree({
             key={`${item.type}-${item.id}`}
             item={item}
             depth={item.depth}
-            childCount={getChildCount(tree, item.id)}
             onToggle={onToggle}
             onEdit={onEdit}
             onDelete={onDelete}

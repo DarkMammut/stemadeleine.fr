@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Flag from "@/components/ui/Flag";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/Utilities";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import Currency from "@/components/Currency";
+import CardList from "@/components/CardList";
+import CampaignCard from "@/components/CampaignCard";
 
-export default function Campaigns() {
+export default function Campaigns({ onNotifySuccess, onNotifyError }) {
   const axios = useAxiosClient();
   const [campaigns, setCampaigns] = useState([]);
 
@@ -29,8 +29,12 @@ export default function Campaigns() {
         }),
       );
       setCampaigns(campaignsWithAmount);
-    } catch {
-      setCampaigns([]);
+    } catch (error) {
+      console.error("Error loading campaigns:", error);
+      onNotifyError?.(
+        "Erreur de chargement",
+        "Impossible de charger les campagnes",
+      );
     }
   };
 
@@ -41,19 +45,29 @@ export default function Campaigns() {
   const handleImportHelloAsso = async () => {
     try {
       await axios.post("/api/helloasso/import");
-      fetchCampaigns();
-      alert("Import HelloAsso terminé avec succès.");
+      await fetchCampaigns();
+      onNotifySuccess?.(
+        "Import HelloAsso terminé",
+        "Les données ont été mises à jour avec succès",
+      );
     } catch (error) {
       console.error("Erreur lors de l'import HelloAsso:", error);
-      alert("Erreur lors de l'import HelloAsso");
+      onNotifyError?.(
+        "Erreur d'import",
+        "Impossible d'importer les données HelloAsso",
+      );
     }
   };
 
-  function getFlagVariant(state) {
-    if (state === "Public") return "primary";
-    if (state === "Private") return "danger";
-    return "secondary";
-  }
+  const handleCampaignClick = (campaign) => {
+    if (campaign.url) {
+      window.open(campaign.url, "_blank");
+    }
+  };
+
+  const filteredCampaigns = campaigns.filter(
+    (campaign) => campaign.title !== "Checkout",
+  );
 
   return (
     <>
@@ -63,34 +77,20 @@ export default function Campaigns() {
             icon: ArrowPathIcon,
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
+            variant: "refresh",
           },
         ]}
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {campaigns
-          .filter((campaign) => campaign.title !== "Checkout")
-          .map((campaign) => (
-            <div
-              key={campaign.id}
-              className="p-4 rounded-2xl shadow cursor-pointer hover:bg-secondary"
-              onClick={() => window.open(campaign.url, "_blank")}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-lg">{campaign.title}</span>
-                <Flag variant={getFlagVariant(campaign.state)}>
-                  {campaign.state}
-                </Flag>
-              </div>
-              <div className="text-sm text-gray-600 mb-1">
-                Montant collecté :{" "}
-                <Currency
-                  value={campaign.collectedAmount}
-                  currency={campaign.currency}
-                />
-              </div>
-            </div>
-          ))}
-      </div>
+
+      <CardList emptyMessage="Aucune campagne trouvée.">
+        {filteredCampaigns.map((campaign) => (
+          <CampaignCard
+            key={campaign.id}
+            campaign={campaign}
+            onClick={() => handleCampaignClick(campaign)}
+          />
+        ))}
+      </CardList>
     </>
   );
 }

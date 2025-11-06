@@ -1,23 +1,25 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import { useNewsletterOperations } from "@/hooks/useNewsletterOperations";
-import ListContent from "@/components/ListContent";
+import CardList from "@/components/CardList";
+import NewsletterCard from "@/components/NewsletterCard";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Newsletters() {
+  const router = useRouter();
   const [newsletters, setNewsletters] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const {
-    getAllNewsletters,
-    createNewsletter,
-    updateNewsletterVisibility,
-    deleteNewsletter,
-  } = useNewsletterOperations();
+  const { getAllNewsletters, createNewsletter } = useNewsletterOperations();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadNewsletters();
@@ -30,7 +32,10 @@ export default function Newsletters() {
       setNewsletters(data);
     } catch (error) {
       console.error("Error loading newsletters:", error);
-      alert("Erreur lors du chargement des newsletters");
+      showError(
+        "Erreur de chargement",
+        "Impossible de charger les newsletters",
+      );
     } finally {
       setLoading(false);
     }
@@ -44,14 +49,19 @@ export default function Newsletters() {
         description: "Description de la newsletter",
         isVisible: false,
       });
-
-      // Reload newsletters list
       await loadNewsletters();
-      console.log("Newsletter created successfully");
+      showSuccess(
+        "Newsletter créée",
+        "Une nouvelle newsletter a été créée avec succès",
+      );
     } catch (error) {
       console.error("Error creating newsletter:", error);
-      alert("Erreur lors de la création de la newsletter");
+      showError("Erreur de création", "Impossible de créer la newsletter");
     }
+  };
+
+  const handleNewsletterClick = (newsletter) => {
+    router.push(`/newsletters/${newsletter.id}`);
   };
 
   if (loading) {
@@ -64,13 +74,9 @@ export default function Newsletters() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-6"
     >
-      <Title
-        label="Gestion des Newsletters"
-        apiUrl="/api/newsletters"
-        data={newsletters}
-      />
+      <Title label="Gestion des Newsletters" />
 
       <Utilities
         actions={[
@@ -82,12 +88,22 @@ export default function Newsletters() {
         ]}
       />
 
-      <ListContent
-        label="Newsletters"
-        getAll={getAllNewsletters}
-        updateVisibility={updateNewsletterVisibility}
-        remove={deleteNewsletter}
-        routePrefix="newsletters"
+      <CardList emptyMessage="Aucune newsletter trouvée.">
+        {newsletters.map((newsletter) => (
+          <NewsletterCard
+            key={newsletter.id}
+            newsletter={newsletter}
+            onClick={() => handleNewsletterClick(newsletter)}
+          />
+        ))}
+      </CardList>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
       />
     </motion.div>
   );

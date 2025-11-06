@@ -19,20 +19,63 @@ export default function DetailsUser({ user, onEdit, onDelete }) {
   ];
 
   return (
-    <div className="details-user p-4 border rounded">
-      <h2 className="text-xl font-bold mb-2">
-        {user.firstname} {user.lastname}
-      </h2>
-      <div>Email : {user.email}</div>
-      <div>Téléphone mobile : {user.phoneMobile}</div>
-      <div>Téléphone fixe : {user.phoneLandline}</div>
-      <div>Newsletter : {user.newsletter ? "Oui" : "Non"}</div>
-      <div>Date de naissance : {user.birthDate}</div>
-      <div className="mt-2">
-        <h3 className="font-semibold">Adresses :</h3>
+    <div className="details-user space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          {user.firstname} {user.lastname}
+        </h2>
+        <div className="border-t border-gray-200 pt-6 space-y-4">
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Email</span>
+            <span className="text-sm text-gray-900">{user.email}</span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">
+              Téléphone mobile
+            </span>
+            <span className="text-sm text-gray-900">
+              {user.phoneMobile || "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">
+              Téléphone fixe
+            </span>
+            <span className="text-sm text-gray-900">
+              {user.phoneLandline || "-"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">
+              Newsletter
+            </span>
+            <span className="text-sm text-gray-900">
+              {user.newsletter ? "Oui" : "Non"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">
+              Date de naissance
+            </span>
+            <span className="text-sm text-gray-900">
+              {user.birthDate || "-"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Adresses</h3>
         <AddressManager addresses={user.addresses || []} editable={false} />
       </div>
-      <Utilities actions={actions} />
+
+      <div className="border-t border-gray-200 pt-6">
+        <Utilities actions={actions} />
+      </div>
     </div>
   );
 }

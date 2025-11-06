@@ -9,9 +9,12 @@ import useGetPage from "@/hooks/useGetPage";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
-import Switch from "@/components/ui/Switch";
+import MediaManager from "@/components/MediaManager";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function EditPage({ pageId }) {
   const { page, refetch } = useGetPage({ route: pageId });
@@ -22,6 +25,8 @@ export default function EditPage({ pageId }) {
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
   const axios = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     if (page) setPageData(page);
@@ -65,11 +70,33 @@ export default function EditPage({ pageId }) {
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
-    await axios.put(`/api/pages/${pageId}/hero-media`, {
-      heroMediaId: mediaId,
-    });
-    refetch();
+  const handleAddMedia = async (pageId, mediaId) => {
+    try {
+      await axios.put(`/api/pages/${pageId}/hero-media`, {
+        heroMediaId: mediaId,
+      });
+      await refetch();
+
+      // Construire l'objet content avec le média ajouté
+      return {
+        ...pageData,
+        medias: [{ id: mediaId }],
+      };
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du média:", error);
+      throw error;
+    }
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const handleRemoveMedia = async (pageId, mediaId) => {
+    try {
+      await axios.delete(`/api/pages/${pageId}/media`);
+      await refetch();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du média:", error);
+      throw error;
+    }
   };
 
   const handleFormChange = () => {
@@ -88,10 +115,10 @@ export default function EditPage({ pageId }) {
       });
       setSaving(false);
       refetch();
-      alert("Page mise à jour !");
+      showSuccess("Page enregistrée", "La page a été mise à jour avec succès");
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde de la page");
+      showError("Erreur de sauvegarde", "Impossible d'enregistrer la page");
       setSaving(false);
     }
   };
@@ -99,6 +126,7 @@ export default function EditPage({ pageId }) {
   const handleCancelEdit = () => {
     setPageData(page);
     setFormKey((prev) => prev + 1);
+    showSuccess("Modifications annulées", "Les changements ont été annulés");
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -108,18 +136,30 @@ export default function EditPage({ pageId }) {
       setSavingVisibility(false);
       setPageData((prev) => ({ ...prev, isVisible }));
       refetch();
+      showSuccess(
+        `Page ${isVisible ? "rendue visible" : "masquée"}`,
+        "La visibilité a été mise à jour automatiquement",
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError("Erreur de visibilité", "Impossible de modifier la visibilité");
       setSavingVisibility(false);
     }
   };
 
   // Fonction pour publier la page courante
   const handlePublishPage = async () => {
-    await axios.put(`/api/pages/${pageId}/publish`);
-    await refetch();
+    try {
+      await axios.put(`/api/pages/${pageId}/publish`);
+      await refetch();
+      showSuccess("Page publiée", "La page a été publiée avec succès");
+    } catch (err) {
+      console.error(err);
+      showError("Erreur de publication", "Impossible de publier la page");
+    }
   };
+
+  const breadcrumbs = pageData ? buildPageBreadcrumbs(pageData) : [];
 
   return (
     <motion.div
@@ -127,40 +167,33 @@ export default function EditPage({ pageId }) {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-6xl mx-auto p-6 space-y-6"
     >
-      <Title label="Gestion des pages" onPublish={handlePublishPage} />
+      <Title
+        label={
+          pageData ? pageData.name || "Page sans nom" : "Gestion des pages"
+        }
+        onPublish={handlePublishPage}
+        showBreadcrumbs={!!pageData}
+        breadcrumbs={breadcrumbs}
+      />
 
       <PagesTabs pageId={pageId} />
 
       <Utilities actions={[]} />
 
       {!pageData ? (
-        <div className="text-center py-8 text-text-muted">
+        <div className="text-center py-8 text-gray-500">
           Chargement des données...
         </div>
       ) : (
         <div className="space-y-6">
           {/* Section Visibilité séparée */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Visibilité de la page
-            </h3>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <Switch
-                checked={pageData?.isVisible || false}
-                onChange={handleVisibilityChange}
-                disabled={savingVisibility}
-              />
-              <span className="font-medium text-text">
-                Page visible sur le site
-                {savingVisibility && (
-                  <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-                )}
-              </span>
-            </label>
-            <p className="text-sm text-text-muted mt-2">
-              Cette option se sauvegarde automatiquement
-            </p>
-          </div>
+          <VisibilitySwitch
+            title="Visibilité de la page"
+            label="Page visible sur le site"
+            isVisible={pageData?.isVisible || false}
+            onChange={handleVisibilityChange}
+            savingVisibility={savingVisibility}
+          />
 
           {/* Formulaire principal - Ne s'affiche que quand pageData est complètement chargé */}
           {pageData && Object.keys(pageData).length > 0 && (
@@ -179,12 +212,31 @@ export default function EditPage({ pageId }) {
         </div>
       )}
 
-      <MediaPicker
-        mediaId={page?.heroMedia?.id}
-        attachToEntity={attachToEntity}
-        entityType="pages"
-        entityId={pageId}
-        label="Bannière"
+      {/* Gestion de l'image de bannière (Hero Media) */}
+      {pageData && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Image de bannière
+          </h3>
+          <MediaManager
+            content={{
+              id: pageId,
+              medias: page?.heroMedia ? [page.heroMedia] : [],
+            }}
+            onMediaAdd={handleAddMedia}
+            onMediaRemove={handleRemoveMedia}
+            onMediaChanged={refetch}
+            maxMedias={1}
+          />
+        </div>
+      )}
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
       />
     </motion.div>
   );

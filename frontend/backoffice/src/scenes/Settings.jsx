@@ -167,11 +167,12 @@ export default function Settings() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-8"
     >
       <Title label="Modifier l'organisation" />
+
       {showEditForm ? (
-        <div className="bg-surface border border-border rounded-lg p-6">
+        <div className="space-y-6">
           {/* Champs principaux */}
           <MyForm
             fields={organizationFields}
@@ -187,19 +188,23 @@ export default function Settings() {
       ) : (
         <DetailsOrganization organization={organization} onEdit={handleEdit} />
       )}
-      <AddressManager
-        label="Adresse du siège social"
-        addresses={organization.address ? [organization.address] : []}
-        ownerId={organization.id}
-        ownerType="ORGANIZATION"
-        refreshAddresses={loadOrganization}
-        editable={true}
-        newAddressName={"Siège social"}
-        maxAddresses={1}
-      />
+
+      <div className="border-t border-gray-200 pt-8">
+        <AddressManager
+          label="Adresse du siège social"
+          addresses={organization.address ? [organization.address] : []}
+          ownerId={organization.id}
+          ownerType="ORGANIZATION"
+          refreshAddresses={loadOrganization}
+          editable={true}
+          newAddressName={"Siège social"}
+          maxAddresses={1}
+        />
+      </div>
+
       {/* Sélection des couleurs primaires et secondaires */}
-      <div className="bg-surface border border-border rounded-lg p-6 space-y-6">
-        <h3 className="text-xl font-bold mb-2">Paramètres</h3>
+      <div className="border-t border-gray-200 pt-8 space-y-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Paramètres</h3>
         <MediaPicker
           mediaId={organization?.logo?.id}
           attachToEntity={attachToEntity}
@@ -216,24 +221,28 @@ export default function Settings() {
           disabled={saving}
           multiline={true}
         />
-        <ColorInputWithPicker
-          label="Couleur principale"
-          initialValue={originalOrganizationSettings.primaryColor || "#1976d2"}
-          value={organizationSettings.primaryColor || "#1976d2"}
-          onSave={handleSaveSetting("primaryColor")}
-          onChange={handleChangeSetting("primaryColor")}
-          disabled={saving}
-        />
-        <ColorInputWithPicker
-          label="Couleur secondaire"
-          initialValue={
-            originalOrganizationSettings.secondaryColor || "#dc004e"
-          }
-          value={organizationSettings.secondaryColor || "#dc004e"}
-          onSave={handleSaveSetting("secondaryColor")}
-          onChange={handleChangeSetting("secondaryColor")}
-          disabled={saving}
-        />
+        <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+          <ColorInputWithPicker
+            label="Couleur principale"
+            initialValue={
+              originalOrganizationSettings.primaryColor || "#1976d2"
+            }
+            value={organizationSettings.primaryColor || "#1976d2"}
+            onSave={handleSaveSetting("primaryColor")}
+            onChange={handleChangeSetting("primaryColor")}
+            disabled={saving}
+          />
+          <ColorInputWithPicker
+            label="Couleur secondaire"
+            initialValue={
+              originalOrganizationSettings.secondaryColor || "#dc004e"
+            }
+            value={organizationSettings.secondaryColor || "#dc004e"}
+            onSave={handleSaveSetting("secondaryColor")}
+            onChange={handleChangeSetting("secondaryColor")}
+            disabled={saving}
+          />
+        </div>
       </div>
     </motion.div>
   );

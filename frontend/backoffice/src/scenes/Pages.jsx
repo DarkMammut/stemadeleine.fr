@@ -14,6 +14,9 @@ import useUpdatePageOrder from "@/hooks/useUpdatePageOrder";
 import { removeItem } from "@/utils/treeHelpers";
 import Title from "@/components/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function Pages() {
   const router = useRouter();
@@ -24,6 +27,11 @@ export default function Pages() {
   const { updatePageOrder } = useUpdatePageOrder();
 
   const [treeData, setTreeData] = useState([]);
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     if (pages) setTreeData(pages);
@@ -88,23 +96,29 @@ export default function Pages() {
   );
 
   // Delete - avec axiosClient
-  const handleDelete = useCallback(
-    async (item) => {
-      const confirmDelete = window.confirm(
-        "Êtes-vous sûr de vouloir supprimer cette page ?",
-      );
-      if (!confirmDelete) return;
+  const handleDelete = useCallback(async (item) => {
+    setItemToDelete(item);
+    setShowDeleteModal(true);
+  }, []);
 
-      try {
-        await axios.delete(`/api/pages/${item.pageId}`);
-        await refetch();
-        setTreeData((prev) => removeItem(prev, item.id));
-      } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
-      }
-    },
-    [refetch, axios],
-  );
+  const confirmDelete = useCallback(async () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await axios.delete(`/api/pages/${itemToDelete.pageId}`);
+      await refetch();
+      setTreeData((prev) => removeItem(prev, itemToDelete.id));
+      showSuccess("Page supprimée", "La page a été supprimée avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      showError("Erreur de suppression", "Impossible de supprimer la page");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+    }
+  }, [itemToDelete, axios, refetch, showSuccess, showError]);
 
   // Création directe d'une page racine
   const handleCreateRootPage = useCallback(async () => {
@@ -114,18 +128,29 @@ export default function Pages() {
         name: "Nouvelle page",
       });
       await refetch();
+      showSuccess("Page créée", "Une nouvelle page a été créée avec succès");
     } catch (error) {
       console.error("Erreur lors de l'ajout de la page:", error);
+      showError("Erreur de création", "Impossible de créer la page");
     }
-  }, [createPage, refetch]);
+  }, [createPage, refetch, showSuccess, showError]);
 
   // Fonction pour publier toutes les pages (et enfants) via la nouvelle route backend
   const handlePublishPages = async () => {
-    if (!treeData || treeData.length === 0) return;
-    await Promise.all(
-      treeData.map((page) => axios.put(`/api/pages/${page.pageId}/publish`)),
-    );
-    await refetch();
+    try {
+      if (!treeData || treeData.length === 0) return;
+      await Promise.all(
+        treeData.map((page) => axios.put(`/api/pages/${page.pageId}/publish`)),
+      );
+      await refetch();
+      showSuccess(
+        "Publication terminée",
+        "Toutes les pages ont été publiées avec succès",
+      );
+    } catch (error) {
+      console.error("Erreur lors de la publication:", error);
+      showError("Erreur de publication", "Impossible de publier les pages");
+    }
   };
 
   if (loading) return <p>Chargement…</p>;
@@ -156,6 +181,26 @@ export default function Pages() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         canHaveChildren={() => true}
+      />
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+      />
+
+      <DeleteModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Supprimer la page"
+        message="Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible."
+        isDeleting={isDeleting}
       />
     </motion.div>
   );

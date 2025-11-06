@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Card from "@/components/Card";
+import Card from "@/components/ui/Card";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 
 export default function ContactCard({ contact, onClick }) {

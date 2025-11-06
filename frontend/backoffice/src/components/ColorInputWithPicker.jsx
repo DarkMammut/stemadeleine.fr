@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ColorPicker from "./ColorPicker";
+import ColorPicker from "@/components/ColorPicker";
 import Button from "@/components/ui/Button";
 
 export default function ColorInputWithPicker({
@@ -37,47 +37,54 @@ export default function ColorInputWithPicker({
   const isModified = color !== savedColor;
 
   return (
-    <div className="flex flex-col gap-1 w-full">
-      {label && <label className="font-medium mb-1">{label}</label>}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-10">
-          <ColorPicker
-            value={color}
-            onChange={handleChange}
-            displayHex={false}
-          />
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => handleChange(e.target.value)}
-            pattern="#?[0-9A-Fa-f]{6}"
-            maxLength={7}
-            className="border rounded px-2 py-1 font-mono w-28 transition-colors"
-            disabled={disabled}
-          />
-        </div>
-
-        {isModified && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleSave}
-              disabled={disabled}
-            >
-              {saveButtonLabel}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleCancel}
-              disabled={disabled}
-            >
-              {cancelButtonLabel}
-            </Button>
+    <>
+      <div className="px-4 py-6 sm:p-8">
+        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8">
+          <div className="col-span-full">
+            {label && (
+              <label className="block text-sm/6 font-medium text-gray-900 mb-2">
+                {label}
+              </label>
+            )}
+            <div className="flex items-center gap-4">
+              <ColorPicker
+                value={color}
+                onChange={handleChange}
+                displayHex={false}
+              />
+              <input
+                type="text"
+                value={color}
+                onChange={(e) => handleChange(e.target.value)}
+                pattern="#?[0-9A-Fa-f]{6}"
+                maxLength={7}
+                disabled={disabled}
+                className="block w-32 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 font-mono disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
+      {isModified && (
+        <div className="flex items-center justify-end gap-x-6 border-t border-gray-900/10 px-4 py-4 sm:px-8">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCancel}
+            disabled={disabled}
+          >
+            {cancelButtonLabel}
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            disabled={disabled}
+          >
+            {saveButtonLabel}
+          </Button>
+        </div>
+      )}
+    </>
   );
 }

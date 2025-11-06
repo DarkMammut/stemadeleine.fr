@@ -3,12 +3,19 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  FunnelIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import { useUserOperations } from "@/hooks/useUserOperations";
-import ListUsers from "@/components/ListUsers";
+import CardList from "@/components/CardList";
+import UserCard from "@/components/UserCard";
 import { useAxiosClient } from "@/utils/axiosClient";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Users() {
   const router = useRouter();
@@ -16,8 +23,10 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [showAdherentsOnly, setShowAdherentsOnly] = useState(false);
 
-  const { getAllUsers, createUser, deleteUser } = useUserOperations();
+  const { getAllUsers, createUser } = useUserOperations();
   const axios = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadUsers();
@@ -30,7 +39,10 @@ export default function Users() {
       setUsers(data);
     } catch (error) {
       console.error("Error loading users:", error);
-      alert("Erreur lors du chargement des utilisateurs");
+      showError(
+        "Erreur de chargement",
+        "Impossible de charger les utilisateurs",
+      );
     } finally {
       setLoading(false);
     }
@@ -48,36 +60,30 @@ export default function Users() {
         birthDate: null,
       });
       await loadUsers();
-      console.log("User created successfully");
+      showSuccess(
+        "Utilisateur créé",
+        "Un nouvel utilisateur a été créé avec succès",
+      );
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Erreur lors de la création de l'utilisateur");
+      showError("Erreur de création", "Impossible de créer l'utilisateur");
     }
-  };
-
-  const handleDeleteUser = async (user) => {
-    try {
-      await deleteUser(user.id);
-      await loadUsers();
-      console.log("User deleted successfully");
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("Erreur lors de la suppression de l'utilisateur");
-    }
-  };
-
-  const handleEditUser = (user) => {
-    router.push(`/users/${user.id}`);
   };
 
   const handleImportHelloAsso = async () => {
     try {
       await axios.post("/api/users/import");
       await loadUsers();
-      alert("Import HelloAsso terminé avec succès.");
+      showSuccess(
+        "Import HelloAsso terminé",
+        "Les données ont été importées avec succès",
+      );
     } catch (error) {
       console.error("Erreur lors de l'import HelloAsso:", error);
-      alert("Erreur lors de l'import HelloAsso");
+      showError(
+        "Erreur d'import",
+        "Impossible d'importer les données HelloAsso",
+      );
     }
   };
 
@@ -85,8 +91,8 @@ export default function Users() {
     setShowAdherentsOnly((prev) => !prev);
   };
 
-  const handleUserClick = (userId) => {
-    router.push(`/users/${userId}`);
+  const handleUserClick = (user) => {
+    router.push(`/users/${user.id}`);
   };
 
   if (loading) {
@@ -102,6 +108,7 @@ export default function Users() {
       className="w-full max-w-4xl mx-auto space-y-6"
     >
       <Title label="Utilisateurs" />
+
       <Utilities
         actions={[
           {
@@ -113,19 +120,34 @@ export default function Users() {
             icon: ArrowPathIcon,
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
+            variant: "refresh",
           },
           {
-            icon: null,
+            icon: FunnelIcon,
             label: showAdherentsOnly ? "Afficher tous" : "Afficher adhérents",
             callback: handleToggleAdherents,
+            variant: "filter",
           },
         ]}
       />
 
-      <ListUsers
-        users={users}
-        onUserClick={handleUserClick}
-        showAdherentFlag={showAdherentsOnly}
+      <CardList emptyMessage="Aucun utilisateur trouvé.">
+        {users.map((user) => (
+          <UserCard
+            key={user.id}
+            user={user}
+            onClick={() => handleUserClick(user)}
+            showAdherentFlag={showAdherentsOnly}
+          />
+        ))}
+      </CardList>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
       />
     </motion.div>
   );

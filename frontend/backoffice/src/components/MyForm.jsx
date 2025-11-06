@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Button from "@/components/ui/Button";
 import CurrencyInput from "@/components/CurrencyInput";
+import Button from "@/components/ui/Button";
 
 export default function MyForm({
   fields,
@@ -16,12 +16,6 @@ export default function MyForm({
   // Initialisation du state à partir de initialValues uniquement au montage
   const [formValues, setFormValues] = useState(() => ({ ...initialValues }));
   const [errors, setErrors] = useState({});
-
-  const hasChanges = () => {
-    return Object.keys(formValues).some(
-      (key) => formValues[key] !== initialValues[key],
-    );
-  };
 
   const isValid = () => {
     return fields.every((field) => {
@@ -67,118 +61,154 @@ export default function MyForm({
   };
 
   return (
-    <div className="bg-surface border border-border rounded-lg p-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {fields.map((field) => (
-          <div key={field.name} className="flex flex-col">
-            {field.type === "checkbox" ? (
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name={field.name}
-                  checked={formValues[field.name] || false}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-primary bg-surface border-border rounded focus:ring-primary"
-                />
-                <span className="font-medium text-text">{field.label}</span>
-              </label>
-            ) : field.name === "amount" ? (
-              <>
-                {field.label && (
-                  <label className="mb-2 font-medium text-text">
-                    {field.label}
-                  </label>
-                )}
-                <CurrencyInput
-                  value={formValues.amount}
-                  onChange={(val) => {
-                    const updatedValues = { ...formValues, amount: val };
-                    setFormValues(updatedValues);
-                    if (onChangeExternal) {
-                      onChangeExternal("amount", val, updatedValues);
-                    }
-                  }}
-                  currency={field.currency || "EUR"}
-                />
-                {errors.amount && (
-                  <span className="text-danger text-xs mt-1">
-                    {errors.amount}
-                  </span>
-                )}
-              </>
-            ) : (
-              <>
-                {field.label && (
-                  <label className="mb-2 font-medium text-text">
-                    {field.label}
-                  </label>
-                )}
-                {field.type === "textarea" ? (
-                  <textarea
-                    name={field.name}
-                    value={formValues[field.name] || ""}
-                    onChange={handleChange}
-                    placeholder={field.placeholder || ""}
-                    className={`bg-surface border border-border text-text rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary resize-vertical min-h-[100px] ${
-                      errors[field.name] ? "border-danger" : ""
-                    }`}
-                  />
-                ) : field.type === "select" ? (
-                  <select
-                    name={field.name}
-                    value={formValues[field.name] || ""}
-                    onChange={handleChange}
-                    className={`bg-surface border border-border text-text rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer ${
-                      errors[field.name] ? "border-danger" : ""
-                    }`}
-                  >
-                    <option value="">
-                      {field.placeholder || "Sélectionnez une option..."}
-                    </option>
-                    {field.options?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : field.type === "readonly" ? (
-                  <input
-                    type="text"
-                    name={field.name}
-                    value={formValues[field.name] || ""}
-                    disabled
-                    className="bg-surface/50 border border-border text-text-muted rounded-lg p-3 cursor-not-allowed"
-                  />
-                ) : (
-                  <input
-                    type={field.type || "text"}
-                    name={field.name}
-                    value={formValues[field.name] || ""}
-                    onChange={handleChange}
-                    placeholder={field.placeholder || ""}
-                    className={`bg-surface border border-border text-text rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary ${
-                      errors[field.name] ? "border-danger" : ""
-                    }`}
-                  />
-                )}
-              </>
-            )}
-            {errors[field.name] && (
-              <span className="text-danger text-sm mt-2 flex items-center gap-1">
-                <span>⚠️</span>
-                {errors[field.name]}
-              </span>
-            )}
-          </div>
-        ))}
-        <div className="flex gap-4 mt-6">
+    <form
+      className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl"
+      onSubmit={handleSubmit}
+    >
+      <div className="px-4 py-6 sm:p-8">
+        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          {fields.map((field) => (
+            <div
+              key={field.name}
+              className={`${field.type === "textarea" || field.fullWidth ? "col-span-full" : "sm:col-span-3"}`}
+            >
+              {field.type === "checkbox" ? (
+                <div className="flex gap-3">
+                  <div className="flex h-6 shrink-0 items-center">
+                    <input
+                      type="checkbox"
+                      name={field.name}
+                      id={field.name}
+                      checked={formValues[field.name] || false}
+                      onChange={handleChange}
+                      className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
+                    />
+                  </div>
+                  <div className="text-sm/6">
+                    <label
+                      htmlFor={field.name}
+                      className="font-medium text-gray-900"
+                    >
+                      {field.label}
+                    </label>
+                  </div>
+                </div>
+              ) : field.name === "amount" ? (
+                <>
+                  {field.label && (
+                    <label
+                      htmlFor={field.name}
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {field.label}
+                    </label>
+                  )}
+                  <div className="mt-2">
+                    <CurrencyInput
+                      value={formValues.amount}
+                      onChange={(val) => {
+                        const updatedValues = { ...formValues, amount: val };
+                        setFormValues(updatedValues);
+                        if (onChangeExternal) {
+                          onChangeExternal("amount", val, updatedValues);
+                        }
+                      }}
+                      currency={field.currency || "EUR"}
+                    />
+                  </div>
+                  {errors.amount && (
+                    <p className="mt-2 text-sm text-red-600">{errors.amount}</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  {field.label && (
+                    <label
+                      htmlFor={field.name}
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {field.label}
+                      {field.required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </label>
+                  )}
+                  <div className="mt-2">
+                    {field.type === "textarea" ? (
+                      <textarea
+                        id={field.name}
+                        name={field.name}
+                        rows={3}
+                        value={formValues[field.name] || ""}
+                        onChange={handleChange}
+                        placeholder={field.placeholder || ""}
+                        className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                          errors[field.name] ? "outline-red-500" : ""
+                        }`}
+                      />
+                    ) : field.type === "select" ? (
+                      <select
+                        id={field.name}
+                        name={field.name}
+                        value={formValues[field.name] || ""}
+                        onChange={handleChange}
+                        className={`block w-full rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-pointer ${
+                          errors[field.name] ? "outline-red-500" : ""
+                        }`}
+                      >
+                        <option value="">
+                          {field.placeholder || "Sélectionnez une option..."}
+                        </option>
+                        {field.options?.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : field.type === "readonly" ? (
+                      <input
+                        type="text"
+                        id={field.name}
+                        name={field.name}
+                        value={formValues[field.name] || ""}
+                        disabled
+                        className="block w-full rounded-md bg-gray-50 px-3 py-1.5 text-base text-gray-500 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6"
+                      />
+                    ) : (
+                      <input
+                        type={field.type || "text"}
+                        id={field.name}
+                        name={field.name}
+                        value={formValues[field.name] || ""}
+                        onChange={handleChange}
+                        placeholder={field.placeholder || ""}
+                        className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                          errors[field.name] ? "outline-red-500" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
+                  {errors[field.name] && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {(showSubmitButton || onCancel) && (
+        <div className="flex items-center justify-end gap-x-3 border-t border-gray-900/10 px-4 py-4 sm:px-8">
           {onCancel && (
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
+              size="md"
               onClick={onCancel}
-              loading={loading}
-              className=""
+              disabled={loading}
             >
               {cancelButtonLabel}
             </Button>
@@ -187,14 +217,15 @@ export default function MyForm({
             <Button
               type="submit"
               variant="primary"
+              size="md"
+              disabled={loading || !isValid()}
               loading={loading}
-              className=""
             >
               {submitButtonLabel}
             </Button>
           )}
         </div>
-      </form>
-    </div>
+      )}
+    </form>
   );
 }

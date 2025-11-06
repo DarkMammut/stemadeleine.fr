@@ -11,7 +11,7 @@ import {
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
 import RichTextEditor from "@/components/RichTextEditor";
-import ContentMediaManager from "@/components/ContentMediaManager";
+import MediaManager from "@/components/MediaManager";
 import { useContentOperations } from "@/hooks/useContentOperations";
 
 const NewsletterContentManager = ({ newsletterId, onContentsChange }) => {
@@ -507,7 +507,7 @@ const NewsletterContentManager = ({ newsletterId, onContentsChange }) => {
                       </div>
 
                       {/* Content Media Manager */}
-                      <ContentMediaManager
+                      <MediaManager
                         content={content}
                         onMediaAdd={handleAddMediaToContent}
                         onMediaRemove={handleRemoveMediaFromContent}

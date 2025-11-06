@@ -8,7 +8,10 @@ import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
-import ListPayments from "@/components/ListPayments";
+import CardList from "@/components/CardList";
+import PaymentCard from "@/components/PaymentCard";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Payments() {
   const router = useRouter();
@@ -16,8 +19,9 @@ export default function Payments() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { getAllPayments, createPayment, deletePayment } =
-    usePaymentOperations();
+  const { getAllPayments, createPayment } = usePaymentOperations();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadPayments();
@@ -30,7 +34,7 @@ export default function Payments() {
       setPayments(data);
     } catch (error) {
       console.error("Erreur lors du chargement des paiements:", error);
-      alert("Erreur lors du chargement des paiements");
+      showError("Erreur de chargement", "Impossible de charger les paiements");
     } finally {
       setLoading(false);
     }
@@ -46,41 +50,35 @@ export default function Payments() {
         type: "",
       });
       await loadPayments();
-      console.log("Paiement créé avec succès");
+      showSuccess(
+        "Paiement créé",
+        "Un nouveau paiement a été créé avec succès",
+      );
     } catch (error) {
       console.error("Erreur lors de la création du paiement:", error);
-      alert("Erreur lors de la création du paiement");
+      showError("Erreur de création", "Impossible de créer le paiement");
     }
-  };
-
-  const handleDeletePayment = async (payment) => {
-    try {
-      await deletePayment(payment.id);
-      await loadPayments();
-      console.log("Paiement supprimé avec succès");
-    } catch (error) {
-      console.error("Erreur lors de la suppression du paiement:", error);
-      alert("Erreur lors de la suppression du paiement");
-    }
-  };
-
-  const handleEditPayment = (payment) => {
-    router.push(`/payments/${payment.id}`);
   };
 
   const handleImportHelloAsso = async () => {
     try {
       await axios.post("/api/payments/import");
       await loadPayments();
-      alert("Import HelloAsso terminé avec succès.");
+      showSuccess(
+        "Import HelloAsso terminé",
+        "Les paiements ont été importés avec succès",
+      );
     } catch (error) {
       console.error("Erreur lors de l'import HelloAsso:", error);
-      alert("Erreur lors de l'import HelloAsso");
+      showError(
+        "Erreur d'import",
+        "Impossible d'importer les paiements HelloAsso",
+      );
     }
   };
 
-  const handlePaymentClick = (paymentId) => {
-    router.push(`/payments/${paymentId}`);
+  const handlePaymentClick = (payment) => {
+    router.push(`/payments/${payment.id}`);
   };
 
   if (loading) {
@@ -94,6 +92,7 @@ export default function Payments() {
       className="w-full max-w-4xl mx-auto space-y-6"
     >
       <Title label="Paiements" />
+
       <Utilities
         actions={[
           {
@@ -105,11 +104,28 @@ export default function Payments() {
             icon: ArrowPathIcon,
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
+            variant: "refresh",
           },
         ]}
       />
 
-      <ListPayments payments={payments} onPaymentClick={handlePaymentClick} />
+      <CardList emptyMessage="Aucun paiement trouvé.">
+        {payments.map((payment) => (
+          <PaymentCard
+            key={payment.id}
+            payment={payment}
+            onClick={() => handlePaymentClick(payment)}
+          />
+        ))}
+      </CardList>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+      />
     </motion.div>
   );
 }

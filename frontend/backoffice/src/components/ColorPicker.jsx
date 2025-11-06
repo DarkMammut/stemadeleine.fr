@@ -6,6 +6,18 @@ export default function ColorPicker({
   label,
   displayHex = true,
 }) {
+  // Si pas de label et pas d'affichage hex, retourner juste l'input
+  if (!label && !displayHex) {
+    return (
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange && onChange(e.target.value)}
+        className="w-8 h-8 border rounded cursor-pointer"
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && <label className="font-medium mb-1">{label}</label>}

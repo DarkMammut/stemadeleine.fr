@@ -7,6 +7,7 @@ import UserDetails from "@/components/UserDetails";
 import UserForm from "@/components/UserForm";
 import AddressManager from "@/components/AddressManager";
 import MembershipManager from "@/components/MembershipManager";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function EditUser() {
   const { id } = useParams();
@@ -16,6 +17,8 @@ export default function EditUser() {
   const [editMode, setEditMode] = useState(false);
   const [userForm, setUserForm] = useState({});
   const [savingUser, setSavingUser] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchUser();
@@ -60,10 +63,16 @@ export default function EditUser() {
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Supprimer cet utilisateur ?")) {
+    setIsDeleting(true);
+    try {
       await axios.delete(`/api/users/${id}`);
       alert("Utilisateur supprimé");
       // Redirection ou autre logique ici
+    } catch (error) {
+      alert("Erreur lors de la suppression");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -77,7 +86,11 @@ export default function EditUser() {
     >
       <Title label="Modifier l'utilisateur" />
       {!editMode ? (
-        <UserDetails user={user} onEdit={handleEdit} onDelete={handleDelete} />
+        <UserDetails
+          user={user}
+          onEdit={handleEdit}
+          onDelete={() => setShowDeleteModal(true)}
+        />
       ) : (
         <>
           <div className="bg-surface border border-border rounded-lg p-6">
@@ -109,6 +122,15 @@ export default function EditUser() {
           </div>
         </>
       )}
+
+      <DeleteModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Supprimer l'utilisateur"
+        message="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
+        isDeleting={isDeleting}
+      />
     </motion.div>
   );
 }

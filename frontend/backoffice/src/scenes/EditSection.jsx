@@ -8,15 +8,15 @@ import useGetSection from "@/hooks/useGetSection";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
-import Switch from "@/components/ui/Switch";
+import MediaManager from "@/components/MediaManager";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function EditSection({ sectionId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
   const { updateSection } = useAddSection();
-  const { updateSectionVisibility, setSectionMedia } = useSectionOperations();
+  const { updateSectionVisibility } = useSectionOperations();
   const [sectionData, setSectionData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
@@ -45,13 +45,32 @@ export default function EditSection({ sectionId }) {
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
+  const handleAddMedia = async (sectionId, mediaId) => {
     try {
-      await setSectionMedia(sectionId, mediaId);
-      refetch();
+      await axios.put(`/api/sections/${sectionId}/media`, {
+        mediaId: mediaId,
+      });
+      await refetch();
+
+      // Construire l'objet content avec le média ajouté
+      return {
+        ...sectionData,
+        medias: [{ id: mediaId }],
+      };
     } catch (error) {
-      console.error("Error setting section media:", error);
-      alert("Erreur lors de l'ajout du média");
+      console.error("Erreur lors de l'ajout du média:", error);
+      throw error;
+    }
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const handleRemoveMedia = async (sectionId, mediaId) => {
+    try {
+      await axios.delete(`/api/sections/${sectionId}/media`);
+      await refetch();
+    } catch (error) {
+      console.error("Erreur lors de la suppression du média:", error);
+      throw error;
     }
   };
 
@@ -129,27 +148,13 @@ export default function EditSection({ sectionId }) {
       ) : (
         <div className="space-y-6">
           {/* Section Visibilité séparée */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Visibilité de la section
-            </h3>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <Switch
-                checked={sectionData?.isVisible || false}
-                onChange={handleVisibilityChange}
-                disabled={savingVisibility}
-              />
-              <span className="font-medium text-text">
-                Section visible sur le site
-                {savingVisibility && (
-                  <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-                )}
-              </span>
-            </label>
-            <p className="text-sm text-text-muted mt-2">
-              Cette option se sauvegarde automatiquement
-            </p>
-          </div>
+          <VisibilitySwitch
+            title="Visibilité de la section"
+            label="Section visible sur le site"
+            isVisible={sectionData?.isVisible || false}
+            onChange={handleVisibilityChange}
+            savingVisibility={savingVisibility}
+          />
 
           {/* Formulaire principal - Ne s'affiche que quand sectionData est complètement chargé */}
           {sectionData && Object.keys(sectionData).length > 0 && (
@@ -167,29 +172,39 @@ export default function EditSection({ sectionId }) {
           )}
 
           {/* Rich Text Content Editor */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <ContentManager
-              parentId={section?.sectionId}
-              parentType="section"
-              customLabels={{
-                header: "Contenus de la section",
-                addButton: "Ajouter un contenu",
-                empty: "Aucun contenu pour cette section.",
-                loading: "Chargement des contenus...",
-                saveContent: "Enregistrer le contenu",
-                bodyLabel: "Contenu de la section",
-              }}
-            />
-          </div>
+          <ContentManager
+            parentId={section?.sectionId}
+            parentType="section"
+            customLabels={{
+              header: "Contenus de la section",
+              addButton: "Ajouter un contenu",
+              empty: "Aucun contenu pour cette section.",
+              loading: "Chargement des contenus...",
+              saveContent: "Enregistrer le contenu",
+              bodyLabel: "Contenu de la section",
+            }}
+          />
         </div>
       )}
 
-      <MediaPicker
-        mediaId={section?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="sections"
-        entityId={sectionId}
-      />
+      {/* Gestion de l'image de la section (Section Media) */}
+      {sectionData && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Image de la section
+          </h3>
+          <MediaManager
+            content={{
+              id: sectionId,
+              medias: section?.media ? [section.media] : [],
+            }}
+            onMediaAdd={handleAddMedia}
+            onMediaRemove={handleRemoveMedia}
+            onMediaChanged={refetch}
+            maxMedias={1}
+          />
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -10,6 +10,8 @@ import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
 import CardList from "@/components/CardList";
 import ContactCard from "@/components/ContactCard";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Contacts() {
   const router = useRouter();
@@ -19,6 +21,8 @@ export default function Contacts() {
 
   const { getAllContacts, markContactAsRead } = useContactOperations();
   const { refreshUnreadCount } = useContactsContext();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadContacts();
@@ -32,7 +36,7 @@ export default function Contacts() {
       await refreshUnreadCount();
     } catch (error) {
       console.error("Error loading contacts:", error);
-      alert("Erreur lors du chargement des contacts");
+      showError("Erreur de chargement", "Impossible de charger les contacts");
     } finally {
       setLoading(false);
     }
@@ -51,6 +55,7 @@ export default function Contacts() {
         await refreshUnreadCount();
       } catch (error) {
         console.error("Error marking contact as read:", error);
+        showError("Erreur", "Impossible de marquer le contact comme lu");
       }
     }
     // Navigate to contact detail page
@@ -58,7 +63,15 @@ export default function Contacts() {
   };
 
   const handleRefresh = async () => {
-    await loadContacts();
+    try {
+      await loadContacts();
+      showSuccess(
+        "Actualisation réussie",
+        "La liste des contacts a été mise à jour",
+      );
+    } catch (error) {
+      // Error already handled in loadContacts
+    }
   };
 
   const toggleFilter = () => {
@@ -97,11 +110,13 @@ export default function Contacts() {
             icon: ArrowPathIcon,
             label: "Actualiser",
             callback: handleRefresh,
+            variant: "refresh",
           },
           {
             icon: FunnelIcon,
             label: `Filtre: ${getFilterLabel()}`,
             callback: toggleFilter,
+            variant: "filter",
           },
         ]}
       />
@@ -115,6 +130,14 @@ export default function Contacts() {
           />
         ))}
       </CardList>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+      />
     </motion.div>
   );
 }

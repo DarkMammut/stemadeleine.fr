@@ -2,14 +2,15 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import IconButton from "@/components/ui/IconButton";
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
+import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 
 export default function SortableItem({
   item,
   depth = 0,
-  childCount = 0,
   onToggle,
   onEdit,
   onDelete,
@@ -50,39 +51,52 @@ export default function SortableItem({
       style={style}
       className={`mb-2 relative ${depth > 0 ? "child-line" : ""}`}
     >
-      <div className="flex items-center justify-between rounded-xl px-3 py-2 border border-border shadow bg-surface text-text">
-        {/* Draggable */}
-        <div
-          className="flex items-center gap-2 flex-1 cursor-move text-text"
-          {...attributes}
-          {...listeners}
-        >
-          <span className="text-text-muted">⋮⋮</span>
-          <span className="font-medium text-text">{item.name}</span>
+      <div className="flex items-center justify-between rounded-xl px-3 py-2 border border-gray-200 shadow bg-white text-gray-900">
+        {/* Draggable avec Switch */}
+        <div className="flex items-center gap-3 flex-1">
+          <div
+            className="flex items-center gap-2 cursor-move text-gray-900"
+            {...attributes}
+            {...listeners}
+          >
+            <span className="text-gray-500">⋮⋮</span>
+          </div>
+          <Switch checked={visible} onChange={handleSwitch} />
+          <span className="font-medium text-gray-900">{item.name}</span>
         </div>
+
         {/* Bouton Ajouter un enfant si la prop existe ET si c'est une section */}
         {onAddChild && item.type === "section" && (
-          <button
-            className="ml-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors cursor-pointer"
+          <Button
+            variant="link"
+            size="sm"
             onClick={() => {
               console.log("🟢 Add module button clicked for section:", item);
               onAddChild(item);
             }}
-            type="button"
+            className="ml-2"
           >
-            + Ajouter un module
-          </button>
+            <PlusIcon className="w-4 h-4 mr-1" />
+            Ajouter un module
+          </Button>
         )}
 
-        {/* Non draggable (buttons & switch) */}
+        {/* Non draggable (buttons) */}
         <div className="flex items-center gap-2">
-          <Switch checked={visible} onChange={handleSwitch} />
-          <Button variant="secondary" size="sm" onClick={() => onEdit?.(item)}>
-            Edit
-          </Button>
-          <Button variant="danger" size="sm" onClick={() => onDelete?.(item)}>
-            Suppr
-          </Button>
+          <IconButton
+            icon={PencilIcon}
+            label="Modifier"
+            variant="secondary"
+            size="sm"
+            onClick={() => onEdit?.(item)}
+          />
+          <IconButton
+            icon={TrashIcon}
+            label="Supprimer"
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete?.(item)}
+          />
         </div>
       </div>
     </div>

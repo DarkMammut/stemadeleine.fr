@@ -29,7 +29,7 @@ export default function NavigationStepper() {
   const buildBreadcrumbs = () => {
     const breadcrumbs = [
       {
-        name: "Accueil",
+        name: "Website",
         href: "/pages",
         icon: HomeIcon,
         current: false,
@@ -110,10 +110,10 @@ export default function NavigationStepper() {
             className="flex items-center"
           >
             {index > 0 && (
-              <ChevronRightIcon className="h-4 w-4 text-text-muted mx-2" />
+              <ChevronRightIcon className="h-4 w-4 text-gray-400 mx-2" />
             )}
             {breadcrumb.current ? (
-              <span className="flex items-center text-sm font-medium text-text">
+              <span className="flex items-center text-sm font-medium text-gray-900">
                 {breadcrumb.icon && (
                   <breadcrumb.icon className="h-4 w-4 mr-1" />
                 )}
@@ -122,7 +122,7 @@ export default function NavigationStepper() {
             ) : (
               <Link
                 href={breadcrumb.href}
-                className="flex items-center text-sm font-medium text-text-muted hover:text-text transition-colors"
+                className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
               >
                 {breadcrumb.icon && (
                   <breadcrumb.icon className="h-4 w-4 mr-1" />

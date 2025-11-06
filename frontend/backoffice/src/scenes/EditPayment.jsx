@@ -6,6 +6,7 @@ import Title from "@/components/Title";
 import MyForm from "@/components/MyForm";
 import DetailsPayment from "@/components/DetailsPayment";
 import LinkUser from "@/components/LinkUser";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -16,6 +17,8 @@ export default function EditPayment() {
   const [saving, setSaving] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [paymentEnums, setPaymentEnums] = useState({ status: [], type: [] });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadPayment();
@@ -83,10 +86,16 @@ export default function EditPayment() {
 
   const handleEdit = () => setShowEditForm(true);
   const handleDelete = async () => {
-    if (window.confirm("Supprimer ce paiement ?")) {
+    setIsDeleting(true);
+    try {
       await axios.delete(`/api/payments/${id}`);
       alert("Paiement supprimé");
       // Redirection ou autre logique ici
+    } catch (error) {
+      alert("Erreur lors de la suppression");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
   const handleUserNavigate = () => {
@@ -164,12 +173,22 @@ export default function EditPayment() {
 
   if (!showEditForm) {
     return (
-      <DetailsPayment
-        payment={payment}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onUserNavigate={handleUserNavigate}
-      />
+      <>
+        <DetailsPayment
+          payment={payment}
+          onEdit={handleEdit}
+          onDelete={() => setShowDeleteModal(true)}
+          onUserNavigate={handleUserNavigate}
+        />
+        <DeleteModal
+          open={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          title="Supprimer le paiement"
+          message="Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible."
+          isDeleting={isDeleting}
+        />
+      </>
     );
   }
 

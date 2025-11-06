@@ -1,7 +1,8 @@
 import React from "react";
 import UserLink from "@/components/UserLink";
 import Currency from "@/components/Currency";
-import Button from "@/components/ui/Button";
+import IconButton from "@/components/ui/IconButton";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function DetailsPayment({
   payment,
@@ -12,33 +13,83 @@ export default function DetailsPayment({
   if (!payment) return null;
 
   return (
-    <div className="details-payment p-4 border rounded">
-      <h2 className="text-xl font-bold mb-2">Paiement #{payment.id}</h2>
+    <div className="details-payment space-y-6">
       <div>
-        Montant :{" "}
-        <Currency value={payment.amount} currency={payment.currency} />
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Paiement #{payment.id}
+        </h2>
+        <div className="border-t border-gray-200 pt-6 space-y-4">
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Montant</span>
+            <span className="text-sm text-gray-900">
+              <Currency value={payment.amount} currency={payment.currency} />
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Type</span>
+            <span className="text-sm text-gray-900">{payment.type}</span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Statut</span>
+            <span className="text-sm text-gray-900">{payment.status}</span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Date</span>
+            <span className="text-sm text-gray-900">{payment.paymentDate}</span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">
+              Formulaire
+            </span>
+            <span className="text-sm text-gray-900">{payment.formSlug}</span>
+          </div>
+
+          <div className="grid grid-cols-[140px_1fr] gap-4">
+            <span className="text-sm font-semibold text-gray-500">Reçu</span>
+            <span className="text-sm text-gray-900">
+              {payment.receiptUrl ? (
+                <a
+                  href={payment.receiptUrl}
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  Voir le reçu
+                </a>
+              ) : (
+                "-"
+              )}
+            </span>
+          </div>
+        </div>
       </div>
-      <div>Type : {payment.type}</div>
-      <div>Statut : {payment.status}</div>
-      <div>Date : {payment.paymentDate}</div>
-      <div>Formulaire : {payment.formSlug}</div>
-      <div>
-        Reçu :{" "}
-        {payment.receiptUrl ? <a href={payment.receiptUrl}>Voir</a> : "-"}
-      </div>
+
       {payment.user && (
-        <div className="mt-2">
-          <h3 className="font-semibold">Utilisateur associé :</h3>
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Utilisateur associé
+          </h3>
           <UserLink user={payment.user} onClick={onUserNavigate} />
         </div>
       )}
-      <div className="flex gap-2 mt-4">
-        <Button variant="primary" onClick={onEdit}>
-          Modifier
-        </Button>
-        <Button variant="danger" onClick={onDelete}>
-          Supprimer
-        </Button>
+
+      <div className="border-t border-gray-200 pt-6 flex gap-2">
+        <IconButton
+          icon={PencilIcon}
+          label="Modifier"
+          variant="secondary"
+          size="md"
+          onClick={onEdit}
+        />
+        <IconButton
+          icon={TrashIcon}
+          label="Supprimer"
+          variant="danger"
+          size="md"
+          onClick={onDelete}
+        />
       </div>
     </div>
   );

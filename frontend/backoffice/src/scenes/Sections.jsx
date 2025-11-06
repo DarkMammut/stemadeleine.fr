@@ -17,6 +17,7 @@ import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
 import Button from "@/components/ui/Button";
 import { useAxiosClient } from "@/utils/axiosClient";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
@@ -34,6 +35,9 @@ export default function Sections({ pageId }) {
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [targetSection, setTargetSection] = useState(null);
   const [selectedModuleType, setSelectedModuleType] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     if (page?.sections) {
@@ -132,28 +136,32 @@ export default function Sections({ pageId }) {
     [router, pageId],
   );
 
-  const handleDelete = useCallback(
-    async (item) => {
-      const itemType = item.type === "section" ? "section" : "module";
-      const confirmDelete = window.confirm(
-        `Are you sure you want to delete this ${itemType}?`,
-      );
-      if (!confirmDelete) return;
-      try {
-        if (item.type === "section") {
-          await deleteSection(item.sectionId);
-        } else if (item.type === "module") {
-          await deleteModule(item.moduleId);
-        }
-        await refetch();
-        setTreeData((prev) => removeItem(prev, item.id));
-      } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
-        alert("Erreur lors de la suppression.");
+  const handleDelete = useCallback(async (item) => {
+    setItemToDelete(item);
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      if (itemToDelete.type === "section") {
+        await deleteSection(itemToDelete.sectionId);
+      } else if (itemToDelete.type === "module") {
+        await deleteModule(itemToDelete.moduleId);
       }
-    },
-    [deleteSection, deleteModule, refetch],
-  );
+      await refetch();
+      setTreeData((prev) => removeItem(prev, itemToDelete.id));
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Erreur lors de la suppression.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+    }
+  }, [itemToDelete, deleteSection, deleteModule, refetch]);
 
   const handleAddModule = useCallback((section) => {
     setTargetSection(section);
@@ -323,6 +331,18 @@ export default function Sections({ pageId }) {
           </div>
         </div>
       )}
+
+      <DeleteModal
+        open={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title={`Supprimer ${itemToDelete?.type === "section" ? "la section" : "le module"}`}
+        message={`Êtes-vous sûr de vouloir supprimer ${itemToDelete?.type === "section" ? "cette section" : "ce module"} ? Cette action est irréversible.`}
+        isDeleting={isDeleting}
+      />
     </motion.div>
   );
 }

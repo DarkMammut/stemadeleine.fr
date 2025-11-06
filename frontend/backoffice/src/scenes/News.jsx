@@ -1,19 +1,25 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import { useNewsOperations } from "@/hooks/useNewsOperations";
-import ListContent from "@/components/ListContent";
+import CardList from "@/components/CardList";
+import NewsCard from "@/components/NewsCard";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function News() {
+  const router = useRouter();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { getAllNews, createNews, updateNewsVisibility, deleteNews } =
-    useNewsOperations();
+  const { getAllNews, createNews } = useNewsOperations();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadNews();
@@ -26,7 +32,7 @@ export default function News() {
       setNews(data);
     } catch (error) {
       console.error("Error loading news:", error);
-      alert("Erreur lors du chargement des news");
+      showError("Erreur de chargement", "Impossible de charger les actualités");
     } finally {
       setLoading(false);
     }
@@ -40,14 +46,19 @@ export default function News() {
         description: "Description de la news",
         isVisible: false,
       });
-
-      // Reload newsletters list
       await loadNews();
-      console.log("News created successfully");
+      showSuccess(
+        "Actualité créée",
+        "Une nouvelle actualité a été créée avec succès",
+      );
     } catch (error) {
       console.error("Error creating news:", error);
-      alert("Erreur lors de la création de la news");
+      showError("Erreur de création", "Impossible de créer l'actualité");
     }
+  };
+
+  const handleNewsClick = (newsItem) => {
+    router.push(`/news/${newsItem.id}`);
   };
 
   if (loading) {
@@ -58,13 +69,9 @@ export default function News() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-6"
     >
-      <Title
-        label="Gestion des News"
-        apiUrl="/api/news-publications"
-        data={news}
-      />
+      <Title label="Gestion des News" />
 
       <Utilities
         actions={[
@@ -76,12 +83,22 @@ export default function News() {
         ]}
       />
 
-      <ListContent
-        label="News"
-        getAll={getAllNews}
-        updateVisibility={updateNewsVisibility}
-        remove={deleteNews}
-        routePrefix="news"
+      <CardList emptyMessage="Aucune news trouvée.">
+        {news.map((newsItem) => (
+          <NewsCard
+            key={newsItem.id}
+            news={newsItem}
+            onClick={() => handleNewsClick(newsItem)}
+          />
+        ))}
+      </CardList>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
       />
     </motion.div>
   );

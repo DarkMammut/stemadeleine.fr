@@ -9,6 +9,10 @@ import Utilities from "@/components/Utilities";
 import NavigationButtons from "@/components/NavigationButtons";
 import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
+import { buildContactBreadcrumbs } from "@/utils/breadcrumbs";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function EditContact() {
   const { id } = useParams();
@@ -17,10 +21,14 @@ export default function EditContact() {
   const [loading, setLoading] = useState(true);
   const [allContacts, setAllContacts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { getAllContacts, getContactById, markContactAsRead, deleteContact } =
     useContactOperations();
   const { refreshUnreadCount } = useContactsContext();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadContactAndList();
@@ -49,23 +57,25 @@ export default function EditContact() {
       }
     } catch (error) {
       console.error("Error loading contact:", error);
-      alert("Erreur lors du chargement du contact");
+      showError("Erreur de chargement", "Impossible de charger le contact");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce contact ?")) {
-      try {
-        await deleteContact(id);
-        await refreshUnreadCount();
-        alert("Contact supprimé");
-        router.push("/contacts");
-      } catch (error) {
-        console.error("Error deleting contact:", error);
-        alert("Erreur lors de la suppression du contact");
-      }
+    setIsDeleting(true);
+    try {
+      await deleteContact(id);
+      await refreshUnreadCount();
+      showSuccess("Contact supprimé", "Le contact a été supprimé avec succès");
+      setTimeout(() => router.push("/contacts"), 1000);
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      showError("Erreur de suppression", "Impossible de supprimer le contact");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -75,9 +85,13 @@ export default function EditContact() {
       await markContactAsRead(id, newStatus);
       setContact((prev) => ({ ...prev, isRead: newStatus }));
       await refreshUnreadCount();
+      showSuccess(
+        `Contact marqué comme ${newStatus ? "lu" : "non lu"}`,
+        "Le statut a été mis à jour",
+      );
     } catch (error) {
       console.error("Error toggling read status:", error);
-      alert("Erreur lors de la modification du statut");
+      showError("Erreur", "Impossible de modifier le statut du contact");
     }
   };
 
@@ -122,6 +136,8 @@ export default function EditContact() {
     return <div className="text-center py-8">Contact non trouvé</div>;
   }
 
+  const breadcrumbs = contact ? buildContactBreadcrumbs(contact) : [];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -130,8 +146,8 @@ export default function EditContact() {
     >
       <Title
         label={`Contact: ${getFullName()}`}
-        showBackButton={true}
-        backTo="/contacts"
+        showBreadcrumbs={!!contact}
+        breadcrumbs={breadcrumbs}
       />
 
       <Utilities
@@ -144,7 +160,7 @@ export default function EditContact() {
           {
             icon: TrashIcon,
             label: "Supprimer",
-            callback: handleDelete,
+            callback: () => setShowDeleteModal(true),
             variant: "danger",
           },
         ]}
@@ -243,6 +259,23 @@ export default function EditContact() {
           hasNext={currentIndex < allContacts.length - 1}
         />
       </div>
+
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+      />
+
+      <DeleteModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Supprimer le contact"
+        message="Êtes-vous sûr de vouloir supprimer ce contact ? Cette action est irréversible."
+        isDeleting={isDeleting}
+      />
     </motion.div>
   );
 }

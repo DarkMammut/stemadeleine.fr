@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
-import Switch from "@/components/ui/Switch";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 
 export default function TimelineModuleEditor({
@@ -90,24 +90,13 @@ export default function TimelineModuleEditor({
   return (
     <div className="space-y-6">
       {/* Section Visibilité */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Visibilité du module
-        </h3>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Switch
-            checked={moduleData?.isVisible || false}
-            onChange={handleVisibilityChange}
-            disabled={savingVisibility}
-          />
-          <span className="font-medium text-text">
-            Module visible sur le site
-            {savingVisibility && (
-              <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-            )}
-          </span>
-        </label>
-      </div>
+      <VisibilitySwitch
+        title="Visibilité du module"
+        label="Module visible sur le site"
+        isVisible={moduleData?.isVisible || false}
+        onChange={handleVisibilityChange}
+        savingVisibility={savingVisibility}
+      />
 
       {/* Formulaire principal */}
       {moduleData && Object.keys(moduleData).length > 0 && (
