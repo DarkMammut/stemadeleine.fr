@@ -1,5 +1,6 @@
 import PublishButton from "@/components/ui/PublishButton";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import BackButton from "@/components/ui/BackButton";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import NavigationStepper from "@/components/NavigationStepper";
 
@@ -11,39 +12,22 @@ export default function Title({
   backTo = null,
   showBreadcrumbs = false,
   breadcrumbs = [],
+  autoHideBackButton = true, // Nouvelle prop pour contrôler l'auto-hide
 }) {
   const router = useRouter();
 
-  const handleBack = () => {
-    if (backTo) {
-      router.push(backTo);
-    } else {
-      router.back();
-    }
-  };
-
   return (
     <div className="w-full mb-8">
-      <div>
-        {/* Mobile back button */}
-        {showBackButton && (
-          <nav aria-label="Back" className="sm:hidden">
-            <button
-              onClick={handleBack}
-              className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
-            >
-              <ChevronLeftIcon
-                aria-hidden="true"
-                className="mr-1 -ml-1 h-5 w-5 shrink-0 text-gray-400"
-              />
-              Retour
-            </button>
-          </nav>
-        )}
+      <div className="space-y-2">
+        {/* BackButton intelligent - s'affiche dans les sous-pages */}
+        <BackButton
+          to={backTo}
+          autoHide={autoHideBackButton && !showBackButton}
+        />
 
-        {/* Desktop breadcrumbs or back button */}
-        {showBreadcrumbs ? (
-          <nav aria-label="Breadcrumb" className="hidden sm:flex">
+        {/* Desktop breadcrumbs */}
+        {showBreadcrumbs && breadcrumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" className="sm:flex">
             <ol role="list" className="flex items-center space-x-4">
               {breadcrumbs.map((breadcrumb, index) => (
                 <li key={index}>
@@ -83,26 +67,13 @@ export default function Title({
               ))}
             </ol>
           </nav>
-        ) : (
-          showBackButton && (
-            <nav aria-label="Back" className="hidden sm:flex">
-              <button
-                onClick={handleBack}
-                className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
-              >
-                <ChevronLeftIcon
-                  aria-hidden="true"
-                  className="mr-1 -ml-1 h-5 w-5 shrink-0 text-gray-400"
-                />
-                Retour
-              </button>
-            </nav>
-          )
         )}
 
         {/* Fallback: use existing NavigationStepper if no breadcrumbs provided */}
-        {!showBreadcrumbs && !showBackButton && <NavigationStepper />}
+        {!showBreadcrumbs && <NavigationStepper />}
       </div>
+
+      {/* ...existing code... */}
 
       <div className="mt-2 md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
