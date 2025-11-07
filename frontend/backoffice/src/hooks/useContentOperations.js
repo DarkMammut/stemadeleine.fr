@@ -1,26 +1,44 @@
-import {useAxiosClient} from "@/utils/axiosClient";
-import {useCallback} from "react";
+import { useAxiosClient } from '@/utils/axiosClient';
+import { useCallback } from 'react';
 
 /**
- * Hook générique pour la gestion des contenus (section, module, ...)
- * @param {Object} options - { parentType: "section" | "module" }
+ * Hook générique pour la gestion des contenus (section, module, newsletter-publication, etc.)
+ * @param {Object} options - { parentType: "section" | "module" | "newsletter-publication" | etc. }
  */
 export const useContentOperations = ({ parentType = "section" } = {}) => {
   const axios = useAxiosClient();
 
   // Génère le préfixe d'URL selon le type de parent
-  const getApiPrefix = (parentId) => {
-    if (parentType === "module") return `/api/modules/${parentId}/contents`;
-    return `/api/sections/${parentId}/contents`;
-  };
+  const getApiPrefix = useCallback(
+    (parentId) => {
+      // Map des types de parents vers leurs routes API
+      const routeMap = {
+        section: `/api/sections/${parentId}/contents`,
+        module: `/api/modules/${parentId}/contents`,
+        "newsletter-publication": `/api/newsletter-publication/${parentId}/contents`,
+        "news-publication": `/api/news-publications/${parentId}/contents`,
+        news: `/api/news/${parentId}/contents`,
+      };
 
-  // Récupère les contenus pour un parent (section/module)
+      return routeMap[parentType] || `/api/${parentType}/${parentId}/contents`;
+    },
+    [parentType],
+  );
+
+  // Génère la route pour les opérations sur un contenu spécifique
+  const getContentApiRoute = useCallback((contentId, operation = "") => {
+    // Routes génériques pour les opérations sur contenus
+    const baseRoute = `/api/content/${contentId}`;
+    return operation ? `${baseRoute}/${operation}` : baseRoute;
+  }, []);
+
+  // Récupère les contenus pour un parent (section/module/newsletter/etc.)
   const getContents = useCallback(
     async (parentId) => {
       try {
         const response = await axios.get(getApiPrefix(parentId));
         // Déduplication par contentId/version
-        const uniqueContents = response.data.reduce((acc, content) => {
+        return response.data.reduce((acc, content) => {
           const existingIndex = acc.findIndex(
             (c) => c.contentId === content.contentId,
           );
@@ -33,13 +51,12 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
           }
           return acc;
         }, []);
-        return uniqueContents;
       } catch (error) {
         console.error("Error fetching contents:", error);
         throw error;
       }
     },
-    [axios],
+    [axios, getApiPrefix],
   );
 
   // Création d'un contenu
@@ -53,24 +70,21 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
         throw error;
       }
     },
-    [axios],
+    [axios, getApiPrefix],
   );
 
   // Update content
   const updateContent = useCallback(
     async (contentId, data) => {
       try {
-        const response = await axios.put(
-          `/api/sections/contents/${contentId}`,
-          data,
-        );
+        const response = await axios.put(getContentApiRoute(contentId), data);
         return response.data;
       } catch (error) {
         console.error("Error updating content:", error);
         throw error;
       }
     },
-    [axios],
+    [axios, getContentApiRoute],
   );
 
   // Update content visibility
@@ -78,7 +92,7 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
     async (contentId, isVisible) => {
       try {
         const response = await axios.put(
-          `/api/sections/contents/${contentId}/visibility`,
+          getContentApiRoute(contentId, "visibility"),
           { isVisible },
         );
         return response.data;
@@ -87,20 +101,20 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
         throw error;
       }
     },
-    [axios],
+    [axios, getContentApiRoute],
   );
 
   // Delete content
   const deleteContent = useCallback(
     async (contentId) => {
       try {
-        await axios.delete(`/api/sections/contents/${contentId}`);
+        await axios.delete(getContentApiRoute(contentId));
       } catch (error) {
         console.error("Error deleting content:", error);
         throw error;
       }
     },
-    [axios],
+    [axios, getContentApiRoute],
   );
 
   // Media operations (POST sur /api/content-media avec clé composite)

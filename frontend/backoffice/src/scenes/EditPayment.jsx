@@ -6,7 +6,7 @@ import Title from "@/components/Title";
 import MyForm from "@/components/MyForm";
 import DetailsPayment from "@/components/DetailsPayment";
 import LinkUser from "@/components/LinkUser";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -180,13 +180,14 @@ export default function EditPayment() {
           onDelete={() => setShowDeleteModal(true)}
           onUserNavigate={handleUserNavigate}
         />
-        <DeleteModal
+        <ConfirmModal
           open={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDelete}
           title="Supprimer le paiement"
           message="Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible."
-          isDeleting={isDeleting}
+          isLoading={isDeleting}
+          variant="danger"
         />
       </>
     );

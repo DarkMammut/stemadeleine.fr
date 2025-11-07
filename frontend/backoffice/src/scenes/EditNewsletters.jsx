@@ -2,15 +2,24 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import Utilities from "@/components/Utilities";
 import Title from "@/components/Title";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
-import Switch from "@/components/ui/Switch";
-import StatusTag from "@/components/ui/StatusTag";
-import Button from "@/components/ui/Button";
-import { useNewsletterOperations } from "@/hooks/useNewsletterOperations";
-import NewsletterContentManager from "@/components/NewsletterContentManager";
+import MediaManager from "@/components/MediaManager";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
+import ContentManager from "@/components/ContentManager";
+import NewsletterPreviewModal from "@/components/NewsletterPreviewModal";
+import PublicationInfoCard from "@/components/PublicationInfoCard";
+import DownloadButton from "@/components/ui/DownloadButton";
+import SendButton from "@/components/ui/SendButton";
+import IconButton from "@/components/ui/IconButton";
+import Notification from "@/components/Notification";
+import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
+import { useNotification } from "@/hooks/useNotification";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useAxiosClient } from "@/utils/axiosClient";
+import { EyeIcon } from "@heroicons/react/24/outline";
 
 export default function EditNewsletters({ newsletterId }) {
   const [newsletterData, setNewsletterData] = useState(null);
@@ -18,18 +27,22 @@ export default function EditNewsletters({ newsletterId }) {
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [error, setError] = useState(null);
-  const [showDeleteMediaModal, setShowDeleteMediaModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
+  const axios = useAxiosClient();
+  const router = useRouter();
   const {
-    getNewsletter,
-    updateNewsletter,
-    updateNewsletterVisibility,
-    setNewsletterMedia,
-    removeNewsletterMedia,
-    publishNewsletter,
-  } = useNewsletterOperations();
+    getNewsletterPublicationById,
+    updateNewsletterPublication,
+    updateNewsletterPublicationVisibility,
+    publishNewsletterPublication,
+    deleteNewsletterPublication,
+  } = useNewsletterPublicationOperations();
+
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   // Load newsletter data
   useEffect(() => {
@@ -42,13 +55,45 @@ export default function EditNewsletters({ newsletterId }) {
     try {
       setLoading(true);
       setError(null);
-      const data = await getNewsletter(newsletterId);
+      const data = await getNewsletterPublicationById(newsletterId);
       setNewsletterData(data);
     } catch (error) {
       console.error("Error loading newsletter:", error);
       setError(error);
+      showError("Erreur de chargement", "Impossible de charger la newsletter");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddMedia = async (newsletterId, mediaId) => {
+    try {
+      await axios.put(`/api/newsletter-publication/${newsletterId}/media`, {
+        mediaId: mediaId,
+      });
+      await loadNewsletter();
+      showSuccess("Média ajouté", "Le média a été ajouté avec succès");
+
+      return {
+        ...newsletterData,
+        medias: [{ id: mediaId }],
+      };
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du média:", error);
+      showError("Erreur", "Impossible d'ajouter le média");
+      throw error;
+    }
+  };
+
+  const handleRemoveMedia = async (newsletterId) => {
+    try {
+      await axios.delete(`/api/newsletter-publication/${newsletterId}/media`);
+      await loadNewsletter();
+      showSuccess("Média supprimé", "Le média a été supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du média:", error);
+      showError("Erreur", "Impossible de supprimer le média");
+      throw error;
     }
   };
 
@@ -87,29 +132,44 @@ export default function EditNewsletters({ newsletterId }) {
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
-      await updateNewsletter(newsletterId, {
+      await updateNewsletterPublication(newsletterId, {
         name: values.name,
         title: values.title,
         description: values.description,
       });
-      await loadNewsletter(); // Reload to get updated data
-      alert("Newsletter mise à jour !");
+      await loadNewsletter();
+      showSuccess(
+        "Newsletter mise à jour",
+        "Les modifications ont été enregistrées avec succès",
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde de la newsletter");
+      showError(
+        "Erreur de sauvegarde",
+        "Impossible d'enregistrer les modifications",
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  const handleCancelEdit = () => {
+    loadNewsletter();
+    setFormKey((prev) => prev + 1);
+  };
+
   const handleVisibilityChange = async (isVisible) => {
     try {
       setSavingVisibility(true);
-      await updateNewsletterVisibility(newsletterId, isVisible);
+      await updateNewsletterPublicationVisibility(newsletterId, isVisible);
       setNewsletterData((prev) => ({ ...prev, isVisible }));
+      showSuccess(
+        "Visibilité mise à jour",
+        `Newsletter ${isVisible ? "visible" : "masquée"} avec succès`,
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError("Erreur", "Impossible de modifier la visibilité");
     } finally {
       setSavingVisibility(false);
     }
@@ -122,44 +182,50 @@ export default function EditNewsletters({ newsletterId }) {
   const confirmPublish = async () => {
     try {
       setSaving(true);
-      await publishNewsletter(newsletterId);
-      await loadNewsletter(); // Reload to get updated status
-      alert("Newsletter publiée avec succès !");
+      await publishNewsletterPublication(newsletterId);
+      await loadNewsletter();
+      showSuccess(
+        "Newsletter publiée",
+        "La newsletter a été publiée avec succès !",
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la publication");
+      showError("Erreur de publication", "Impossible de publier la newsletter");
     } finally {
       setSaving(false);
       setShowPublishModal(false);
     }
   };
 
-  const attachToEntity = async (mediaId) => {
+  const handleDelete = async () => {
     try {
-      await setNewsletterMedia(newsletterId, mediaId);
-      await loadNewsletter(); // Reload to get updated media
-    } catch (error) {
-      console.error("Error setting newsletter media:", error);
-      alert("Erreur lors de l'ajout du média");
+      await deleteNewsletterPublication(newsletterId);
+      showSuccess(
+        "Newsletter supprimée",
+        "La newsletter a été supprimée avec succès",
+      );
+      // Redirection vers la liste des newsletters
+      router.push("/newsletters");
+    } catch (err) {
+      console.error(err);
+      showError(
+        "Erreur de suppression",
+        "Impossible de supprimer la newsletter",
+      );
+      throw err; // Re-throw pour que DeleteButton gère l'état
     }
   };
 
-  const removeMedia = async () => {
-    setShowDeleteMediaModal(true);
+  const handleDownloadPDF = async () => {
+    // TODO: Implémenter la génération de PDF
+    console.log("Téléchargement PDF de la newsletter:", newsletterId);
+    alert("Fonctionnalité de téléchargement PDF à venir !");
   };
 
-  const confirmRemoveMedia = async () => {
-    setIsDeleting(true);
-    try {
-      await removeNewsletterMedia(newsletterId);
-      await loadNewsletter(); // Reload to get updated data
-    } catch (error) {
-      console.error("Error removing newsletter media:", error);
-      alert("Erreur lors de la suppression du média");
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteMediaModal(false);
-    }
+  const handleSend = async () => {
+    // TODO: Implémenter le publipostage
+    console.log("Envoi de la newsletter:", newsletterId);
+    alert("Fonctionnalité d'envoi à venir !");
   };
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
@@ -174,13 +240,9 @@ export default function EditNewsletters({ newsletterId }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
+      className="w-full max-w-6xl mx-auto space-y-6"
     >
-      <Title
-        label="Édition de newsletter"
-        apiUrl={`/api/newsletter-publications/${newsletterId}`}
-        data={newsletterData}
-      />
+      <Title label="Édition de newsletter" />
 
       <Utilities actions={[]} />
 
@@ -190,159 +252,140 @@ export default function EditNewsletters({ newsletterId }) {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Newsletter Status and Actions */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Statut de la newsletter
-            </h3>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <StatusTag status={newsletterData.status} />
-                <span className="text-sm text-text-muted">
-                  Créée le{" "}
-                  {new Date(newsletterData.createdAt).toLocaleDateString()}
-                </span>
-                {newsletterData.publishedDate && (
-                  <span className="text-sm text-text-muted">
-                    Publiée le{" "}
-                    {new Date(
-                      newsletterData.publishedDate,
-                    ).toLocaleDateString()}
-                  </span>
-                )}
-              </div>
-              {newsletterData.status === "DRAFT" && (
-                <Button
-                  variant="primary"
+          {/* Newsletter Information, Status and Actions */}
+          <PublicationInfoCard
+            title="Informations sur la newsletter"
+            status={newsletterData.status}
+            createdAt={newsletterData.createdAt}
+            publishedDate={newsletterData.publishedDate}
+            updatedAt={newsletterData.updatedAt}
+            author={newsletterData.author}
+            entityId={newsletterData?.newsletterId || newsletterData?.id}
+            entityIdLabel="ID Newsletter"
+            contentsCount={
+              newsletterData?.contents ? newsletterData.contents.length : 0
+            }
+            onPublish={handlePublish}
+            canPublish={newsletterData.status === "DRAFT"}
+            isPublishing={saving}
+            onDelete={handleDelete}
+            isDeleting={saving}
+            deleteConfirmTitle="Supprimer la newsletter"
+            deleteConfirmMessage="Êtes-vous sûr de vouloir supprimer cette newsletter ? Cette action est irréversible."
+            additionalButtons={
+              <>
+                <IconButton
+                  variant="secondary"
                   size="sm"
-                  onClick={handlePublish}
-                  disabled={saving}
-                >
-                  Publier la newsletter
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Newsletter Visibility */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Visibilité de la newsletter
-            </h3>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <Switch
-                checked={newsletterData?.isVisible || false}
-                onChange={handleVisibilityChange}
-                disabled={savingVisibility}
-              />
-              <span className="font-medium text-text">
-                Newsletter visible sur le site
-                {savingVisibility && (
-                  <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-                )}
-              </span>
-            </label>
-            <p className="text-sm text-text-muted mt-2">
-              Cette option se sauvegarde automatiquement
-            </p>
-          </div>
-
-          {/* Main Form */}
-          <MyForm
-            fields={fields}
-            formValues={newsletterData}
-            setFormValues={setNewsletterData}
-            onSubmit={handleSubmit}
-            onChange={handleFormChange}
-            loading={saving}
-            submitButtonLabel="Enregistrer la newsletter"
+                  onClick={() => setShowPreviewModal(true)}
+                  icon={EyeIcon}
+                  label="Aperçu"
+                  hoverExpand={true}
+                  title="Voir l'aperçu"
+                />
+                <DownloadButton
+                  onDownload={handleDownloadPDF}
+                  downloadLabel="PDF"
+                  size="sm"
+                  hoverExpand={true}
+                />
+                <SendButton
+                  onSend={handleSend}
+                  sendLabel="Envoyer"
+                  size="sm"
+                  hoverExpand={true}
+                  disabled={newsletterData.status !== "PUBLISHED"}
+                />
+              </>
+            }
           />
 
-          {/* Media Section */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text">
-                Média principal
-              </h3>
-              {newsletterData.media && (
-                <Button variant="danger" size="sm" onClick={removeMedia}>
-                  Supprimer le média
-                </Button>
-              )}
-            </div>
-            <MediaPicker
-              mediaId={newsletterData?.media?.id}
-              attachToEntity={attachToEntity}
-              entityType="newsletter-publications"
-              entityId={newsletterId}
-            />
-          </div>
+          {/* Newsletter Visibility */}
+          <VisibilitySwitch
+            title="Visibilité de la newsletter"
+            label="Newsletter visible sur le site"
+            isVisible={newsletterData?.isVisible || false}
+            onChange={handleVisibilityChange}
+            savingVisibility={savingVisibility}
+          />
 
-          {/* Newsletter Content Editor */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <NewsletterContentManager
-              newsletterId={newsletterId}
-              initialContents={newsletterData?.contents || []}
+          {/* Main Form */}
+          {newsletterData && Object.keys(newsletterData).length > 0 && (
+            <MyForm
+              key={`newsletter-form-${formKey}`}
+              title="Informations de la newsletter"
+              fields={fields}
+              initialValues={newsletterData}
+              onSubmit={handleSubmit}
+              onChange={handleFormChange}
+              loading={saving}
+              submitButtonLabel="Enregistrer la newsletter"
+              onCancel={handleCancelEdit}
+              cancelButtonLabel="Annuler"
             />
-          </div>
+          )}
 
-          {/* Newsletter Info */}
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">
-              Informations sur la newsletter
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-text">ID Newsletter:</span>
-                <span className="text-text-muted ml-2">
-                  {newsletterData.newsletterId}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium text-text">Auteur:</span>
-                <span className="text-text-muted ml-2">
-                  {newsletterData.author
-                    ? `${newsletterData.author.firstname} ${newsletterData.author.lastname}`
-                    : "Non défini"}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium text-text">
-                  Dernière modification:
-                </span>
-                <span className="text-text-muted ml-2">
-                  {new Date(newsletterData.updatedAt).toLocaleDateString()}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium text-text">Contenus:</span>
-                <span className="text-text-muted ml-2">
-                  {newsletterData.contents ? newsletterData.contents.length : 0}{" "}
-                  contenu(s)
-                </span>
-              </div>
-            </div>
-          </div>
+          {/* Rich Text Content Editor */}
+          <ContentManager
+            parentId={newsletterId}
+            parentType="newsletter-publication"
+            customLabels={{
+              header: "Contenus de la newsletter",
+              addButton: "Ajouter un contenu",
+              empty: "Aucun contenu pour cette newsletter.",
+              loading: "Chargement des contenus...",
+              saveContent: "Enregistrer le contenu",
+              bodyLabel: "Contenu de la newsletter",
+            }}
+          />
         </div>
       )}
 
-      <DeleteModal
-        open={showDeleteMediaModal}
-        onClose={() => setShowDeleteMediaModal(false)}
-        onConfirm={confirmRemoveMedia}
-        title="Supprimer le média"
-        message="Êtes-vous sûr de vouloir supprimer le média ? Cette action est irréversible."
-        isDeleting={isDeleting}
+      {/* Gestion de l'image de la newsletter (Newsletter Media) */}
+      {newsletterData && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Image de la newsletter
+          </h3>
+          <MediaManager
+            content={{
+              id: newsletterId,
+              medias: newsletterData?.media ? [newsletterData.media] : [],
+            }}
+            onMediaAdd={handleAddMedia}
+            onMediaRemove={handleRemoveMedia}
+            onMediaChanged={loadNewsletter}
+            maxMedias={1}
+          />
+        </div>
+      )}
+
+      {/* Newsletter Preview Modal */}
+      <NewsletterPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        newsletterData={newsletterData}
       />
 
-      <DeleteModal
+      {/* Publish Confirmation Modal */}
+      <ConfirmModal
         open={showPublishModal}
         onClose={() => setShowPublishModal(false)}
         onConfirm={confirmPublish}
         title="Publier la newsletter"
         message="Êtes-vous sûr de vouloir publier cette newsletter ?"
         confirmLabel="Publier"
-        isDeleting={saving}
+        isLoading={saving}
+        variant="primary"
+      />
+
+      {/* Notification */}
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
       />
     </motion.div>
   );

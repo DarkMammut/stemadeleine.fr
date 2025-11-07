@@ -17,7 +17,7 @@ import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
 import Button from "@/components/ui/Button";
 import { useAxiosClient } from "@/utils/axiosClient";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
@@ -332,7 +332,7 @@ export default function Sections({ pageId }) {
         </div>
       )}
 
-      <DeleteModal
+      <ConfirmModal
         open={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
@@ -341,7 +341,8 @@ export default function Sections({ pageId }) {
         onConfirm={confirmDelete}
         title={`Supprimer ${itemToDelete?.type === "section" ? "la section" : "le module"}`}
         message={`Êtes-vous sûr de vouloir supprimer ${itemToDelete?.type === "section" ? "cette section" : "ce module"} ? Cette action est irréversible.`}
-        isDeleting={isDeleting}
+        isLoading={isDeleting}
+        variant="danger"
       />
     </motion.div>
   );

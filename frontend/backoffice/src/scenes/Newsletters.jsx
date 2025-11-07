@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
-import { useNewsletterOperations } from "@/hooks/useNewsletterOperations";
+import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
 import CardList from "@/components/CardList";
 import NewsletterCard from "@/components/NewsletterCard";
 import Notification from "@/components/Notification";
@@ -17,7 +17,8 @@ export default function Newsletters() {
   const [newsletters, setNewsletters] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { getAllNewsletters, createNewsletter } = useNewsletterOperations();
+  const { getAllNewsletterPublications, createNewsletterPublication } =
+    useNewsletterPublicationOperations();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
 
@@ -28,7 +29,7 @@ export default function Newsletters() {
   const loadNewsletters = async () => {
     try {
       setLoading(true);
-      const data = await getAllNewsletters();
+      const data = await getAllNewsletterPublications();
       setNewsletters(data);
     } catch (error) {
       console.error("Error loading newsletters:", error);
@@ -43,7 +44,7 @@ export default function Newsletters() {
 
   const handleCreateNewsletter = async () => {
     try {
-      await createNewsletter({
+      await createNewsletterPublication({
         name: "Nouvelle Newsletter",
         title: "Nouvelle Newsletter",
         description: "Description de la newsletter",

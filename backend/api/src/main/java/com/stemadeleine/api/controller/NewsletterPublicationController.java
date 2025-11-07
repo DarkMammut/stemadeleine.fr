@@ -378,18 +378,19 @@ public class NewsletterPublicationController {
         User currentUser = customUserDetails.account().getUser();
         String title = body.getOrDefault("title", "New Newsletter Content");
 
-        log.info("POST /api/newsletters/{}/contents - Creating new content by user: {}",
+        log.info("POST /api/newsletter-publication/{}/contents - Creating new content by user: {}",
                 newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the newsletter publication to use its ID as ownerId for content
+            // Get the newsletter publication by its ID (not by newsletterId)
             NewsletterPublication newsletter = newsletterPublicationService
-                    .getNewsletterPublicationByNewsletterId(newsletterId)
+                    .getNewsletterPublicationById(newsletterId)
                     .orElseThrow(() -> new RuntimeException("Newsletter not found"));
 
-            // Create content with newsletter ID as owner
+            // Create content with newsletterId as owner (not the publication ID)
+            // This ensures contents remain linked across different versions of the same newsletter
             JsonNode defaultBody = objectMapper.readTree("{\"html\": \"<p>Start writing your newsletter content here...</p>\"}");
-            Content content = contentService.createContent(title, defaultBody, newsletter.getId(), currentUser);
+            Content content = contentService.createContent(title, defaultBody, newsletter.getNewsletterId(), currentUser);
 
             ContentDto contentDto = contentMapper.toDto(content);
             log.info("Newsletter content created successfully with ID: {}", content.getId());
@@ -411,17 +412,18 @@ public class NewsletterPublicationController {
         }
 
         User currentUser = customUserDetails.account().getUser();
-        log.info("GET /api/newsletters/{}/contents - Fetching contents by user: {}",
+        log.info("GET /api/newsletter-publication/{}/contents - Fetching contents by user: {}",
                 newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the newsletter publication to use its ID as ownerId
+            // Get the newsletter publication by its ID (not by newsletterId)
             NewsletterPublication newsletter = newsletterPublicationService
-                    .getNewsletterPublicationByNewsletterId(newsletterId)
+                    .getNewsletterPublicationById(newsletterId)
                     .orElseThrow(() -> new RuntimeException("Newsletter not found"));
 
-            // Get latest contents by owner (newsletter ID)
-            List<Content> contents = contentService.getLatestContentsByOwner(newsletter.getId());
+            // Get latest contents by newsletterId (owner)
+            // This ensures contents are shared across all versions of the same newsletter
+            List<Content> contents = contentService.getLatestContentsByOwner(newsletter.getNewsletterId());
             List<ContentDto> contentDtos = contents.stream()
                     .map(contentMapper::toDto)
                     .collect(Collectors.toList());

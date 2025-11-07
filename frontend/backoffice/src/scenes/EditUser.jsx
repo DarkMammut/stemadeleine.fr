@@ -7,7 +7,7 @@ import UserDetails from "@/components/UserDetails";
 import UserForm from "@/components/UserForm";
 import AddressManager from "@/components/AddressManager";
 import MembershipManager from "@/components/MembershipManager";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function EditUser() {
   const { id } = useParams();
@@ -123,13 +123,14 @@ export default function EditUser() {
         </>
       )}
 
-      <DeleteModal
+      <ConfirmModal
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
         title="Supprimer l'utilisateur"
         message="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
-        isDeleting={isDeleting}
+        isLoading={isDeleting}
+        variant="danger"
       />
     </motion.div>
   );

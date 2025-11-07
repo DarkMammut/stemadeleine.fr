@@ -3,16 +3,16 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
-import EditNewsletters from "@/scenes/EditNewsletters";
+import EditNews from "@/scenes/EditNews";
 
-export default function NewsletterPage() {
-  const [current, setCurrent] = useState("newsletters");
+export default function NewsPage() {
+  const [current, setCurrent] = useState("news");
   const params = useParams();
-  const newsletterId = params.newsletterId;
+  const newsId = params.newsId;
 
   return (
     <Layout current={current} setCurrent={setCurrent}>
-      <EditNewsletters newsletterId={newsletterId} />
+      <EditNews newsId={newsId} />
     </Layout>
   );
 }

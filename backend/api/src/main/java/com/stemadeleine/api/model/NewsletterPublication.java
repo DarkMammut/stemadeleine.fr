@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -66,12 +65,7 @@ public class NewsletterPublication {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    // Many-to-many relationship with Content through newsletter_content table
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "newsletter_content",
-            joinColumns = @JoinColumn(name = "newsletter_publication_id"),
-            inverseJoinColumns = @JoinColumn(name = "content_id")
-    )
-    private List<Content> contents;
+    // Note: Contents are linked via Content.ownerId = this.newsletterId
+    // This allows contents to be shared across all versions of the same newsletter
+    // Use ContentService.getLatestContentsByOwner(newsletterId) to retrieve them
 }

@@ -16,7 +16,7 @@ import Title from "@/components/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Pages() {
   const router = useRouter();
@@ -191,7 +191,7 @@ export default function Pages() {
         message={notification.message}
       />
 
-      <DeleteModal
+      <ConfirmModal
         open={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
@@ -200,7 +200,8 @@ export default function Pages() {
         onConfirm={confirmDelete}
         title="Supprimer la page"
         message="Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible."
-        isDeleting={isDeleting}
+        isLoading={isDeleting}
+        variant="danger"
       />
     </motion.div>
   );

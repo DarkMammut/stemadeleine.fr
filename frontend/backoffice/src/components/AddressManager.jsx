@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
 import Button from "@/components/ui/Button";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function AddressManager({
@@ -211,7 +211,7 @@ export default function AddressManager({
           </div>
         ))}
 
-      <DeleteModal
+      <ConfirmModal
         open={deleteModalOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
@@ -221,6 +221,7 @@ export default function AddressManager({
             ? `Êtes-vous sûr de vouloir supprimer l'adresse "${addressToDelete.name}" ?`
             : "Êtes-vous sûr de vouloir supprimer cette adresse ?"
         }
+        variant="danger"
       />
     </div>
   );

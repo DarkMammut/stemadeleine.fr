@@ -12,6 +12,7 @@ export default function MyForm({
   showSubmitButton = true,
   onCancel,
   cancelButtonLabel = "Annuler",
+  title, // Titre optionnel
 }) {
   // Initialisation du state à partir de initialValues uniquement au montage
   const [formValues, setFormValues] = useState(() => ({ ...initialValues }));
@@ -65,6 +66,11 @@ export default function MyForm({
       className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl"
       onSubmit={handleSubmit}
     >
+      {title && (
+        <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        </div>
+      )}
       <div className="px-4 py-6 sm:p-8">
         <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           {fields.map((field) => (

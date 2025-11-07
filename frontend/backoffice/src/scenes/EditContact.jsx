@@ -12,7 +12,7 @@ import { useContactsContext } from "@/contexts/ContactsContext";
 import { buildContactBreadcrumbs } from "@/utils/breadcrumbs";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import DeleteModal from "@/components/DeleteModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function EditContact() {
   const { id } = useParams();
@@ -268,13 +268,14 @@ export default function EditContact() {
         message={notification.message}
       />
 
-      <DeleteModal
+      <ConfirmModal
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
         title="Supprimer le contact"
         message="Êtes-vous sûr de vouloir supprimer ce contact ? Cette action est irréversible."
-        isDeleting={isDeleting}
+        isLoading={isDeleting}
+        variant="danger"
       />
     </motion.div>
   );

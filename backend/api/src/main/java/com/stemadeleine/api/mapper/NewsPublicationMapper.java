@@ -2,6 +2,7 @@ package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.NewsPublicationDto;
 import com.stemadeleine.api.model.NewsPublication;
+import com.stemadeleine.api.service.ContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ public class NewsPublicationMapper {
     private final MediaMapper mediaMapper;
     private final UserMapper userMapper;
     private final ContentMapper contentMapper;
+    private final ContentService contentService;
 
     /**
      * Convert NewsPublication entity to DTO
@@ -23,6 +25,10 @@ public class NewsPublicationMapper {
         if (publication == null) {
             return null;
         }
+
+        // Retrieve contents via newsId (owner)
+        // This ensures we get the latest contents shared across all versions
+        var contents = contentService.getLatestContentsByOwner(publication.getNewsId());
 
         return NewsPublicationDto.builder()
                 .id(publication.getId())
@@ -37,11 +43,9 @@ public class NewsPublicationMapper {
                 .endDate(publication.getEndDate())
                 .media(publication.getMedia() != null ? mediaMapper.toDto(publication.getMedia()) : null)
                 .author(publication.getAuthor() != null ? userMapper.toDto(publication.getAuthor()) : null)
-                .contents(publication.getContents() != null ?
-                        publication.getContents().stream()
-                                .map(contentMapper::toDto)
-                                .collect(Collectors.toList()) :
-                        null)
+                .contents(contents.stream()
+                        .map(contentMapper::toDto)
+                        .collect(Collectors.toList()))
                 .createdAt(publication.getCreatedAt())
                 .updatedAt(publication.getUpdatedAt())
                 .build();

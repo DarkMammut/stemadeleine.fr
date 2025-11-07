@@ -87,6 +87,7 @@ export default function SortableItem({
             icon={PencilIcon}
             label="Modifier"
             variant="secondary"
+            hoverExpand={true}
             size="sm"
             onClick={() => onEdit?.(item)}
           />
@@ -94,6 +95,7 @@ export default function SortableItem({
             icon={TrashIcon}
             label="Supprimer"
             variant="danger"
+            hoverExpand={true}
             size="sm"
             onClick={() => onDelete?.(item)}
           />

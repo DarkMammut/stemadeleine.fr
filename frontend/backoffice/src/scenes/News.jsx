@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
-import { useNewsOperations } from "@/hooks/useNewsOperations";
+import { useNewsPublicationOperations } from "@/hooks/useNewsPublicationOperations";
 import CardList from "@/components/CardList";
 import NewsCard from "@/components/NewsCard";
 import Notification from "@/components/Notification";
@@ -17,7 +17,8 @@ export default function News() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { getAllNews, createNews } = useNewsOperations();
+  const { getAllNewsPublications, createNewsPublication } =
+    useNewsPublicationOperations();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
 
@@ -28,7 +29,7 @@ export default function News() {
   const loadNews = async () => {
     try {
       setLoading(true);
-      const data = await getAllNews();
+      const data = await getAllNewsPublications();
       setNews(data);
     } catch (error) {
       console.error("Error loading news:", error);
@@ -40,11 +41,18 @@ export default function News() {
 
   const handleCreateNews = async () => {
     try {
-      await createNews({
-        name: "Nouvelle News",
-        title: "Nouvelle News",
-        description: "Description de la news",
+      // Dates par défaut : aujourd'hui pour startDate, dans 30 jours pour endDate
+      const now = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30);
+
+      await createNewsPublication({
+        name: "Nouvelle Actualité",
+        title: "Nouvelle Actualité",
+        description: "Description de l'actualité",
         isVisible: false,
+        startDate: now.toISOString(),
+        endDate: endDate.toISOString(),
       });
       await loadNews();
       showSuccess(

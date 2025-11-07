@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDownIcon, ChevronRightIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
-import IconButton from '@/components/ui/IconButton';
 import Switch from '@/components/ui/Switch';
 import RichTextEditor from '@/components/RichTextEditor';
 import MediaManager from '@/components/MediaManager';
 import PublishButton from '@/components/ui/PublishButton';
+import DeleteButton from '@/components/ui/DeleteButton';
 import { useContentOperations } from '@/hooks/useContentOperations';
+import ConfirmModal from '@/components/ConfirmModal';
 
 /**
  * Composant générique de gestion de contenus pour section, module, etc.
@@ -27,6 +28,8 @@ const ContentManager = ({
   const [loading, setLoading] = useState(false);
   const [savingStates, setSavingStates] = useState({});
   const [editingContent, setEditingContent] = useState({});
+  const [showPublishAllModal, setShowPublishAllModal] = useState(false);
+  const [isPublishingAll, setIsPublishingAll] = useState(false);
 
   // Utilise le hook d'opérations, adapté pour le parentType
   const {
@@ -165,7 +168,6 @@ const ContentManager = ({
 
   // Delete content
   const handleDeleteContent = async (contentId) => {
-    if (!confirm("Voulez-vous vraiment supprimer ce contenu ?")) return;
     try {
       setSavingStates((prev) => ({ ...prev, [contentId]: true }));
       await deleteContent(contentId);
@@ -178,24 +180,21 @@ const ContentManager = ({
     } catch (error) {
       console.error("Error deleting content:", error);
       alert("Erreur lors de la suppression du contenu.");
+      throw error; // Re-throw pour que DeleteButton gère l'état
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
   };
 
-  // Fonction pour publier tous les contenus
-  const handlePublishAllContents = async () => {
-    if (
-      !confirm(
-        "Voulez-vous vraiment publier tous les contenus de ce " +
-          parentType +
-          " ?",
-      )
-    )
-      return;
+  // Fonction pour ouvrir la modal de publication
+  const handleOpenPublishAllModal = () => {
+    setShowPublishAllModal(true);
+  };
 
+  // Fonction pour publier tous les contenus (après confirmation)
+  const handleConfirmPublishAll = async () => {
     try {
-      setLoading(true);
+      setIsPublishingAll(true);
       // Utilise l'endpoint de publication en lot
       const response = await fetch(`/api/content/owner/${parentId}/publish`, {
         method: "POST",
@@ -222,7 +221,8 @@ const ContentManager = ({
       console.error("Error publishing all contents:", error);
       alert("Erreur lors de la publication des contenus.");
     } finally {
-      setLoading(false);
+      setIsPublishingAll(false);
+      setShowPublishAllModal(false);
     }
   };
 
@@ -279,8 +279,8 @@ const ContentManager = ({
           </h3>
           <div className="flex items-center gap-2">
             <PublishButton
-              onPublish={handlePublishAllContents}
-              disabled={loading || contents.length === 0}
+              onPublish={handleOpenPublishAllModal}
+              disabled={loading || contents.length === 0 || isPublishingAll}
               publishLabel={customLabels.publishButton || "Publier tous"}
               publishedLabel="Tous publiés"
               size="md"
@@ -411,13 +411,14 @@ const ContentManager = ({
                     )}
                   </div>
 
-                  <IconButton
-                    icon={TrashIcon}
-                    label="Supprimer"
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDeleteContent(content.contentId)}
+                  <DeleteButton
+                    onDelete={() => handleDeleteContent(content.contentId)}
                     disabled={savingStates[content.contentId]}
+                    deleteLabel="Supprimer"
+                    confirmTitle="Supprimer le contenu"
+                    confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
+                    size="sm"
+                    hoverExpand={true}
                   />
                 </div>
 
@@ -482,6 +483,18 @@ const ContentManager = ({
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Publish All Confirmation Modal */}
+      <ConfirmModal
+        open={showPublishAllModal}
+        onClose={() => setShowPublishAllModal(false)}
+        onConfirm={handleConfirmPublishAll}
+        title="Publier tous les contenus"
+        message={`Êtes-vous sûr de vouloir publier tous les contenus de ce ${parentType} ? Cette action créera une nouvelle version pour chaque contenu modifié.`}
+        confirmLabel="Publier tous"
+        isLoading={isPublishingAll}
+        variant="primary"
+      />
     </div>
   );
 };

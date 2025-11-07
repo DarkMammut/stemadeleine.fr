@@ -382,14 +382,15 @@ public class NewsPublicationController {
                 newsId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the news publication to use its ID as ownerId for content
+            // Get the news publication by its ID (not by newsId)
             NewsPublication news = newsPublicationService
-                    .getNewsPublicationByNewsId(newsId)
+                    .getNewsPublicationById(newsId)
                     .orElseThrow(() -> new RuntimeException("News not found"));
 
-            // Create content with news ID as owner
+            // Create content with newsId as owner (not the publication ID)
+            // This ensures contents remain linked across different versions of the same news
             JsonNode defaultBody = objectMapper.readTree("{\"html\": \"<p>Start writing your news content here...</p>\"}");
-            Content content = contentService.createContent(title, defaultBody, news.getId(), currentUser);
+            Content content = contentService.createContent(title, defaultBody, news.getNewsId(), currentUser);
 
             ContentDto contentDto = contentMapper.toDto(content);
             log.info("News content created successfully with ID: {}", content.getId());
@@ -415,13 +416,14 @@ public class NewsPublicationController {
                 newsId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the news publication to use its ID as ownerId
+            // Get the news publication by its ID (not by newsId)
             NewsPublication news = newsPublicationService
-                    .getNewsPublicationByNewsId(newsId)
+                    .getNewsPublicationById(newsId)
                     .orElseThrow(() -> new RuntimeException("News not found"));
 
-            // Get latest contents by owner (news ID)
-            List<Content> contents = contentService.getLatestContentsByOwner(news.getId());
+            // Get latest contents by newsId (owner)
+            // This ensures contents are shared across all versions of the same news
+            List<Content> contents = contentService.getLatestContentsByOwner(news.getNewsId());
             List<ContentDto> contentDtos = contents.stream()
                     .map(contentMapper::toDto)
                     .collect(Collectors.toList());
