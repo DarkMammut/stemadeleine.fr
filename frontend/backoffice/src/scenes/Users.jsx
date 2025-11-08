@@ -3,11 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  ArrowPathIcon,
-  FunnelIcon,
-  PlusIcon,
-} from "@heroicons/react/24/outline";
+import { FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
 import { useUserOperations } from "@/hooks/useUserOperations";
@@ -117,14 +113,14 @@ export default function Users() {
             callback: handleCreateUser,
           },
           {
-            icon: ArrowPathIcon,
+            variant: "refresh",
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
-            variant: "refresh",
+            hoverExpand: true,
           },
           {
             icon: FunnelIcon,
-            label: showAdherentsOnly ? "Afficher tous" : "Afficher adhérents",
+            label: showAdherentsOnly ? "Filtre: Tous" : "Filtre: adhérents",
             callback: handleToggleAdherents,
             variant: "filter",
           },

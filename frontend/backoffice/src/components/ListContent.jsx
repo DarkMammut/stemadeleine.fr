@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import StatusTag from "@/components/ui/StatusTag";
 import Switch from "@/components/ui/Switch";
 import Button from "@/components/ui/Button";
+import DeleteButton from "@/components/ui/DeleteButton";
 
 export default function ListContent({
   label,
@@ -51,14 +52,9 @@ export default function ListContent({
     }
   };
 
-  const handleDelete = async (item) => {
-    if (
-      !window.confirm(`Êtes-vous sûr de vouloir supprimer "${item.title}" ?`)
-    ) {
-      return;
-    }
+  const handleDelete = async (id) => {
     try {
-      await remove(item.id);
+      await remove(id);
       await loadItems();
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -131,13 +127,14 @@ export default function ListContent({
                     Edit
                   </Button>
 
-                  <Button
-                    variant="danger"
+                  <DeleteButton
+                    onDelete={() => handleDelete(item.id)}
                     size="sm"
-                    onClick={() => handleDelete(item)}
-                  >
-                    Suppr
-                  </Button>
+                    deleteLabel="Supprimer"
+                    confirmTitle="Confirmer la suppression"
+                    confirmMessage={`Êtes-vous sûr de vouloir supprimer "${item.title}" ? Cette action est irréversible.`}
+                    hoverExpand={false}
+                  />
                 </div>
               </div>
             </div>

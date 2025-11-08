@@ -1,8 +1,11 @@
 package com.stemadeleine.api.service;
 
+import com.stemadeleine.api.dto.PaymentCreateDto;
 import com.stemadeleine.api.dto.PaymentUpdateDto;
 import com.stemadeleine.api.model.Payment;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.PaymentRepository;
+import com.stemadeleine.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();
@@ -22,6 +26,27 @@ public class PaymentService {
 
     public Optional<Payment> getPaymentById(UUID id) {
         return paymentRepository.findById(id);
+    }
+
+    @Transactional
+    public Payment createPayment(PaymentCreateDto dto) {
+        Payment payment = Payment.builder()
+                .amount(dto.getAmount())
+                .currency(dto.getCurrency() != null ? dto.getCurrency() : "EUR")
+                .paymentDate(dto.getPaymentDate())
+                .status(dto.getStatus())
+                .type(dto.getType())
+                .formSlug(dto.getFormSlug())
+                .receiptUrl(dto.getReceiptUrl())
+                .build();
+
+        // Associer l'utilisateur si fourni
+        if (dto.getUserId() != null) {
+            Optional<User> user = userRepository.findById(dto.getUserId());
+            user.ifPresent(payment::setUser);
+        }
+
+        return paymentRepository.save(payment);
     }
 
     @Transactional
@@ -43,7 +68,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void deletePayment(Long id) {
+    public void deletePayment(UUID id) {
         paymentRepository.deleteById(id);
     }
 

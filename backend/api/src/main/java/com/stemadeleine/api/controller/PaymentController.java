@@ -1,12 +1,12 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.PaymentCreateDto;
 import com.stemadeleine.api.dto.PaymentUpdateDto;
 import com.stemadeleine.api.model.Payment;
 import com.stemadeleine.api.model.PaymentStatus;
 import com.stemadeleine.api.model.PaymentType;
 import com.stemadeleine.api.service.HelloAssoImportService;
 import com.stemadeleine.api.service.PaymentService;
-import com.stemadeleine.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,6 @@ import java.util.*;
 public class PaymentController {
     private final PaymentService paymentService;
     private final HelloAssoImportService helloAssoImportService;
-    private final UserService userService;
 
     @GetMapping
     public List<Payment> getAllPayments() {
@@ -34,10 +33,13 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<Payment> addPayment(@RequestBody Payment payment) {
-        payment.setUser(null);
-        Payment saved = paymentService.addPayment(payment);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<Payment> addPayment(@RequestBody PaymentCreateDto paymentDto) {
+        try {
+            Payment saved = paymentService.createPayment(paymentDto);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     @PutMapping("/{id}")
@@ -51,7 +53,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePayment(@PathVariable UUID id) {
         paymentService.deletePayment(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
 import Button from "@/components/ui/Button";
-import ConfirmModal from "@/components/ConfirmModal";
+import DeleteButton from "@/components/ui/DeleteButton";
 import { useAxiosClient } from "@/utils/axiosClient";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function AddressManager({
   label = "Adresses",
@@ -15,6 +17,8 @@ export default function AddressManager({
   maxAddresses = undefined,
 }) {
   const axios = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [adding, setAdding] = useState(false);
@@ -27,8 +31,6 @@ export default function AddressManager({
     state: "",
     country: "",
   });
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [addressToDelete, setAddressToDelete] = useState(null);
 
   const isLimitReached =
     typeof maxAddresses === "number" && addresses.length >= maxAddresses;
@@ -63,8 +65,13 @@ export default function AddressManager({
       });
       setAdding(false);
       await refreshAddresses();
+      showSuccess("Adresse ajoutée", "L'adresse a été ajoutée avec succès");
     } catch (err) {
-      alert("Erreur lors de l'ajout");
+      console.error("Erreur lors de l'ajout:", err);
+      showError(
+        "Erreur d'ajout",
+        "Impossible d'ajouter l'adresse. Veuillez réessayer.",
+      );
     }
   };
 
@@ -93,33 +100,30 @@ export default function AddressManager({
       });
       setEditingId(null);
       await refreshAddresses();
+      showSuccess("Adresse modifiée", "L'adresse a été modifiée avec succès");
     } catch (err) {
-      alert("Erreur lors de la modification");
+      console.error("Erreur lors de la modification:", err);
+      showError(
+        "Erreur de modification",
+        "Impossible de modifier l'adresse. Veuillez réessayer.",
+      );
     }
   };
 
   // Suppression d'une adresse
-  const handleDeleteClick = (address) => {
+  const handleDelete = async (addressId) => {
     if (!editable || !refreshAddresses) return;
-    setAddressToDelete(address);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!addressToDelete) return;
     try {
-      await axios.delete(`/api/addresses/${addressToDelete.id}`);
+      await axios.delete(`/api/addresses/${addressId}`);
       await refreshAddresses();
-      setDeleteModalOpen(false);
-      setAddressToDelete(null);
+      showSuccess("Adresse supprimée", "L'adresse a été supprimée avec succès");
     } catch (err) {
-      alert("Erreur lors de la suppression");
+      console.error("Erreur lors de la suppression:", err);
+      showError(
+        "Erreur de suppression",
+        "Impossible de supprimer l'adresse. Veuillez réessayer.",
+      );
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteModalOpen(false);
-    setAddressToDelete(null);
   };
 
   return (
@@ -174,13 +178,13 @@ export default function AddressManager({
                   </div>
                 </div>
                 {editable && (
-                  <Button
-                    variant="danger"
+                  <DeleteButton
+                    onDelete={() => handleDelete(address.id)}
                     size="sm"
-                    onClick={() => handleDeleteClick(address)}
-                  >
-                    Supprimer
-                  </Button>
+                    deleteLabel="Supprimer"
+                    confirmTitle="Supprimer l'adresse"
+                    confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
+                  />
                 )}
               </div>
             )}
@@ -205,24 +209,21 @@ export default function AddressManager({
           </div>
         ) : (
           <div className="border-t border-gray-200 pt-4">
-            <Button variant="primary" size="sm" onClick={() => setAdding(true)}>
-              Ajouter une adresse
+            <Button variant="link" size="sm" onClick={() => setAdding(true)}>
+              + Ajouter une adresse
             </Button>
           </div>
         ))}
 
-      <ConfirmModal
-        open={deleteModalOpen}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title="Supprimer l'adresse"
-        message={
-          addressToDelete
-            ? `Êtes-vous sûr de vouloir supprimer l'adresse "${addressToDelete.name}" ?`
-            : "Êtes-vous sûr de vouloir supprimer cette adresse ?"
-        }
-        variant="danger"
-      />
+      {/* Notification */}
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
     </div>
   );
 }

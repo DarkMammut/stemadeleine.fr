@@ -3,14 +3,18 @@ import { motion } from "framer-motion";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/Title";
 import MyForm from "@/components/MyForm";
-import DetailsOrganization from "@/components/DetailsOrganization";
-import MediaPicker from "@/components/MediaPicker";
+import OrganizationDetails from "@/components/OrganizationDetails";
+import MediaManager from "@/components/MediaManager";
 import AddressManager from "@/components/AddressManager";
 import ColorInputWithPicker from "@/components/ColorInputWithPicker";
 import InputWithActions from "@/components/InputWithActions";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Settings() {
   const axios = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
   const [organization, setOrganization] = useState(null);
   const [organizationForm, setOrganizationForm] = useState({});
   const [organizationSettings, setOrganizationSettings] = useState({});
@@ -22,6 +26,10 @@ export default function Settings() {
 
   useEffect(() => {
     loadOrganization();
+    // Cleanup: masquer la notification au démontage
+    return () => {
+      hideNotification();
+    };
   }, []);
 
   const loadOrganization = async () => {
@@ -46,7 +54,7 @@ export default function Settings() {
       setOrganizationSettings(settings);
       setOriginalOrganizationSettings(settings);
     } catch (e) {
-      alert("Erreur lors du chargement de l'organisation");
+      showError("Erreur de chargement", "Impossible de charger l'organisation");
     } finally {
       setLoading(false);
     }
@@ -122,10 +130,16 @@ export default function Settings() {
         secondaryColor: organizationForm.secondaryColor,
       });
       await loadOrganization();
-      alert("Organisation modifiée");
+      showSuccess(
+        "Organisation modifiée",
+        "Les informations ont été mises à jour avec succès",
+      );
       setShowEditForm(false);
     } catch (e) {
-      alert("Erreur lors de la modification de l'organisation");
+      showError(
+        "Erreur de modification",
+        "Impossible de modifier l'organisation",
+      );
     } finally {
       setSaving(false);
     }
@@ -135,11 +149,23 @@ export default function Settings() {
 
   const handleCancelEdit = () => setShowEditForm(false);
 
-  const attachToEntity = async (mediaId) => {
+  // Fonctions pour MediaManager (logo)
+  const handleLogoAdd = async (contentId, mediaId) => {
     await axios.put(
       `/api/organizations/${organization.id}/logo?mediaId=${mediaId}`,
     );
-    loadOrganization();
+    await loadOrganization();
+  };
+
+  const handleLogoRemove = async (contentId, mediaId) => {
+    await axios.delete(`/api/organizations/${organization.id}/media`);
+    await loadOrganization();
+  };
+
+  // Créer un objet "content" pour MediaManager à partir du logo
+  const logoContent = {
+    id: organization?.id,
+    medias: organization?.logo ? [organization.logo] : [],
   };
 
   // Handlers génériques pour settings
@@ -154,8 +180,12 @@ export default function Settings() {
         [key]: val,
       });
       await loadOrganization();
+      showSuccess("Paramètre modifié", "La modification a été enregistrée");
     } catch (e) {
-      alert("Erreur lors de la modification");
+      showError(
+        "Erreur de modification",
+        "Impossible de modifier le paramètre",
+      );
     } finally {
       setSaving(false);
     }
@@ -186,7 +216,7 @@ export default function Settings() {
           />
         </div>
       ) : (
-        <DetailsOrganization organization={organization} onEdit={handleEdit} />
+        <OrganizationDetails organization={organization} onEdit={handleEdit} />
       )}
 
       <div className="border-t border-gray-200 pt-8">
@@ -205,13 +235,18 @@ export default function Settings() {
       {/* Sélection des couleurs primaires et secondaires */}
       <div className="border-t border-gray-200 pt-8 space-y-6">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Paramètres</h3>
-        <MediaPicker
-          mediaId={organization?.logo?.id}
-          attachToEntity={attachToEntity}
-          entityType="organizations"
-          entityId={organization.id}
-          label="Logo de l'organisation"
-        />
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <label className="block text-sm font-semibold text-gray-900 mb-4">
+            Logo de l'organisation
+          </label>
+          <MediaManager
+            content={logoContent}
+            onMediaAdd={handleLogoAdd}
+            onMediaRemove={handleLogoRemove}
+            onMediaChanged={loadOrganization}
+            maxMedias={1}
+          />
+        </div>
         <InputWithActions
           label="Description"
           initialValue={originalOrganizationSettings.description || ""}
@@ -244,6 +279,16 @@ export default function Settings() {
           />
         </div>
       </div>
+
+      {/* Notification */}
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
     </motion.div>
   );
 }

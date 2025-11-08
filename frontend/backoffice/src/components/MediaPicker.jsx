@@ -6,8 +6,11 @@ import MediaModifier from "./MediaModifier";
 import { useAxiosClient } from "@/utils/axiosClient";
 import useRemoveMedia from "@/hooks/useRemoveMedia";
 import Button from "@/components/ui/Button";
+import DeleteButton from "@/components/ui/DeleteButton";
 import IconButton from "@/components/ui/IconButton";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function MediaPicker({
   mediaId,
@@ -20,6 +23,8 @@ export default function MediaPicker({
 }) {
   const axios = useAxiosClient();
   const { removeMedia, loading: removeLoading } = useRemoveMedia();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [showMediaModifier, setShowMediaModifier] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
@@ -35,22 +40,13 @@ export default function MediaPicker({
 
   const handleRemoveMedia = async () => {
     if (!selectedMedia || !entityId) return;
-
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce média ?")) {
-      return;
-    }
-
-    try {
-      await removeMedia(entityType, entityId, {
-        allowMultiple,
-        mediaId: mediaIdToRemove || selectedMedia?.id,
-      });
-      setSelectedMedia(null);
-      if (attachToEntity) {
-        window.location.reload();
-      }
-    } catch (error) {
-      alert("Erreur lors de la suppression du média");
+    await removeMedia(entityType, entityId, {
+      allowMultiple,
+      mediaId: mediaIdToRemove || selectedMedia?.id,
+    });
+    setSelectedMedia(null);
+    if (attachToEntity) {
+      window.location.reload();
     }
   };
 
@@ -69,9 +65,13 @@ export default function MediaPicker({
       setSelectedMedia(media);
       setShowMediaModifier(false);
       setSelectedMediaId(null);
+      showSuccess("Média attaché", "Le média a été attaché avec succès");
     } catch (error) {
       console.error("Error attaching media:", error);
-      alert("Erreur lors de l'attachement du média");
+      showError(
+        "Erreur d'attachement",
+        "Impossible d'attacher le média. Veuillez réessayer.",
+      );
     }
   };
 
@@ -120,14 +120,14 @@ export default function MediaPicker({
             >
               Modifier
             </Button>
-            <Button
-              variant="danger"
+            <DeleteButton
+              onDelete={handleRemoveMedia}
               size="sm"
-              onClick={handleRemoveMedia}
+              deleteLabel="Supprimer"
+              confirmTitle="Supprimer le média"
+              confirmMessage="Êtes-vous sûr de vouloir supprimer ce média ?"
               disabled={removeLoading}
-            >
-              {removeLoading ? "Suppression..." : "Supprimer"}
-            </Button>
+            />
           </div>
         </div>
       ) : (
@@ -213,6 +213,16 @@ export default function MediaPicker({
             />
           </div>
         </div>
+      )}
+
+      {/* Notification */}
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={hideNotification}
+        />
       )}
     </div>
   );

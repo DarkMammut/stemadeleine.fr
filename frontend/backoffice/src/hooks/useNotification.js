@@ -20,10 +20,12 @@ export function useNotification() {
   };
 
   const hideNotification = () => {
-    setNotification((prev) => ({
-      ...prev,
+    setNotification({
       show: false,
-    }));
+      type: "success",
+      title: "",
+      message: "",
+    });
   };
 
   // Méthodes de convenance

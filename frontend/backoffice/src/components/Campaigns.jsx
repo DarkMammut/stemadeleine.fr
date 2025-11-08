@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/Utilities";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import CardList from "@/components/CardList";
 import CampaignCard from "@/components/CampaignCard";
 
@@ -74,10 +73,9 @@ export default function Campaigns({ onNotifySuccess, onNotifyError }) {
       <Utilities
         actions={[
           {
-            icon: ArrowPathIcon,
+            variant: "refresh",
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
-            variant: "refresh",
           },
         ]}
       />

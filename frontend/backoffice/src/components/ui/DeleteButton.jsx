@@ -6,8 +6,9 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 /**
  * Composant de bouton de suppression réutilisable avec modal de confirmation intégrée
  * @param {Function} onDelete - Fonction appelée lors de la confirmation de suppression
+ * @param {Function} onSuccess - Fonction appelée après une suppression réussie
  * @param {boolean} disabled - Désactive le bouton
- * {string} deleteLabel - Texte du bouton de suppression
+ * @param {string} deleteLabel - Texte du bouton de suppression
  * @param {string} confirmTitle - Titre de la modal de confirmation
  * @param {string} confirmMessage - Message de la modal de confirmation
  * @param {string} confirmLabel - Texte du bouton de confirmation
@@ -17,6 +18,7 @@ import { TrashIcon } from '@heroicons/react/24/outline';
  */
 export default function DeleteButton({
   onDelete,
+  onSuccess,
   disabled = false,
   deleteLabel = "Supprimer",
   confirmTitle = "Confirmer la suppression",
@@ -43,6 +45,9 @@ export default function DeleteButton({
       setLoading(true);
       await onDelete();
       setShowModal(false);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       console.error("Erreur suppression :", err);
       setShowModal(false);

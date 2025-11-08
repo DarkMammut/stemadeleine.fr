@@ -7,7 +7,6 @@ import UserDetails from "@/components/UserDetails";
 import UserForm from "@/components/UserForm";
 import AddressManager from "@/components/AddressManager";
 import MembershipManager from "@/components/MembershipManager";
-import ConfirmModal from "@/components/ConfirmModal";
 
 export default function EditUser() {
   const { id } = useParams();
@@ -17,8 +16,6 @@ export default function EditUser() {
   const [editMode, setEditMode] = useState(false);
   const [userForm, setUserForm] = useState({});
   const [savingUser, setSavingUser] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchUser();
@@ -63,16 +60,12 @@ export default function EditUser() {
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
     try {
       await axios.delete(`/api/users/${id}`);
       alert("Utilisateur supprimé");
       // Redirection ou autre logique ici
     } catch (error) {
       alert("Erreur lors de la suppression");
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
     }
   };
 
@@ -82,29 +75,27 @@ export default function EditUser() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-8"
     >
       <Title label="Modifier l'utilisateur" />
+
       {!editMode ? (
-        <UserDetails
-          user={user}
-          onEdit={handleEdit}
-          onDelete={() => setShowDeleteModal(true)}
-        />
+        <UserDetails user={user} onEdit={handleEdit} onDelete={handleDelete} />
       ) : (
         <>
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <UserForm
-              initialValues={userForm}
-              onSubmit={handleSaveUser}
-              onChange={(_, __, updatedValues) => setUserForm(updatedValues)}
-              loading={savingUser}
-              onCancel={handleCancelEdit}
-            />
-          </div>
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">Adresses</h3>
+          {/* Informations de l'utilisateur */}
+          <UserForm
+            initialValues={userForm}
+            onSubmit={handleSaveUser}
+            onChange={(_, __, updatedValues) => setUserForm(updatedValues)}
+            loading={savingUser}
+            onCancel={handleCancelEdit}
+          />
+
+          {/* Section Adresses */}
+          <div className="border-t border-gray-200 pt-8">
             <AddressManager
+              label="Adresses"
               addresses={user.addresses || []}
               ownerId={user.id}
               ownerType="USER"
@@ -112,8 +103,10 @@ export default function EditUser() {
               editable={true}
             />
           </div>
-          <div className="bg-surface border border-border rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-text mb-4">Adhésion</h3>
+
+          {/* Section Adhésion */}
+          <div className="border-t border-gray-200 pt-8">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Adhésion</h3>
             <MembershipManager
               userId={user.id}
               memberships={user.memberships || []}
@@ -122,16 +115,6 @@ export default function EditUser() {
           </div>
         </>
       )}
-
-      <ConfirmModal
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDelete}
-        title="Supprimer l'utilisateur"
-        message="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
-        isLoading={isDeleting}
-        variant="danger"
-      />
     </motion.div>
   );
 }

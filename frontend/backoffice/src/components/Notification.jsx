@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -10,7 +11,7 @@ import {
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export default function Notification({
-  show,
+  show = true,
   onClose,
   type = "success", // success, error, info, warning
   title,
@@ -22,29 +23,31 @@ export default function Notification({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (show) {
-      setMounted(true);
-      // Small delay to trigger animation
-      setTimeout(() => setVisible(true), 10);
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
-      if (autoClose) {
-        const timer = setTimeout(() => {
-          handleClose();
-        }, duration);
+  useEffect(() => {
+    // Small delay to trigger animation
+    const showTimer = setTimeout(() => setVisible(true), 10);
 
-        return () => clearTimeout(timer);
-      }
-    } else {
-      setVisible(false);
-      // Remove from DOM after animation
-      setTimeout(() => setMounted(false), 300);
+    if (autoClose && show) {
+      const closeTimer = setTimeout(() => {
+        handleClose();
+      }, duration);
+
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(closeTimer);
+      };
     }
+
+    return () => clearTimeout(showTimer);
   }, [show, autoClose, duration]);
 
   const handleClose = () => {
     setVisible(false);
     setTimeout(() => {
-      setMounted(false);
       onClose?.();
     }, 300);
   };
@@ -87,43 +90,42 @@ export default function Notification({
   };
 
   if (!mounted) return null;
+  if (!show || !title) return null;
 
-  return (
+  const notificationContent = (
     <div
       aria-live="assertive"
-      className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6 z-50"
+      className="pointer-events-none fixed top-0 right-0 p-6 z-[9999]"
     >
-      <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
-        <div
-          className={`pointer-events-auto w-full max-w-sm rounded-lg bg-white shadow-lg border border-gray-200 transform transition-all duration-300 ease-out ${
-            visible
-              ? "opacity-100 translate-y-0 sm:translate-x-0"
-              : "opacity-0 translate-y-2 sm:translate-x-2 sm:translate-y-0"
-          }`}
-        >
-          <div className="p-4">
-            <div className="flex items-start">
-              <div className="shrink-0">{getIcon()}</div>
-              <div className="ml-3 w-0 flex-1 pt-0.5">
-                <p className="text-sm font-medium text-gray-900">{title}</p>
-                {message && (
-                  <p className="mt-1 text-sm text-gray-500">{message}</p>
-                )}
-              </div>
-              <div className="ml-4 flex shrink-0">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 transition-colors cursor-pointer"
-                >
-                  <span className="sr-only">Fermer</span>
-                  <XMarkIcon aria-hidden="true" className="h-5 w-5" />
-                </button>
-              </div>
+      <div
+        className={`pointer-events-auto w-96 rounded-lg bg-white shadow-lg border border-gray-200 transform transition-all duration-300 ease-out ${
+          visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"
+        }`}
+      >
+        <div className="p-4">
+          <div className="flex items-start">
+            <div className="shrink-0">{getIcon()}</div>
+            <div className="ml-3 w-0 flex-1 pt-0.5">
+              <p className="text-sm font-medium text-gray-900">{title}</p>
+              {message && (
+                <p className="mt-1 text-sm text-gray-500">{message}</p>
+              )}
+            </div>
+            <div className="ml-4 flex shrink-0">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 transition-colors cursor-pointer"
+              >
+                <span className="sr-only">Fermer</span>
+                <XMarkIcon aria-hidden="true" className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(notificationContent, document.body);
 }

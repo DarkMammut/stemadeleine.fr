@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { motion } from "framer-motion";
 import Title from "@/components/Title";
 import MyForm from "@/components/MyForm";
-import DetailsPayment from "@/components/DetailsPayment";
+import PaymentDetails from "@/components/PaymentDetails";
 import LinkUser from "@/components/LinkUser";
-import ConfirmModal from "@/components/ConfirmModal";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function EditPayment() {
   const { id } = useParams();
+  const router = useRouter();
   const axios = useAxiosClient();
   const [payment, setPayment] = useState(null);
   const [paymentForm, setPaymentForm] = useState({});
@@ -17,8 +19,8 @@ export default function EditPayment() {
   const [saving, setSaving] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [paymentEnums, setPaymentEnums] = useState({ status: [], type: [] });
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     loadPayment();
@@ -42,7 +44,8 @@ export default function EditPayment() {
         paymentDate: res.data.paymentDate || "",
       });
     } catch (e) {
-      alert("Erreur lors du chargement du paiement");
+      console.error("Erreur lors du chargement du paiement:", e);
+      showError("Erreur de chargement", "Impossible de charger le paiement");
     } finally {
       setLoading(false);
     }
@@ -57,7 +60,7 @@ export default function EditPayment() {
     }
   };
 
-  const handleChange = (nameOrEvent, value, allValues) => {
+  const handleChange = (nameOrEvent, value) => {
     if (typeof nameOrEvent === "string") {
       // Appel direct depuis CurrencyInput ou MyForm
       setPaymentForm((f) => ({ ...f, [nameOrEvent]: value }));
@@ -76,28 +79,39 @@ export default function EditPayment() {
     try {
       await axios.put(`/api/payments/${id}`, formValues);
       await loadPayment();
-      alert("Paiement modifié");
+      setShowEditForm(false);
+      showSuccess(
+        "Paiement modifié",
+        "Les modifications ont été enregistrées avec succès",
+      );
     } catch (e) {
-      alert("Erreur lors de la modification du paiement");
+      console.error("Erreur lors de la modification du paiement:", e);
+      showError("Erreur de modification", "Impossible de modifier le paiement");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleEdit = () => setShowEditForm(true);
+  const handleEdit = () => {
+    setShowEditForm(true);
+  };
+
   const handleDelete = async () => {
-    setIsDeleting(true);
     try {
       await axios.delete(`/api/payments/${id}`);
-      alert("Paiement supprimé");
-      // Redirection ou autre logique ici
+      showSuccess(
+        "Paiement supprimé",
+        "Le paiement a été supprimé avec succès",
+      );
+      setTimeout(() => {
+        router.push("/payments");
+      }, 1500);
     } catch (error) {
-      alert("Erreur lors de la suppression");
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
+      console.error("Erreur lors de la suppression:", error);
+      showError("Erreur de suppression", "Impossible de supprimer le paiement");
     }
   };
+
   const handleUserNavigate = () => {
     if (payment?.user?.id) {
       window.location.href = `/users/${payment.user.id}`;
@@ -110,9 +124,16 @@ export default function EditPayment() {
     try {
       await axios.put(`/api/payments/${id}`, { ...paymentForm, userId });
       await loadPayment();
-      alert("Utilisateur lié au paiement");
+      showSuccess(
+        "Utilisateur lié",
+        "L'utilisateur a été lié au paiement avec succès",
+      );
     } catch (e) {
-      alert("Erreur lors de la liaison de l'utilisateur");
+      console.error("Erreur lors de la liaison de l'utilisateur:", e);
+      showError(
+        "Erreur de liaison",
+        "Impossible de lier l'utilisateur au paiement",
+      );
     } finally {
       setSaving(false);
     }
@@ -171,57 +192,57 @@ export default function EditPayment() {
 
   if (loading) return <div>Chargement...</div>;
 
-  if (!showEditForm) {
-    return (
-      <>
-        <DetailsPayment
-          payment={payment}
-          onEdit={handleEdit}
-          onDelete={() => setShowDeleteModal(true)}
-          onUserNavigate={handleUserNavigate}
-        />
-        <ConfirmModal
-          open={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={handleDelete}
-          title="Supprimer le paiement"
-          message="Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible."
-          isLoading={isDeleting}
-          variant="danger"
-        />
-      </>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
+      className="w-full max-w-4xl mx-auto space-y-8"
     >
       <Title label="Modifier le paiement" />
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <MyForm
-          fields={paymentFields}
-          initialValues={paymentForm}
-          onSubmit={handleSave}
-          onChange={handleChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le paiement"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
+
+      {!showEditForm ? (
+        <PaymentDetails
+          payment={payment}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onUserNavigate={handleUserNavigate}
         />
-      </div>
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Lier un utilisateur
-        </h3>
-        <LinkUser
-          onLink={handleLinkUser}
-          onCreateAndLink={handleCreateAndLinkUser}
-          loading={saving}
-        />
-      </div>
+      ) : (
+        <>
+          {/* Informations du paiement */}
+          <MyForm
+            fields={paymentFields}
+            initialValues={paymentForm}
+            onSubmit={handleSave}
+            onChange={handleChange}
+            loading={saving}
+            submitButtonLabel="Enregistrer le paiement"
+            onCancel={handleCancelEdit}
+            cancelButtonLabel="Annuler"
+          />
+
+          {/* Section Lier un utilisateur */}
+          <div className="border-t border-gray-200 pt-8">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">
+              Lier un utilisateur
+            </h3>
+            <LinkUser
+              onLink={handleLinkUser}
+              onCreateAndLink={handleCreateAndLinkUser}
+              loading={saving}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Modal de confirmation pour la modification */}
+      {/* Notifications */}
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        message={notification.message}
+      />
     </motion.div>
   );
 }

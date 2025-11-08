@@ -53,7 +53,7 @@ export default function LinkUser({ onLink, onCreateAndLink, loading }) {
       {!creating ? (
         <div>
           <label className="block mb-2 font-medium">
-            Rechercher un utilisateur
+            Rechercher un émetteur existant
           </label>
           <input
             type="text"
@@ -77,11 +77,20 @@ export default function LinkUser({ onLink, onCreateAndLink, loading }) {
             </select>
           )}
           <div className="flex gap-2">
-            <Button onClick={handleLink} disabled={!selectedUserId || loading}>
-              Lier l'utilisateur sélectionné
+            <Button
+              onClick={handleLink}
+              disabled={!selectedUserId || loading}
+              variant="primary"
+              size="md"
+            >
+              Lier l'émetteur sélectionné
             </Button>
-            <Button variant="secondary" onClick={() => setCreating(true)}>
-              Créer et lier un nouvel utilisateur
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setCreating(true)}
+            >
+              Créer et lier un nouvel émetteur
             </Button>
           </div>
         </div>
@@ -116,11 +125,17 @@ export default function LinkUser({ onLink, onCreateAndLink, loading }) {
             className="border rounded px-3 py-2 w-full"
           />
           <div className="flex gap-2 mt-2">
-            <Button type="submit" loading={creatingLoading}>
+            <Button
+              type="submit"
+              loading={creatingLoading}
+              variant="primary"
+              size="md"
+            >
               Créer et lier
             </Button>
             <Button
-              variant="secondary"
+              variant="outline"
+              size="md"
               type="button"
               onClick={() => setCreating(false)}
             >

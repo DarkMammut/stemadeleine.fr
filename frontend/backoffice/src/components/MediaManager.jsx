@@ -216,10 +216,6 @@ const MediaManager = ({
   };
 
   const handleRemoveMedia = async (mediaId) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce média ?")) {
-      return;
-    }
-
     try {
       await onMediaRemove(content.id, mediaId);
       if (onMediaChanged) onMediaChanged();

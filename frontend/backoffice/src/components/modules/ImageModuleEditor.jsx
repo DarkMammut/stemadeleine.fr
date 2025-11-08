@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
+import MediaManager from "@/components/MediaManager";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 
@@ -54,14 +55,19 @@ export default function ImageModuleEditor({
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
-    try {
-      await setModuleMedia(moduleId, mediaId);
-      refetch();
-    } catch (error) {
-      console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
-    }
+  // Fonctions pour MediaManager
+  const handleMediaAdd = async (contentId, mediaId) => {
+    await setModuleMedia(moduleId, mediaId);
+  };
+
+  const handleMediaRemove = async (contentId, mediaId) => {
+    await setModuleMedia(moduleId, null);
+  };
+
+  // Créer un objet "content" pour MediaManager
+  const moduleContent = {
+    id: moduleId,
+    medias: moduleData?.media ? [moduleData.media] : [],
   };
 
   const handleFormChange = () => {
@@ -135,13 +141,18 @@ export default function ImageModuleEditor({
       )}
 
       {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Image du module"
-      />
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <label className="block text-sm font-semibold text-gray-900 mb-4">
+          Image du module
+        </label>
+        <MediaManager
+          content={moduleContent}
+          onMediaAdd={handleMediaAdd}
+          onMediaRemove={handleMediaRemove}
+          onMediaChanged={refetch}
+          maxMedias={1}
+        />
+      </div>
     </div>
   );
 }

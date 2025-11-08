@@ -1,7 +1,7 @@
 import React from "react";
 import Utilities from "@/components/Utilities";
 
-export default function DetailsPayment({ organization, onEdit }) {
+export default function OrganizationDetails({ organization, onEdit }) {
   if (!organization) return null;
 
   const actions = [

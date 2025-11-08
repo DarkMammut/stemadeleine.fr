@@ -247,7 +247,7 @@ public class HelloAssoImportService {
                 user = userRepository.save(user);
             }
             boolean exists = paymentRepository.findAll().stream()
-                    .anyMatch(p -> p.getHelloAssoPaymentId().equals(dto.getPaymentId()));
+                    .anyMatch(p -> p.getHelloAssoPaymentId() != null && p.getHelloAssoPaymentId().equals(dto.getPaymentId()));
             if (exists) {
                 ignores++;
                 continue;

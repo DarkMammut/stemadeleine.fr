@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/Title";
 import Utilities from "@/components/Utilities";
@@ -12,12 +12,15 @@ import CardList from "@/components/CardList";
 import PaymentCard from "@/components/PaymentCard";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import PaymentFormModal from "@/components/PaymentFormModal";
 
 export default function Payments() {
   const router = useRouter();
   const axios = useAxiosClient();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const { getAllPayments, createPayment } = usePaymentOperations();
   const { notification, showSuccess, showError, hideNotification } =
@@ -40,23 +43,18 @@ export default function Payments() {
     }
   };
 
-  const handleCreatePayment = async () => {
+  const handleCreatePayment = async (paymentData) => {
     try {
-      await createPayment({
-        label: "Nouveau Paiement",
-        amount: 0,
-        date: new Date().toISOString(),
-        user: null,
-        type: "",
-      });
+      setIsCreating(true);
+      await createPayment(paymentData);
       await loadPayments();
-      showSuccess(
-        "Paiement créé",
-        "Un nouveau paiement a été créé avec succès",
-      );
+      setIsModalOpen(false);
+      showSuccess("Paiement créé", "Le paiement a été créé avec succès");
     } catch (error) {
       console.error("Erreur lors de la création du paiement:", error);
       showError("Erreur de création", "Impossible de créer le paiement");
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -98,13 +96,13 @@ export default function Payments() {
           {
             icon: PlusIcon,
             label: "Nouveau Paiement",
-            callback: handleCreatePayment,
+            callback: () => setIsModalOpen(true),
           },
           {
-            icon: ArrowPathIcon,
+            variant: "refresh",
             label: "Actualiser HelloAsso",
             callback: handleImportHelloAsso,
-            variant: "refresh",
+            hoverExpand: true,
           },
         ]}
       />
@@ -118,6 +116,13 @@ export default function Payments() {
           />
         ))}
       </CardList>
+
+      <PaymentFormModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreatePayment}
+        isLoading={isCreating}
+      />
 
       <Notification
         show={notification.show}

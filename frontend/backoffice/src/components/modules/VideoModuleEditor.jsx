@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
-import Switch from "@/components/ui/Switch";
+import MediaManager from "@/components/MediaManager";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 
@@ -110,27 +110,31 @@ export default function VideoModuleEditor({
     }
   };
 
+  // Fonctions pour MediaManager
+  const handleMediaAdd = async (contentId, mediaId) => {
+    await setModuleMedia(moduleId, mediaId);
+  };
+
+  const handleMediaRemove = async (contentId, mediaId) => {
+    await setModuleMedia(moduleId, null);
+  };
+
+  // Créer un objet "content" pour MediaManager
+  const moduleContent = {
+    id: moduleId,
+    medias: moduleData?.media ? [moduleData.media] : [],
+  };
+
   return (
     <div className="space-y-6">
       {/* Section Visibilité */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          Visibilité du module
-        </h3>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <Switch
-            checked={moduleData?.isVisible || false}
-            onChange={handleVisibilityChange}
-            disabled={savingVisibility}
-          />
-          <span className="font-medium text-text">
-            Module visible sur le site
-            {savingVisibility && (
-              <span className="text-text-muted ml-2">(Sauvegarde...)</span>
-            )}
-          </span>
-        </label>
-      </div>
+      <VisibilitySwitch
+        title="Visibilité du module"
+        label="Module visible sur le site"
+        isVisible={moduleData?.isVisible || false}
+        onChange={handleVisibilityChange}
+        savingVisibility={savingVisibility}
+      />
 
       {/* Formulaire principal */}
       {moduleData && Object.keys(moduleData).length > 0 && (
@@ -148,13 +152,18 @@ export default function VideoModuleEditor({
       )}
 
       {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Vignette de la vidéo"
-      />
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <label className="block text-sm font-semibold text-gray-900 mb-4">
+          Image du module
+        </label>
+        <MediaManager
+          content={moduleContent}
+          onMediaAdd={handleMediaAdd}
+          onMediaRemove={handleMediaRemove}
+          onMediaChanged={refetch}
+          maxMedias={1}
+        />
+      </div>
     </div>
   );
 }
