@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { ChevronRightIcon, HomeIcon } from "@heroicons/react/16/solid";
+import { ChevronRightIcon, DocumentTextIcon } from "@heroicons/react/16/solid";
 import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
 
 export default function NavigationStepper() {
@@ -31,7 +31,7 @@ export default function NavigationStepper() {
       {
         name: "Website",
         href: "/pages",
-        icon: HomeIcon,
+        icon: DocumentTextIcon,
         current: false,
       },
     ];

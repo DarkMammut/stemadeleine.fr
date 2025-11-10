@@ -1,38 +1,86 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyForm from "@/components/MyForm";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
-import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
-import MediaPicker from "@/components/MediaPicker";
-import Button from "@/components/ui/Button";
-import { PlusIcon } from "@heroicons/react/16/solid";
+import useGetModule from "@/hooks/useGetModule";
+import useGetGallery from "@/hooks/useGetGallery";
+import useGalleryVariants from "@/hooks/useGalleryVariants";
+import MediaManager from "@/components/MediaManager";
 import { useGalleriesMediasOperations } from "@/hooks/useGalleriesMediasOperations";
-import MediaGrid from "@/components/MediaGrid";
-import MediaModifier from "@/components/MediaModifier";
-import IconButton from "@/components/ui/IconButton";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function GalleryModuleEditor({
   moduleId,
-  moduleData,
-  setModuleData,
-  refetch,
+  moduleData: _initialModuleData,
+  setModuleData: setParentModuleData,
+  refetch: _parentRefetch,
 }) {
-  const { updateModule } = useAddModule();
   const { updateModuleVisibility } = useModuleOperations();
-  const [saving, setSaving] = useState(false);
+  const axios = useAxiosClient();
+  const [savingModule, setSavingModule] = useState(false);
+  const [savingGallery, setSavingGallery] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [showMediaPicker, setShowMediaPicker] = useState(false);
-  const [editingMedia, setEditingMedia] = useState(null);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
-  const { addMedia, removeMedia, mediaLoading } = useGalleriesMediasOperations({
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
+  const { addMedia, removeMedia } = useGalleriesMediasOperations({
     entityType: "gallery",
   });
 
-  // Champs basés sur le modèle Java Gallery
-  const fields = [
+  // Récupérer les données du module (name, title)
+  const {
+    module,
+    refetch: refetchModule,
+    loading: moduleLoading,
+  } = useGetModule({ moduleId });
+
+  // Récupérer les données complètes de la galerie (variant, medias)
+  const {
+    gallery,
+    refetch: refetchGallery,
+    loading: galleryLoading,
+  } = useGetGallery({ moduleId });
+
+  // Récupérer les variantes disponibles depuis le backend
+  const { variants: variantOptions, loading: variantsLoading } =
+    useGalleryVariants();
+
+  // États locaux
+  const [moduleData, setModuleData] = useState(null);
+  const [galleryData, setGalleryData] = useState(null);
+
+  // Synchroniser avec les données du module
+  useEffect(() => {
+    if (module) {
+      console.log("📦 Données de module chargées:", module);
+      setModuleData(module);
+    }
+  }, [module]);
+
+  // Synchroniser avec les données de la galerie
+  useEffect(() => {
+    if (gallery) {
+      console.log("🖼️ Données de galerie chargées:", gallery);
+      console.log("  - variant:", gallery.variant);
+      setGalleryData(gallery);
+    }
+  }, [gallery]);
+
+  // Mettre à jour le parent avec les données combinées
+  useEffect(() => {
+    if (moduleData && galleryData && setParentModuleData) {
+      setParentModuleData({
+        ...moduleData,
+        ...galleryData,
+      });
+    }
+  }, [moduleData, galleryData, setParentModuleData]);
+
+  // Champs pour le formulaire Module (name, title)
+  const moduleFields = [
     {
       name: "name",
       label: "Nom du module",
@@ -47,42 +95,85 @@ export default function GalleryModuleEditor({
       placeholder: "Entrez le titre",
       required: true,
     },
+  ];
+
+  // Champs pour le formulaire Gallery (variant)
+  const galleryFields = [
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [{ value: "GRID", label: "Grille" }],
+      options: variantOptions,
     },
   ];
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
-
-  const handleSubmit = async (values) => {
+  // Soumission du formulaire Module
+  const handleModuleSubmit = async (values) => {
+    console.log("📝 Soumission du formulaire Module avec values:", values);
+    setSavingModule(true);
     try {
-      setSaving(true);
-      await updateModule(moduleId, {
+      const payload = {
         name: values.name,
         title: values.title,
-        variant: values.variant,
-        sortOrder: parseInt(values.sortOrder) || 0,
-      });
-      setSaving(false);
-      refetch();
-      alert("Module galerie mis à jour !");
+      };
+      console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
+
+      const response = await axios.put(`/api/modules/${module.id}`, payload);
+
+      console.log("📥 Réponse du serveur:", response.data);
+
+      // Mettre à jour moduleData
+      setModuleData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      console.log("✅ Module mis à jour");
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
-      setSaving(false);
+      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      throw err;
+    } finally {
+      setSavingModule(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+  // Soumission du formulaire Gallery
+  const handleGallerySubmit = async (values) => {
+    console.log("📝 Soumission du formulaire Gallery avec values:", values);
+    setSavingGallery(true);
+    try {
+      const payload = {
+        variant: values.variant,
+      };
+      console.log("📤 Envoi au serveur (endpoint: /api/galleries):", payload);
+
+      const response = await axios.put(`/api/galleries/${gallery.id}`, payload);
+
+      console.log("📥 Réponse du serveur:", response.data);
+      console.log("  - variant dans réponse:", response.data?.variant);
+
+      // Mettre à jour galleryData
+      setGalleryData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      console.log("✅ Galerie mise à jour");
+    } catch (err) {
+      console.error("❌ Erreur lors de la sauvegarde de la galerie:", err);
+      throw err;
+    } finally {
+      setSavingGallery(false);
+    }
+  };
+
+  const handleCancelModuleEdit = async () => {
+    await refetchModule();
+  };
+
+  const handleCancelGalleryEdit = async () => {
+    await refetchGallery();
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -90,34 +181,35 @@ export default function GalleryModuleEditor({
       setSavingVisibility(true);
       await updateModuleVisibility(moduleId, isVisible);
       setSavingVisibility(false);
+
+      // Mettre à jour les données locales
       setModuleData((prev) => ({ ...prev, isVisible }));
+      if (setParentModuleData && moduleData && galleryData) {
+        setParentModuleData({ ...moduleData, ...galleryData, isVisible });
+      }
+
+      showSuccess(
+        "Visibilité mise à jour",
+        `Le module est maintenant ${isVisible ? "visible" : "masqué"}`,
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError(
+        "Erreur de visibilité",
+        "Impossible de mettre à jour la visibilité du module",
+      );
       setSavingVisibility(false);
     }
   };
 
-  const handleAddMedia = async (mediaId) => {
-    try {
-      await addMedia(moduleId, mediaId);
-      setShowMediaPicker(false);
-      refetch();
-    } catch (error) {
-      console.error("Erreur lors de l'ajout du média :", error);
-      alert("Erreur lors de l'ajout du média");
-    }
-  };
-
-  const handleRemoveMedia = async (mediaId) => {
-    try {
-      await removeMedia(moduleId, mediaId);
-      refetch();
-    } catch (error) {
-      console.error("Erreur lors de la suppression du média :", error);
-      alert("Erreur lors de la suppression du média");
-    }
-  };
+  // Afficher un loader pendant le chargement initial
+  if (
+    (moduleLoading && !moduleData) ||
+    (galleryLoading && !galleryData) ||
+    variantsLoading
+  ) {
+    return <div className="text-center py-8">Chargement de la galerie...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -130,86 +222,54 @@ export default function GalleryModuleEditor({
         savingVisibility={savingVisibility}
       />
 
-      {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
+      {/* Formulaire Module (name, title) */}
+      {moduleData && (
         <MyForm
-          key={`${moduleId || "gallery-module"}-${formKey}`}
-          fields={fields}
+          title="Détails de la galerie"
+          fields={moduleFields}
           initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module galerie"
-          onCancel={handleCancelEdit}
+          onSubmit={handleModuleSubmit}
+          loading={savingModule}
+          submitButtonLabel="Enregistrer"
+          onCancel={handleCancelModuleEdit}
           cancelButtonLabel="Annuler"
+          successMessage="Les informations du module ont été mises à jour avec succès"
+          errorMessage="Impossible de mettre à jour le module"
         />
       )}
 
-      {/* Gestion des médias de la galerie */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-text">
-            Médias de la galerie
-          </h3>
-          <Button
-            onClick={() => setShowMediaPicker(true)}
-            variant="primary"
-            size="sm"
-            loading={mediaLoading}
-          >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Ajouter un média
-          </Button>
-        </div>
-
-        <MediaGrid
-          medias={moduleData?.medias || []}
-          onEdit={setEditingMedia}
-          onRemove={handleRemoveMedia}
-        />
-      </div>
-
-      {/* Sélecteur de média */}
-      {showMediaPicker && (
-        <MediaPicker
-          attachToEntity={handleAddMedia}
-          entityType="gallery"
-          entityId={moduleId}
-          onClose={() => setShowMediaPicker(false)}
+      {/* Formulaire Gallery (variant) */}
+      {galleryData && (
+        <MyForm
+          title="Paramètres de la galerie"
+          fields={galleryFields}
+          initialValues={galleryData}
+          onSubmit={handleGallerySubmit}
+          loading={savingGallery}
+          submitButtonLabel="Enregistrer"
+          onCancel={handleCancelGalleryEdit}
+          cancelButtonLabel="Annuler"
+          successMessage="La variante de la galerie a été mise à jour avec succès"
+          errorMessage="Impossible de mettre à jour la galerie"
         />
       )}
 
-      {/* Éditeur de média */}
-      {editingMedia && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Modifier le média
-              </h3>
-              <IconButton
-                icon={XMarkIcon}
-                label="Fermer"
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditingMedia(null)}
-              />
-            </div>
+      {/* Gestion des médias avec MediaManager */}
+      <MediaManager
+        content={{ id: moduleId, medias: galleryData?.medias || [] }}
+        onMediaAdd={addMedia}
+        onMediaRemove={removeMedia}
+        onMediaChanged={refetchGallery}
+      />
 
-            <MediaModifier
-              mediaId={editingMedia.id}
-              onMediaUpdated={() => {
-                refetch();
-              }}
-              onConfirm={() => {
-                setEditingMedia(null);
-                refetch();
-              }}
-              onCancel={() => setEditingMedia(null)}
-            />
-          </div>
-        </div>
-      )}
+      {/* Notifications */}
+      <Notification
+        show={notification.show}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={hideNotification}
+      />
     </div>
   );
 }

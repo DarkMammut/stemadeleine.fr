@@ -229,13 +229,14 @@ export default function MediaEditor({
                     setMedia(res.data);
                     setOriginalMedia(res.data); // Mise à jour de l'état original
                     setHasUnsavedChanges(false);
-                    alert("Média mis à jour !");
                   } catch (err) {
                     console.error(err);
-                    alert("Erreur lors de la sauvegarde");
+                    throw err;
                   }
                 }}
                 submitButtonLabel="Modifier le média"
+                successMessage="Le média a été mis à jour avec succès"
+                errorMessage="Erreur lors de la sauvegarde du média"
                 additionalButtons={
                   hasUnsavedChanges
                     ? [

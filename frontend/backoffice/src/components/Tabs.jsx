@@ -3,12 +3,25 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Tabs({ tabs, defaultIndex = 0 }) {
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
+export default function Tabs({ tabs, defaultIndex = 0, persistKey }) {
+  const [activeIndex, setActiveIndex] = useState(() => {
+    // Si persistKey est fourni, récupérer l'onglet actif depuis sessionStorage
+    if (persistKey && typeof window !== "undefined") {
+      const savedTab = sessionStorage.getItem(persistKey);
+      return savedTab ? parseInt(savedTab, 10) : defaultIndex;
+    }
+    return defaultIndex;
+  });
   const router = useRouter();
 
   const handleTabClick = (tab, idx) => {
     setActiveIndex(idx);
+
+    // Sauvegarder l'onglet actif si persistKey est fourni
+    if (persistKey && typeof window !== "undefined") {
+      sessionStorage.setItem(persistKey, idx.toString());
+    }
+
     if (tab.url) {
       router.push(tab.url);
     }

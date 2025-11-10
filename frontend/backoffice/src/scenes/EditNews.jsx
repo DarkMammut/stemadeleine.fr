@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Utilities from "@/components/Utilities";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
@@ -15,6 +14,7 @@ import { useNewsPublicationOperations } from "@/hooks/useNewsPublicationOperatio
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 import ConfirmModal from "@/components/ConfirmModal";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditNews({ newsId }) {
   const [newsData, setNewsData] = useState(null);
@@ -236,11 +236,7 @@ export default function EditNews({ newsId }) {
     );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto space-y-6"
-    >
+    <SceneLayout>
       <Title label="Édition d'actualité" />
 
       <Utilities actions={[]} />
@@ -314,21 +310,17 @@ export default function EditNews({ newsId }) {
 
       {/* Gestion de l'image de l'actualité (News Media) */}
       {newsData && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Image de l'actualité
-          </h3>
-          <MediaManager
-            content={{
-              id: newsId,
-              medias: newsData?.media ? [newsData.media] : [],
-            }}
-            onMediaAdd={handleAddMedia}
-            onMediaRemove={handleRemoveMedia}
-            onMediaChanged={loadNews}
-            maxMedias={1}
-          />
-        </div>
+        <MediaManager
+          title="Image de l'actualité"
+          content={{
+            id: newsId,
+            medias: newsData?.media ? [newsData.media] : [],
+          }}
+          onMediaAdd={handleAddMedia}
+          onMediaRemove={handleRemoveMedia}
+          onMediaChanged={loadNews}
+          maxMedias={1}
+        />
       )}
 
       {/* Publish Confirmation Modal */}
@@ -351,6 +343,6 @@ export default function EditNews({ newsId }) {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

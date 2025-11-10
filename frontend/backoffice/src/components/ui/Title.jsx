@@ -2,7 +2,6 @@ import PublishButton from "@/components/ui/PublishButton";
 import BackButton from "@/components/ui/BackButton";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
-import NavigationStepper from "@/components/NavigationStepper";
 
 export default function Title({
   label = "Title",
@@ -18,21 +17,27 @@ export default function Title({
 
   return (
     <div className="w-full mb-8">
-      <div className="space-y-2">
-        {/* BackButton intelligent - s'affiche dans les sous-pages */}
-        <BackButton
-          to={backTo}
-          autoHide={autoHideBackButton && !showBackButton}
-        />
+      {/* BackButton et Breadcrumbs sur la même ligne */}
+      <div className="relative flex items-center justify-center mb-6">
+        {/* BackButton à gauche */}
+        <div className="absolute left-0">
+          <BackButton
+            to={backTo}
+            autoHide={autoHideBackButton && !showBackButton}
+          />
+        </div>
 
-        {/* Desktop breadcrumbs */}
+        {/* Breadcrumbs centrés */}
         {showBreadcrumbs && breadcrumbs.length > 0 && (
           <nav aria-label="Breadcrumb" className="sm:flex">
             <ol role="list" className="flex items-center space-x-4">
               {breadcrumbs.map((breadcrumb, index) => (
                 <li key={index}>
                   {index === 0 ? (
-                    <div className="flex">
+                    <div className="flex items-center">
+                      {breadcrumb.icon && (
+                        <breadcrumb.icon className="h-5 w-5 shrink-0 text-gray-400 mr-2" />
+                      )}
                       <button
                         onClick={() => router.push(breadcrumb.href)}
                         className="text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
@@ -46,21 +51,26 @@ export default function Title({
                         aria-hidden="true"
                         className="h-5 w-5 shrink-0 text-gray-400"
                       />
-                      {breadcrumb.current ? (
-                        <span
-                          aria-current="page"
-                          className="ml-4 text-sm font-medium text-gray-500"
-                        >
-                          {breadcrumb.name}
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => router.push(breadcrumb.href)}
-                          className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
-                        >
-                          {breadcrumb.name}
-                        </button>
-                      )}
+                      <div className="flex items-center ml-4">
+                        {breadcrumb.icon && (
+                          <breadcrumb.icon className="h-5 w-5 shrink-0 text-gray-400 mr-2" />
+                        )}
+                        {breadcrumb.current ? (
+                          <span
+                            aria-current="page"
+                            className="text-sm font-medium text-gray-500"
+                          >
+                            {breadcrumb.name}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => router.push(breadcrumb.href)}
+                            className="text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
+                          >
+                            {breadcrumb.name}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </li>
@@ -68,14 +78,9 @@ export default function Title({
             </ol>
           </nav>
         )}
-
-        {/* Fallback: use existing NavigationStepper if no breadcrumbs provided */}
-        {!showBreadcrumbs && <NavigationStepper />}
       </div>
 
-      {/* ...existing code... */}
-
-      <div className="mt-2 md:flex md:items-center md:justify-between">
+      <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">

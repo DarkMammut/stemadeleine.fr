@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { ArrowPathIcon, FunnelIcon } from "@heroicons/react/24/outline";
-import Title from "@/components/Title";
+import SceneLayout from "@/components/ui/SceneLayout";
+import Title from "@/components/ui/Title";
 import Utilities from "@/components/Utilities";
 import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
@@ -97,12 +97,8 @@ export default function Contacts() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
-    >
-      <Title label="Contacts" />
+    <SceneLayout>
+      <Title label="Demandes" />
 
       <Utilities
         actions={[
@@ -138,6 +134,6 @@ export default function Contacts() {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

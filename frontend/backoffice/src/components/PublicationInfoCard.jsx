@@ -29,8 +29,8 @@ export default function PublicationInfoCard({
   additionalButtons = null, // Boutons supplémentaires à afficher
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+      <div className="flex items-center justify-between px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <div className="flex items-center gap-2">
           {additionalButtons}
@@ -59,7 +59,7 @@ export default function PublicationInfoCard({
       </div>
 
       {/* Information Grid */}
-      <div className="space-y-4">
+      <div className="px-4 py-6 sm:p-8 space-y-4">
         {/* Statut - Ligne 1 complète */}
         <div className="flex items-center gap-3 text-sm">
           <span className="font-medium text-gray-900">Statut:</span>

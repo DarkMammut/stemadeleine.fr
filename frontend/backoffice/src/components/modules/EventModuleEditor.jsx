@@ -154,6 +154,8 @@ export default function EventModuleEditor({
           submitButtonLabel="Enregistrer le module événement"
           onCancel={handleCancelEdit}
           cancelButtonLabel="Annuler"
+          successMessage="Le module événement a été mis à jour avec succès"
+          errorMessage="Impossible d'enregistrer le module événement"
         />
       )}
 

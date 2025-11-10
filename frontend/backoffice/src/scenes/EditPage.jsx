@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import SceneLayout from "@/components/ui/SceneLayout";
 import PagesTabs from "@/components/PagesTabs";
 import Utilities from "@/components/Utilities";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import useGetPage from "@/hooks/useGetPage";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
@@ -162,11 +162,7 @@ export default function EditPage({ pageId }) {
   const breadcrumbs = pageData ? buildPageBreadcrumbs(pageData) : [];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
-    >
+    <SceneLayout>
       <Title
         label={
           pageData ? pageData.name || "Page sans nom" : "Gestion des pages"
@@ -175,11 +171,8 @@ export default function EditPage({ pageId }) {
         showBreadcrumbs={!!pageData}
         breadcrumbs={breadcrumbs}
       />
-
       <PagesTabs pageId={pageId} />
-
       <Utilities actions={[]} />
-
       {!pageData ? (
         <div className="text-center py-8 text-gray-500">
           Chargement des données...
@@ -199,6 +192,7 @@ export default function EditPage({ pageId }) {
           {pageData && Object.keys(pageData).length > 0 && (
             <MyForm
               key={`${pageData.id || "page-form"}-${formKey}`} // Clé combinée pour forcer le remontage
+              title="Détails de la page"
               fields={fields}
               initialValues={pageData}
               onSubmit={handleSubmit}
@@ -207,30 +201,26 @@ export default function EditPage({ pageId }) {
               submitButtonLabel="Enregistrer la page"
               onCancel={handleCancelEdit}
               cancelButtonLabel="Annuler"
+              successMessage="La page a été mise à jour avec succès"
+              errorMessage="Impossible d'enregistrer la page"
             />
           )}
         </div>
       )}
-
       {/* Gestion de l'image de bannière (Hero Media) */}
       {pageData && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Image de bannière
-          </h3>
-          <MediaManager
-            content={{
-              id: pageId,
-              medias: page?.heroMedia ? [page.heroMedia] : [],
-            }}
-            onMediaAdd={handleAddMedia}
-            onMediaRemove={handleRemoveMedia}
-            onMediaChanged={refetch}
-            maxMedias={1}
-          />
-        </div>
+        <MediaManager
+          title="Image de bannière"
+          content={{
+            id: pageId,
+            medias: page?.heroMedia ? [page.heroMedia] : [],
+          }}
+          onMediaAdd={handleAddMedia}
+          onMediaRemove={handleRemoveMedia}
+          onMediaChanged={refetch}
+          maxMedias={1}
+        />
       )}
-
       <Notification
         show={notification.show}
         onClose={hideNotification}
@@ -238,6 +228,6 @@ export default function EditPage({ pageId }) {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

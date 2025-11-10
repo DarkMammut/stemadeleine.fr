@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
-import { motion } from "framer-motion";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import UserDetails from "@/components/UserDetails";
 import UserForm from "@/components/UserForm";
 import AddressManager from "@/components/AddressManager";
 import MembershipManager from "@/components/MembershipManager";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditUser() {
   const { id } = useParams();
@@ -72,11 +72,7 @@ export default function EditUser() {
   if (loading) return <div>Chargement...</div>;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-8"
-    >
+    <SceneLayout>
       <Title label="Modifier l'utilisateur" />
 
       {!editMode ? (
@@ -115,6 +111,6 @@ export default function EditUser() {
           </div>
         </>
       )}
-    </motion.div>
+    </SceneLayout>
   );
 }

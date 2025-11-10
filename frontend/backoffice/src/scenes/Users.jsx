@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
-import Title from "@/components/Title";
+import SceneLayout from "@/components/ui/SceneLayout";
+import Title from "@/components/ui/Title";
 import Utilities from "@/components/Utilities";
 import { useUserOperations } from "@/hooks/useUserOperations";
 import CardList from "@/components/CardList";
@@ -98,12 +98,8 @@ export default function Users() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
-    >
-      <Title label="Utilisateurs" />
+    <SceneLayout>
+      <Title label="Adhérents" />
 
       <Utilities
         actions={[
@@ -145,6 +141,6 @@ export default function Users() {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import SectionsTabs from "@/components/SectionsTabs";
 import Utilities from "@/components/Utilities";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import useGetSection from "@/hooks/useGetSection";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
@@ -11,9 +11,13 @@ import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
+import SceneLayout from "@/components/ui/SceneLayout";
 
-export default function EditSection({ sectionId }) {
+export default function EditSection({ sectionId, pageId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
   const { updateSection } = useAddSection();
   const { updateSectionVisibility } = useSectionOperations();
@@ -22,6 +26,8 @@ export default function EditSection({ sectionId }) {
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
   const axios = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   useEffect(() => {
     if (section) setSectionData(section);
@@ -51,6 +57,7 @@ export default function EditSection({ sectionId }) {
         mediaId: mediaId,
       });
       await refetch();
+      showSuccess("Média ajouté", "Le média a été ajouté avec succès");
 
       // Construire l'objet content avec le média ajouté
       return {
@@ -59,24 +66,26 @@ export default function EditSection({ sectionId }) {
       };
     } catch (error) {
       console.error("Erreur lors de l'ajout du média:", error);
+      showError("Erreur", "Impossible d'ajouter le média");
       throw error;
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const handleRemoveMedia = async (sectionId, mediaId) => {
+  const handleRemoveMedia = async (sectionId, _mediaId) => {
     try {
       await axios.delete(`/api/sections/${sectionId}/media`);
       await refetch();
+      showSuccess("Média supprimé", "Le média a été supprimé avec succès");
     } catch (error) {
       console.error("Erreur lors de la suppression du média:", error);
+      showError("Erreur", "Impossible de supprimer le média");
       throw error;
     }
   };
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
+  const handleFormChange = (name, value, allValues) => {
+    // Synchroniser les changements du formulaire avec sectionData
+    setSectionData((prev) => ({ ...prev, ...allValues }));
   };
 
   const handleSubmit = async (values) => {
@@ -89,12 +98,13 @@ export default function EditSection({ sectionId }) {
         content: values.content,
         order: parseInt(values.order) || 0,
       });
-      setSaving(false);
       refetch();
-      alert("Section mise à jour !");
+      // MyForm gère déjà les notifications de succès
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde de la section");
+      // MyForm gère déjà les notifications d'erreur
+      throw err; // Re-lancer l'erreur pour que MyForm puisse l'afficher
+    } finally {
       setSaving(false);
     }
   };
@@ -110,17 +120,27 @@ export default function EditSection({ sectionId }) {
       await updateSectionVisibility(sectionId, isVisible);
       setSavingVisibility(false);
       setSectionData((prev) => ({ ...prev, isVisible }));
+      showSuccess(
+        "Visibilité modifiée",
+        `La section est maintenant ${isVisible ? "visible" : "masquée"}`,
+      );
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError("Erreur", "Impossible de modifier la visibilité");
       setSavingVisibility(false);
     }
   };
 
   // Fonction pour publier la section courante
   const handlePublishSection = async () => {
-    await axios.put(`/api/sections/${sectionId}/publish`);
-    await refetch();
+    try {
+      await axios.put(`/api/sections/${sectionId}/publish`);
+      await refetch();
+      showSuccess("Section publiée", "La section a été publiée avec succès");
+    } catch (err) {
+      console.error(err);
+      showError("Erreur", "Impossible de publier la section");
+    }
   };
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
@@ -131,13 +151,24 @@ export default function EditSection({ sectionId }) {
       </div>
     );
 
+  // Construire les breadcrumbs
+  const breadcrumbs = section
+    ? buildPageBreadcrumbs(
+        { id: pageId, name: section.page?.name || "Page" },
+        section,
+      )
+    : [];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto space-y-6"
-    >
-      <Title label="Gestion de la section" onPublish={handlePublishSection} />
+    <SceneLayout>
+      <Title
+        label="Gestion de la section"
+        onPublish={handlePublishSection}
+        showBreadcrumbs={!!section}
+        breadcrumbs={breadcrumbs}
+      />
+
+      <SectionsTabs pageId={pageId} sectionId={sectionId} />
 
       <Utilities actions={[]} />
 
@@ -160,14 +191,17 @@ export default function EditSection({ sectionId }) {
           {sectionData && Object.keys(sectionData).length > 0 && (
             <MyForm
               key={`${sectionData.sectionId || "section-form"}-${formKey}`} // Clé combinée pour forcer le remontage
+              title="Détails de la section"
               fields={fields}
               initialValues={sectionData}
               onSubmit={handleSubmit}
               onChange={handleFormChange}
               loading={saving}
-              submitButtonLabel="Enregistrer la section"
+              submitButtonLabel="Enregistrer"
               onCancel={handleCancelEdit}
               cancelButtonLabel="Annuler"
+              successMessage="La section a été mise à jour avec succès"
+              errorMessage="Impossible d'enregistrer la section"
             />
           )}
 
@@ -189,22 +223,21 @@ export default function EditSection({ sectionId }) {
 
       {/* Gestion de l'image de la section (Section Media) */}
       {sectionData && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Image de la section
-          </h3>
-          <MediaManager
-            content={{
-              id: sectionId,
-              medias: section?.media ? [section.media] : [],
-            }}
-            onMediaAdd={handleAddMedia}
-            onMediaRemove={handleRemoveMedia}
-            onMediaChanged={refetch}
-            maxMedias={1}
-          />
-        </div>
+        <MediaManager
+          title="Image de la section"
+          content={{
+            id: sectionId,
+            medias: section?.media ? [section.media] : [],
+          }}
+          onMediaAdd={handleAddMedia}
+          onMediaRemove={handleRemoveMedia}
+          onMediaChanged={refetch}
+          maxMedias={1}
+        />
       )}
-    </motion.div>
+
+      {/* Notification */}
+      <Notification {...notification} onClose={hideNotification} />
+    </SceneLayout>
   );
 }

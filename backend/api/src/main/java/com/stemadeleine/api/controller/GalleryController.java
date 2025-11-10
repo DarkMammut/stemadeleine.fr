@@ -1,14 +1,8 @@
 package com.stemadeleine.api.controller;
 
-import com.stemadeleine.api.dto.AttachMediaRequest;
-import com.stemadeleine.api.dto.CreateModuleRequest;
-import com.stemadeleine.api.dto.GalleryDto;
-import com.stemadeleine.api.dto.UpdateGalleryRequest;
+import com.stemadeleine.api.dto.*;
 import com.stemadeleine.api.mapper.GalleryMapper;
-import com.stemadeleine.api.model.CustomUserDetails;
-import com.stemadeleine.api.model.Gallery;
-import com.stemadeleine.api.model.Media;
-import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.service.GalleryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -35,6 +31,16 @@ public class GalleryController {
         return galleries.stream().map(galleryMapper::toDto).toList();
     }
 
+    @GetMapping("/variants")
+    public ResponseEntity<List<String>> getGalleryVariants() {
+        log.info("GET /api/galleries/variants - Retrieving available gallery variants");
+        List<String> variants = Arrays.stream(GalleryVariants.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        log.debug("Gallery variants: {}", variants);
+        return ResponseEntity.ok(variants);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GalleryDto> getGalleryById(@PathVariable UUID id) {
         log.info("GET /api/galleries/{} - Retrieving gallery by ID", id);
@@ -45,6 +51,20 @@ public class GalleryController {
                 })
                 .orElseGet(() -> {
                     log.warn("Gallery not found with ID: {}", id);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("/by-module-id/{moduleId}")
+    public ResponseEntity<GalleryDto> getGalleryByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/galleries/by-module-id/{} - Retrieving latest gallery version by moduleId", moduleId);
+        return galleryService.getLastVersionByModuleId(moduleId)
+                .map(gallery -> {
+                    log.debug("Gallery found: {} (version {})", gallery.getId(), gallery.getVersion());
+                    return ResponseEntity.ok(galleryMapper.toDto(gallery));
+                })
+                .orElseGet(() -> {
+                    log.warn("Gallery not found with moduleId: {}", moduleId);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -70,7 +90,7 @@ public class GalleryController {
 
     @PostMapping("/version")
     public ResponseEntity<GalleryDto> createNewVersionForModule(
-            @RequestBody UpdateGalleryRequest request,
+            @RequestBody CreateGalleryVersionRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
         if (currentUserDetails == null) {
             throw new RuntimeException("User not authenticated");
@@ -83,10 +103,12 @@ public class GalleryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GalleryDto> updateGallery(@PathVariable UUID id, @RequestBody Gallery galleryDetails) {
+    public ResponseEntity<GalleryDto> updateGallery(
+            @PathVariable UUID id,
+            @RequestBody UpdateGalleryRequest request) {
         log.info("PUT /api/galleries/{} - Updating a gallery", id);
         try {
-            Gallery updatedGallery = galleryService.updateGallery(id, galleryDetails);
+            Gallery updatedGallery = galleryService.updateGallery(id, request);
             log.debug("Gallery updated: {}", updatedGallery.getId());
             return ResponseEntity.ok(galleryMapper.toDto(updatedGallery));
         } catch (RuntimeException e) {

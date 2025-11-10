@@ -2,10 +2,11 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import IconButton from "@/components/ui/IconButton";
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
-import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import ModifyButton from "@/components/ui/ModifyButton";
+import DeleteButton from "@/components/ui/DeleteButton";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 
 export default function SortableItem({
@@ -83,21 +84,16 @@ export default function SortableItem({
 
         {/* Non draggable (buttons) */}
         <div className="flex items-center gap-2">
-          <IconButton
-            icon={PencilIcon}
-            label="Modifier"
-            variant="secondary"
-            hoverExpand={true}
+          <ModifyButton
+            onModify={() => onEdit?.(item)}
+            modifyLabel="Modifier"
             size="sm"
-            onClick={() => onEdit?.(item)}
           />
-          <IconButton
-            icon={TrashIcon}
-            label="Supprimer"
-            variant="danger"
-            hoverExpand={true}
+          <DeleteButton
+            onDelete={() => onDelete?.(item)}
+            deleteLabel="Supprimer"
             size="sm"
-            onClick={() => onDelete?.(item)}
+            hoverExpand={true}
           />
         </div>
       </div>

@@ -86,6 +86,12 @@ export default function MembershipManager({
         submitButtonLabel={
           currentMembership ? "Enregistrer l'adhésion" : "Créer l'adhésion"
         }
+        successMessage={
+          currentMembership
+            ? "L'adhésion a été mise à jour avec succès"
+            : "L'adhésion a été créée avec succès"
+        }
+        errorMessage="Impossible d'enregistrer l'adhésion"
       />
     </div>
   );

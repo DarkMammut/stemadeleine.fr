@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import useGetModule from "@/hooks/useGetModule";
-import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
 import axios from "axios";
 
 // Import des composants spécialisés par type de module (basés sur votre backend Java)
@@ -16,6 +14,8 @@ import FormModuleEditor from "@/components/modules/FormModuleEditor";
 import ListModuleEditor from "@/components/modules/ListModuleEditor";
 import TimelineModuleEditor from "@/components/modules/TimelineModuleEditor";
 import NewsletterModuleEditor from "@/components/modules/NewsletterModuleEditor";
+import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 // Mapping des types de modules vers leurs composants d'édition (basé sur vos modèles Java)
 const MODULE_COMPONENTS = {
@@ -41,7 +41,11 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
   } = useBreadcrumbData({ pageId, sectionId, moduleId });
 
   useEffect(() => {
-    if (module) setModuleData(module);
+    if (module) {
+      console.log("📦 Module reçu dans EditModule:", module);
+      console.log("  - type:", module.type);
+      setModuleData(module);
+    }
   }, [module]);
 
   // Fonction pour publier le module courant (et ses contenus si présents)
@@ -71,11 +75,7 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
 
   if (!ModuleComponent) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-6xl mx-auto space-y-6"
-      >
+      <SceneLayout>
         <Title label="Édition de module" onPublish={handlePublishModule} />
         <div className="text-center py-8 text-red-600">
           Type de module non supporté: {moduleData.type}
@@ -84,16 +84,12 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
             Types disponibles: {Object.keys(MODULE_COMPONENTS).join(", ")}
           </span>
         </div>
-      </motion.div>
+      </SceneLayout>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto space-y-6"
-    >
+    <SceneLayout>
       <Title
         label={`Édition de module - ${moduleData.type}`}
         onPublish={handlePublishModule}
@@ -105,6 +101,6 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
         setModuleData={setModuleData}
         refetch={refetch}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

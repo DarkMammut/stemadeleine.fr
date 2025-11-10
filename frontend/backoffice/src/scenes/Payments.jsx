@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useAxiosClient } from "@/utils/axiosClient";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import Utilities from "@/components/Utilities";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
 import CardList from "@/components/CardList";
@@ -13,6 +11,8 @@ import PaymentCard from "@/components/PaymentCard";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import PaymentFormModal from "@/components/PaymentFormModal";
+import SceneLayout from "@/components/ui/SceneLayout";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function Payments() {
   const router = useRouter();
@@ -84,11 +84,7 @@ export default function Payments() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
-    >
+    <SceneLayout>
       <Title label="Paiements" />
 
       <Utilities
@@ -131,6 +127,6 @@ export default function Payments() {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

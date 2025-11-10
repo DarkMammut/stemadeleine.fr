@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
-import EditSection from "@/scenes/EditSection";
+import Modules from "@/scenes/Modules";
 
-export default function EditSectionPage() {
+export default function ModulesPage() {
   const { sectionId, pageId } = useParams();
   const [current, setCurrent] = useState("website");
 
@@ -19,7 +19,7 @@ export default function EditSectionPage() {
 
   return (
     <Layout current={current} setCurrent={setCurrent}>
-      <EditSection sectionId={sectionId} pageId={pageId} />
+      <Modules sectionId={sectionId} pageId={pageId} />
     </Layout>
   );
 }

@@ -16,6 +16,7 @@ export default function BackButton({
   label = "Retour",
   autoHide = true,
   mainPages = [
+    "/dashboard",
     "/pages",
     "/news",
     "/newsletters",
@@ -23,6 +24,7 @@ export default function BackButton({
     "/contacts",
     "/sections",
     "/payments",
+    "/settings",
   ],
 }) {
   const router = useRouter();

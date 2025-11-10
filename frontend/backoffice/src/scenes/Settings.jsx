@@ -1,15 +1,19 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { useAxiosClient } from "@/utils/axiosClient";
-import Title from "@/components/Title";
+import SceneLayout from "@/components/ui/SceneLayout";
+import Title from "@/components/ui/Title";
+import Tabs from "@/components/Tabs";
+
 import MyForm from "@/components/MyForm";
 import OrganizationDetails from "@/components/OrganizationDetails";
-import MediaManager from "@/components/MediaManager";
 import AddressManager from "@/components/AddressManager";
+import MediaManager from "@/components/MediaManager";
 import ColorInputWithPicker from "@/components/ColorInputWithPicker";
 import InputWithActions from "@/components/InputWithActions";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function Settings() {
   const axios = useAxiosClient();
@@ -26,7 +30,6 @@ export default function Settings() {
 
   useEffect(() => {
     loadOrganization();
-    // Cleanup: masquer la notification au démontage
     return () => {
       hideNotification();
     };
@@ -66,46 +69,40 @@ export default function Settings() {
       label: "Nom de l'organisation",
       type: "text",
       required: false,
-      defaultValue: organization?.name || "",
     },
     {
       name: "legalForm",
       label: "Forme juridique",
       type: "text",
       required: false,
-      defaultValue: organization?.legalForm || "",
     },
     {
       name: "siret",
       label: "SIRET",
       type: "text",
       required: false,
-      defaultValue: organization?.siret || "",
     },
     {
       name: "siren",
       label: "SIREN",
       type: "text",
       required: false,
-      defaultValue: organization?.siren || "",
     },
     {
       name: "vatNumber",
       label: "Numéro de TVA",
       type: "text",
       required: false,
-      defaultValue: organization?.vatNumber || "",
     },
     {
       name: "apeCode",
       label: "Code APE",
       type: "text",
       required: false,
-      defaultValue: organization?.apeCode || "",
     },
   ];
 
-  const handleChange = (nameOrEvent, value, allValues) => {
+  const handleChange = (nameOrEvent, value) => {
     if (nameOrEvent && nameOrEvent.target) {
       const { name, value: val, type, checked } = nameOrEvent.target;
       setOrganizationForm((f) => ({
@@ -125,9 +122,6 @@ export default function Settings() {
     try {
       await axios.patch(`/api/organizations/${organization.id}/info`, {
         ...formValues,
-        description: organizationForm.description,
-        primaryColor: organizationForm.primaryColor,
-        secondaryColor: organizationForm.secondaryColor,
       });
       await loadOrganization();
       showSuccess(
@@ -146,7 +140,6 @@ export default function Settings() {
   };
 
   const handleEdit = () => setShowEditForm(true);
-
   const handleCancelEdit = () => setShowEditForm(false);
 
   // Fonctions pour MediaManager (logo)
@@ -179,7 +172,15 @@ export default function Settings() {
       await axios.patch(`/api/organizations/${organization.id}/settings`, {
         [key]: val,
       });
-      await loadOrganization();
+
+      // Mettre à jour seulement les données nécessaires sans refresh complet
+      const updatedSettings = { ...originalOrganizationSettings, [key]: val };
+      setOriginalOrganizationSettings(updatedSettings);
+      setOrganizationSettings(updatedSettings);
+
+      // Mettre à jour l'organisation avec la nouvelle valeur
+      setOrganization((prev) => ({ ...prev, [key]: val }));
+
       showSuccess("Paramètre modifié", "La modification a été enregistrée");
     } catch (e) {
       showError(
@@ -193,92 +194,120 @@ export default function Settings() {
 
   if (loading) return <div>Chargement...</div>;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-8"
-    >
-      <Title label="Modifier l'organisation" />
-
-      {showEditForm ? (
+  const tabs = [
+    {
+      label: "Organisation",
+      content: (
         <div className="space-y-6">
-          {/* Champs principaux */}
-          <MyForm
-            fields={organizationFields}
-            initialValues={organizationForm}
-            onSubmit={handleSave}
-            onChange={handleChange}
-            loading={saving}
-            submitButtonLabel="Enregistrer les modifications"
-            onCancel={handleCancelEdit}
-            cancelButtonLabel="Annuler"
+          {/* Informations de l'organisation */}
+          {showEditForm ? (
+            <MyForm
+              title="Informations de l'organisation"
+              fields={organizationFields}
+              initialValues={organizationForm}
+              onSubmit={handleSave}
+              onChange={handleChange}
+              loading={saving}
+              submitButtonLabel="Enregistrer les modifications"
+              onCancel={handleCancelEdit}
+              cancelButtonLabel="Annuler"
+              successMessage="L'organisation a été mise à jour avec succès"
+              errorMessage="Impossible d'enregistrer l'organisation"
+            />
+          ) : (
+            <OrganizationDetails
+              organization={organization}
+              onEdit={handleEdit}
+            />
+          )}
+
+          {/* Adresse du siège social */}
+          <AddressManager
+            label="Adresse du siège social"
+            addresses={organization.address ? [organization.address] : []}
+            ownerId={organization.id}
+            ownerType="ORGANIZATION"
+            refreshAddresses={loadOrganization}
+            editable={true}
+            newAddressName={"Siège social"}
+            maxAddresses={1}
           />
         </div>
-      ) : (
-        <OrganizationDetails organization={organization} onEdit={handleEdit} />
-      )}
-
-      <div className="border-t border-gray-200 pt-8">
-        <AddressManager
-          label="Adresse du siège social"
-          addresses={organization.address ? [organization.address] : []}
-          ownerId={organization.id}
-          ownerType="ORGANIZATION"
-          refreshAddresses={loadOrganization}
-          editable={true}
-          newAddressName={"Siège social"}
-          maxAddresses={1}
-        />
-      </div>
-
-      {/* Sélection des couleurs primaires et secondaires */}
-      <div className="border-t border-gray-200 pt-8 space-y-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Paramètres</h3>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <label className="block text-sm font-semibold text-gray-900 mb-4">
-            Logo de l'organisation
-          </label>
+      ),
+    },
+    {
+      label: "Paramètres du site",
+      content: (
+        <div className="space-y-6">
           <MediaManager
+            title="Logo de l'organisation"
             content={logoContent}
             onMediaAdd={handleLogoAdd}
             onMediaRemove={handleLogoRemove}
             onMediaChanged={loadOrganization}
             maxMedias={1}
           />
-        </div>
-        <InputWithActions
-          label="Description"
-          initialValue={originalOrganizationSettings.description || ""}
-          value={organizationSettings.description || ""}
-          onSave={handleSaveSetting("description")}
-          onChange={handleChangeSetting("description")}
-          disabled={saving}
-          multiline={true}
-        />
-        <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-          <ColorInputWithPicker
-            label="Couleur principale"
-            initialValue={
-              originalOrganizationSettings.primaryColor || "#1976d2"
-            }
-            value={organizationSettings.primaryColor || "#1976d2"}
-            onSave={handleSaveSetting("primaryColor")}
-            onChange={handleChangeSetting("primaryColor")}
+
+          <InputWithActions
+            title="Description de l'organisation"
+            label="Description"
+            initialValue={originalOrganizationSettings.description || ""}
+            onSave={handleSaveSetting("description")}
+            onChange={handleChangeSetting("description")}
             disabled={saving}
+            multiline={true}
+            showSaveButton={false}
+            showCancelButton={false}
+            successMessage="Description mise à jour"
+            errorMessage="Erreur lors de la mise à jour de la description"
           />
-          <ColorInputWithPicker
-            label="Couleur secondaire"
-            initialValue={
-              originalOrganizationSettings.secondaryColor || "#dc004e"
-            }
-            value={organizationSettings.secondaryColor || "#dc004e"}
-            onSave={handleSaveSetting("secondaryColor")}
-            onChange={handleChangeSetting("secondaryColor")}
-            disabled={saving}
-          />
+
+          <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+            <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Thème et couleurs
+              </h3>
+            </div>
+            <ColorInputWithPicker
+              label="Couleur principale"
+              initialValue={
+                originalOrganizationSettings.primaryColor || "#1976d2"
+              }
+              onSave={handleSaveSetting("primaryColor")}
+              onChange={handleChangeSetting("primaryColor")}
+              disabled={saving}
+              loading={saving}
+              showSaveButton={false}
+              showCancelButton={false}
+              successMessage="Couleur principale mise à jour"
+              errorMessage="Erreur lors de la mise à jour de la couleur principale"
+            />
+            <ColorInputWithPicker
+              label="Couleur secondaire"
+              initialValue={
+                originalOrganizationSettings.secondaryColor || "#dc004e"
+              }
+              onSave={handleSaveSetting("secondaryColor")}
+              onChange={handleChangeSetting("secondaryColor")}
+              disabled={saving}
+              loading={saving}
+              showSaveButton={false}
+              showCancelButton={false}
+              successMessage="Couleur secondaire mise à jour"
+              errorMessage="Erreur lors de la mise à jour de la couleur secondaire"
+            />
+          </div>
         </div>
-      </div>
+      ),
+    },
+  ];
+
+  return (
+    <SceneLayout>
+      <Title label="Paramètres" />
+
+      {/* Tabs avec persistance automatique */}
+      <Tabs tabs={tabs} defaultIndex={0} persistKey="settings-active-tab" />
 
       {/* Notification */}
       {notification.show && (
@@ -289,6 +318,6 @@ export default function Settings() {
           onClose={hideNotification}
         />
       )}
-    </motion.div>
+    </SceneLayout>
   );
 }

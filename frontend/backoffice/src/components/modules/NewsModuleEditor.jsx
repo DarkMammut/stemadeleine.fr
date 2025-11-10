@@ -127,6 +127,8 @@ export default function NewsModuleEditor({
           submitButtonLabel="Enregistrer le module actualités"
           onCancel={handleCancelEdit}
           cancelButtonLabel="Annuler"
+          successMessage="Le module actualités a été mis à jour avec succès"
+          errorMessage="Impossible d'enregistrer le module actualités"
         />
       )}
 

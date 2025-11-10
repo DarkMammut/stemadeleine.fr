@@ -111,6 +111,8 @@ export default function ListModuleEditor({
           submitButtonLabel="Enregistrer le module liste"
           onCancel={handleCancelEdit}
           cancelButtonLabel="Annuler"
+          successMessage="Le module liste a été mis à jour avec succès"
+          errorMessage="Impossible d'enregistrer le module liste"
         />
       )}
     </div>

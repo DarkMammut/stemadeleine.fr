@@ -162,6 +162,7 @@ const MediaManager = ({
   onMediaRemove,
   onMediaChanged,
   maxMedias = null, // Limite optionnelle du nombre de médias
+  title = "Galerie de médias", // Titre personnalisable
 }) => {
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [showMediaModifier, setShowMediaModifier] = useState(false);
@@ -235,42 +236,46 @@ const MediaManager = ({
   };
 
   return (
-    <div className="media-manager space-y-4">
-      <h3 className="text-sm font-semibold text-gray-900">
-        Galerie de médias ({content.medias?.length || 0}
-        {maxMedias && ` / ${maxMedias}`})
-      </h3>
+    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+      <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">
+          {title} ({content.medias?.length || 0}
+          {maxMedias && ` / ${maxMedias}`})
+        </h3>
+      </div>
 
-      {/* Avertissement si pas de content.id */}
-      {!content.id && (
-        <div className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg p-4">
-          Vous devez d'abord sauvegarder le contenu avant d'ajouter un média.
-        </div>
-      )}
+      <div className="px-4 py-6 sm:p-8 space-y-4">
+        {/* Avertissement si pas de content.id */}
+        {!content.id && (
+          <div className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg p-4">
+            Vous devez d'abord sauvegarder le contenu avant d'ajouter un média.
+          </div>
+        )}
 
-      {/* MediaGrid pour afficher les médias existants */}
-      {content.medias && content.medias.length > 0 && (
-        <MediaGrid
-          medias={content.medias || []}
-          onRemove={handleRemoveMedia}
-          onEdit={handleEditMedia}
-        />
-      )}
+        {/* MediaGrid pour afficher les médias existants */}
+        {content.medias && content.medias.length > 0 && (
+          <MediaGrid
+            medias={content.medias || []}
+            onRemove={handleRemoveMedia}
+            onEdit={handleEditMedia}
+          />
+        )}
 
-      {/* MediaPicker pour ajouter de nouveaux médias */}
-      {content.id && canAddMedia && (
-        <MediaPickerWrapper
-          onUploadComplete={handleMediaUploaded}
-          onBrowseClick={() => setShowMediaSelector(true)}
-        />
-      )}
+        {/* MediaPicker pour ajouter de nouveaux médias */}
+        {content.id && canAddMedia && (
+          <MediaPickerWrapper
+            onUploadComplete={handleMediaUploaded}
+            onBrowseClick={() => setShowMediaSelector(true)}
+          />
+        )}
 
-      {!canAddMedia && maxMedias && (
-        <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-4">
-          Limite de {maxMedias} média{maxMedias > 1 ? "s" : ""} atteinte.
-          Supprimez un média existant pour en ajouter un nouveau.
-        </div>
-      )}
+        {!canAddMedia && maxMedias && (
+          <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            Limite de {maxMedias} média{maxMedias > 1 ? "s" : ""} atteinte.
+            Supprimez un média existant pour en ajouter un nouveau.
+          </div>
+        )}
+      </div>
 
       {/* Modal de sélection de média */}
       {showMediaSelector && (

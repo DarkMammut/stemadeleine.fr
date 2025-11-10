@@ -37,6 +37,8 @@ export default function UserForm({
       submitButtonLabel="Enregistrer l'utilisateur"
       onCancel={onCancel}
       cancelButtonLabel="Annuler"
+      successMessage="L'utilisateur a été enregistré avec succès"
+      errorMessage="Impossible d'enregistrer l'utilisateur"
     />
   );
 }

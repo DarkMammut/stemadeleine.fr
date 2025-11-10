@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import Utilities from "@/components/Utilities";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
@@ -20,6 +18,8 @@ import { useNotification } from "@/hooks/useNotification";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { EyeIcon } from "@heroicons/react/24/outline";
+import SceneLayout from "@/components/ui/SceneLayout";
+import { useRouter } from "next/navigation";
 
 export default function EditNewsletters({ newsletterId }) {
   const [newsletterData, setNewsletterData] = useState(null);
@@ -181,7 +181,6 @@ export default function EditNewsletters({ newsletterId }) {
 
   const confirmPublish = async () => {
     try {
-      setSaving(true);
       await publishNewsletterPublication(newsletterId);
       await loadNewsletter();
       showSuccess(
@@ -237,11 +236,7 @@ export default function EditNewsletters({ newsletterId }) {
     );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto space-y-6"
-    >
+    <SceneLayout>
       <Title label="Édition de newsletter" />
 
       <Utilities actions={[]} />
@@ -322,6 +317,8 @@ export default function EditNewsletters({ newsletterId }) {
               submitButtonLabel="Enregistrer la newsletter"
               onCancel={handleCancelEdit}
               cancelButtonLabel="Annuler"
+              successMessage="La newsletter a été mise à jour avec succès"
+              errorMessage="Impossible d'enregistrer la newsletter"
             />
           )}
 
@@ -343,21 +340,17 @@ export default function EditNewsletters({ newsletterId }) {
 
       {/* Gestion de l'image de la newsletter (Newsletter Media) */}
       {newsletterData && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Image de la newsletter
-          </h3>
-          <MediaManager
-            content={{
-              id: newsletterId,
-              medias: newsletterData?.media ? [newsletterData.media] : [],
-            }}
-            onMediaAdd={handleAddMedia}
-            onMediaRemove={handleRemoveMedia}
-            onMediaChanged={loadNewsletter}
-            maxMedias={1}
-          />
-        </div>
+        <MediaManager
+          title="Image de la newsletter"
+          content={{
+            id: newsletterId,
+            medias: newsletterData?.media ? [newsletterData.media] : [],
+          }}
+          onMediaAdd={handleAddMedia}
+          onMediaRemove={handleRemoveMedia}
+          onMediaChanged={loadNewsletter}
+          maxMedias={1}
+        />
       )}
 
       {/* Newsletter Preview Modal */}
@@ -387,6 +380,6 @@ export default function EditNewsletters({ newsletterId }) {
         title={notification.title}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

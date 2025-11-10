@@ -11,6 +11,8 @@ import PublishButton from '@/components/ui/PublishButton';
 import DeleteButton from '@/components/ui/DeleteButton';
 import { useContentOperations } from '@/hooks/useContentOperations';
 import ConfirmModal from '@/components/ConfirmModal';
+import Notification from '@/components/Notification';
+import { useNotification } from '@/hooks/useNotification';
 
 /**
  * Composant générique de gestion de contenus pour section, module, etc.
@@ -30,6 +32,8 @@ const ContentManager = ({
   const [editingContent, setEditingContent] = useState({});
   const [showPublishAllModal, setShowPublishAllModal] = useState(false);
   const [isPublishingAll, setIsPublishingAll] = useState(false);
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   // Utilise le hook d'opérations, adapté pour le parentType
   const {
@@ -58,7 +62,10 @@ const ContentManager = ({
       if (onContentsChange) onContentsChange(uniqueContents);
     } catch (error) {
       console.error("Error loading contents:", error);
-      alert("Erreur lors du chargement des contenus.");
+      showError(
+        "Erreur de chargement",
+        "Erreur lors du chargement des contenus",
+      );
     } finally {
       setLoading(false);
     }
@@ -85,9 +92,13 @@ const ContentManager = ({
       );
       await loadContents();
       setExpandedContents((prev) => new Set([...prev, newContent.contentId]));
+      showSuccess(
+        "Contenu ajouté",
+        "Le nouveau contenu a été créé avec succès",
+      );
     } catch (error) {
       console.error("Error adding content:", error);
-      alert("Erreur lors de l'ajout du contenu.");
+      showError("Erreur", "Erreur lors de l'ajout du contenu");
     } finally {
       setLoading(false);
     }
@@ -104,9 +115,10 @@ const ContentManager = ({
         body: content.body || { html: "<p>Commencez à écrire...</p>" },
       });
       await loadContents();
+      showSuccess("Titre modifié", "Le titre a été mis à jour avec succès");
     } catch (error) {
       console.error("Error updating content title:", error);
-      alert("Erreur lors de la mise à jour du titre.");
+      showError("Erreur", "Erreur lors de la mise à jour du titre");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -140,9 +152,13 @@ const ContentManager = ({
           c.contentId === contentId ? { ...c, hasLocalChanges: false } : c,
         ),
       );
+      showSuccess(
+        "Contenu enregistré",
+        "Le contenu a été sauvegardé avec succès",
+      );
     } catch (error) {
       console.error("Error saving content body:", error);
-      alert("Erreur lors de la sauvegarde du contenu.");
+      showError("Erreur", "Erreur lors de la sauvegarde du contenu");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -158,9 +174,13 @@ const ContentManager = ({
           c.contentId === contentId ? { ...c, isVisible: isVisible } : c,
         ),
       );
+      showSuccess(
+        "Visibilité modifiée",
+        `Le contenu est maintenant ${isVisible ? "visible" : "masqué"}`,
+      );
     } catch (error) {
       console.error("Error updating content visibility:", error);
-      alert("Erreur lors de la mise à jour de la visibilité.");
+      showError("Erreur", "Erreur lors de la mise à jour de la visibilité");
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
     }
@@ -177,9 +197,10 @@ const ContentManager = ({
         newSet.delete(contentId);
         return newSet;
       });
+      showSuccess("Contenu supprimé", "Le contenu a été supprimé avec succès");
     } catch (error) {
       console.error("Error deleting content:", error);
-      alert("Erreur lors de la suppression du contenu.");
+      showError("Erreur", "Erreur lors de la suppression du contenu");
       throw error; // Re-throw pour que DeleteButton gère l'état
     } finally {
       setSavingStates((prev) => ({ ...prev, [contentId]: false }));
@@ -214,12 +235,13 @@ const ContentManager = ({
       await loadContents();
 
       // Afficher le résultat
-      alert(
-        `Publication terminée : ${result.publishedCount} contenu(s) publié(s), ${result.skippedCount} ignoré(s)`,
+      showSuccess(
+        "Publication terminée",
+        `${result.publishedCount} contenu(s) publié(s), ${result.skippedCount} ignoré(s)`,
       );
     } catch (error) {
       console.error("Error publishing all contents:", error);
-      alert("Erreur lors de la publication des contenus.");
+      showError("Erreur", "Erreur lors de la publication des contenus");
     } finally {
       setIsPublishingAll(false);
       setShowPublishAllModal(false);
@@ -271,9 +293,9 @@ const ContentManager = ({
 
   // Rendu UI (labels personnalisables)
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <div className="content-manager space-y-4">
-        <div className="flex justify-between items-center">
+    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+      <div className="content-manager">
+        <div className="flex justify-between items-center px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
             {customLabels.header || "Contenus"}
           </h3>
@@ -297,19 +319,19 @@ const ContentManager = ({
           </div>
         </div>
         {loading && contents.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
             {customLabels.loading || "Chargement des contenus..."}
           </div>
         )}
         {!loading && contents.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
             <p>
               {customLabels.empty ||
                 "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
             </p>
           </div>
         )}
-        <div className="space-y-3">
+        <div className="px-4 py-6 sm:p-8 space-y-3">
           <AnimatePresence>
             {contents.map((content, index) => (
               <motion.div
@@ -495,6 +517,9 @@ const ContentManager = ({
         isLoading={isPublishingAll}
         variant="primary"
       />
+
+      {/* Notification */}
+      <Notification {...notification} onClose={hideNotification} />
     </div>
   );
 };

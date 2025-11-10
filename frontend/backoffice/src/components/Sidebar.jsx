@@ -60,7 +60,7 @@ export default function Sidebar({ current, setCurrent }) {
       key: "payments",
     },
     {
-      label: "Settings",
+      label: "Paramètres",
       icon: <Cog6ToothIcon className="w-5 h-5" />,
       url: "/settings",
       key: "settings",

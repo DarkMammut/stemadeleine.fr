@@ -2,6 +2,7 @@ package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.UpdateGalleryRequest;
+import com.stemadeleine.api.dto.CreateGalleryVersionRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.GalleryRepository;
@@ -49,17 +50,21 @@ public class GalleryService {
     }
 
     @Transactional
-    public Gallery updateGallery(UUID id, Gallery galleryDetails) {
+    public Gallery updateGallery(UUID id, UpdateGalleryRequest request) {
         log.info("Mise à jour de la galerie avec l'ID : {}", id);
         return galleryRepository.findById(id)
                 .map(gallery -> {
-                    gallery.setName(galleryDetails.getName());
-                    gallery.setSortOrder(galleryDetails.getSortOrder());
-                    gallery.setIsVisible(galleryDetails.getIsVisible());
-                    gallery.setVariant(galleryDetails.getVariant() != null ? galleryDetails.getVariant() : GalleryVariants.GRID);
-                    gallery.setTitle(galleryDetails.getTitle());
-                    if (galleryDetails.getMedias() != null) {
-                        gallery.setMedias(galleryDetails.getMedias());
+                    if (request.getName() != null) {
+                        gallery.setName(request.getName());
+                    }
+                    if (request.getTitle() != null) {
+                        gallery.setTitle(request.getTitle());
+                    }
+                    if (request.getVariant() != null) {
+                        gallery.setVariant(request.getVariant());
+                    }
+                    if (request.getSortOrder() != null) {
+                        gallery.setSortOrder(request.getSortOrder());
                     }
                     log.debug("Galerie mise à jour : {}", gallery);
                     return galleryRepository.save(gallery);
@@ -107,7 +112,7 @@ public class GalleryService {
         return savedGallery;
     }
 
-    public Gallery createGalleryVersion(UpdateGalleryRequest request, User author) {
+    public Gallery createGalleryVersion(CreateGalleryVersionRequest request, User author) {
         log.info("Création d'une nouvelle version de Gallery pour le moduleId : {}", request.moduleId());
 
         // 1. Récupérer le module (pour structure ou fallback)

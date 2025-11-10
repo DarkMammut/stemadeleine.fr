@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
-import { motion } from "framer-motion";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import MyForm from "@/components/MyForm";
 import PaymentDetails from "@/components/PaymentDetails";
 import LinkUser from "@/components/LinkUser";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -31,7 +31,6 @@ export default function EditPayment() {
     setLoading(true);
     try {
       const res = await axios.get(`/api/payments/${id}`);
-      setPayment(res.data);
       setPaymentForm({
         amount:
           typeof res.data.amount === "number"
@@ -193,11 +192,7 @@ export default function EditPayment() {
   if (loading) return <div>Chargement...</div>;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-8"
-    >
+    <SceneLayout>
       <Title label="Modifier le paiement" />
 
       {!showEditForm ? (
@@ -219,6 +214,8 @@ export default function EditPayment() {
             submitButtonLabel="Enregistrer le paiement"
             onCancel={handleCancelEdit}
             cancelButtonLabel="Annuler"
+            successMessage="Le paiement a été mis à jour avec succès"
+            errorMessage="Impossible d'enregistrer le paiement"
           />
 
           {/* Section Lier un utilisateur */}
@@ -243,6 +240,6 @@ export default function EditPayment() {
         type={notification.type}
         message={notification.message}
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

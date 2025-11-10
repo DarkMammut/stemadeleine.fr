@@ -1,7 +1,10 @@
 // Utility functions to build breadcrumbs for different contexts
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
 
 export const buildPageBreadcrumbs = (page, section = null, module = null) => {
-  const breadcrumbs = [{ name: "Pages", href: "/pages" }];
+  const breadcrumbs = [
+    { name: "Website", href: "/pages", icon: DocumentTextIcon },
+  ];
 
   if (page) {
     breadcrumbs.push({

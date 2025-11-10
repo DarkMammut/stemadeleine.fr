@@ -2,22 +2,23 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/16/solid";
-
 import Utilities from "@/components/Utilities";
 import useGetPage from "@/hooks/useGetPage";
-import { removeItem } from "@/utils/treeHelpers";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import useAddSection from "@/hooks/useAddSection";
 import DraggableTree from "@/components/DraggableTree";
 import PagesTabs from "@/components/PagesTabs";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
-import Button from "@/components/ui/Button";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
 import ConfirmModal from "@/components/ConfirmModal";
+import AddModuleModal from "@/components/AddModuleModal";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
@@ -30,11 +31,12 @@ export default function Sections({ pageId }) {
   const { updateSectionVisibility, deleteSection } = useSectionOperations();
   const { updateModuleVisibility, deleteModule } = useModuleOperations();
   const axiosClient = useAxiosClient();
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
   const [treeData, setTreeData] = useState([]);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [targetSection, setTargetSection] = useState(null);
-  const [selectedModuleType, setSelectedModuleType] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -78,15 +80,22 @@ export default function Sections({ pageId }) {
       setTreeData(newTree);
       try {
         await updateSectionOrder(pageId, newTree);
+        showSuccess(
+          "Ordre mis à jour",
+          "L'ordre des sections a été modifié avec succès",
+        );
       } catch (error) {
         console.error(
           "Erreur lors du changement d'ordre des sections :",
           error,
         );
-        alert("Erreur lors du changement d'ordre des sections.");
+        showError(
+          "Erreur de réorganisation",
+          "Impossible de modifier l'ordre des sections",
+        );
       }
     },
-    [pageId, updateSectionOrder],
+    [pageId, updateSectionOrder, showSuccess, showError],
   );
 
   const handleToggle = useCallback(
@@ -94,8 +103,16 @@ export default function Sections({ pageId }) {
       try {
         if (item.type === "section") {
           await updateSectionVisibility(item.sectionId, newVal);
+          showSuccess(
+            "Visibilité mise à jour",
+            `La section est maintenant ${newVal ? "visible" : "masquée"}`,
+          );
         } else if (item.type === "module") {
           await updateModuleVisibility(item.moduleId, newVal);
+          showSuccess(
+            "Visibilité mise à jour",
+            `Le module est maintenant ${newVal ? "visible" : "masqué"}`,
+          );
         }
         setTreeData((prev) =>
           prev.map((section) => {
@@ -117,10 +134,13 @@ export default function Sections({ pageId }) {
         );
       } catch (error) {
         console.error("Erreur lors du changement de visibilité :", error);
-        alert("Erreur lors du changement de visibilité.");
+        showError(
+          "Erreur de visibilité",
+          "Impossible de modifier la visibilité",
+        );
       }
     },
-    [updateSectionVisibility, updateModuleVisibility],
+    [updateSectionVisibility, updateModuleVisibility, showSuccess, showError],
   );
 
   const handleEdit = useCallback(
@@ -148,28 +168,43 @@ export default function Sections({ pageId }) {
     try {
       if (itemToDelete.type === "section") {
         await deleteSection(itemToDelete.sectionId);
+        showSuccess(
+          "Section supprimée",
+          "La section a été supprimée avec succès",
+        );
       } else if (itemToDelete.type === "module") {
         await deleteModule(itemToDelete.moduleId);
+        showSuccess("Module supprimé", "Le module a été supprimé avec succès");
       }
       await refetch();
       setTreeData((prev) => removeItem(prev, itemToDelete.id));
     } catch (error) {
       console.error("Erreur lors de la suppression :", error);
-      alert("Erreur lors de la suppression.");
+      showError(
+        "Erreur de suppression",
+        `Impossible de supprimer ${itemToDelete.type === "section" ? "la section" : "le module"}`,
+      );
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
       setItemToDelete(null);
     }
-  }, [itemToDelete, deleteSection, deleteModule, refetch]);
+  }, [
+    itemToDelete,
+    deleteSection,
+    deleteModule,
+    refetch,
+    showSuccess,
+    showError,
+  ]);
 
   const handleAddModule = useCallback((section) => {
     setTargetSection(section);
     setShowAddModuleModal(true);
   }, []);
 
-  const handleConfirmAddModule = async () => {
-    if (!selectedModuleType || !targetSection) {
+  const handleConfirmAddModule = async (moduleType) => {
+    if (!moduleType || !targetSection) {
       return;
     }
     const typeToEndpoint = {
@@ -183,28 +218,31 @@ export default function Sections({ pageId }) {
       gallery: "/api/galleries",
     };
     try {
-      if (typeToEndpoint[selectedModuleType]) {
-        const childEndpoint = typeToEndpoint[selectedModuleType];
+      if (typeToEndpoint[moduleType]) {
+        const childEndpoint = typeToEndpoint[moduleType];
         await axiosClient.post(childEndpoint, {
           sectionId: targetSection.sectionId,
-          name: `New ${selectedModuleType}`,
+          name: `New ${moduleType}`,
         });
       } else {
         const url = "/api/modules";
         const payload = {
           sectionId: targetSection.sectionId,
-          type: selectedModuleType,
-          name: `New ${selectedModuleType}`,
+          type: moduleType,
+          name: `New ${moduleType}`,
         };
         await axiosClient.post(url, payload);
       }
       setShowAddModuleModal(false);
       setTargetSection(null);
-      setSelectedModuleType("");
       await refetch();
+      showSuccess(
+        "Module créé",
+        `Le module ${moduleType} a été ajouté avec succès`,
+      );
     } catch (error) {
       console.error("Erreur lors de l'ajout du module :", error);
-      alert("Erreur lors de l'ajout du module.");
+      showError("Erreur de création", "Impossible d'ajouter le module");
     }
   };
 
@@ -222,13 +260,17 @@ export default function Sections({ pageId }) {
   if (loading) return <p>Loading…</p>;
   if (error) return <p>Error: {error.message}</p>;
 
+  // Construire les breadcrumbs pour la page sections
+  const breadcrumbs = page ? buildPageBreadcrumbs(page) : [];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto space-y-6"
-    >
-      <Title label="Content Management" onPublish={handlePublishSections} />
+    <SceneLayout>
+      <Title
+        label="Content Management"
+        onPublish={handlePublishSections}
+        showBreadcrumbs={!!page}
+        breadcrumbs={breadcrumbs}
+      />
 
       <PagesTabs pageId={pageId} />
 
@@ -261,77 +303,19 @@ export default function Sections({ pageId }) {
         onAddChild={handleAddModule}
       />
 
-      {/* Module addition modal */}
-      {showAddModuleModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div
-            className="p-6 rounded-xl shadow-xl min-w-[300px]"
-            style={{
-              backgroundColor: "var(--color-surface)",
-              borderColor: "var(--color-border)",
-              color: "var(--color-text)",
-            }}
-          >
-            <h2
-              className="text-lg font-bold mb-4"
-              style={{ color: "var(--color-text)" }}
-            >
-              Add a module to {targetSection?.name}
-            </h2>
-            <label
-              className="block mb-2"
-              style={{ color: "var(--color-text)" }}
-            >
-              Module type:
-            </label>
-            <select
-              className="rounded px-2 py-1 w-full mb-4"
-              style={{
-                backgroundColor: "var(--color-background)",
-                borderColor: "var(--color-border)",
-                color: "var(--color-text)",
-                border: "1px solid var(--color-border)",
-              }}
-              value={selectedModuleType}
-              onChange={(e) => setSelectedModuleType(e.target.value)}
-            >
-              <option value="">Select a type</option>
-              <option value="article">Article</option>
-              <option value="gallery">Gallery</option>
-              <option value="news">News</option>
-              <option value="newsletter">Newsletter</option>
-              <option value="cta">CTA</option>
-              <option value="timeline">Timeline</option>
-              <option value="form">Form</option>
-              <option value="list">List</option>
-            </select>
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                size="md"
-                onClick={() => {
-                  setShowAddModuleModal(false);
-                  setTargetSection(null);
-                  setSelectedModuleType("");
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                size="md"
-                onClick={handleConfirmAddModule}
-                disabled={!selectedModuleType}
-              >
-                Add
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal d'ajout de module */}
+      <AddModuleModal
+        open={showAddModuleModal}
+        onClose={() => {
+          setShowAddModuleModal(false);
+          setTargetSection(null);
+        }}
+        onConfirm={handleConfirmAddModule}
+        section={targetSection}
+        isLoading={false}
+      />
 
+      {/* Modal de confirmation de suppression */}
       <ConfirmModal
         open={showDeleteModal}
         onClose={() => {
@@ -344,6 +328,15 @@ export default function Sections({ pageId }) {
         isLoading={isDeleting}
         variant="danger"
       />
-    </motion.div>
+
+      {/* Notifications */}
+      <Notification
+        show={notification.show}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={hideNotification}
+      />
+    </SceneLayout>
   );
 }

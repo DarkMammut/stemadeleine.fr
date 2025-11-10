@@ -152,18 +152,14 @@ export default function VideoModuleEditor({
       )}
 
       {/* Sélecteur de média */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <label className="block text-sm font-semibold text-gray-900 mb-4">
-          Image du module
-        </label>
-        <MediaManager
-          content={moduleContent}
-          onMediaAdd={handleMediaAdd}
-          onMediaRemove={handleMediaRemove}
-          onMediaChanged={refetch}
-          maxMedias={1}
-        />
-      </div>
+      <MediaManager
+        title="Image du module"
+        content={moduleContent}
+        onMediaAdd={handleMediaAdd}
+        onMediaRemove={handleMediaRemove}
+        onMediaChanged={refetch}
+        maxMedias={1}
+      />
     </div>
   );
 }

@@ -1,31 +1,39 @@
 import React from "react";
-import Utilities from "@/components/Utilities";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import ModifyButton from "@/components/ui/ModifyButton";
+import DeleteButton from "@/components/ui/DeleteButton";
 
 export default function UserDetails({ user, onEdit, onDelete }) {
   if (!user) return null;
 
-  const actions = [
-    {
-      icon: PencilIcon,
-      label: "Modifier",
-      callback: onEdit,
-    },
-    {
-      variant: "delete",
-      label: "Supprimer",
-      callback: onDelete,
-    },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Informations principales */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          {user.firstname} {user.lastname}
-        </h2>
-        <div className="border-t border-gray-200 pt-6 space-y-4">
+      <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+        <div className="flex items-center justify-between px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {user.firstname} {user.lastname}
+          </h3>
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <ModifyButton
+                onModify={onEdit}
+                modifyLabel="Modifier"
+                size="sm"
+              />
+            )}
+            {onDelete && (
+              <DeleteButton
+                onDelete={onDelete}
+                deleteLabel="Supprimer"
+                confirmTitle="Supprimer l'utilisateur"
+                confirmMessage="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
+                size="sm"
+                hoverExpand={true}
+              />
+            )}
+          </div>
+        </div>
+        <div className="px-4 py-6 sm:p-8 space-y-4">
           <div className="grid grid-cols-[140px_1fr] gap-4">
             <span className="text-sm font-semibold text-gray-500">Email</span>
             <span className="text-sm text-gray-900">{user.email || "-"}</span>
@@ -73,9 +81,11 @@ export default function UserDetails({ user, onEdit, onDelete }) {
 
       {/* Adresses */}
       {user.addresses && user.addresses.length > 0 && (
-        <div className="border-t border-gray-200 pt-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Adresses</h3>
-          <div className="space-y-6">
+        <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+          <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Adresses</h3>
+          </div>
+          <div className="px-4 py-6 sm:p-8 space-y-6">
             {user.addresses.map((address) => (
               <div key={address.id} className="space-y-2">
                 <div className="text-lg font-semibold text-gray-900">
@@ -106,9 +116,11 @@ export default function UserDetails({ user, onEdit, onDelete }) {
 
       {/* Adhésions */}
       {user.memberships && user.memberships.length > 0 && (
-        <div className="border-t border-gray-200 pt-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">Adhésions</h3>
-          <div className="space-y-6">
+        <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+          <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Adhésions</h3>
+          </div>
+          <div className="px-4 py-6 sm:p-8 space-y-6">
             {user.memberships.map((membership) => (
               <div key={membership.id} className="space-y-2">
                 <div className="flex items-center gap-3">
@@ -140,11 +152,6 @@ export default function UserDetails({ user, onEdit, onDelete }) {
           </div>
         </div>
       )}
-
-      {/* Boutons d'action */}
-      <div className="border-t border-gray-200 pt-6">
-        <Utilities actions={actions} />
-      </div>
     </div>
   );
 }

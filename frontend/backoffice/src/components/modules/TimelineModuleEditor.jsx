@@ -110,6 +110,8 @@ export default function TimelineModuleEditor({
           submitButtonLabel="Enregistrer le module chronologie"
           onCancel={handleCancelEdit}
           cancelButtonLabel="Annuler"
+          successMessage="Le module chronologie a été mis à jour avec succès"
+          errorMessage="Impossible d'enregistrer le module chronologie"
         />
       )}
     </div>

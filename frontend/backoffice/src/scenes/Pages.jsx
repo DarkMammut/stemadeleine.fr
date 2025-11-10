@@ -2,9 +2,9 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { PlusIcon } from "@heroicons/react/16/solid";
 
+import SceneLayout from "@/components/ui/SceneLayout";
 import Utilities from "@/components/Utilities";
 import DraggableTree from "@/components/DraggableTree";
 import useGetPages from "@/hooks/useGetPages";
@@ -12,7 +12,7 @@ import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
 import useUpdatePageOrder from "@/hooks/useUpdatePageOrder";
 import { removeItem } from "@/utils/treeHelpers";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
@@ -96,7 +96,7 @@ export default function Pages() {
   );
 
   // Delete - avec axiosClient
-  const handleDelete = useCallback(async (item) => {
+  const handleDelete = useCallback((item) => {
     setItemToDelete(item);
     setShowDeleteModal(true);
   }, []);
@@ -157,12 +157,8 @@ export default function Pages() {
   if (error) return <p>Erreur: {error.message}</p>;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-6xl mx-auto p-6 space-y-6"
-    >
-      <Title label="Gestion des pages" onPublish={handlePublishPages} />
+    <SceneLayout>
+      <Title label="Website" onPublish={handlePublishPages} />
 
       <Utilities
         actions={[
@@ -199,10 +195,10 @@ export default function Pages() {
         }}
         onConfirm={confirmDelete}
         title="Supprimer la page"
-        message="Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible."
+        message={`Êtes-vous sûr de vouloir supprimer "${itemToDelete?.name}" ? Cette action est irréversible.`}
         isLoading={isDeleting}
         variant="danger"
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

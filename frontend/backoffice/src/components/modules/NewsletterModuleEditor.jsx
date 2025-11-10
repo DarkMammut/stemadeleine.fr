@@ -118,6 +118,8 @@ export default function NewsletterModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
+        successMessage="Le module texte a été mis à jour avec succès"
+        errorMessage="Impossible d'enregistrer le module texte"
         title="Visibilité du module"
         label="Module visible sur le site"
         isVisible={moduleData?.isVisible || false}
@@ -135,6 +137,8 @@ export default function NewsletterModuleEditor({
           onChange={handleFormChange}
           loading={saving}
           submitButtonLabel="Enregistrer le module newsletter"
+          successMessage="Le module newsletter a été mis à jour avec succès"
+          errorMessage="Impossible d'enregistrer le module newsletter"
           onCancel={handleCancelEdit}
           cancelButtonLabel="Annuler"
         />

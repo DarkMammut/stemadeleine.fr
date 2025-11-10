@@ -127,93 +127,109 @@ export default function AddressManager({
   };
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-xl font-bold text-gray-900">{label}</h3>
-
-      <div className="space-y-4">
-        {addresses.map((address) => (
-          <div key={address.id} className="border-t border-gray-200 pt-4">
-            {editable && editingId === address.id ? (
-              <div className="flex-1">
-                <MyForm
-                  key={editingId}
-                  fields={addressFields}
-                  initialValues={editForm}
-                  onSubmit={handleEditSubmit}
-                  onChange={setEditForm}
-                  submitButtonLabel="Enregistrer"
-                  onCancel={() => setEditingId(null)}
-                  cancelButtonLabel="Annuler"
-                />
-              </div>
-            ) : (
-              <div className="flex items-start justify-between gap-4">
-                <div
-                  className={editable ? "cursor-pointer flex-1" : "flex-1"}
-                  onClick={editable ? () => handleEdit(address) : undefined}
-                >
-                  <div className="space-y-2">
-                    <span className="text-lg font-semibold text-gray-900 block">
-                      {address.name}
-                    </span>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div>{address.addressLine1}</div>
-                      {address.addressLine2 && (
-                        <div>{address.addressLine2}</div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-700">
-                          {address.postCode}
-                        </span>
-                        <span>{address.city}</span>
-                      </div>
-                      {(address.state || address.country) && (
-                        <div className="flex items-center gap-2 text-gray-500">
-                          {address.state && <span>{address.state}</span>}
-                          {address.state && address.country && <span>•</span>}
-                          {address.country && <span>{address.country}</span>}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {editable && (
-                  <DeleteButton
-                    onDelete={() => handleDelete(address.id)}
-                    size="sm"
-                    deleteLabel="Supprimer"
-                    confirmTitle="Supprimer l'adresse"
-                    confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
+      <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
       </div>
 
-      {editable &&
-        !isLimitReached &&
-        (adding ? (
-          <div className="border-t border-gray-200 pt-4">
-            <MyForm
-              key="add"
-              fields={addressFields}
-              initialValues={addForm}
-              onSubmit={handleAddSubmit}
-              onChange={setAddForm}
-              submitButtonLabel="Ajouter"
-              onCancel={() => setAdding(false)}
-              cancelButtonLabel="Annuler"
-            />
+      <div className="px-4 py-6 sm:p-8">
+        {addresses.length > 0 ? (
+          <div className="space-y-6">
+            {addresses.map((address) => (
+              <div key={address.id}>
+                {editable && editingId === address.id ? (
+                  <div className="flex-1">
+                    <MyForm
+                      key={editingId}
+                      fields={addressFields}
+                      initialValues={editForm}
+                      onSubmit={handleEditSubmit}
+                      onChange={setEditForm}
+                      submitButtonLabel="Enregistrer"
+                      onCancel={() => setEditingId(null)}
+                      cancelButtonLabel="Annuler"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-4">
+                    <div
+                      className={editable ? "cursor-pointer flex-1" : "flex-1"}
+                      onClick={editable ? () => handleEdit(address) : undefined}
+                    >
+                      <div className="space-y-2">
+                        <span className="text-lg font-semibold text-gray-900 block">
+                          {address.name}
+                        </span>
+                        <div className="space-y-1 text-sm text-gray-600">
+                          <div>{address.addressLine1}</div>
+                          {address.addressLine2 && (
+                            <div>{address.addressLine2}</div>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <span className="inline-block px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-700">
+                              {address.postCode}
+                            </span>
+                            <span>{address.city}</span>
+                          </div>
+                          {(address.state || address.country) && (
+                            <div className="flex items-center gap-2 text-gray-500">
+                              {address.state && <span>{address.state}</span>}
+                              {address.state && address.country && (
+                                <span>•</span>
+                              )}
+                              {address.country && (
+                                <span>{address.country}</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {editable && (
+                      <DeleteButton
+                        onDelete={() => handleDelete(address.id)}
+                        size="sm"
+                        deleteLabel="Supprimer"
+                        confirmTitle="Supprimer l'adresse"
+                        confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="border-t border-gray-200 pt-4">
-            <Button variant="link" size="sm" onClick={() => setAdding(true)}>
-              + Ajouter une adresse
-            </Button>
+          <p className="text-sm text-gray-500">Aucune adresse enregistrée</p>
+        )}
+
+        {editable && !isLimitReached && (
+          <div
+            className={
+              addresses.length > 0
+                ? "mt-6 pt-6 border-t border-gray-200"
+                : "mt-0"
+            }
+          >
+            {adding ? (
+              <MyForm
+                key="add"
+                fields={addressFields}
+                initialValues={addForm}
+                onSubmit={handleAddSubmit}
+                onChange={setAddForm}
+                submitButtonLabel="Ajouter"
+                onCancel={() => setAdding(false)}
+                cancelButtonLabel="Annuler"
+              />
+            ) : (
+              <Button variant="link" size="sm" onClick={() => setAdding(true)}>
+                + Ajouter une adresse
+              </Button>
+            )}
           </div>
-        ))}
+        )}
+      </div>
 
       {/* Notification */}
       {notification.show && (

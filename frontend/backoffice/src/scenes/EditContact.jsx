@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { CheckIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import Title from "@/components/Title";
+import Title from "@/components/ui/Title";
 import Utilities from "@/components/Utilities";
 import NavigationButtons from "@/components/NavigationButtons";
 import { useContactOperations } from "@/hooks/useContactOperations";
@@ -13,6 +12,7 @@ import { buildContactBreadcrumbs } from "@/utils/breadcrumbs";
 import Notification from "@/components/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import ConfirmModal from "@/components/ConfirmModal";
+import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditContact() {
   const { id } = useParams();
@@ -139,11 +139,7 @@ export default function EditContact() {
   const breadcrumbs = contact ? buildContactBreadcrumbs(contact) : [];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto space-y-6"
-    >
+    <SceneLayout>
       <Title
         label={`Contact: ${getFullName()}`}
         showBreadcrumbs={!!contact}
@@ -240,7 +236,7 @@ export default function EditContact() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Utilisateur lié
                 </label>
-                <div className="inline-flex items-center px-3 py-2 rounded-md bg-green-50 border border-green-200">
+                <div className="bg-green-50 rounded-md p-3">
                   <p className="text-sm text-green-900">
                     {contact.user.firstname} {contact.user.lastname} (
                     {contact.user.email})
@@ -277,6 +273,6 @@ export default function EditContact() {
         isLoading={isDeleting}
         variant="danger"
       />
-    </motion.div>
+    </SceneLayout>
   );
 }

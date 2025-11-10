@@ -1,22 +1,19 @@
 package com.stemadeleine.api.dto;
 
 import com.stemadeleine.api.model.GalleryVariants;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-public record UpdateGalleryRequest(
-        @NotNull(message = "Module ID cannot be null")
-        UUID moduleId,
-
-        @NotBlank(message = "Le nom est requis")
-        String name,
-
-        @NotBlank(message = "Title cannot be empty")
-        String title,
-
-        @NotNull(message = "Variant cannot be null")
-        GalleryVariants variant
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateGalleryRequest {
+    private String name;
+    private String title;
+    private GalleryVariants variant;
+    private Integer sortOrder;
 }
+

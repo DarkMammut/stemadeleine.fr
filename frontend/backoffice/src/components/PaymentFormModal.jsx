@@ -249,6 +249,12 @@ export default function PaymentFormModal({
                   }
                   onCancel={onClose}
                   cancelButtonLabel="Annuler"
+                  successMessage={
+                    payment
+                      ? "Le paiement a été mis à jour avec succès"
+                      : "Le paiement a été créé avec succès"
+                  }
+                  errorMessage="Impossible d'enregistrer le paiement"
                 />
               )}
             </div>

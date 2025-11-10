@@ -3,15 +3,21 @@ import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 import Tabs from "@/components/Tabs";
 
-export default function PagesTabs({ pageId }) {
+export default function SectionsTabs({ pageId, sectionId }) {
   const pathname = usePathname();
 
   const tabs = useMemo(
     () => [
-      { label: "Informations", url: `/pages/${pageId}` },
-      { label: "Contenu", url: `/pages/${pageId}/sections` },
+      {
+        label: "Informations",
+        url: `/pages/${pageId}/sections/${sectionId}`,
+      },
+      {
+        label: "Contenus",
+        url: `/pages/${pageId}/sections/${sectionId}/modules`,
+      },
     ],
-    [pageId],
+    [pageId, sectionId],
   );
 
   // Déterminer l'onglet actif en fonction de l'URL
