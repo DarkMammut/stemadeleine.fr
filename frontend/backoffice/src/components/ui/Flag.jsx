@@ -17,6 +17,8 @@ export default function Flag({
     secondary:
       "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-400",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+    success:
+      "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
     ghost: "bg-transparent text-gray-900 hover:bg-gray-100 focus:ring-gray-300",
   };
 

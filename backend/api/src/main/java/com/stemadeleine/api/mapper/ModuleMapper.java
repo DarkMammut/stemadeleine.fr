@@ -51,7 +51,9 @@ public class ModuleMapper {
                 article.getStatus() != null ? article.getStatus().name() : null,
                 article.getIsVisible(),
                 article.getVersion(),
-                article.getContents() != null ? article.getContents().stream().map(contentMapper).toList() : null
+                article.getContents() != null ? article.getContents().stream().map(contentMapper).toList() : null,
+                article.getWriter(),
+                article.getWritingDate()
         );
     }
 
@@ -113,7 +115,8 @@ public class ModuleMapper {
                 news.getName(),
                 news.getType(),
                 news.getVariant() != null ? news.getVariant().name() : null,
-                news.getDescription(), null,
+                news.getDescription(),
+                null,
                 null,
                 news.getSortOrder(),
                 news.getStatus() != null ? news.getStatus().name() : null,

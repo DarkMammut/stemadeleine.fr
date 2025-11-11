@@ -18,12 +18,14 @@ import { useNotification } from '@/hooks/useNotification';
  * Composant générique de gestion de contenus pour section, module, etc.
  * parentType: "section", "module", ...
  * parentId: identifiant de la section ou du module
+ * showSaveButton: true = toujours visible, false = visible seulement si modifications
  */
 const ContentManager = ({
   parentId,
   parentType = "section",
   onContentsChange,
   customLabels = {},
+  showSaveButton = false,
 }) => {
   const [contents, setContents] = useState([]);
   const [expandedContents, setExpandedContents] = useState(new Set());
@@ -473,23 +475,40 @@ const ContentManager = ({
                             />
                           </div>
                         </div>
+                        {/* Bouton de sauvegarde - logique similaire à InputWithActions */}
+                        {(() => {
+                          // Si showSaveButton est true : toujours visible
+                          // Si showSaveButton est false : visible seulement si hasLocalChanges
+                          const shouldShow =
+                            showSaveButton === true ||
+                            (showSaveButton === false &&
+                              content.hasLocalChanges);
+                          return (
+                            shouldShow && (
+                              <div className="flex justify-end">
+                                <Button
+                                  onClick={() =>
+                                    handleSaveContentBody(content.contentId)
+                                  }
+                                  disabled={
+                                    savingStates[content.contentId] ||
+                                    !content.hasLocalChanges
+                                  }
+                                >
+                                  {customLabels.saveContent ||
+                                    "Enregistrer le contenu"}
+                                </Button>
+                              </div>
+                            )
+                          );
+                        })()}
                         <MediaManager
                           content={content}
                           onMediaAdd={handleAddMediaToContent}
                           onMediaRemove={handleRemoveMediaFromContent}
                           onMediaChanged={loadContents}
                         />
-                        <div className="flex justify-end">
-                          <Button
-                            onClick={() =>
-                              handleSaveContentBody(content.contentId)
-                            }
-                            disabled={savingStates[content.contentId]}
-                          >
-                            {customLabels.saveContent ||
-                              "Enregistrer le contenu"}
-                          </Button>
-                        </div>
+
                         {savingStates[content.contentId] && (
                           <div className="text-sm text-blue-600 flex items-center gap-2">
                             <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>

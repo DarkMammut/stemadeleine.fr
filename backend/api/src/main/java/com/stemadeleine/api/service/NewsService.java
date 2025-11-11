@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateNewsPutRequest;
 import com.stemadeleine.api.dto.UpdateNewsRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,18 +40,30 @@ public class NewsService {
         return news;
     }
 
-    public News updateNews(UUID id, News details) {
+    public Optional<News> getLastVersionByModuleId(UUID moduleId) {
+        log.info("Recherche de la dernière version de l'actualité avec le moduleId : {}", moduleId);
+        Optional<News> news = newsRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
+        log.debug("Actualité trouvée : {}", news.isPresent());
+        return news;
+    }
+
+    public News updateNews(UUID id, UpdateNewsPutRequest request) {
         log.info("Mise à jour de l'actualité avec l'ID : {}", id);
         return newsRepository.findById(id)
                 .map(news -> {
-                    news.setDescription(details.getDescription());
-                    news.setIsVisible(details.getIsVisible());
-                    news.setVariant(details.getVariant());
-                    news.setMedia(details.getMedia());
-                    news.setContents(details.getContents());
-                    news.setName(details.getName());
-                    news.setTitle(details.getTitle());
-                    news.setSortOrder(details.getSortOrder());
+                    if (request.getTitle() != null) {
+                        news.setTitle(request.getTitle());
+                    }
+                    if (request.getName() != null) {
+                        news.setName(request.getName());
+                    }
+                    if (request.getSortOrder() != null) {
+                        news.setSortOrder(request.getSortOrder());
+                    }
+                    if (request.getVariant() != null) {
+                        news.setVariant(request.getVariant());
+                    }
                     log.debug("Actualité mise à jour : {}", news);
                     return newsRepository.save(news);
                 })
@@ -75,7 +89,7 @@ public class NewsService {
         Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
                 .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
-        // Créer directement la timeline (hérite de Module)
+        // Créer directement la news (hérite de Module)
         News news = News.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
@@ -97,29 +111,31 @@ public class NewsService {
         return savedNews;
     }
 
-    public com.stemadeleine.api.model.News createNewsVersion(UpdateNewsRequest request, User author) {
+    public News createNewsVersion(UpdateNewsRequest request, User author) {
         log.info("Création d'une nouvelle version de news pour le moduleId : {}", request.moduleId());
 
         // 1. Récupérer le module
         Module module = moduleService.getModuleByModuleId(request.moduleId())
                 .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
 
-        // 2. Récupérer la dernière version de l'article pour ce module
-        com.stemadeleine.api.model.News previousNews = newsRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
+        // 2. Récupérer la dernière version de la news pour ce module
+        News previousNews = newsRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
                 .orElse(null);
 
         // 3. Fusionner les infos du request et de la version précédente
         String name = request.name() != null ? request.name() : (previousNews != null ? previousNews.getName() : module.getName());
         String title = request.title() != null ? request.title() : (previousNews != null ? previousNews.getTitle() : module.getTitle());
         NewsVariants variant = request.variant() != null ? request.variant() : (previousNews != null ? previousNews.getVariant() : NewsVariants.LAST3);
+        List<Content> contents = previousNews != null ? new ArrayList<>(previousNews.getContents()) : new ArrayList<>();
         String type = module.getType();
         Integer sortOrder = module.getSortOrder();
         Boolean isVisible = module.getIsVisible();
         PublishingStatus status = PublishingStatus.DRAFT;
         int newVersion = previousNews != null ? previousNews.getVersion() + 1 : 1;
 
-        com.stemadeleine.api.model.News news = com.stemadeleine.api.model.News.builder()
+        News news = News.builder()
                 .variant(variant)
+                .contents(contents)
                 .moduleId(module.getModuleId())
                 .section(module.getSection())
                 .name(name)
@@ -132,7 +148,7 @@ public class NewsService {
                 .version(newVersion)
                 .build();
 
-        com.stemadeleine.api.model.News savedNews = newsRepository.save(news);
+        News savedNews = newsRepository.save(news);
         log.info("Nouvelle version de news créée avec succès, ID : {}", savedNews.getId());
         return savedNews;
     }

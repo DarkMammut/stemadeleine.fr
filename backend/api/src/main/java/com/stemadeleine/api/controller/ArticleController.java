@@ -2,9 +2,11 @@ package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.ArticleDto;
 import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateArticlePutRequest;
 import com.stemadeleine.api.dto.UpdateArticleRequest;
 import com.stemadeleine.api.mapper.ArticleMapper;
 import com.stemadeleine.api.model.Article;
+import com.stemadeleine.api.model.ArticleVariants;
 import com.stemadeleine.api.model.CustomUserDetails;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.ArticleService;
@@ -14,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,6 +40,16 @@ public class ArticleController {
                 .toList();
     }
 
+    @GetMapping("/variants")
+    public ResponseEntity<List<String>> getArticleVariants() {
+        log.info("GET /api/articles/variants - Retrieving available article variants");
+        List<String> variants = Arrays.stream(ArticleVariants.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        log.debug("Article variants: {}", variants);
+        return ResponseEntity.ok(variants);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ArticleDto> getArticleById(@PathVariable UUID id) {
         log.info("GET /api/articles/{} - Retrieving article by ID", id);
@@ -46,6 +60,20 @@ public class ArticleController {
                 })
                 .orElseGet(() -> {
                     log.warn("Article not found with ID: {}", id);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("/by-module-id/{moduleId}")
+    public ResponseEntity<ArticleDto> getArticleByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/articles/by-module-id/{} - Retrieving latest article version by moduleId", moduleId);
+        return articleService.getLastVersionByModuleId(moduleId)
+                .map(article -> {
+                    log.debug("Article found: {} (version {})", article.getId(), article.getVersion());
+                    return ResponseEntity.ok(articleMapper.toDto(article));
+                })
+                .orElseGet(() -> {
+                    log.warn("Article not found with moduleId: {}", moduleId);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -63,13 +91,14 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ArticleDto> updateArticle(@PathVariable UUID id, @RequestBody Article articleDetails) {
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable UUID id, @RequestBody UpdateArticlePutRequest request) {
         log.info("PUT /api/articles/{} - Updating an article", id);
         try {
-            Article updated = articleService.updateArticle(id, articleDetails);
+            Article updated = articleService.updateArticle(id, request);
             log.debug("Article updated: {}", updated.getId());
             return ResponseEntity.ok(articleMapper.toDto(updated));
         } catch (RuntimeException e) {
+            log.error("Error updating article {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
@@ -96,3 +125,4 @@ public class ArticleController {
         return ResponseEntity.ok(articleMapper.toDto(article));
     }
 }
+

@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateArticlePutRequest;
 import com.stemadeleine.api.dto.UpdateArticleRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
@@ -39,16 +40,35 @@ public class ArticleService {
         return article;
     }
 
-    public Article updateArticle(UUID id, Article articleDetails) {
+    public Optional<Article> getLastVersionByModuleId(UUID moduleId) {
+        log.info("Recherche de la dernière version de l'article avec le moduleId : {}", moduleId);
+        Optional<Article> article = articleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(a -> a.getStatus() != PublishingStatus.DELETED);
+        log.debug("Article trouvé : {}", article.isPresent());
+        return article;
+    }
+
+    public Article updateArticle(UUID id, UpdateArticlePutRequest request) {
         log.info("Mise à jour de l'article avec l'ID : {}", id);
         return articleRepository.findById(id)
                 .map(article -> {
-                    article.setTitle(articleDetails.getTitle());
-                    article.setSortOrder(articleDetails.getSortOrder());
-                    article.setIsVisible(articleDetails.getIsVisible());
-                    article.setVariant(articleDetails.getVariant());
-                    if (articleDetails.getContents() != null) {
-                        article.setContents(articleDetails.getContents());
+                    if (request.getTitle() != null) {
+                        article.setTitle(request.getTitle());
+                    }
+                    if (request.getName() != null) {
+                        article.setName(request.getName());
+                    }
+                    if (request.getSortOrder() != null) {
+                        article.setSortOrder(request.getSortOrder());
+                    }
+                    if (request.getVariant() != null) {
+                        article.setVariant(request.getVariant());
+                    }
+                    if (request.getWriter() != null) {
+                        article.setWriter(request.getWriter());
+                    }
+                    if (request.getWritingDate() != null) {
+                        article.setWritingDate(request.getWritingDate());
                     }
                     log.debug("Article mis à jour : {}", article);
                     return articleRepository.save(article);
@@ -80,6 +100,8 @@ public class ArticleService {
         Boolean isVisible = module.getIsVisible();
         PublishingStatus status = PublishingStatus.DRAFT;
         int newVersion = previousArticle != null ? previousArticle.getVersion() + 1 : 1;
+        String writer = request.writer() != null ? request.writer() : (previousArticle != null ? previousArticle.getWriter() : null);
+        java.time.LocalDate writingDate = request.writingDate() != null ? request.writingDate() : (previousArticle != null ? previousArticle.getWritingDate() : null);
 
         Article article = Article.builder()
                 .variant(variant)
@@ -94,6 +116,8 @@ public class ArticleService {
                 .status(status)
                 .author(author)
                 .version(newVersion)
+                .writer(writer)
+                .writingDate(writingDate)
                 .build();
 
         Article savedArticle = articleRepository.save(article);
@@ -131,6 +155,8 @@ public class ArticleService {
                 .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
+                .writer(null)
+                .writingDate(null)
                 .build();
 
         Article savedArticle = articleRepository.save(article);

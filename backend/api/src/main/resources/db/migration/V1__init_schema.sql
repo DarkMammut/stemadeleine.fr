@@ -145,6 +145,8 @@ CREATE INDEX idx_contents_content_id_version ON contents(content_id, version DES
 CREATE TABLE articles (
                           id UUID PRIMARY KEY,
                           variant article_variants DEFAULT 'STAGGERED' NOT NULL,
+                          writer VARCHAR(255),
+                          writing_date DATE,
                           FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE
 );
 

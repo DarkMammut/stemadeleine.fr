@@ -77,8 +77,27 @@ export const useContentOperations = ({ parentType = "section" } = {}) => {
   const updateContent = useCallback(
     async (contentId, data) => {
       try {
-        const response = await axios.put(getContentApiRoute(contentId), data);
-        return response.data;
+        let updatedContent = null;
+
+        // Si on met à jour le titre
+        if (data.title !== undefined) {
+          const titleResponse = await axios.put(
+            getContentApiRoute(contentId, "title"),
+            { title: data.title },
+          );
+          updatedContent = titleResponse.data;
+        }
+
+        // Si on met à jour le body
+        if (data.body !== undefined) {
+          const bodyResponse = await axios.put(
+            getContentApiRoute(contentId, "body"),
+            { body: data.body },
+          );
+          updatedContent = bodyResponse.data;
+        }
+
+        return updatedContent;
       } catch (error) {
         console.error("Error updating content:", error);
         throw error;

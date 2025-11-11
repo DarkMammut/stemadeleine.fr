@@ -1,26 +1,79 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
-import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import useGetModule from "@/hooks/useGetModule";
+import useGetNewsletter from "@/hooks/useGetNewsletter";
+import useNewsVariants from "@/hooks/useNewsVariants";
+import ContentManager from "@/components/ContentManager";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function NewsletterModuleEditor({
   moduleId,
-  moduleData,
-  setModuleData,
-  refetch,
+  moduleData: _initialModuleData,
+  setModuleData: setParentModuleData,
+  refetch: _parentRefetch,
 }) {
-  const { updateModule } = useAddModule();
-  const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
-  const [saving, setSaving] = useState(false);
+  const { updateModuleVisibility } = useModuleOperations();
+  const axios = useAxiosClient();
+  const [savingModule, setSavingModule] = useState(false);
+  const [savingNewsletter, setSavingNewsletter] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
-  // Champs basés sur le modèle Java Newsletter
-  const fields = [
+  // Récupérer les données du module (name, title)
+  const {
+    module,
+    refetch: refetchModule,
+    loading: moduleLoading,
+  } = useGetModule({ moduleId });
+
+  // Récupérer les données complètes de la newsletter (variant, writer, writingDate, contents)
+  const {
+    newsletter,
+    refetch: refetchNewsletter,
+    loading: newsletterLoading,
+  } = useGetNewsletter({ moduleId });
+
+  // Récupérer les variantes disponibles depuis le backend
+  const { variants: variantOptions, loading: variantsLoading } =
+    useNewsVariants();
+
+  // États locaux
+  const [moduleData, setModuleData] = useState(null);
+  const [newsletterData, setNewsletterData] = useState(null);
+
+  // Synchroniser avec les données du module
+  useEffect(() => {
+    if (module) {
+      setModuleData(module);
+    }
+  }, [module]);
+
+  // Synchroniser avec les données de la newsletter
+  useEffect(() => {
+    if (newsletter) {
+      setNewsletterData(newsletter);
+    }
+  }, [newsletter]);
+
+  // Mettre à jour le parent avec les données combinées
+  useEffect(() => {
+    if (moduleData && newsletterData && setParentModuleData) {
+      setParentModuleData({
+        ...moduleData,
+        ...newsletterData,
+      });
+    }
+  }, [moduleData, newsletterData, setParentModuleData]);
+
+  // Champs pour le formulaire Module (name, title)
+  const moduleFields = [
     {
       name: "name",
       label: "Nom du module",
@@ -35,70 +88,86 @@ export default function NewsletterModuleEditor({
       placeholder: "Entrez le titre",
       required: true,
     },
+  ];
+
+  // Champs pour le formulaire Newsletter (variant, writer, writingDate)
+  const newsletterFields = [
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [
-        { value: "LAST3", label: "Les 3 dernières newsletters" },
-        { value: "ARCHIVE", label: "Archive complète" },
-        { value: "SUBSCRIPTION", label: "Formulaire d'inscription" },
-      ],
-    },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      placeholder: "Description du module newsletter",
-    },
-    {
-      name: "startDate",
-      label: "Date de début de publication",
-      type: "datetime-local",
-      required: true,
+      options: variantOptions,
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
+  // Soumission du formulaire Module
+  const handleModuleSubmit = async (values) => {
+    setSavingModule(true);
     try {
-      await setModuleMedia(moduleId, mediaId);
-      refetch();
-    } catch (error) {
-      console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
-    }
-  };
-
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      setSaving(true);
-      await updateModule(moduleId, {
+      const payload = {
         name: values.name,
         title: values.title,
-        variant: values.variant,
-        description: values.description,
-        startDate: values.startDate,
-        order: parseInt(values.order) || 0,
-      });
-      setSaving(false);
-      refetch();
-      alert("Module newsletter mis à jour !");
+      };
+
+      const response = await axios.put(
+        `/api/modules/${module.moduleId}`,
+        payload,
+      );
+
+      // Mettre à jour moduleData
+      setModuleData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      showSuccess("Module mis à jour avec succès");
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
-      setSaving(false);
+      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      showError("Erreur lors de la sauvegarde du module");
+      throw err;
+    } finally {
+      setSavingModule(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+  // Soumission du formulaire Newsletter
+  const handleNewsletterSubmit = async (values) => {
+    setSavingNewsletter(true);
+    try {
+      const payload = {
+        variant: values.variant,
+        writer: values.writer || null,
+        writingDate: values.writingDate || null,
+      };
+
+      const response = await axios.put(
+        `/api/newsletters/${newsletter.id}`,
+        payload,
+      );
+
+      // Mettre à jour newsletterData
+      setNewsletterData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      showSuccess("Newsletter mise à jour avec succès");
+    } catch (err) {
+      console.error("❌ Erreur lors de la sauvegarde de la newsletter:", err);
+      showError("Erreur lors de la sauvegarde de la newsletter");
+      throw err;
+    } finally {
+      setSavingNewsletter(false);
+    }
+  };
+
+  const handleCancelModuleEdit = async () => {
+    await refetchModule();
+  };
+
+  const handleCancelNewsletterEdit = async () => {
+    await refetchNewsletter();
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -107,19 +176,30 @@ export default function NewsletterModuleEditor({
       await updateModuleVisibility(moduleId, isVisible);
       setSavingVisibility(false);
       setModuleData((prev) => ({ ...prev, isVisible }));
+      showSuccess(`Module ${isVisible ? "visible" : "masqué"}`);
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError("Erreur lors de la mise à jour de la visibilité");
       setSavingVisibility(false);
     }
   };
 
+  if (moduleLoading || newsletterLoading || variantsLoading) {
+    return <div className="p-4">Chargement...</div>;
+  }
+
   return (
     <div className="space-y-6">
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
+
       {/* Section Visibilité */}
       <VisibilitySwitch
-        successMessage="Le module texte a été mis à jour avec succès"
-        errorMessage="Impossible d'enregistrer le module texte"
         title="Visibilité du module"
         label="Module visible sur le site"
         isVisible={moduleData?.isVisible || false}
@@ -127,30 +207,48 @@ export default function NewsletterModuleEditor({
         savingVisibility={savingVisibility}
       />
 
-      {/* Formulaire principal */}
+      {/* Formulaire Module (name, title) */}
       {moduleData && Object.keys(moduleData).length > 0 && (
         <MyForm
-          key={`${moduleId || "newsletter-module"}-${formKey}`}
-          fields={fields}
+          key={`module-${moduleId}`}
+          title="Informations du module"
+          fields={moduleFields}
           initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module newsletter"
-          successMessage="Le module newsletter a été mis à jour avec succès"
-          errorMessage="Impossible d'enregistrer le module newsletter"
-          onCancel={handleCancelEdit}
+          onSubmit={handleModuleSubmit}
+          loading={savingModule}
+          submitButtonLabel="Enregistrer les informations du module"
+          onCancel={handleCancelModuleEdit}
           cancelButtonLabel="Annuler"
         />
       )}
 
-      {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Image du module newsletter"
+      {/* Formulaire Newsletter (variant, writer, writingDate) */}
+      {newsletterData && Object.keys(newsletterData).length > 0 && (
+        <MyForm
+          key={`newsletter-${newsletter?.id}`}
+          title="Détails de la newsletter"
+          fields={newsletterFields}
+          initialValues={newsletterData}
+          onSubmit={handleNewsletterSubmit}
+          loading={savingNewsletter}
+          submitButtonLabel="Enregistrer les détails de la newsletter"
+          onCancel={handleCancelNewsletterEdit}
+          cancelButtonLabel="Annuler"
+        />
+      )}
+
+      {/* Gestion des contenus */}
+      <ContentManager
+        parentId={moduleId}
+        parentType="module"
+        customLabels={{
+          header: "Contenus du module newsletter",
+          addButton: "Ajouter un contenu de newsletter",
+          empty: "Aucun contenu pour ce module newsletter.",
+          loading: "Chargement des contenus...",
+          saveContent: "Enregistrer le contenu",
+          bodyLabel: "Contenu de la newsletter",
+        }}
       />
     </div>
   );

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -25,4 +26,10 @@ public class Article extends Module {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "article_id", referencedColumnName = "id")
     private List<Content> contents;
+
+    @Column(name = "writer")
+    private String writer;
+
+    @Column(name = "writing_date")
+    private LocalDate writingDate;
 }

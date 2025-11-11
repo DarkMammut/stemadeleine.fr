@@ -22,6 +22,8 @@ export default function Button({
       "bg-gray-200 text-gray-900 hover:bg-gray-300 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-gray-400",
     danger:
       "bg-red-600 text-white hover:bg-red-500 focus:ring-red-500 shadow-sm",
+    success:
+      "bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-600 shadow-sm",
     ghost: "bg-transparent text-gray-900 hover:bg-gray-100 focus:ring-gray-300",
     link: "bg-transparent text-blue-600 hover:text-blue-700 hover:bg-blue-50 focus:ring-blue-300",
     outline:

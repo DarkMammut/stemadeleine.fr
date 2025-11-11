@@ -119,7 +119,10 @@ export default function GalleryModuleEditor({
       };
       console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
 
-      const response = await axios.put(`/api/modules/${module.id}`, payload);
+      const response = await axios.put(
+        `/api/modules/${module.moduleId}`,
+        payload,
+      );
 
       console.log("📥 Réponse du serveur:", response.data);
 

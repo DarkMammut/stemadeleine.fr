@@ -1,27 +1,84 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
-import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import useGetModule from "@/hooks/useGetModule";
+import useGetNews from "@/hooks/useGetNews";
+import useNewsVariants from "@/hooks/useNewsVariants";
 import ContentManager from "@/components/ContentManager";
+import Notification from "@/components/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function NewsModuleEditor({
   moduleId,
-  moduleData,
-  setModuleData,
-  refetch,
+  moduleData: _initialModuleData,
+  setModuleData: setParentModuleData,
+  refetch: _parentRefetch,
 }) {
-  const { updateModule } = useAddModule();
-  const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
-  const [saving, setSaving] = useState(false);
+  const { updateModuleVisibility } = useModuleOperations();
+  const axios = useAxiosClient();
+  const [savingModule, setSavingModule] = useState(false);
+  const [savingNews, setSavingNews] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
 
-  // Champs basés sur le modèle Java News
-  const fields = [
+  // Récupérer les données du module (name, title)
+  const {
+    module,
+    refetch: refetchModule,
+    loading: moduleLoading,
+  } = useGetModule({ moduleId });
+
+  // Récupérer les données complètes de l'actualité (variant, writer, writingDate, contents)
+  const {
+    news,
+    refetch: refetchNews,
+    loading: newsLoading,
+  } = useGetNews({ moduleId });
+
+  // Récupérer les variantes disponibles depuis le backend
+  const { variants: variantOptions, loading: variantsLoading } =
+    useNewsVariants();
+
+  // États locaux
+  const [moduleData, setModuleData] = useState(null);
+  const [newsData, setNewsData] = useState(null);
+
+  // Synchroniser avec les données du module
+  useEffect(() => {
+    if (module) {
+      console.log("📦 Données de module chargées:", module);
+      setModuleData(module);
+    }
+  }, [module]);
+
+  // Synchroniser avec les données de l'actualité
+  useEffect(() => {
+    if (news) {
+      console.log("📝 Données d'actualité chargées:", news);
+      console.log("  - variant:", news.variant);
+      console.log("  - writer:", news.writer);
+      console.log("  - writingDate:", news.writingDate);
+      setNewsData(news);
+    }
+  }, [news]);
+
+  // Mettre à jour le parent avec les données combinées
+  useEffect(() => {
+    if (moduleData && newsData && setParentModuleData) {
+      setParentModuleData({
+        ...moduleData,
+        ...newsData,
+      });
+    }
+  }, [moduleData, newsData, setParentModuleData]);
+
+  // Champs pour le formulaire Module (name, title)
+  const moduleFields = [
     {
       name: "name",
       label: "Nom du module",
@@ -31,64 +88,101 @@ export default function NewsModuleEditor({
     },
     {
       name: "title",
-      label: "Titre",
+      label: "Titre de l'actualité",
       type: "text",
       placeholder: "Entrez le titre",
       required: true,
     },
+  ];
+
+  // Champs pour le formulaire News (variant, writer, writingDate)
+  const newsFields = [
     {
       name: "variant",
       label: "Variante d'affichage",
       type: "select",
       required: true,
-      options: [{ value: "LAST3", label: "Les 3 dernières actualités" }],
-    },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      placeholder: "Description du module actualités",
+      options: variantOptions,
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
+  // Soumission du formulaire Module
+  const handleModuleSubmit = async (values) => {
+    console.log("📝 Soumission du formulaire Module avec values:", values);
+    setSavingModule(true);
     try {
-      await setModuleMedia(moduleId, mediaId);
-      refetch();
-    } catch (error) {
-      console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
-    }
-  };
-
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      setSaving(true);
-      await updateModule(moduleId, {
+      const payload = {
         name: values.name,
         title: values.title,
-        variant: values.variant,
-        description: values.description,
-        order: parseInt(values.order) || 0,
-      });
-      setSaving(false);
-      refetch();
-      alert("Module actualités mis à jour !");
+      };
+      console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
+
+      const response = await axios.put(
+        `/api/modules/${module.moduleId}`,
+        payload,
+      );
+
+      console.log("📥 Réponse du serveur:", response.data);
+
+      // Mettre à jour moduleData
+      setModuleData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      showSuccess("Module mis à jour avec succès");
+      console.log("✅ Module mis à jour");
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
-      setSaving(false);
+      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      showError("Erreur lors de la sauvegarde du module");
+      throw err;
+    } finally {
+      setSavingModule(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+  // Soumission du formulaire News
+  const handleNewsSubmit = async (values) => {
+    console.log("📝 Soumission du formulaire News avec values:", values);
+    setSavingNews(true);
+    try {
+      const payload = {
+        variant: values.variant,
+        writer: values.writer || null,
+        writingDate: values.writingDate || null,
+      };
+      console.log("📤 Envoi au serveur (endpoint: /api/news):", payload);
+
+      const response = await axios.put(`/api/news/${news.id}`, payload);
+
+      console.log("📥 Réponse du serveur:", response.data);
+      console.log("  - variant dans réponse:", response.data?.variant);
+      console.log("  - writer dans réponse:", response.data?.writer);
+      console.log("  - writingDate dans réponse:", response.data?.writingDate);
+
+      // Mettre à jour newsData
+      setNewsData((prev) => ({
+        ...prev,
+        ...response.data,
+      }));
+
+      showSuccess("Actualité mise à jour avec succès");
+      console.log("✅ Actualité mise à jour");
+    } catch (err) {
+      console.error("❌ Erreur lors de la sauvegarde de l'actualité:", err);
+      showError("Erreur lors de la sauvegarde de l'actualité");
+      throw err;
+    } finally {
+      setSavingNews(false);
+    }
+  };
+
+  const handleCancelModuleEdit = async () => {
+    await refetchModule();
+  };
+
+  const handleCancelNewsEdit = async () => {
+    await refetchNews();
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -97,15 +191,28 @@ export default function NewsModuleEditor({
       await updateModuleVisibility(moduleId, isVisible);
       setSavingVisibility(false);
       setModuleData((prev) => ({ ...prev, isVisible }));
+      showSuccess(`Module ${isVisible ? "visible" : "masqué"}`);
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      showError("Erreur lors de la mise à jour de la visibilité");
       setSavingVisibility(false);
     }
   };
 
+  if (moduleLoading || newsLoading || variantsLoading) {
+    return <div className="p-4">Chargement...</div>;
+  }
+
   return (
     <div className="space-y-6">
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
+
       {/* Section Visibilité */}
       <VisibilitySwitch
         title="Visibilité du module"
@@ -115,46 +222,48 @@ export default function NewsModuleEditor({
         savingVisibility={savingVisibility}
       />
 
-      {/* Formulaire principal */}
+      {/* Formulaire Module (name, title) */}
       {moduleData && Object.keys(moduleData).length > 0 && (
         <MyForm
-          key={`${moduleId || "news-module"}-${formKey}`}
-          fields={fields}
+          key={`module-${moduleId}`}
+          title="Détails du module"
+          fields={moduleFields}
           initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module actualités"
-          onCancel={handleCancelEdit}
+          onSubmit={handleModuleSubmit}
+          loading={savingModule}
+          submitButtonLabel="Enregistrer les informations du module"
+          onCancel={handleCancelModuleEdit}
           cancelButtonLabel="Annuler"
-          successMessage="Le module actualités a été mis à jour avec succès"
-          errorMessage="Impossible d'enregistrer le module actualités"
+        />
+      )}
+
+      {/* Formulaire News (variant, writer, writingDate) */}
+      {newsData && Object.keys(newsData).length > 0 && (
+        <MyForm
+          key={`news-${news?.id}`}
+          title="Détails de l'actualité"
+          fields={newsFields}
+          initialValues={newsData}
+          onSubmit={handleNewsSubmit}
+          loading={savingNews}
+          submitButtonLabel="Enregistrer les détails de l'actualité"
+          onCancel={handleCancelNewsEdit}
+          cancelButtonLabel="Annuler"
         />
       )}
 
       {/* Gestion des contenus */}
-      <div className="bg-surface border border-border rounded-lg p-6">
-        <ContentManager
-          parentId={moduleId}
-          parentType="module"
-          customLabels={{
-            header: "Contenus du module actualités",
-            addButton: "Ajouter un contenu d'actualité",
-            empty: "Aucun contenu pour ce module actualités.",
-            loading: "Chargement des contenus...",
-            saveContent: "Enregistrer le contenu",
-            bodyLabel: "Contenu de l'actualité",
-          }}
-        />
-      </div>
-
-      {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Image du module actualités"
+      <ContentManager
+        parentId={moduleId}
+        parentType="module"
+        customLabels={{
+          header: "Contenus du module actualités",
+          addButton: "Ajouter un contenu d'actualité",
+          empty: "Aucun contenu pour ce module actualités.",
+          loading: "Chargement des contenus...",
+          saveContent: "Enregistrer le contenu",
+          bodyLabel: "Contenu de l'actualité",
+        }}
       />
     </div>
   );

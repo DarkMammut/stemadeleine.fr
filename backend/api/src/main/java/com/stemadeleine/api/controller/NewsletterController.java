@@ -2,9 +2,11 @@ package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.NewsletterDto;
-import com.stemadeleine.api.dto.UpdateNewsRequest;
+import com.stemadeleine.api.dto.UpdateNewsletterPutRequest;
+import com.stemadeleine.api.dto.UpdateNewsletterRequest;
 import com.stemadeleine.api.mapper.NewsletterMapper;
 import com.stemadeleine.api.model.CustomUserDetails;
+import com.stemadeleine.api.model.NewsVariants;
 import com.stemadeleine.api.model.Newsletter;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.NewsletterService;
@@ -14,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -33,6 +37,16 @@ public class NewsletterController {
         return newsletters.stream().map(newsletterMapper::toDto).toList();
     }
 
+    @GetMapping("/variants")
+    public ResponseEntity<List<String>> getNewsletterVariants() {
+        log.info("GET /api/newsletters/variants - Retrieving available newsletter variants");
+        List<String> variants = Arrays.stream(NewsVariants.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        log.debug("Newsletter variants: {}", variants);
+        return ResponseEntity.ok(variants);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<NewsletterDto> getNewsletterById(@PathVariable UUID id) {
         log.info("GET /api/newsletter/{} - Retrieving newsletter by ID", id);
@@ -43,6 +57,20 @@ public class NewsletterController {
                 })
                 .orElseGet(() -> {
                     log.warn("Newsletter not found with ID: {}", id);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("/by-module-id/{moduleId}")
+    public ResponseEntity<NewsletterDto> getNewsletterByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/newsletters/by-module-id/{} - Retrieving latest newsletter version by moduleId", moduleId);
+        return newsletterService.getLastVersionByModuleId(moduleId)
+                .map(newsletter -> {
+                    log.debug("Newsletter found: {} (version {})", newsletter.getId(), newsletter.getVersion());
+                    return ResponseEntity.ok(newsletterMapper.toDto(newsletter));
+                })
+                .orElseGet(() -> {
+                    log.warn("Newsletter not found with moduleId: {}", moduleId);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -68,7 +96,7 @@ public class NewsletterController {
 
     @PostMapping("/version")
     public ResponseEntity<NewsletterDto> createNewVersionForModule(
-            @RequestBody UpdateNewsRequest request,
+            @RequestBody UpdateNewsletterRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
         if (currentUserDetails == null) {
             throw new RuntimeException("User not authenticated");
@@ -81,10 +109,10 @@ public class NewsletterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NewsletterDto> updateNewsletter(@PathVariable UUID id, @RequestBody Newsletter newsletterDetails) {
+    public ResponseEntity<NewsletterDto> updateNewsletter(@PathVariable UUID id, @RequestBody UpdateNewsletterPutRequest request) {
         log.info("PUT /api/newsletter/{} - Updating a newsletter", id);
         try {
-            Newsletter updatedNewsletter = newsletterService.updateNewsletter(id, newsletterDetails);
+            Newsletter updatedNewsletter = newsletterService.updateNewsletter(id, request);
             log.debug("Newsletter updated: {}", updatedNewsletter.getId());
             return ResponseEntity.ok(newsletterMapper.toDto(updatedNewsletter));
         } catch (RuntimeException e) {

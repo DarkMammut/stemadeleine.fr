@@ -46,7 +46,7 @@ export default function PublishButton({
 
   if (published) {
     return (
-      <Flag variant="primary" size={size}>
+      <Flag variant="success" size={size}>
         {publishedLabel}
       </Flag>
     );
@@ -55,7 +55,7 @@ export default function PublishButton({
   return (
     <Button
       onClick={handlePublish}
-      variant="primary"
+      variant="success"
       size={size}
       loading={loading}
       disabled={disabled || loading}

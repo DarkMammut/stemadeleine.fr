@@ -1,7 +1,8 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
-import com.stemadeleine.api.dto.UpdateNewsRequest;
+import com.stemadeleine.api.dto.UpdateNewsletterPutRequest;
+import com.stemadeleine.api.dto.UpdateNewsletterRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.NewsletterRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,19 +40,31 @@ public class NewsletterService {
         return newsletter;
     }
 
+    public Optional<Newsletter> getLastVersionByModuleId(UUID moduleId) {
+        log.info("Recherche de la dernière version de la newsletter avec le moduleId : {}", moduleId);
+        Optional<Newsletter> newsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
+        log.debug("Newsletter trouvée : {}", newsletter.isPresent());
+        return newsletter;
+    }
+
     @Transactional
-    public Newsletter updateNewsletter(UUID id, Newsletter details) {
+    public Newsletter updateNewsletter(UUID id, UpdateNewsletterPutRequest request) {
         log.info("Mise à jour de la newsletter avec l'ID : {}", id);
         return newsletterRepository.findById(id)
                 .map(newsletter -> {
-                    newsletter.setDescription(details.getDescription());
-                    newsletter.setIsVisible(details.getIsVisible());
-                    newsletter.setVariant(details.getVariant());
-                    newsletter.setMedia(details.getMedia());
-                    newsletter.setContents(details.getContents());
-                    newsletter.setName(details.getName());
-                    newsletter.setTitle(details.getTitle());
-                    newsletter.setSortOrder(details.getSortOrder());
+                    if (request.getTitle() != null) {
+                        newsletter.setTitle(request.getTitle());
+                    }
+                    if (request.getName() != null) {
+                        newsletter.setName(request.getName());
+                    }
+                    if (request.getSortOrder() != null) {
+                        newsletter.setSortOrder(request.getSortOrder());
+                    }
+                    if (request.getVariant() != null) {
+                        newsletter.setVariant(request.getVariant());
+                    }
                     log.debug("Newsletter mise à jour : {}", newsletter);
                     return newsletterRepository.save(newsletter);
                 })
@@ -76,7 +90,7 @@ public class NewsletterService {
         Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
                 .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
 
-        // Créer directement la timeline (hérite de Module)
+        // Créer directement la newsletter (hérite de Module)
         Newsletter newsletter = Newsletter.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
@@ -98,29 +112,31 @@ public class NewsletterService {
         return savedNewsletter;
     }
 
-    public com.stemadeleine.api.model.Newsletter createNewsletterVersion(UpdateNewsRequest request, User author) {
-        log.info("Création d'une nouvelle version d'article pour le moduleId : {}", request.moduleId());
+    public Newsletter createNewsletterVersion(UpdateNewsletterRequest request, User author) {
+        log.info("Création d'une nouvelle version de newsletter pour le moduleId : {}", request.moduleId());
 
         // 1. Récupérer le module
         Module module = moduleService.getModuleByModuleId(request.moduleId())
                 .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
 
-        // 2. Récupérer la dernière version de l'article pour ce module
-        com.stemadeleine.api.model.Newsletter previousNewsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
+        // 2. Récupérer la dernière version de la newsletter pour ce module
+        Newsletter previousNewsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
                 .orElse(null);
 
         // 3. Fusionner les infos du request et de la version précédente
         String name = request.name() != null ? request.name() : (previousNewsletter != null ? previousNewsletter.getName() : module.getName());
         String title = request.title() != null ? request.title() : (previousNewsletter != null ? previousNewsletter.getTitle() : module.getTitle());
         NewsVariants variant = request.variant() != null ? request.variant() : (previousNewsletter != null ? previousNewsletter.getVariant() : NewsVariants.LAST3);
+        List<Content> contents = previousNewsletter != null ? new ArrayList<>(previousNewsletter.getContents()) : new ArrayList<>();
         String type = module.getType();
         Integer sortOrder = module.getSortOrder();
         Boolean isVisible = module.getIsVisible();
         PublishingStatus status = PublishingStatus.DRAFT;
         int newVersion = previousNewsletter != null ? previousNewsletter.getVersion() + 1 : 1;
 
-        com.stemadeleine.api.model.Newsletter newsletter = com.stemadeleine.api.model.Newsletter.builder()
+        Newsletter newsletter = Newsletter.builder()
                 .variant(variant)
+                .contents(contents)
                 .moduleId(module.getModuleId())
                 .section(module.getSection())
                 .name(name)
@@ -133,7 +149,7 @@ public class NewsletterService {
                 .version(newVersion)
                 .build();
 
-        com.stemadeleine.api.model.Newsletter savedNewsletter = newsletterRepository.save(newsletter);
+        Newsletter savedNewsletter = newsletterRepository.save(newsletter);
         log.info("Nouvelle version de newsletter créée avec succès, ID : {}", savedNewsletter.getId());
         return savedNewsletter;
     }

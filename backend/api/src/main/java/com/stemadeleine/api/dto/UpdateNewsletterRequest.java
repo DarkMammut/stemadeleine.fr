@@ -1,27 +1,22 @@
 package com.stemadeleine.api.dto;
 
-import com.stemadeleine.api.model.ArticleVariants;
+import com.stemadeleine.api.model.NewsVariants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
-public record UpdateArticleRequest(
+public record UpdateNewsletterRequest(
         @NotNull(message = "Module ID cannot be null")
         UUID moduleId,
 
-        @NotBlank(message = "Name cannot be empty")
+        @NotBlank(message = "Le nom est requis")
         String name,
 
         @NotBlank(message = "Title cannot be empty")
         String title,
 
-        @NotNull(message = "Variant cannot be null")
-        ArticleVariants variant,
-
-        String writer,
-
-        LocalDate writingDate
+        @NotNull(message = "La variante est requise")
+        NewsVariants variant
 ) {
 }

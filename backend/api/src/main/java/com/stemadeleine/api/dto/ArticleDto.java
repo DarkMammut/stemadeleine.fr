@@ -1,5 +1,6 @@
 package com.stemadeleine.api.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public record ArticleDto(
         String status,
         Boolean isVisible,
         Integer version,
-        List<ContentDto> contents
+        List<ContentDto> contents,
+        String writer,
+        LocalDate writingDate
 ) implements ModuleDtoMarker {
 }
