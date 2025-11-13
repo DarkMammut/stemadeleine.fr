@@ -1,114 +1,163 @@
 import React from "react";
-import UserLink from "@/components/UserLink";
-import Currency from "@/components/Currency";
-import ModifyButton from "@/components/ui/ModifyButton";
+import EditablePanel from "@/components/ui/EditablePanel";
+import MyForm from "@/components/MyForm";
+import PropTypes from "prop-types";
+import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
 import DeleteButton from "@/components/ui/DeleteButton";
 
 export default function PaymentDetails({
   payment,
-  onEdit,
   onDelete,
   onUserNavigate,
+  // EditablePanel-related props
+  editable = true,
+  initialValues = {},
+  onSave = null,
+  onChange = null,
+  loading = false, // form loading
+  saving = false, // submit in progress
+  paymentEnums = { type: [], status: [] },
 }) {
   if (!payment) return null;
 
+  const paymentFields = [
+    {
+      name: "amount",
+      label: "Montant",
+      type: "currency",
+      currency: "EUR",
+      required: true,
+      defaultValue: initialValues.amount,
+    },
+    {
+      name: "type",
+      label: "Type",
+      type: "select",
+      required: true,
+      defaultValue: initialValues.type,
+      options: (paymentEnums.type || []).map((v) => ({ label: v, value: v })),
+    },
+    {
+      name: "status",
+      label: "Statut",
+      type: "select",
+      required: true,
+      defaultValue: initialValues.status,
+      flag: true,
+      flagKey: "statusFlag",
+      options: (paymentEnums.status || []).map((v) => ({ label: v, value: v })),
+    },
+    {
+      name: "formSlug",
+      label: "Slug formulaire",
+      type: "text",
+      required: false,
+      defaultValue: initialValues.formSlug,
+    },
+    {
+      name: "receiptUrl",
+      label: "URL reçu",
+      type: "url",
+      required: false,
+      defaultValue: initialValues.receiptUrl,
+    },
+    {
+      name: "paymentDate",
+      label: "Date de paiement",
+      type: "date",
+      required: false,
+      defaultValue: initialValues.paymentDate,
+    },
+  ];
+
+  // build actions: delete button if provided
+  const panelActions = (
+    <>
+      {onDelete && (
+        <DeleteButton
+          onDelete={onDelete}
+          deleteLabel="Supprimer"
+          confirmTitle="Supprimer le paiement"
+          confirmMessage="Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible."
+          size="sm"
+        />
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Informations principales */}
-      <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-        <div className="flex items-center justify-between px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Paiement #{payment.id}
-          </h3>
-          <div className="flex items-center gap-2">
-            {onEdit && (
-              <ModifyButton
-                onModify={onEdit}
-                modifyLabel="Modifier"
-                size="sm"
-              />
+      {(() => {
+        // Build merged initial values and ensure statusFlag exists (fallback to status)
+        const mergedInitialValues = {
+          ...(payment || {}),
+          statusFlag:
+            (payment && (payment.statusFlag ?? payment.status)) || undefined,
+          ...(initialValues || {}),
+        };
+
+        return (
+          <EditablePanel
+            title={`Paiement #${payment.id}`}
+            icon={CurrencyDollarIcon}
+            canEdit={editable}
+            // For read-mode display we must pass the actual payment data as initialValues
+            // Merge edit-time initialValues (if any) so editing still works
+            initialValues={mergedInitialValues}
+            fields={paymentFields}
+            displayColumns={2}
+            onSubmit={onSave}
+            loading={loading}
+            actions={panelActions}
+            renderForm={({
+              initialValues: iv,
+              onCancel,
+              onSubmit,
+              loading: formLoading,
+            }) => (
+              <div>
+                <MyForm
+                  fields={paymentFields}
+                  initialValues={iv}
+                  onSubmit={onSubmit}
+                  onChange={onChange}
+                  loading={formLoading || saving}
+                  submitButtonLabel="Enregistrer le paiement"
+                  onCancel={onCancel}
+                  cancelButtonLabel="Annuler"
+                  successMessage="Le paiement a été mis à jour avec succès"
+                  errorMessage="Impossible d'enregistrer le paiement"
+                />
+              </div>
             )}
-            {onDelete && (
-              <DeleteButton
-                onDelete={onDelete}
-                deleteLabel="Supprimer"
-                confirmTitle="Supprimer le paiement"
-                confirmMessage="Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible."
-                size="sm"
-                hoverExpand={true}
-              />
-            )}
-          </div>
-        </div>
-        <div className="px-4 py-6 sm:p-8 space-y-4">
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Montant</span>
-            <span className="text-sm text-gray-900">
-              <Currency value={payment.amount} currency={payment.currency} />
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Type</span>
-            <span className="text-sm text-gray-900">{payment.type || "-"}</span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Statut</span>
-            <span className="text-sm text-gray-900">
-              {payment.status || "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Date</span>
-            <span className="text-sm text-gray-900">
-              {payment.paymentDate
-                ? new Date(payment.paymentDate).toLocaleDateString("fr-FR")
-                : "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">
-              Formulaire
-            </span>
-            <span className="text-sm text-gray-900">
-              {payment.formSlug || "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Reçu</span>
-            <span className="text-sm text-gray-900">
-              {payment.receiptUrl ? (
-                <a
-                  href={payment.receiptUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  Voir le reçu
-                </a>
-              ) : (
-                "-"
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Utilisateur associé */}
-      {payment.user && (
-        <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-          <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Emetteur</h3>
-          </div>
-          <div className="px-4 py-6 sm:p-8">
-            <UserLink user={payment.user} onClick={onUserNavigate} />
-          </div>
-        </div>
-      )}
+          />
+        );
+      })()}
     </div>
   );
 }
+
+PaymentDetails.propTypes = {
+  payment: PropTypes.object.isRequired,
+  onDelete: PropTypes.func,
+  onUserNavigate: PropTypes.func,
+  editable: PropTypes.bool,
+  initialValues: PropTypes.object,
+  onSave: PropTypes.func,
+  onChange: PropTypes.func,
+  loading: PropTypes.bool,
+  saving: PropTypes.bool,
+  paymentEnums: PropTypes.object,
+};
+
+PaymentDetails.defaultProps = {
+  onDelete: null,
+  onUserNavigate: null,
+  editable: true,
+  initialValues: {},
+  onSave: null,
+  onChange: null,
+  loading: false,
+  saving: false,
+  paymentEnums: { type: [], status: [] },
+};

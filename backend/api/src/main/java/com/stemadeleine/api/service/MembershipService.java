@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,8 +31,6 @@ public class MembershipService {
                 .dateAdhesion(dto.getDateAdhesion() != null ? dto.getDateAdhesion() : LocalDate.now())
                 .active(dto.getActive() != null ? dto.getActive() : true)
                 .dateFin(dto.getDateFin() != null ? dto.getDateFin() : LocalDate.of(currentYear, 12, 31))
-                .updatedAt(LocalDate.now())
-                .createdAt(LocalDate.now())
                 .build();
         return membershipRepository.save(membership);
     }
@@ -43,9 +42,37 @@ public class MembershipService {
         if (membership.getDateFin() == null || membership.getDateFin().getYear() != currentYear) {
             throw new IllegalStateException("Seule l'adhésion de l'année en cours peut être modifiée.");
         }
-        membership.setActive(dto.getActive());
-        membership.setUpdatedAt(LocalDate.now());
+        // Only update active if provided (avoid writing null into non-nullable column)
+        if (dto.getActive() != null) {
+            membership.setActive(dto.getActive());
+        }
+        // Optionally update dates if provided
+        if (dto.getDateAdhesion() != null) {
+            membership.setDateAdhesion(dto.getDateAdhesion());
+        }
+        if (dto.getDateFin() != null) {
+            membership.setDateFin(dto.getDateFin());
+        }
+        // updatedAt will be populated by @UpdateTimestamp on save
         // Ajoute d'autres champs modifiables si besoin
         return membershipRepository.save(membership);
+    }
+
+    // Récupère toutes les adhésions pour un utilisateur donné
+    @Transactional(readOnly = true)
+    public List<Membership> getMembershipsByUserId(UUID userId) {
+        return membershipRepository.findByUser_Id(userId);
+    }
+
+    // Récupère toutes les adhésions
+    @Transactional(readOnly = true)
+    public List<Membership> getAllMemberships() {
+        return membershipRepository.findAll();
+    }
+
+    // Récupère une adhésion par son id
+    @Transactional(readOnly = true)
+    public Membership getMembershipById(UUID membershipId) {
+        return membershipRepository.findById(membershipId).orElseThrow();
     }
 }

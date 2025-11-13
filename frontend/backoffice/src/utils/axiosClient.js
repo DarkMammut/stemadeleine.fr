@@ -15,6 +15,21 @@ export function useAxiosClient() {
       withCredentials: true,
     });
 
+    // Log outgoing requests for debug (temporary)
+    instance.interceptors.request.use((config) => {
+      try {
+        console.log("Axios request ->", {
+          method: config.method,
+          url: config.url,
+          baseURL: config.baseURL,
+          data: config.data,
+        });
+      } catch (e) {
+        // ignore logging errors
+      }
+      return config;
+    });
+
     instance.interceptors.response.use(
       (response) => response,
       async (error) => {

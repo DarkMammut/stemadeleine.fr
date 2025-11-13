@@ -21,7 +21,7 @@ Backoffice de gestion de contenu pour le site de la paroisse Sainte-Madeleine, d
 ### Documentation des Composants
 
 - **[src/components/ui/IconButton.md](./src/components/ui/IconButton.md)** - Boutons avec icônes
-- **[src/components/DeleteModal.md](./src/components/DeleteModal.md)** - Modale de suppression
+- **[src/components/DeleteModal.md](src/components/ui/DeleteModal.md)** - Modale de suppression
 
 ## 🚀 Démarrage Rapide
 

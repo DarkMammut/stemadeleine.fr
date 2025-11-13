@@ -1,42 +1,100 @@
 import { useCallback } from "react";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 export function useUserOperations() {
+  const axios = useAxiosClient();
   const apiUrl = "/api/users";
 
-  const getAllUsers = useCallback(async (adherentsOnly = false) => {
-    const url = adherentsOnly ? `${apiUrl}/adherents` : apiUrl;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Erreur lors du chargement des utilisateurs");
-    return await res.json();
-  }, []);
+  const getCurrentUser = useCallback(async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/me`);
+      return res.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        // 401 est déjà géré par ton interceptor, donc on peut renvoyer null
+        return null;
+      }
+      console.error(
+        "Erreur lors du chargement de l'utilisateur actuel :",
+        error,
+      );
+      throw error;
+    }
+  }, [axios]);
 
-  const createUser = useCallback(async (user) => {
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    });
-    if (!res.ok) throw new Error("Erreur lors de la création de l'utilisateur");
-    return await res.json();
-  }, []);
+  // now pageable: page (0-based) and size
+  const getAllUsers = useCallback(
+    async (adherentsOnly = false, page = 0, size = 20) => {
+      const urlBase = adherentsOnly ? `${apiUrl}/adherents` : apiUrl;
+      const params = `?page=${page}&size=${size}`;
+      const res = await axios.get(`${urlBase}${params}`);
+      // expecting a Page<T> structure from backend: { content: [...], totalElements, totalPages, number, size }
+      return res.data;
+    },
+    [axios],
+  );
 
-  const updateUserVisibility = useCallback(async (id, visible) => {
-    const res = await fetch(`${apiUrl}/${id}/visibility`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ visible }),
-    });
-    if (!res.ok)
-      throw new Error("Erreur lors de la mise à jour de la visibilité");
-    return await res.json();
-  }, []);
+  const createUser = useCallback(
+    async (user) => {
+      const res = await axios.post(apiUrl, user);
+      return res.data;
+    },
+    [axios],
+  );
 
-  const deleteUser = useCallback(async (id) => {
-    const res = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
-    if (!res.ok)
-      throw new Error("Erreur lors de la suppression de l'utilisateur");
-    return await res.json();
-  }, []);
+  // Normalize user payloads before sending to API (avoid empty string for date fields)
+  const normalizeUserPayload = (user) => {
+    if (!user || typeof user !== "object") return user;
+    const copy = { ...user };
+    if (Object.prototype.hasOwnProperty.call(copy, "birthDate")) {
+      if (copy.birthDate === "" || copy.birthDate == null) {
+        copy.birthDate = null;
+      }
+    }
+    return copy;
+  };
 
-  return { getAllUsers, createUser, updateUserVisibility, deleteUser };
+  const updateUser = useCallback(
+    async (id, user) => {
+      const payload = normalizeUserPayload(user);
+      const res = await axios.put(`${apiUrl}/${id}`, payload);
+      return res.data;
+    },
+    [axios],
+  );
+
+  const updateCurrentUser = useCallback(
+    async (user) => {
+      const payload = normalizeUserPayload(user);
+      const res = await axios.put(`${apiUrl}/me`, payload);
+      return res.data;
+    },
+    [axios],
+  );
+
+  const updateUserVisibility = useCallback(
+    async (id, visible) => {
+      const res = await axios.patch(`${apiUrl}/${id}/visibility`, { visible });
+      return res.data;
+    },
+    [axios],
+  );
+
+  const deleteUser = useCallback(
+    async (id) => {
+      const res = await axios.delete(`${apiUrl}/${id}`);
+      return res.data;
+    },
+    [axios],
+  );
+
+  return {
+    getCurrentUser,
+    getAllUsers,
+    createUser,
+    updateUser,
+    updateCurrentUser,
+    updateUserVisibility,
+    deleteUser,
+  };
 }

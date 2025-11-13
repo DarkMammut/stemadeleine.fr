@@ -420,14 +420,14 @@ La modale peut être fermée :
 ## Voir Aussi
 
 - [ConfirmModal](./ConfirmModal.jsx) - Modale de confirmation générique
-- [DeleteButton](./ui/DeleteButton.jsx) - Bouton de suppression avec modale intégrée
-- [Notification](./Notification.jsx) - Système de notifications
-- [useNotification Hook](../hooks/useNotification.js) - Hook pour gérer les notifications
+- [DeleteButton](DeleteButton.jsx) - Bouton de suppression avec modale intégrée
+- [Notification](../Notification.jsx) - Système de notifications
+- [useNotification Hook](../../hooks/useNotification.js) - Hook pour gérer les notifications
 
 ## Support
 
 Pour plus d'informations, consultez :
 
-- [Guide des Utilitaires](../../UTILITIES_GUIDE.md)
+- [Guide des Utilitaires](../../../UTILITIES_GUIDE.md)
 - [Documentation de Développement](../../../DEVELOPMENT.md)
 

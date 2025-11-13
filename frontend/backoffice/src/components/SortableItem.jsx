@@ -64,6 +64,11 @@ export default function SortableItem({
           </div>
           <Switch checked={visible} onChange={handleSwitch} />
           <span className="font-medium text-gray-900">{item.name}</span>
+          {item.moduleType && (
+            <span className="text-gray-500 text-sm ml-2">
+              ({item.moduleType})
+            </span>
+          )}
         </div>
 
         {/* Bouton Ajouter un enfant si la prop existe ET si c'est une section */}

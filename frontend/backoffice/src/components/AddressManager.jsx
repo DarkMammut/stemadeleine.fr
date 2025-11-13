@@ -3,11 +3,19 @@ import MyForm from "@/components/MyForm";
 import Button from "@/components/ui/Button";
 import DeleteButton from "@/components/ui/DeleteButton";
 import { useAxiosClient } from "@/utils/axiosClient";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import Panel from "@/components/ui/Panel";
+import PropTypes from "prop-types";
+import IconButton from "@/components/ui/IconButton";
+import {
+  MapPinIcon as MapPinOutlineIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
+import ModifyButton from "@/components/ui/ModifyButton";
 
 export default function AddressManager({
-  label = "Adresses",
+  label = "Mes Adresses",
   addresses,
   ownerId,
   ownerType,
@@ -16,6 +24,12 @@ export default function AddressManager({
   newAddressName = "Nouvelle adresse",
   maxAddresses = undefined,
 }) {
+  const handleAddClick = () => {
+    if (!editable || isLimitReached) return;
+    setAdding(true);
+    setEditingId("new");
+    setEditForm({ ...addForm });
+  };
   const axios = useAxiosClient();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
@@ -33,7 +47,8 @@ export default function AddressManager({
   });
 
   const isLimitReached =
-    typeof maxAddresses === "number" && addresses.length >= maxAddresses;
+    typeof maxAddresses === "number" &&
+    (addresses?.length || 0) >= maxAddresses;
 
   const addressFields = [
     { name: "name", label: "Nom", type: "text", required: true },
@@ -126,17 +141,50 @@ export default function AddressManager({
     }
   };
 
-  return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
-      </div>
+  // Header action: always show the primary add button when editable and not limit reached
+  const headerAction =
+    editable && !isLimitReached ? (
+      <IconButton
+        icon={PlusIcon}
+        label="Ajouter"
+        variant="primary"
+        size="md"
+        onClick={handleAddClick}
+      />
+    ) : null;
 
-      <div className="px-4 py-6 sm:p-8">
+  const TitleNode = (
+    <div className="flex items-center gap-3">
+      <MapPinOutlineIcon className="w-6 h-6 text-gray-500" />
+      <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
+    </div>
+  );
+
+  return (
+    <Panel title={TitleNode} actionsPrimary={headerAction}>
+      <div>
+        {/* Si on est en ajout, afficher le formulaire inline en haut pour éviter les doublons */}
+        {adding && (
+          <div className="mb-4">
+            <MyForm
+              key="add"
+              fields={addressFields}
+              initialValues={addForm}
+              onSubmit={handleAddSubmit}
+              onChange={setAddForm}
+              submitButtonLabel="Ajouter"
+              onCancel={() => setAdding(false)}
+              cancelButtonLabel="Annuler"
+              allowNoChanges={true}
+              inline={true}
+            />
+          </div>
+        )}
+
         {addresses.length > 0 ? (
-          <div className="space-y-6">
+          <div className="divide-y divide-gray-200">
             {addresses.map((address) => (
-              <div key={address.id}>
+              <div key={address.id} className="py-4">
                 {editable && editingId === address.id ? (
                   <div className="flex-1">
                     <MyForm
@@ -146,6 +194,7 @@ export default function AddressManager({
                       onSubmit={handleEditSubmit}
                       onChange={setEditForm}
                       submitButtonLabel="Enregistrer"
+                      inline={true}
                       onCancel={() => setEditingId(null)}
                       cancelButtonLabel="Annuler"
                     />
@@ -186,13 +235,20 @@ export default function AddressManager({
                       </div>
                     </div>
                     {editable && (
-                      <DeleteButton
-                        onDelete={() => handleDelete(address.id)}
-                        size="sm"
-                        deleteLabel="Supprimer"
-                        confirmTitle="Supprimer l'adresse"
-                        confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
-                      />
+                      <div className="flex flex-col items-end gap-2">
+                        <ModifyButton
+                          size="sm"
+                          modifyLabel="Modifier"
+                          onModify={() => handleEdit(address)}
+                        />
+                        <DeleteButton
+                          onDelete={() => handleDelete(address.id)}
+                          size="sm"
+                          deleteLabel="Supprimer"
+                          confirmTitle="Supprimer l'adresse"
+                          confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -203,27 +259,11 @@ export default function AddressManager({
           <p className="text-sm text-gray-500">Aucune adresse enregistrée</p>
         )}
 
-        {editable && !isLimitReached && (
-          <div
-            className={
-              addresses.length > 0
-                ? "mt-6 pt-6 border-t border-gray-200"
-                : "mt-0"
-            }
-          >
-            {adding ? (
-              <MyForm
-                key="add"
-                fields={addressFields}
-                initialValues={addForm}
-                onSubmit={handleAddSubmit}
-                onChange={setAddForm}
-                submitButtonLabel="Ajouter"
-                onCancel={() => setAdding(false)}
-                cancelButtonLabel="Annuler"
-              />
-            ) : (
-              <Button variant="link" size="sm" onClick={() => setAdding(true)}>
+        {/* Affiche le bouton bas uniquement si la liste est vide (évite une bordure vide sous la liste) */}
+        {editable && !isLimitReached && addresses && addresses.length === 0 && (
+          <div className="mt-0">
+            {!adding && (
+              <Button variant="link" size="sm" onClick={handleAddClick}>
                 + Ajouter une adresse
               </Button>
             )}
@@ -240,6 +280,27 @@ export default function AddressManager({
           onClose={hideNotification}
         />
       )}
-    </div>
+    </Panel>
   );
 }
+
+AddressManager.propTypes = {
+  label: PropTypes.string,
+  addresses: PropTypes.array.isRequired,
+  ownerId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  ownerType: PropTypes.string,
+  refreshAddresses: PropTypes.func,
+  editable: PropTypes.bool,
+  newAddressName: PropTypes.string,
+  maxAddresses: PropTypes.number,
+};
+
+AddressManager.defaultProps = {
+  label: "Adresses",
+  ownerId: null,
+  ownerType: null,
+  refreshAddresses: null,
+  editable: true,
+  newAddressName: "Nouvelle adresse",
+  maxAddresses: undefined,
+};

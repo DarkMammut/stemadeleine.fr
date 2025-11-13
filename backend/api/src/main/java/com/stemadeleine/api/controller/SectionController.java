@@ -70,14 +70,15 @@ public class SectionController {
     ) {
         if (currentUserDetails == null) {
             log.error("Attempt to create section without authentication");
-            throw new RuntimeException("User not authenticated");
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
         }
 
         User currentUser = currentUserDetails.account().getUser();
         log.info("POST /api/sections - Creating new section for page {}", request.pageId());
 
         if (request.pageId() == null) {
-            throw new RuntimeException("PageId is required for new section");
+            // throw a specific exception mapped to 400 by GlobalExceptionHandler
+            throw new com.stemadeleine.api.exception.BadRequestException("PageId is required for new section");
         }
 
         Section section = sectionService.createNewSection(request.pageId(), request.name(), currentUser);
@@ -506,3 +507,4 @@ public class SectionController {
         return ResponseEntity.ok(sectionMapper.toDto(publishedSection));
     }
 }
+

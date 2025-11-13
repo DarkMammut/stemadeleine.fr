@@ -14,9 +14,9 @@ import useUpdatePageOrder from "@/hooks/useUpdatePageOrder";
 import { removeItem } from "@/utils/treeHelpers";
 import Title from "@/components/ui/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function Pages() {
   const router = useRouter();

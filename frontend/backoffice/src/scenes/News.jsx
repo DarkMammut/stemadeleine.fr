@@ -9,7 +9,7 @@ import Utilities from "@/components/Utilities";
 import { useNewsPublicationOperations } from "@/hooks/useNewsPublicationOperations";
 import CardList from "@/components/CardList";
 import NewsCard from "@/components/NewsCard";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function News() {

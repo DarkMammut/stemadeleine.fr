@@ -2,6 +2,7 @@ package com.stemadeleine.api.controller;
 
 import com.stemadeleine.api.dto.PaymentCreateDto;
 import com.stemadeleine.api.dto.PaymentUpdateDto;
+import com.stemadeleine.api.dto.PaymentUserDto;
 import com.stemadeleine.api.model.Payment;
 import com.stemadeleine.api.model.PaymentStatus;
 import com.stemadeleine.api.model.PaymentType;
@@ -38,7 +39,7 @@ public class PaymentController {
             Payment saved = paymentService.createPayment(paymentDto);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).build();
         }
     }
 
@@ -48,7 +49,17 @@ public class PaymentController {
             Payment updated = paymentService.updatePayment(id, paymentDetails);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(404).build();
+        }
+    }
+
+    @PutMapping("/{id}/user")
+    public ResponseEntity<Payment> updatePaymentUser(@PathVariable UUID id, @RequestBody PaymentUserDto payload) {
+        try {
+            Payment updated = paymentService.updatePaymentUser(id, payload.getUserId());
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).build();
         }
     }
 

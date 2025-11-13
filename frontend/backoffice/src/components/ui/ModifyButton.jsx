@@ -46,7 +46,7 @@ export default function ModifyButton({
 
   if (modified) {
     return (
-      <Flag variant="success" size={size}>
+      <Flag variant="secondary" size={size}>
         {modifiedLabel}
       </Flag>
     );

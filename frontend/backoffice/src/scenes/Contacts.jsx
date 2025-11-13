@@ -10,7 +10,7 @@ import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
 import CardList from "@/components/CardList";
 import ContactCard from "@/components/ContactCard";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function Contacts() {

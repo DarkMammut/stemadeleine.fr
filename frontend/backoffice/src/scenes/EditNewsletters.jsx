@@ -12,14 +12,15 @@ import PublicationInfoCard from "@/components/PublicationInfoCard";
 import DownloadButton from "@/components/ui/DownloadButton";
 import SendButton from "@/components/ui/SendButton";
 import IconButton from "@/components/ui/IconButton";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
 import { useNotification } from "@/hooks/useNotification";
-import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import SceneLayout from "@/components/ui/SceneLayout";
 import { useRouter } from "next/navigation";
+import EditablePanel from "@/components/ui/EditablePanel";
 
 export default function EditNewsletters({ newsletterId }) {
   const [newsletterData, setNewsletterData] = useState(null);
@@ -306,19 +307,30 @@ export default function EditNewsletters({ newsletterId }) {
 
           {/* Main Form */}
           {newsletterData && Object.keys(newsletterData).length > 0 && (
-            <MyForm
-              key={`newsletter-form-${formKey}`}
+            <EditablePanel
               title="Informations de la newsletter"
-              fields={fields}
+              canEdit={true}
               initialValues={newsletterData}
+              fields={fields}
+              displayColumns={2}
               onSubmit={handleSubmit}
-              onChange={handleFormChange}
-              loading={saving}
-              submitButtonLabel="Enregistrer la newsletter"
-              onCancel={handleCancelEdit}
-              cancelButtonLabel="Annuler"
-              successMessage="La newsletter a été mise à jour avec succès"
-              errorMessage="Impossible d'enregistrer la newsletter"
+              onCancelExternal={handleCancelEdit}
+              renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
+                <MyForm
+                  key={`newsletter-form-${formKey}`}
+                  title="Informations de la newsletter"
+                  fields={fields}
+                  initialValues={initialValues}
+                  onSubmit={onSubmit}
+                  onChange={handleFormChange}
+                  loading={loading}
+                  submitButtonLabel="Enregistrer la newsletter"
+                  onCancel={onCancel}
+                  cancelButtonLabel="Annuler"
+                  successMessage="La newsletter a été mise à jour avec succès"
+                  errorMessage="Impossible d'enregistrer la newsletter"
+                />
+              )}
             />
           )}
 

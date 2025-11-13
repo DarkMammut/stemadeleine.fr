@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -47,11 +48,11 @@ public class NewsPublication {
     @Column(name = "published_date")
     private OffsetDateTime publishedDate;
 
-    @Column(name = "start_date", nullable = false)
-    private OffsetDateTime startDate;
+    @Column(name = "start_date")
+    private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
-    private OffsetDateTime endDate;
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     // Single featured media for the news
     @ManyToOne(fetch = FetchType.LAZY)

@@ -32,8 +32,10 @@ export default function ConfirmModal({
     onConfirm();
   };
 
-  const iconColorClass = variant === "danger" ? "bg-red-100" : "bg-blue-100";
-  const iconTextClass = variant === "danger" ? "text-red-600" : "text-blue-600";
+  const iconColorClass = variant === "danger" ? "bg-red-50" : "bg-blue-100";
+  const iconTextClass = variant === "danger" ? "text-red-700" : "text-blue-600";
+
+  const iconSizeClass = variant === "danger" ? "size-14" : "size-6";
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-[9999]">
@@ -50,11 +52,11 @@ export default function ConfirmModal({
           >
             <div className="sm:flex sm:items-start">
               <div
-                className={`mx-auto flex size-12 shrink-0 items-center justify-center rounded-full ${iconColorClass} sm:mx-0 sm:size-10`}
+                className={`mx-auto flex ${iconSizeClass} shrink-0 items-center justify-center rounded-full ${iconColorClass} sm:mx-0 sm:size-10`}
               >
                 <ExclamationTriangleIcon
                   aria-hidden="true"
-                  className={`size-6 ${iconTextClass}`}
+                  className={`size-8 ${iconTextClass}`}
                 />
               </div>
               <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -81,16 +83,18 @@ export default function ConfirmModal({
               >
                 {confirmLabel}
               </Button>
-              <Button
-                type="button"
-                onClick={onClose}
-                disabled={isLoading}
-                variant="outline"
-                size="md"
-                className="mt-3 sm:mt-0 w-full sm:w-auto"
-              >
-                {cancelLabel}
-              </Button>
+              {cancelLabel ? (
+                <Button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isLoading}
+                  variant="outline"
+                  size="md"
+                  className="mt-3 sm:mt-0 w-full sm:w-auto"
+                >
+                  {cancelLabel}
+                </Button>
+              ) : null}
             </div>
           </DialogPanel>
         </div>

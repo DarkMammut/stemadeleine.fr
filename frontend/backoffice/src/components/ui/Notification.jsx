@@ -18,6 +18,7 @@ export default function Notification({
   message,
   autoClose = true,
   duration = 3000,
+  prominent = false,
 }) {
   const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -89,6 +90,23 @@ export default function Notification({
     }
   };
 
+  // Border color for prominent notifications
+  const getBorderClass = () => {
+    if (!prominent) return "border-gray-200";
+    switch (type) {
+      case "success":
+        return "border-green-500";
+      case "error":
+        return "border-red-500";
+      case "warning":
+        return "border-yellow-400";
+      case "info":
+        return "border-blue-500";
+      default:
+        return "border-gray-200";
+    }
+  };
+
   if (!mounted) return null;
   if (!show || !title) return null;
 
@@ -98,9 +116,11 @@ export default function Notification({
       className="pointer-events-none fixed top-0 right-0 p-6 z-[9999]"
     >
       <div
-        className={`pointer-events-auto w-96 rounded-lg bg-white shadow-lg border border-gray-200 transform transition-all duration-300 ease-out ${
+        className={`pointer-events-auto ${
+          prominent ? "w-[28rem] rounded-xl border-2" : "w-96 rounded-lg"
+        } bg-white shadow-lg transform transition-all duration-300 ease-out ${
           visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"
-        }`}
+        } ${getBorderClass()}`}
       >
         <div className="p-4">
           <div className="flex items-start">

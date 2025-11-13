@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
+import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
@@ -43,13 +43,26 @@ export default function FormModuleEditor({
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
+  const handleMediaAdd = async (contentId, mediaId) => {
     try {
       await setModuleMedia(moduleId, mediaId);
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Error setting module media:", error);
       alert("Erreur lors de l'ajout du média");
+    }
+  };
+
+  const handleMediaRemove = async (contentId, mediaId) => {
+    try {
+      // remove media by setting it to null (API expects module media id or null)
+      await setModuleMedia(moduleId, null);
+      await refetch();
+      // Log pour montrer d'où provient la suppression et quel mediaId a été retiré
+      console.debug("Media removed", { contentId, mediaId });
+    } catch (error) {
+      console.error("Error removing module media:", error);
+      alert("Erreur lors de la suppression du média");
     }
   };
 
@@ -121,13 +134,17 @@ export default function FormModuleEditor({
         />
       )}
 
-      {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Image du formulaire"
+      {/* Media manager (remplace MediaPicker) */}
+      <MediaManager
+        title="Image du formulaire"
+        content={{
+          id: moduleId,
+          medias: moduleData?.media ? [moduleData.media] : [],
+        }}
+        onMediaAdd={handleMediaAdd}
+        onMediaRemove={handleMediaRemove}
+        onMediaChanged={refetch}
+        maxMedias={1}
       />
     </div>
   );

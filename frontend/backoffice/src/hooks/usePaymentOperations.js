@@ -26,5 +26,32 @@ export function usePaymentOperations() {
     [axios],
   );
 
-  return { getAllPayments, createPayment, deletePayment };
+  // Attacher un user à un paiement via une route dédiée
+  const attachUser = useCallback(
+    async (paymentId, userId) => {
+      // convention: PUT /api/payments/:id/user { userId }
+      const res = await axios.put(`${apiUrl}/${paymentId}/user`, { userId });
+      return res.data;
+    },
+    [axios],
+  );
+
+  // Détacher le user d'un paiement
+  const detachUser = useCallback(
+    async (paymentId) => {
+      const res = await axios.put(`${apiUrl}/${paymentId}/user`, {
+        userId: null,
+      });
+      return res.data;
+    },
+    [axios],
+  );
+
+  return {
+    getAllPayments,
+    createPayment,
+    deletePayment,
+    attachUser,
+    detachUser,
+  };
 }

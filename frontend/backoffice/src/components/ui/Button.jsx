@@ -31,7 +31,7 @@ export default function Button({
     refresh:
       "bg-green-600 text-white hover:bg-green-500 focus:ring-green-600 shadow-sm",
     filter:
-      "bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-600 shadow-sm",
+      "bg-gray-300 text-gray-900 hover:bg-gray-400 ring-1 ring-inset ring-gray-400 hover:bg-gray-50 focus:ring-gray-500",
   };
 
   const sizes = {

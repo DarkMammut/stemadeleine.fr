@@ -9,9 +9,9 @@ import NavigationButtons from "@/components/NavigationButtons";
 import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
 import { buildContactBreadcrumbs } from "@/utils/breadcrumbs";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditContact() {

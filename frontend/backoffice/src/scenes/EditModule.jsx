@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Title from "@/components/ui/Title";
 import useGetModule from "@/hooks/useGetModule";
-import axios from "axios";
 
 // Import des composants spécialisés par type de module (basés sur votre backend Java)
 import NewsModuleEditor from "@/components/modules/NewsModuleEditor";
@@ -16,6 +15,8 @@ import TimelineModuleEditor from "@/components/modules/TimelineModuleEditor";
 import NewsletterModuleEditor from "@/components/modules/NewsletterModuleEditor";
 import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
 import SceneLayout from "@/components/ui/SceneLayout";
+import EditablePanel from "@/components/ui/EditablePanel";
+import { useAxiosClient } from "@/utils/axiosClient";
 
 // Mapping des types de modules vers leurs composants d'édition (basé sur vos modèles Java)
 const MODULE_COMPONENTS = {
@@ -32,13 +33,11 @@ const MODULE_COMPONENTS = {
 export default function EditModule({ pageId, sectionId, moduleId }) {
   const { module, refetch, loading, error } = useGetModule({ moduleId });
   const [moduleData, setModuleData] = useState(null);
+  const axiosClient = useAxiosClient();
 
   // Hook pour les breadcrumbs
-  const {
-    breadcrumbData,
-    loading: breadcrumbLoading,
-    error: breadcrumbError,
-  } = useBreadcrumbData({ pageId, sectionId, moduleId });
+  // we don't need breadcrumb values here, but keep hook call for side-effects if any
+  useBreadcrumbData({ pageId, sectionId, moduleId });
 
   useEffect(() => {
     if (module) {
@@ -47,6 +46,29 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
       setModuleData(module);
     }
   }, [module]);
+
+  // Centralized metadata submit for module (name, title, description)
+  const handleModuleMetadataSubmit = async (values) => {
+    try {
+      // Build payload minimally
+      const payload = {
+        name: values.name,
+        title: values.title,
+        description: values.description,
+      };
+      const res = await axiosClient.put(`/api/modules/${moduleId}`, payload);
+      // update local state with server response
+      setModuleData((prev) => ({ ...(prev || {}), ...(res.data || {}) }));
+      // refetch other data if needed
+      await refetch();
+    } catch (err) {
+      console.error(
+        "Erreur lors de la sauvegarde des métadonnées du module",
+        err,
+      );
+      throw err;
+    }
+  };
 
   // Fonction pour publier le module courant (et ses contenus si présents)
   const handlePublishModule = async () => {
@@ -95,12 +117,43 @@ export default function EditModule({ pageId, sectionId, moduleId }) {
         onPublish={handlePublishModule}
       />
 
-      <ModuleComponent
-        moduleId={moduleId}
-        moduleData={moduleData}
-        setModuleData={setModuleData}
-        refetch={refetch}
-      />
+      <EditablePanel
+        title={`Module - ${moduleData.name || moduleData.title || moduleData.type}`}
+        initialValues={moduleData}
+        onSubmit={handleModuleMetadataSubmit}
+        fields={[
+          { name: "name", label: "Nom", type: "text" },
+          { name: "title", label: "Titre", type: "text" },
+          { name: "description", label: "Description", type: "textarea" },
+        ]}
+        renderForm={({ initialValues }) => (
+          <ModuleComponent
+            moduleId={moduleId}
+            moduleData={initialValues}
+            setModuleData={setModuleData}
+            refetch={refetch}
+          />
+        )}
+      >
+        {/* read-only summary when not editing: richer info */}
+        <div className="p-2 space-y-1">
+          <div className="text-sm font-medium">
+            {moduleData.title || moduleData.name}
+          </div>
+          <div className="text-xs text-text-muted">Type: {moduleData.type}</div>
+          <div className="text-xs text-text-muted">
+            Visibilité: {moduleData.isVisible ? "visible" : "masqué"}
+          </div>
+          <div className="text-xs text-text-muted">
+            Contenus: {moduleData.contents ? moduleData.contents.length : 0}
+          </div>
+          {moduleData.description && (
+            <div className="text-xs text-text-muted">
+              {moduleData.description}
+            </div>
+          )}
+        </div>
+      </EditablePanel>
     </SceneLayout>
   );
 }

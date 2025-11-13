@@ -67,8 +67,6 @@ public class HelloAssoImportService {
                     .dateAdhesion(java.time.LocalDate.now())
                     .active(true)
                     .dateFin(java.time.LocalDate.of(currentYear, 12, 31))
-                    .updatedAt(java.time.LocalDate.now())
-                    .createdAt(java.time.LocalDate.now())
                     .build();
             membershipRepository.save(membership);
             log.info("Nouvel utilisateur ajouté: {} {}", user.getFirstname(), user.getLastname());

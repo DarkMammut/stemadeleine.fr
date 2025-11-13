@@ -1,13 +1,15 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/ui/Title";
-import MyForm from "@/components/MyForm";
 import PaymentDetails from "@/components/PaymentDetails";
 import LinkUser from "@/components/LinkUser";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import SceneLayout from "@/components/ui/SceneLayout";
+import { usePaymentOperations } from "@/hooks/usePaymentOperations";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -17,10 +19,10 @@ export default function EditPayment() {
   const [paymentForm, setPaymentForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
   const [paymentEnums, setPaymentEnums] = useState({ status: [], type: [] });
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
+  const { attachUser, detachUser } = usePaymentOperations();
 
   useEffect(() => {
     loadPayment();
@@ -31,6 +33,8 @@ export default function EditPayment() {
     setLoading(true);
     try {
       const res = await axios.get(`/api/payments/${id}`);
+      // Mettre à jour à la fois le formulaire et l'objet payment utilisé par la vue
+      setPayment(res.data);
       setPaymentForm({
         amount:
           typeof res.data.amount === "number"
@@ -78,7 +82,6 @@ export default function EditPayment() {
     try {
       await axios.put(`/api/payments/${id}`, formValues);
       await loadPayment();
-      setShowEditForm(false);
       showSuccess(
         "Paiement modifié",
         "Les modifications ont été enregistrées avec succès",
@@ -89,10 +92,6 @@ export default function EditPayment() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleEdit = () => {
-    setShowEditForm(true);
   };
 
   const handleDelete = async () => {
@@ -116,7 +115,6 @@ export default function EditPayment() {
       window.location.href = `/users/${payment.user.id}`;
     }
   };
-  const handleCancelEdit = () => setShowEditForm(false);
 
   const handleLinkUser = async (userId) => {
     setSaving(true);
@@ -142,95 +140,82 @@ export default function EditPayment() {
     await handleLinkUser(userId);
   };
 
-  const paymentFields = [
-    {
-      name: "amount",
-      label: "Montant",
-      type: "number",
-      required: true,
-      defaultValue: paymentForm.amount,
-    },
-    {
-      name: "type",
-      label: "Type",
-      type: "select",
-      required: true,
-      defaultValue: paymentForm.type,
-      options: paymentEnums.type.map((v) => ({ label: v, value: v })),
-    },
-    {
-      name: "status",
-      label: "Statut",
-      type: "select",
-      required: true,
-      defaultValue: paymentForm.status,
-      options: paymentEnums.status.map((v) => ({ label: v, value: v })),
-    },
-    {
-      name: "formSlug",
-      label: "Slug formulaire",
-      type: "text",
-      required: false,
-      defaultValue: paymentForm.formSlug,
-    },
-    {
-      name: "receiptUrl",
-      label: "URL reçu",
-      type: "text",
-      required: false,
-      defaultValue: paymentForm.receiptUrl,
-    },
-    {
-      name: "paymentDate",
-      label: "Date de paiement",
-      type: "date",
-      required: false,
-      defaultValue: paymentForm.paymentDate,
-    },
-  ];
-
+  // Fallback si rien n'est retourné
   if (loading) return <div>Chargement...</div>;
+
+  if (!payment) {
+    return (
+      <SceneLayout>
+        <Title label="Modifier le paiement" />
+        <div className="text-gray-600">Paiement introuvable.</div>
+        <Notification
+          show={notification.show}
+          onClose={hideNotification}
+          type={notification.type}
+          message={notification.message}
+        />
+      </SceneLayout>
+    );
+  }
 
   return (
     <SceneLayout>
       <Title label="Modifier le paiement" />
 
-      {!showEditForm ? (
-        <PaymentDetails
-          payment={payment}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onUserNavigate={handleUserNavigate}
-        />
-      ) : (
-        <>
-          {/* Informations du paiement */}
-          <MyForm
-            fields={paymentFields}
-            initialValues={paymentForm}
-            onSubmit={handleSave}
-            onChange={handleChange}
-            loading={saving}
-            submitButtonLabel="Enregistrer le paiement"
-            onCancel={handleCancelEdit}
-            cancelButtonLabel="Annuler"
-            successMessage="Le paiement a été mis à jour avec succès"
-            errorMessage="Impossible d'enregistrer le paiement"
-          />
+      <PaymentDetails
+        payment={payment}
+        onDelete={handleDelete}
+        onUserNavigate={handleUserNavigate}
+        editable={true}
+        initialValues={paymentForm}
+        onSave={handleSave}
+        onChange={handleChange}
+        loading={loading}
+        saving={saving}
+        paymentEnums={paymentEnums}
+      />
 
-          {/* Section Lier un utilisateur */}
-          <div className="border-t border-gray-200 pt-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">
-              Lier un utilisateur
-            </h3>
-            <LinkUser
-              onLink={handleLinkUser}
-              onCreateAndLink={handleCreateAndLinkUser}
-              loading={saving}
-            />
-          </div>
-        </>
-      )}
+      {/* Lier / Détacher un utilisateur - section séparée */}
+      <LinkUser
+        title="Emetteur"
+        onLink={handleLinkUser}
+        onCreateAndLink={handleCreateAndLinkUser}
+        onLinked={loadPayment}
+        currentUser={payment?.user || null}
+        loading={saving}
+        operations={{
+          // attach expects just userId
+          attach: async (userId) => {
+            const updated = await attachUser(id, userId);
+            // if API returned full payment, use it to update local state
+            if (updated && typeof updated === "object") {
+              setPayment(updated);
+            } else {
+              // fallback: optimistic minimal update
+              setPayment((p) => (p ? { ...p, user: { id: userId } } : p));
+            }
+          },
+          // detach expects no args
+          detach: async () => {
+            const updated = await detachUser(id);
+            if (updated && typeof updated === "object") {
+              setPayment(updated);
+            } else {
+              setPayment((p) => (p ? { ...p, user: null } : p));
+            }
+          },
+          updateLocal: (user) => {
+            if (!user) return setPayment((p) => (p ? { ...p, user: null } : p));
+            const resolved =
+              typeof user === "string"
+                ? { id: user }
+                : user.id
+                  ? { id: user.id }
+                  : user;
+            setPayment((p) => (p ? { ...p, user: resolved } : p));
+          },
+        }}
+      />
 
       {/* Modal de confirmation pour la modification */}
       {/* Notifications */}

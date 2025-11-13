@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
 
 export default function useGetMedia(id) {
@@ -6,7 +6,7 @@ export default function useGetMedia(id) {
   const [media, setMedia] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMedia = async () => {
+  const fetchMedia = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
@@ -17,11 +17,11 @@ export default function useGetMedia(id) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [client, id]);
 
   useEffect(() => {
     fetchMedia();
-  }, [id]);
+  }, [fetchMedia]);
 
   return { media, setMedia, fetchMedia, loading };
 }

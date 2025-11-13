@@ -3,6 +3,7 @@ package com.stemadeleine.api.dto;
 import com.stemadeleine.api.model.PublishingStatus;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,8 +18,8 @@ public record NewsPublicationDto(
         Boolean isVisible,
         PublishingStatus status,
         OffsetDateTime publishedDate,
-        OffsetDateTime startDate,
-        OffsetDateTime endDate,
+        LocalDate startDate,
+        LocalDate endDate,
         MediaDto media,
         UserDto author,
         List<ContentDto> contents,

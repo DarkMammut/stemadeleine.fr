@@ -1,80 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
-import {
-  Cog6ToothIcon,
-  CreditCardIcon,
-  DocumentTextIcon,
-  EnvelopeIcon,
-  HomeIcon,
-  InboxIcon,
-  NewspaperIcon,
-  UserCircleIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
 import { useContactsContext } from "@/contexts/ContactsContext";
+import NAV_ITEMS from "./navigation";
 
 export default function Sidebar({ current, setCurrent }) {
   const router = useRouter();
   const { unreadCount } = useContactsContext();
-  const items = [
-    {
-      label: "Dashboard",
-      icon: <HomeIcon className="w-5 h-5" />,
-      url: "/dashboard",
-      key: "dashboard",
-    },
-    {
-      label: "Website",
-      icon: <DocumentTextIcon className="w-5 h-5" />,
-      url: "/pages",
-      key: "website",
-    },
-    {
-      label: "Actualités",
-      icon: <NewspaperIcon className="w-5 h-5" />,
-      url: "/news",
-      key: "news",
-    },
-    {
-      label: "Newsletters",
-      icon: <EnvelopeIcon className="w-5 h-5" />,
-      url: "/newsletters",
-      key: "newsletters",
-    },
-    {
-      label: "Demandes",
-      icon: <InboxIcon className="w-5 h-5" />,
-      url: "/contacts",
-      key: "contacts",
-    },
-    {
-      label: "Adhérents",
-      icon: <UserGroupIcon className="w-5 h-5" />,
-      url: "/users",
-      key: "users",
-    },
-    {
-      label: "Paiements",
-      icon: <CreditCardIcon className="w-5 h-5" />,
-      url: "/payments",
-      key: "payments",
-    },
-    {
-      label: "Paramètres",
-      icon: <Cog6ToothIcon className="w-5 h-5" />,
-      url: "/settings",
-      key: "settings",
-    },
-    {
-      label: "Profil",
-      icon: <UserCircleIcon className="w-5 h-5" />,
-      url: "/profile",
-      key: "profile",
-    },
-  ];
+  const items = NAV_ITEMS;
 
   return (
-    <aside className="w-64 bg-gray-900 text-white h-screen">
+    // Hidden on small screens, fixed under the header on md+
+    <aside className="hidden md:block fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)] bg-gray-900 text-white">
       <nav className="flex flex-col p-4 space-y-2">
         {items.map((item) => (
           <button

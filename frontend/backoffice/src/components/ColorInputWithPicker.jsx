@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ColorPicker from "@/components/ColorPicker";
 import Button from "@/components/ui/Button";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import Panel from "@/components/ui/Panel";
+import PropTypes from "prop-types";
 
 export default function ColorInputWithPicker({
   title,
@@ -73,13 +75,8 @@ export default function ColorInputWithPicker({
   };
 
   return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      {title && (
-        <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        </div>
-      )}
-      <div className="px-4 py-6 sm:p-8">
+    <Panel title={title}>
+      <div className="space-y-4">
         <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div className="col-span-full">
             {label && (
@@ -107,57 +104,88 @@ export default function ColorInputWithPicker({
             </div>
           </div>
         </div>
+
+        {/* Section des boutons d'actions - logique identique à InputWithActions */}
+        {(() => {
+          const shouldShowCancel =
+            showCancelButton === true ||
+            (showCancelButton === false && hasChanges);
+          const shouldShowSave =
+            showSaveButton === true || (showSaveButton === false && hasChanges);
+          return shouldShowCancel || shouldShowSave;
+        })() && (
+          <div className="flex items-center justify-end gap-x-3">
+            {(showCancelButton === true ||
+              (showCancelButton === false && hasChanges)) && (
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                onClick={handleCancel}
+                disabled={loading || !hasChanges}
+              >
+                {cancelButtonLabel}
+              </Button>
+            )}
+            {(showSaveButton === true ||
+              (showSaveButton === false && hasChanges)) && (
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                onClick={handleSave}
+                disabled={disabled || !hasChanges || loading}
+                loading={loading}
+              >
+                {saveButtonLabel}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Notifications */}
+        <Notification
+          show={notification.show}
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={hideNotification}
+        />
       </div>
-
-      {/* Section des boutons d'actions - logique identique à InputWithActions */}
-      {(() => {
-        // Logique d'affichage des boutons :
-        // - Si showButton est true : toujours visible
-        // - Si showButton est false : visible seulement si hasChanges
-        const shouldShowCancel =
-          showCancelButton === true ||
-          (showCancelButton === false && hasChanges);
-        const shouldShowSave =
-          showSaveButton === true || (showSaveButton === false && hasChanges);
-        return shouldShowCancel || shouldShowSave;
-      })() && (
-        <div className="flex items-center justify-end gap-x-3 px-4 py-4 sm:px-8">
-          {(showCancelButton === true ||
-            (showCancelButton === false && hasChanges)) && (
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handleCancel}
-              disabled={loading || !hasChanges}
-            >
-              {cancelButtonLabel}
-            </Button>
-          )}
-          {(showSaveButton === true ||
-            (showSaveButton === false && hasChanges)) && (
-            <Button
-              type="button"
-              variant="primary"
-              size="md"
-              onClick={handleSave}
-              disabled={disabled || !hasChanges || loading}
-              loading={loading}
-            >
-              {saveButtonLabel}
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Notifications */}
-      <Notification
-        show={notification.show}
-        type={notification.type}
-        title={notification.title}
-        message={notification.message}
-        onClose={hideNotification}
-      />
-    </div>
+    </Panel>
   );
 }
+
+ColorInputWithPicker.propTypes = {
+  title: PropTypes.node,
+  label: PropTypes.string,
+  initialValue: PropTypes.string,
+  onSave: PropTypes.func,
+  onChange: PropTypes.func,
+  onCancel: PropTypes.func,
+  saveButtonLabel: PropTypes.string,
+  cancelButtonLabel: PropTypes.string,
+  disabled: PropTypes.bool,
+  loading: PropTypes.bool,
+  showSaveButton: PropTypes.bool,
+  showCancelButton: PropTypes.bool,
+  successMessage: PropTypes.string,
+  errorMessage: PropTypes.string,
+};
+
+ColorInputWithPicker.defaultProps = {
+  title: null,
+  label: "",
+  initialValue: "#000000",
+  onSave: null,
+  onChange: null,
+  onCancel: null,
+  saveButtonLabel: "Enregistrer",
+  cancelButtonLabel: "Annuler",
+  disabled: false,
+  loading: false,
+  showSaveButton: false,
+  showCancelButton: false,
+  successMessage: "Couleur mise à jour avec succès",
+  errorMessage: "Erreur lors de la mise à jour de la couleur",
+};

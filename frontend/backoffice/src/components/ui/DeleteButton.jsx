@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import IconButton from '@/components/ui/IconButton';
-import ConfirmModal from '@/components/ConfirmModal';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
 /**

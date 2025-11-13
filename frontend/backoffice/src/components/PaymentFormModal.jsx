@@ -41,7 +41,12 @@ export default function PaymentFormModal({
         axios.get("/api/users"),
         axios.get("/api/payments/enums"),
       ]);
-      setUsers(usersRes.data);
+      // L'API peut renvoyer soit un tableau d'utilisateurs, soit une structure paginée { content: [...] }
+      const rawUsers = usersRes?.data;
+      const normalizedUsers = Array.isArray(rawUsers)
+        ? rawUsers
+        : (rawUsers?.content ?? rawUsers?.users ?? []);
+      setUsers(normalizedUsers);
       setPaymentEnums(enumsRes.data);
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
@@ -113,6 +118,11 @@ export default function PaymentFormModal({
         userId: "",
       };
 
+  // normalize users source to always be an array for fields/options
+  const usersArray = Array.isArray(users)
+    ? users
+    : (users?.content ?? users?.users ?? []);
+
   const fields = [
     {
       name: "amount",
@@ -157,7 +167,7 @@ export default function PaymentFormModal({
       type: "select",
       required: false,
       fullWidth: true,
-      options: users.map((user) => ({
+      options: usersArray.map((user) => ({
         value: user.id,
         label: `${user.firstname} ${user.lastname}${user.email ? ` (${user.email})` : ""}`,
       })),

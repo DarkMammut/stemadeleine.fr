@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -24,18 +27,21 @@ public class Membership {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "date_adhesion")
-    private LocalDate dateAdhesion;
-
+    // Active flag
     @Column(name = "active")
     private Boolean active;
+
+    @Column(name = "date_adhesion")
+    private LocalDate dateAdhesion;
 
     @Column(name = "date_fin")
     private LocalDate dateFin;
 
-    @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private OffsetDateTime createdAt;
 
-    @Column(name = "created_at")
-    private LocalDate createdAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
 }

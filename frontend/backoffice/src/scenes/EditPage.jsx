@@ -8,12 +8,13 @@ import Title from "@/components/ui/Title";
 import useGetPage from "@/hooks/useGetPage";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
+import EditablePanel from "@/components/ui/EditablePanel";
 import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function EditPage({ pageId }) {
@@ -89,7 +90,7 @@ export default function EditPage({ pageId }) {
   };
 
   // eslint-disable-next-line no-unused-vars
-  const handleRemoveMedia = async (pageId, mediaId) => {
+  const handleRemoveMedia = async (pageId, _mediaId) => {
     try {
       await axios.delete(`/api/pages/${pageId}/media`);
       await refetch();
@@ -97,11 +98,6 @@ export default function EditPage({ pageId }) {
       console.error("Erreur lors de la suppression du média:", error);
       throw error;
     }
-  };
-
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
   };
 
   const handleSubmit = async (values) => {
@@ -190,19 +186,36 @@ export default function EditPage({ pageId }) {
 
           {/* Formulaire principal - Ne s'affiche que quand pageData est complètement chargé */}
           {pageData && Object.keys(pageData).length > 0 && (
-            <MyForm
-              key={`${pageData.id || "page-form"}-${formKey}`} // Clé combinée pour forcer le remontage
+            <EditablePanel
+              key={`${pageData.id || "page-form"}-${formKey}`}
               title="Détails de la page"
               fields={fields}
               initialValues={pageData}
               onSubmit={handleSubmit}
-              onChange={handleFormChange}
               loading={saving}
-              submitButtonLabel="Enregistrer la page"
-              onCancel={handleCancelEdit}
-              cancelButtonLabel="Annuler"
-              successMessage="La page a été mise à jour avec succès"
-              errorMessage="Impossible d'enregistrer la page"
+              onCancelExternal={handleCancelEdit}
+              renderForm={({
+                initialValues,
+                onCancel,
+                onSubmit,
+                onChange,
+                loading,
+              }) => (
+                // MyForm se contente d'appeler onSubmit / onCancel fournis par EditablePanel
+                <MyForm
+                  title="Détails de la page"
+                  fields={fields}
+                  initialValues={initialValues}
+                  onSubmit={onSubmit}
+                  onChange={onChange}
+                  loading={loading}
+                  submitButtonLabel="Enregistrer la page"
+                  onCancel={onCancel}
+                  cancelButtonLabel="Annuler"
+                  successMessage="La page a été mise à jour avec succès"
+                  errorMessage="Impossible d'enregistrer la page"
+                />
+              )}
             />
           )}
         </div>

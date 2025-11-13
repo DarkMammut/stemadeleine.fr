@@ -9,7 +9,7 @@ import useGetGallery from "@/hooks/useGetGallery";
 import useGalleryVariants from "@/hooks/useGalleryVariants";
 import MediaManager from "@/components/MediaManager";
 import { useGalleriesMediasOperations } from "@/hooks/useGalleriesMediasOperations";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 

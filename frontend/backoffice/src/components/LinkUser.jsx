@@ -1,149 +1,382 @@
-import React, { useEffect, useState } from "react";
-import Button from "@/components/ui/Button";
-import { useAxiosClient } from "@/utils/axiosClient";
+"use client";
 
-export default function LinkUser({ onLink, onCreateAndLink, loading }) {
-  const axios = useAxiosClient();
-  const [search, setSearch] = useState("");
-  const [users, setUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [newUser, setNewUser] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-  });
-  const [creatingLoading, setCreatingLoading] = useState(false);
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useUserOperations } from "@/hooks/useUserOperations";
+import { useAccountOperations } from "@/hooks/useAccountOperations";
+import { useNotification } from "@/hooks/useNotification";
+import IconButton from "@/components/ui/IconButton";
+import Autocomplete from "@/components/ui/Autocomplete";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import DeleteModal from "@/components/ui/DeleteModal";
+import {
+  LinkIcon,
+  PencilIcon,
+  PlusIcon,
+  UserMinusIcon,
+} from "@heroicons/react/24/outline";
+import Button from "./ui/Button";
+import { useRouter } from "next/navigation";
+import EditablePanel from "@/components/ui/EditablePanel";
+import AddUserModal from "@/components/AddUserModal";
+
+export default function LinkUser({
+  title = "Lier un utilisateur",
+  accountId,
+  currentUser,
+  onLinked,
+  onLink,
+  onCreateAndLink,
+  onUnlink,
+  loading: parentLoading = false,
+  operations = null, // { attach: fn, detach: fn, updateLocal: fn }
+}) {
+  const { getAllUsers } = useUserOperations();
+  const accountOps = useAccountOperations();
+  const { showSuccess, showError } = useNotification();
+  const router = useRouter();
+
+  const [userOptions, setUserOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(currentUser ? currentUser.id : "");
+  const [saving, setSaving] = useState(false);
+  const [showConfirmLink, setShowConfirmLink] = useState(false);
+  const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
+  const [editing, setEditing] = useState(!currentUser);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    if (search.length < 2) {
-      setUsers([]);
-      return;
-    }
-    let active = true;
-    axios.get(`/api/users?search=${search}`).then((res) => {
-      if (active) setUsers(res.data);
-    });
+    setSelected(currentUser ? currentUser.id : "");
+    setEditing(!currentUser);
+  }, [currentUser]);
+
+  // précharger la liste d'utilisateurs une fois (limité à 200)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await getAllUsers(false, 0, 200);
+        const list = res && res.content ? res.content : res;
+        const mapped = (list || []).map((u) => ({
+          label:
+            u.displayName ||
+            u.email ||
+            `${u.firstname || ""} ${u.lastname || ""}`,
+          value: u.id,
+        }));
+        if (mounted) setUserOptions(mapped);
+      } catch (err) {
+        console.error("Erreur chargement utilisateurs", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
     return () => {
-      active = false;
+      mounted = false;
     };
-  }, [search, axios]);
+  }, [getAllUsers]);
 
-  const handleLink = () => {
-    if (selectedUserId) onLink(selectedUserId);
+  // helper pour attacher/détacher via la source fournie (operations) ou fallback
+  const doAttach = async (userId) => {
+    console.debug("LinkUser: doAttach called with", userId);
+    // priority: explicit operations prop > accountId/accountOps > onLink callback
+    if (operations && typeof operations.attach === "function") {
+      return operations.attach(userId);
+    }
+    if (
+      accountId &&
+      accountOps &&
+      typeof accountOps.updateAccount === "function"
+    ) {
+      return accountOps.updateAccount(accountId, { user: { id: userId } });
+    }
+    if (typeof onLink === "function") {
+      return onLink(userId);
+    }
+    throw new Error("No attach method available");
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    setCreatingLoading(true);
+  const doDetach = async () => {
+    console.debug("LinkUser: doDetach called");
+    // priority: explicit operations prop > accountId/accountOps > onCreateAndLink(null) or onUnlink
+    if (operations && typeof operations.detach === "function") {
+      return operations.detach();
+    }
+    if (
+      accountId &&
+      accountOps &&
+      typeof accountOps.updateAccount === "function"
+    ) {
+      return accountOps.updateAccount(accountId, { user: null });
+    }
+    if (typeof onCreateAndLink === "function") {
+      // convention existing: onCreateAndLink(null) to unlink when no accountId
+      return onCreateAndLink(null);
+    }
+    if (typeof onUnlink === "function") {
+      return onUnlink();
+    }
+    throw new Error("No detach method available");
+  };
+
+  // rewrite handleLink and handleUnlink to use doAttach / doDetach and optionally update local data via operations.updateLocal
+  const handleLink = async () => {
+    if (!selected)
+      return showError("Sélection requise", "Choisissez un utilisateur");
+    setShowConfirmLink(false);
+    setSaving(true);
+    console.debug("LinkUser: handleLink called, selected=", selected);
     try {
-      const res = await axios.post("/api/users", newUser);
-      onCreateAndLink(res.data.id);
-      setCreating(false);
-      setNewUser({ firstname: "", lastname: "", email: "" });
+      // perform attach
+      await doAttach(selected);
+
+      // optionally update local data if operations provides it
+      if (operations && typeof operations.updateLocal === "function") {
+        try {
+          operations.updateLocal({ id: selected });
+        } catch (e) {
+          console.debug("LinkUser: operations.updateLocal threw", e);
+        }
+      }
+
+      showSuccess("Utilisateur lié", "L'utilisateur a été lié avec succès");
+      onLinked && onLinked();
+      setEditing(false);
     } catch (err) {
-      alert("Erreur lors de la création de l'utilisateur");
+      console.error("Erreur lors du lien:", err);
+      showError("Erreur", "Impossible d'effectuer l'opération de liaison");
     } finally {
-      setCreatingLoading(false);
+      setSaving(false);
     }
   };
+
+  const handleUnlink = async () => {
+    setShowConfirmUnlink(false);
+    setSaving(true);
+    console.debug("LinkUser: handleUnlink called, currentUser=", currentUser);
+    try {
+      await doDetach();
+
+      // optionally update local data
+      if (operations && typeof operations.updateLocal === "function") {
+        try {
+          operations.updateLocal(null);
+        } catch (e) {
+          console.debug("LinkUser: operations.updateLocal threw", e);
+        }
+      }
+
+      showSuccess("Compte détaché", "Le compte a été détaché de l'utilisateur");
+      setSelected("");
+      onLinked && onLinked();
+      if (typeof onUnlink === "function") {
+        try {
+          const maybe = onUnlink();
+          if (maybe && typeof maybe.then === "function") await maybe;
+        } catch (e) {
+          console.debug("LinkUser: onUnlink threw", e);
+        }
+      }
+      setEditing(true);
+    } catch (err) {
+      console.error("Erreur lors du détachement:", err);
+      showError("Erreur", "Impossible de détacher le compte de l'utilisateur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Render: if not editing and a user is attached, show compact view with link + unlink + edit
+  const headerActions = (
+    <>
+      {editing ? null : (
+        <IconButton
+          icon={PencilIcon}
+          label="Modifier"
+          size="md"
+          onClick={() => setEditing(true)}
+          disabled={saving || parentLoading}
+        />
+      )}
+      {!editing && currentUser ? (
+        <IconButton
+          icon={UserMinusIcon}
+          label="Détacher"
+          variant="danger"
+          size="md"
+          hoverExpand={true}
+          onClick={() => setShowConfirmUnlink(true)}
+          disabled={saving || parentLoading}
+        />
+      ) : null}
+    </>
+  );
+
+  // Panel content: either compact view (not editing) or editor (autocomplete)
+  const panelContent =
+    !editing && currentUser ? (
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={() =>
+            currentUser.id && router.push(`/users/${currentUser.id}`)
+          }
+          variant="link"
+          disabled={!currentUser.id}
+        >
+          {(currentUser.firstname || "") +
+            (currentUser.lastname ? " " + currentUser.lastname : "") ||
+            currentUser.email ||
+            "Utilisateur"}
+        </Button>
+        <div className="ml-auto flex items-center gap-2" />
+
+        <DeleteModal
+          open={showConfirmUnlink}
+          onClose={() => setShowConfirmUnlink(false)}
+          onConfirm={handleUnlink}
+          title="Confirmer le détachement"
+          message={"Voulez-vous vraiment détacher ce compte de l'utilisateur ?"}
+          confirmLabel="Détacher"
+          cancelLabel="Annuler"
+          isDeleting={saving}
+        />
+      </div>
+    ) : (
+      <div className="space-y-3">
+        <label className="text-sm font-semibold text-gray-500">
+          Utilisateur lié
+        </label>
+        <div className="flex items-center space-x-2">
+          <div className="w-80">
+            <Autocomplete
+              value={selected}
+              onChange={(val) => setSelected(val)}
+              options={userOptions}
+              labelKey="label"
+              valueKey="value"
+              placeholder="-- Aucun --"
+              disabled={saving || parentLoading}
+            />
+          </div>
+          <IconButton
+            label="Ajouter un nouvel utilisateur"
+            onClick={() => setShowCreateModal(true)}
+            disabled={saving || parentLoading}
+            size="md"
+            variant="link"
+            icon={PlusIcon}
+          />
+          <ConfirmModal
+            open={showConfirmLink}
+            onClose={() => setShowConfirmLink(false)}
+            onConfirm={handleLink}
+            title="Confirmer le lien"
+            message={
+              "Voulez-vous vraiment lier ce compte à l'utilisateur sélectionné ?"
+            }
+            confirmLabel="Lier"
+            cancelLabel="Annuler"
+            isLoading={saving}
+            variant="primary"
+          />
+
+          {loading && (
+            <div className="text-sm text-gray-500">
+              Chargement utilisateurs...
+            </div>
+          )}
+        </div>
+
+        {/* Actions: Add + Cancel buttons */}
+        <div className="flex justify-end gap-2">
+          <Button
+            onClick={() => {
+              setEditing(false);
+              setSelected(currentUser ? currentUser.id : "");
+            }}
+            disabled={saving || parentLoading}
+            size="md"
+            variant="outline"
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowConfirmLink(true)}
+            disabled={saving || parentLoading || !selected}
+          >
+            Enregistrer
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="space-y-4">
-      {!creating ? (
-        <div>
-          <label className="block mb-2 font-medium">
-            Rechercher un émetteur existant
-          </label>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Nom, prénom ou email..."
-            className="border rounded px-3 py-2 w-full mb-2"
-          />
-          {users.length > 0 && (
-            <select
-              className="border rounded px-3 py-2 w-full mb-2"
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
-            >
-              <option value="">Sélectionner...</option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.firstname} {u.lastname} ({u.email})
-                </option>
-              ))}
-            </select>
-          )}
-          <div className="flex gap-2">
-            <Button
-              onClick={handleLink}
-              disabled={!selectedUserId || loading}
-              variant="primary"
-              size="md"
-            >
-              Lier l'émetteur sélectionné
-            </Button>
-            <Button
-              variant="outline"
-              size="md"
-              onClick={() => setCreating(true)}
-            >
-              Créer et lier un nouvel émetteur
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <form onSubmit={handleCreate} className="space-y-2">
-          <label className="block font-medium">Prénom</label>
-          <input
-            type="text"
-            value={newUser.firstname}
-            onChange={(e) =>
-              setNewUser({ ...newUser, firstname: e.target.value })
+    <EditablePanel
+      title={title}
+      icon={LinkIcon}
+      actions={headerActions}
+      initialValues={{}}
+      canEdit={false}
+    >
+      {panelContent}
+
+      {/* Create user modal (shared) */}
+      <AddUserModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={async (created) => {
+          try {
+            // after creation, link
+            if (created && created.id) {
+              await doAttach(created.id);
+              // update local UI if possible
+              if (operations && typeof operations.updateLocal === "function") {
+                try {
+                  operations.updateLocal({ id: created.id });
+                } catch (e) {
+                  console.debug(
+                    "LinkUser: operations.updateLocal threw after create",
+                    e,
+                  );
+                }
+              }
+              onLinked && onLinked();
+              setEditing(false);
             }
-            required
-            className="border rounded px-3 py-2 w-full"
-          />
-          <label className="block font-medium">Nom</label>
-          <input
-            type="text"
-            value={newUser.lastname}
-            onChange={(e) =>
-              setNewUser({ ...newUser, lastname: e.target.value })
-            }
-            required
-            className="border rounded px-3 py-2 w-full"
-          />
-          <label className="block font-medium">Email</label>
-          <input
-            type="email"
-            value={newUser.email}
-            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-            required
-            className="border rounded px-3 py-2 w-full"
-          />
-          <div className="flex gap-2 mt-2">
-            <Button
-              type="submit"
-              loading={creatingLoading}
-              variant="primary"
-              size="md"
-            >
-              Créer et lier
-            </Button>
-            <Button
-              variant="outline"
-              size="md"
-              type="button"
-              onClick={() => setCreating(false)}
-            >
-              Annuler
-            </Button>
-          </div>
-        </form>
-      )}
-    </div>
+          } catch (err) {
+            console.error("Erreur lors de la liaison après création:", err);
+            showError("Erreur", "Impossible de lier l'utilisateur créé");
+            throw err;
+          }
+        }}
+      />
+    </EditablePanel>
   );
 }
+
+LinkUser.propTypes = {
+  accountId: PropTypes.string,
+  currentUser: PropTypes.object,
+  onLinked: PropTypes.func,
+  onLink: PropTypes.func,
+  onCreateAndLink: PropTypes.func,
+  onUnlink: PropTypes.func,
+  loading: PropTypes.bool,
+  title: PropTypes.string,
+  operations: PropTypes.object, // optional operations { attach, detach, updateLocal }
+};
+
+LinkUser.defaultProps = {
+  accountId: null,
+  currentUser: null,
+  onLinked: null,
+  onLink: null,
+  onCreateAndLink: null,
+  onUnlink: null,
+  loading: false,
+  title: "Lier un utilisateur",
+  operations: null,
+};

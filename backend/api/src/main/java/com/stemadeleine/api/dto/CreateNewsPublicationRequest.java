@@ -3,6 +3,7 @@ package com.stemadeleine.api.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -20,9 +21,9 @@ public record CreateNewsPublicationRequest(
 
         OffsetDateTime publishedDate,
 
-        OffsetDateTime startDate,
+        LocalDate startDate,
 
-        OffsetDateTime endDate,
+        LocalDate endDate,
 
         UUID mediaId
 ) {

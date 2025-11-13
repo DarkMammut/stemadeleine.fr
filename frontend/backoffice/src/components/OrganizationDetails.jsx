@@ -1,20 +1,21 @@
 import React from "react";
 import ModifyButton from "@/components/ui/ModifyButton";
+import Panel from "@/components/ui/Panel";
+import PropTypes from "prop-types";
 
 export default function OrganizationDetails({ organization, onEdit }) {
   if (!organization) return null;
 
   return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      <div className="flex items-center justify-between px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {organization.name}
-        </h3>
-        {onEdit && (
+    <Panel
+      title={organization.name}
+      actions={
+        onEdit ? (
           <ModifyButton onModify={onEdit} modifyLabel="Modifier" size="sm" />
-        )}
-      </div>
-      <div className="px-4 py-6 sm:p-8 space-y-4">
+        ) : null
+      }
+    >
+      <div className="space-y-4">
         <div className="grid grid-cols-[140px_1fr] gap-4">
           <span className="text-sm font-semibold text-gray-500">
             Forme juridique
@@ -52,6 +53,15 @@ export default function OrganizationDetails({ organization, onEdit }) {
           </span>
         </div>
       </div>
-    </div>
+    </Panel>
   );
 }
+
+OrganizationDetails.propTypes = {
+  organization: PropTypes.object.isRequired,
+  onEdit: PropTypes.func,
+};
+
+OrganizationDetails.defaultProps = {
+  onEdit: null,
+};

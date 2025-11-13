@@ -10,12 +10,18 @@ import { useUserOperations } from "@/hooks/useUserOperations";
 import CardList from "@/components/CardList";
 import UserCard from "@/components/UserCard";
 import { useAxiosClient } from "@/utils/axiosClient";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import Pagination from "@/components/ui/Pagination";
 
 export default function Users() {
   const router = useRouter();
   const [users, setUsers] = useState([]);
+  const [pageInfo, setPageInfo] = useState({
+    page: 0,
+    size: 10,
+    totalPages: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [showAdherentsOnly, setShowAdherentsOnly] = useState(false);
 
@@ -25,14 +31,27 @@ export default function Users() {
     useNotification();
 
   useEffect(() => {
-    loadUsers();
+    // when toggling the filter, always reset to first page and load it
+    setPageInfo((p) => ({ ...p, page: 0 }));
+    loadUsers(0, pageInfo.size);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAdherentsOnly]);
 
-  const loadUsers = async () => {
+  const loadUsers = async (page = 0, size = pageInfo.size) => {
     try {
       setLoading(true);
-      const data = await getAllUsers(showAdherentsOnly);
-      setUsers(data);
+      const data = await getAllUsers(showAdherentsOnly, page, size);
+      setUsers(data.content || []);
+      setPageInfo((p) => ({
+        ...p,
+        page: data.number || 0,
+        totalPages: data.totalPages || 0,
+        size: data.size || size,
+        totalElements:
+          typeof data.totalElements === "number"
+            ? data.totalElements
+            : p.totalElements,
+      }));
     } catch (error) {
       console.error("Error loading users:", error);
       showError(
@@ -116,7 +135,8 @@ export default function Users() {
           },
           {
             icon: FunnelIcon,
-            label: showAdherentsOnly ? "Filtre: Tous" : "Filtre: adhérents",
+            // label reflects current filter state
+            label: showAdherentsOnly ? "Adhérents" : "Tous",
             callback: handleToggleAdherents,
             variant: "filter",
           },
@@ -133,6 +153,23 @@ export default function Users() {
           />
         ))}
       </CardList>
+
+      <Pagination
+        page={pageInfo.page}
+        totalPages={pageInfo.totalPages}
+        pageSize={pageInfo.size}
+        totalElements={
+          typeof pageInfo.totalElements === "number"
+            ? pageInfo.totalElements
+            : undefined
+        }
+        onChange={(p) => loadUsers(p, pageInfo.size)}
+        onPageSizeChange={(newSize) => {
+          // reset to first page when page size changes
+          setPageInfo((p) => ({ ...p, size: newSize, page: 0 }));
+          loadUsers(0, newSize);
+        }}
+      />
 
       <Notification
         show={notification.show}

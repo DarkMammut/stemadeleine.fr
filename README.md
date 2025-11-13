@@ -46,7 +46,7 @@ pour l'affichage public.
 ### Documentation des Composants
 
 - **[IconButton.md](./frontend/backoffice/src/components/ui/IconButton.md)** - Documentation du composant IconButton
-- **[DeleteModal.md](./frontend/backoffice/src/components/DeleteModal.md)** - Documentation du composant DeleteModal
+- **[DeleteModal.md](frontend/backoffice/src/components/ui/DeleteModal.md)** - Documentation du composant DeleteModal
 
 ## 🚀 Démarrage Rapide
 

@@ -7,11 +7,12 @@ import Title from "@/components/ui/Title";
 import useGetSection from "@/hooks/useGetSection";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
+import EditablePanel from "@/components/ui/EditablePanel";
 import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
@@ -189,19 +190,35 @@ export default function EditSection({ sectionId, pageId }) {
 
           {/* Formulaire principal - Ne s'affiche que quand sectionData est complètement chargé */}
           {sectionData && Object.keys(sectionData).length > 0 && (
-            <MyForm
+            <EditablePanel
               key={`${sectionData.sectionId || "section-form"}-${formKey}`} // Clé combinée pour forcer le remontage
               title="Détails de la section"
               fields={fields}
               initialValues={sectionData}
               onSubmit={handleSubmit}
-              onChange={handleFormChange}
               loading={saving}
-              submitButtonLabel="Enregistrer"
-              onCancel={handleCancelEdit}
-              cancelButtonLabel="Annuler"
-              successMessage="La section a été mise à jour avec succès"
-              errorMessage="Impossible d'enregistrer la section"
+              onCancelExternal={handleCancelEdit}
+              renderForm={({
+                initialValues,
+                onCancel,
+                onSubmit,
+                onChange,
+                loading,
+              }) => (
+                <MyForm
+                  title="Détails de la section"
+                  fields={fields}
+                  initialValues={initialValues}
+                  onSubmit={onSubmit}
+                  onChange={onChange}
+                  loading={loading}
+                  submitButtonLabel="Enregistrer"
+                  onCancel={onCancel}
+                  cancelButtonLabel="Annuler"
+                  successMessage="La section a été mise à jour avec succès"
+                  errorMessage="Impossible d'enregistrer la section"
+                />
+              )}
             />
           )}
 

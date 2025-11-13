@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAxiosClient } from '@/utils/axiosClient';
 import MyForm from '@/components/MyForm';
 import { useNotification } from '@/hooks/useNotification';
-import Notification from '@/components/Notification';
+import Notification from '@/components/ui/Notification';
 
 /**
  * MediaModifier - Composant pour modifier les métadonnées d'un média

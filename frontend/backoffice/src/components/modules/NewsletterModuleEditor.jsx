@@ -8,7 +8,7 @@ import useGetModule from "@/hooks/useGetModule";
 import useGetNewsletter from "@/hooks/useGetNewsletter";
 import useNewsVariants from "@/hooks/useNewsVariants";
 import ContentManager from "@/components/ContentManager";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 

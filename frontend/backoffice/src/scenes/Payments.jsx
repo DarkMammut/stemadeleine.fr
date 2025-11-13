@@ -8,7 +8,7 @@ import Utilities from "@/components/Utilities";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
 import CardList from "@/components/CardList";
 import PaymentCard from "@/components/PaymentCard";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import PaymentFormModal from "@/components/PaymentFormModal";
 import SceneLayout from "@/components/ui/SceneLayout";

@@ -34,4 +34,24 @@ public class GlobalExceptionHandler {
                         "message", "An unexpected error occurred"
                 ));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("IllegalArgumentException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "error", "Bad Request",
+                        "message", ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(com.stemadeleine.api.exception.BadRequestException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(com.stemadeleine.api.exception.BadRequestException ex) {
+        log.warn("BadRequestException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "error", "Bad Request",
+                        "message", ex.getMessage()
+                ));
+    }
 }

@@ -78,4 +78,16 @@ public class PaymentService {
                 .mapToDouble(Payment::getAmount)
                 .sum();
     }
+
+    @Transactional
+    public Payment updatePaymentUser(UUID paymentId, UUID userId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow();
+        if (userId == null) {
+            payment.setUser(null);
+        } else {
+            Optional<User> user = userRepository.findById(userId);
+            user.ifPresent(payment::setUser);
+        }
+        return paymentRepository.save(payment);
+    }
 }

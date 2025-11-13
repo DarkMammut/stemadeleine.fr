@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDownIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { AnimatePresence } from 'framer-motion';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import Switch from '@/components/ui/Switch';
 import RichTextEditor from '@/components/RichTextEditor';
@@ -10,9 +10,12 @@ import MediaManager from '@/components/MediaManager';
 import PublishButton from '@/components/ui/PublishButton';
 import DeleteButton from '@/components/ui/DeleteButton';
 import { useContentOperations } from '@/hooks/useContentOperations';
-import ConfirmModal from '@/components/ConfirmModal';
-import Notification from '@/components/Notification';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import Notification from '@/components/ui/Notification';
 import { useNotification } from '@/hooks/useNotification';
+import Panel from '@/components/ui/Panel';
+import CollapsibleCard from '@/components/ui/CollapsibleCard';
+import PropTypes from 'prop-types';
 
 /**
  * Composant générique de gestion de contenus pour section, module, etc.
@@ -228,7 +231,9 @@ const ContentManager = ({
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la publication");
+        // Afficher une erreur utilisateur au lieu de lancer une exception capturée localement
+        showError("Erreur", "Erreur lors de la publication");
+        return;
       }
 
       const result = await response.json();
@@ -295,31 +300,30 @@ const ContentManager = ({
 
   // Rendu UI (labels personnalisables)
   return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      <div className="content-manager">
-        <div className="flex justify-between items-center px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {customLabels.header || "Contenus"}
-          </h3>
-          <div className="flex items-center gap-2">
-            <PublishButton
-              onPublish={handleOpenPublishAllModal}
-              disabled={loading || contents.length === 0 || isPublishingAll}
-              publishLabel={customLabels.publishButton || "Publier tous"}
-              publishedLabel="Tous publiés"
-              size="md"
-              resetAfterDelay={true}
-            />
-            <Button
-              onClick={handleAddContent}
-              disabled={loading}
-              className="flex items-center gap-2"
-            >
-              <PlusIcon className="w-4 h-4" />
-              {customLabels.addButton || "Ajouter un contenu"}
-            </Button>
-          </div>
+    <Panel
+      title={customLabels.header || "Contenus"}
+      actions={
+        <div className="flex items-center gap-2">
+          <PublishButton
+            onPublish={handleOpenPublishAllModal}
+            disabled={loading || contents.length === 0 || isPublishingAll}
+            publishLabel={customLabels.publishButton || "Publier tous"}
+            publishedLabel="Tous publiés"
+            size="md"
+            resetAfterDelay={true}
+          />
+          <Button
+            onClick={handleAddContent}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <PlusIcon className="w-4 h-4" />
+            {customLabels.addButton || "Ajouter un contenu"}
+          </Button>
         </div>
+      }
+    >
+      <div className="content-manager">
         {loading && contents.length === 0 && (
           <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
             {customLabels.loading || "Chargement des contenus..."}
@@ -333,28 +337,14 @@ const ContentManager = ({
             </p>
           </div>
         )}
-        <div className="px-4 py-6 sm:p-8 space-y-3">
+        <div className="space-y-3">
           <AnimatePresence>
             {contents.map((content, index) => (
-              <motion.div
+              <CollapsibleCard
                 key={`content-${content.contentId}-${content.version}-${index}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="bg-white border border-gray-200 rounded-lg shadow-sm"
-              >
-                <div className="flex items-center gap-3 p-4">
-                  <button
-                    onClick={() => toggleContentExpansion(content.contentId)}
-                    className="p-1 hover:bg-gray-100 rounded-md transition-colors flex-shrink-0"
-                  >
-                    {expandedContents.has(content.contentId) ? (
-                      <ChevronDownIcon className="w-5 h-5 text-gray-600" />
-                    ) : (
-                      <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-                    )}
-                  </button>
-
+                isOpen={expandedContents.has(content.contentId)}
+                onToggle={() => toggleContentExpansion(content.contentId)}
+                leading={
                   <Switch
                     checked={content.isVisible}
                     onChange={(checked) =>
@@ -363,163 +353,138 @@ const ContentManager = ({
                     disabled={savingStates[content.contentId]}
                     size="sm"
                   />
-
-                  <div className="flex-1 min-w-0">
-                    {isEditing(content.contentId, "title") ? (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          const formData = new FormData(e.target);
-                          const newTitle = formData.get("title");
-                          handleTitleUpdate(content.contentId, newTitle);
-                          stopEditing(content.contentId, "title");
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <input
-                          name="title"
-                          defaultValue={content.title}
-                          className="flex-1 px-3 py-1.5 text-base text-gray-900 border border-gray-300 rounded-md focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === "Escape") {
-                              stopEditing(content.contentId, "title");
-                            }
-                          }}
-                        />
-                        <Button
-                          type="submit"
-                          size="sm"
-                          disabled={savingStates[content.contentId]}
-                        >
-                          {customLabels.save || "Enregistrer"}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="sm"
-                          onClick={() =>
-                            stopEditing(content.contentId, "title")
-                          }
-                          disabled={savingStates[content.contentId]}
-                        >
-                          {customLabels.cancel || "Annuler"}
-                        </Button>
-                      </form>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <h4
-                          className="font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors truncate"
-                          onClick={() =>
-                            startEditing(content.contentId, "title")
-                          }
-                          title={
-                            content.title ||
-                            customLabels.untitled ||
-                            "Contenu sans titre"
-                          }
-                        >
-                          {content.title ||
-                            customLabels.untitled ||
-                            "Contenu sans titre"}
-                        </h4>
-                        <div className="text-xs text-gray-500 flex-shrink-0">
-                          v{content.version} • {content.authorUsername}
-                          {content.hasLocalChanges && (
-                            <span className="text-orange-600 ml-2">
-                              • Modifications non sauvegardées
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <DeleteButton
-                    onDelete={() => handleDeleteContent(content.contentId)}
-                    disabled={savingStates[content.contentId]}
-                    deleteLabel="Supprimer"
-                    confirmTitle="Supprimer le contenu"
-                    confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
-                    size="sm"
-                    hoverExpand={true}
-                  />
-                </div>
-
-                <AnimatePresence>
-                  {expandedContents.has(content.contentId) && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden border-t border-gray-200"
+                }
+                renderTitle={() =>
+                  isEditing(content.contentId, "title") ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        const newTitle = formData.get("title");
+                        handleTitleUpdate(content.contentId, newTitle);
+                        stopEditing(content.contentId, "title");
+                      }}
+                      className="flex items-center gap-2"
                     >
-                      <div className="p-6 space-y-6">
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-900 mb-2">
-                            {customLabels.bodyLabel || "Contenu"}
-                          </label>
-                          <div className="border border-gray-300 rounded-lg overflow-hidden">
-                            <RichTextEditor
-                              value={content.body?.html || ""}
-                              onChange={(newBody) =>
-                                handleContentUpdate(content.contentId, newBody)
-                              }
-                              placeholder={
-                                customLabels.bodyPlaceholder ||
-                                "Commencez à écrire..."
-                              }
-                              height="200px"
-                              disabled={savingStates[content.contentId]}
-                            />
-                          </div>
-                        </div>
-                        {/* Bouton de sauvegarde - logique similaire à InputWithActions */}
-                        {(() => {
-                          // Si showSaveButton est true : toujours visible
-                          // Si showSaveButton est false : visible seulement si hasLocalChanges
-                          const shouldShow =
-                            showSaveButton === true ||
-                            (showSaveButton === false &&
-                              content.hasLocalChanges);
-                          return (
-                            shouldShow && (
-                              <div className="flex justify-end">
-                                <Button
-                                  onClick={() =>
-                                    handleSaveContentBody(content.contentId)
-                                  }
-                                  disabled={
-                                    savingStates[content.contentId] ||
-                                    !content.hasLocalChanges
-                                  }
-                                >
-                                  {customLabels.saveContent ||
-                                    "Enregistrer le contenu"}
-                                </Button>
-                              </div>
-                            )
-                          );
-                        })()}
-                        <MediaManager
-                          content={content}
-                          onMediaAdd={handleAddMediaToContent}
-                          onMediaRemove={handleRemoveMediaFromContent}
-                          onMediaChanged={loadContents}
-                        />
-
-                        {savingStates[content.contentId] && (
-                          <div className="text-sm text-blue-600 flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                            {customLabels.saving || "Sauvegarde..."}
-                          </div>
+                      <input
+                        name="title"
+                        defaultValue={content.title}
+                        className="flex-1 px-3 py-1.5 text-base text-gray-900 border border-gray-300 rounded-md focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") {
+                            stopEditing(content.contentId, "title");
+                          }
+                        }}
+                      />
+                      <Button
+                        type="submit"
+                        size="sm"
+                        disabled={savingStates[content.contentId]}
+                      >
+                        {customLabels.save || "Enregistrer"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => stopEditing(content.contentId, "title")}
+                        disabled={savingStates[content.contentId]}
+                      >
+                        {customLabels.cancel || "Annuler"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <h4
+                        className="font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors truncate"
+                        onClick={() => startEditing(content.contentId, "title")}
+                        title={
+                          content.title ||
+                          customLabels.untitled ||
+                          "Contenu sans titre"
+                        }
+                      >
+                        {content.title ||
+                          customLabels.untitled ||
+                          "Contenu sans titre"}
+                      </h4>
+                      <div className="text-xs text-gray-500 flex-shrink-0">
+                        v{content.version} • {content.authorUsername}
+                        {content.hasLocalChanges && (
+                          <span className="text-orange-600 ml-2">
+                            • Modifications non sauvegardées
+                          </span>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
+                  )
+                }
+                actions={
+                  <>
+                    <DeleteButton
+                      onDelete={() => handleDeleteContent(content.contentId)}
+                      disabled={savingStates[content.contentId]}
+                      deleteLabel="Supprimer"
+                      confirmTitle="Supprimer le contenu"
+                      confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
+                      size="sm"
+                      hoverExpand={true}
+                    />
+                  </>
+                }
+              >
+                <div className="space-y-6">
+                  <RichTextEditor
+                    value={content.body?.html || ""}
+                    onChange={(newBody) =>
+                      handleContentUpdate(content.contentId, newBody)
+                    }
+                    placeholder={
+                      customLabels.bodyPlaceholder || "Commencez à écrire..."
+                    }
+                    height="200px"
+                    disabled={savingStates[content.contentId]}
+                  />
+                  {(() => {
+                    const shouldShow =
+                      showSaveButton === true ||
+                      (showSaveButton === false && content.hasLocalChanges);
+                    return (
+                      shouldShow && (
+                        <div className="flex justify-end mt-4">
+                          <Button
+                            onClick={() =>
+                              handleSaveContentBody(content.contentId)
+                            }
+                            disabled={
+                              savingStates[content.contentId] ||
+                              !content.hasLocalChanges
+                            }
+                          >
+                            {customLabels.saveContent ||
+                              "Enregistrer le contenu"}
+                          </Button>
+                        </div>
+                      )
+                    );
+                  })()}
+
+                  <MediaManager
+                    content={content}
+                    onMediaAdd={handleAddMediaToContent}
+                    onMediaRemove={handleRemoveMediaFromContent}
+                    onMediaChanged={loadContents}
+                  />
+
+                  {savingStates[content.contentId] && (
+                    <div className="text-sm text-blue-600 flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                      {customLabels.saving || "Sauvegarde..."}
+                    </div>
                   )}
-                </AnimatePresence>
-              </motion.div>
+                </div>
+              </CollapsibleCard>
             ))}
           </AnimatePresence>
         </div>
@@ -539,8 +504,22 @@ const ContentManager = ({
 
       {/* Notification */}
       <Notification {...notification} onClose={hideNotification} />
-    </div>
+    </Panel>
   );
+};
+
+ContentManager.propTypes = {
+  parentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  parentType: PropTypes.string,
+  onContentsChange: PropTypes.func,
+  customLabels: PropTypes.object,
+  showSaveButton: PropTypes.bool,
+};
+
+ContentManager.defaultProps = {
+  parentType: "section",
+  customLabels: {},
+  showSaveButton: false,
 };
 
 export default ContentManager;

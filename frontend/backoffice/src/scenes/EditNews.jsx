@@ -9,12 +9,13 @@ import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
 import PublicationInfoCard from "@/components/PublicationInfoCard";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNewsPublicationOperations } from "@/hooks/useNewsPublicationOperations";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
-import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import SceneLayout from "@/components/ui/SceneLayout";
+import EditablePanel from "@/components/ui/EditablePanel";
 
 export default function EditNews({ newsId }) {
   const [newsData, setNewsData] = useState(null);
@@ -120,20 +121,14 @@ export default function EditNews({ newsId }) {
     {
       name: "startDate",
       label: "Date de début",
-      type: "datetime-local",
+      type: "date",
       required: true,
-      defaultValue: newsData?.startDate
-        ? new Date(newsData.startDate).toISOString().slice(0, 16)
-        : "",
     },
     {
       name: "endDate",
       label: "Date de fin",
-      type: "datetime-local",
+      type: "date",
       required: true,
-      defaultValue: newsData?.endDate
-        ? new Date(newsData.endDate).toISOString().slice(0, 16)
-        : "",
     },
   ];
 
@@ -144,6 +139,24 @@ export default function EditNews({ newsId }) {
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
+      // Validation: endDate must be >= startDate
+      if (values.startDate && values.endDate) {
+        const [sy, sm, sd] = String(values.startDate)
+          .split("-")
+          .map((v) => parseInt(v, 10));
+        const [ey, em, ed] = String(values.endDate)
+          .split("-")
+          .map((v) => parseInt(v, 10));
+        const sdt = new Date(sy, sm - 1, sd).getTime();
+        const edt = new Date(ey, em - 1, ed).getTime();
+        if (edt < sdt) {
+          showError(
+            "Erreur de validation",
+            "La date de fin ne peut pas être antérieure à la date de début",
+          );
+          return;
+        }
+      }
       await updateNewsPublication(newsId, {
         name: values.name,
         title: values.title,
@@ -278,17 +291,28 @@ export default function EditNews({ newsId }) {
 
           {/* Main Form */}
           {newsData && Object.keys(newsData).length > 0 && (
-            <MyForm
-              key={`news-form-${formKey}`}
+            <EditablePanel
               title="Informations de l'actualité"
-              fields={fields}
+              canEdit={true}
               initialValues={newsData}
+              fields={fields}
+              displayColumns={2}
+              displayGap={4}
               onSubmit={handleSubmit}
-              onChange={handleFormChange}
-              loading={saving}
-              submitButtonLabel="Enregistrer l'actualité"
-              onCancel={handleCancelEdit}
-              cancelButtonLabel="Annuler"
+              onCancelExternal={handleCancelEdit}
+              renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
+                <MyForm
+                  key={`news-form-${formKey}`}
+                  fields={fields}
+                  initialValues={initialValues}
+                  onSubmit={onSubmit}
+                  onChange={handleFormChange}
+                  loading={loading}
+                  submitButtonLabel="Enregistrer l'actualité"
+                  onCancel={onCancel}
+                  cancelButtonLabel="Annuler"
+                />
+              )}
             />
           )}
 

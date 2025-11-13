@@ -7,9 +7,11 @@ import Button from '@/components/ui/Button';
 import MediaSelector from '@/components/MediaSelector';
 import MediaModifier from '@/components/MediaModifier';
 import MediaGrid from '@/components/MediaGrid';
-import Notification from '@/components/Notification';
+import Notification from '@/components/ui/Notification';
+import Panel from '@/components/ui/Panel';
 import { useNotification } from '@/hooks/useNotification';
 import { useAxiosClient } from '@/utils/axiosClient';
+import PropTypes from 'prop-types';
 
 /**
  * MediaPickerWrapper - Zone de drag & drop ou recherche de média
@@ -236,15 +238,10 @@ const MediaManager = ({
   };
 
   return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      <div className="px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {title} ({content.medias?.length || 0}
-          {maxMedias && ` / ${maxMedias}`})
-        </h3>
-      </div>
-
-      <div className="px-4 py-6 sm:p-8 space-y-4">
+    <Panel
+      title={`${title} (${content.medias?.length || 0}${maxMedias ? ` / ${maxMedias}` : ""})`}
+    >
+      <div className="space-y-4">
         {/* Avertissement si pas de content.id */}
         {!content.id && (
           <div className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg p-4">
@@ -324,10 +321,8 @@ const MediaManager = ({
 
             <MediaModifier
               mediaId={selectedMediaId}
-              // eslint-disable-next-line no-unused-vars
-              onMediaUpdated={(media) => {
-                // Optionnel : rafraîchir si nécessaire
-              }}
+              // no-op handler to avoid unused param warning in the parent
+              onMediaUpdated={() => {}}
               onConfirm={handleMediaConfirmed}
               onCancel={() => {
                 setShowMediaModifier(false);
@@ -347,8 +342,28 @@ const MediaManager = ({
           onClose={hideNotification}
         />
       )}
-    </div>
+    </Panel>
   );
+};
+
+MediaManager.propTypes = {
+  content: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    medias: PropTypes.array,
+  }).isRequired,
+  onMediaAdd: PropTypes.func,
+  onMediaRemove: PropTypes.func,
+  onMediaChanged: PropTypes.func,
+  maxMedias: PropTypes.number,
+  title: PropTypes.string,
+};
+
+MediaManager.defaultProps = {
+  onMediaAdd: null,
+  onMediaRemove: null,
+  onMediaChanged: null,
+  maxMedias: null,
+  title: "Galerie de médias",
 };
 
 export default MediaManager;

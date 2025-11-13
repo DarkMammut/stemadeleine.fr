@@ -3,12 +3,14 @@
 import React, { useEffect, useState } from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Tabs from "@/components/Tabs";
+import { useAxiosClient } from "@/utils/axiosClient";
 import MyForm from "@/components/MyForm";
 import OrganizationDetails from "@/components/OrganizationDetails";
 import AddressManager from "@/components/AddressManager";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import EditablePanel from "@/components/ui/EditablePanel";
+import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
 
 export default function Organization() {
   const axios = useAxiosClient();
@@ -18,7 +20,6 @@ export default function Organization() {
   const [organizationForm, setOrganizationForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
     loadOrganization();
@@ -112,74 +113,70 @@ export default function Organization() {
         "Organisation modifiée",
         "Les informations ont été mises à jour avec succès",
       );
-      setShowEditForm(false);
     } catch (e) {
       showError(
         "Erreur de modification",
         "Impossible de modifier l'organisation",
       );
+      throw e;
     } finally {
       setSaving(false);
     }
   };
 
-  const handleEdit = () => setShowEditForm(true);
-  const handleCancelEdit = () => setShowEditForm(false);
-
   if (loading) return <div>Chargement...</div>;
-
-  const tabs = [
-    {
-      label: "Informations",
-      content: (
-        <div className="space-y-6">
-          {showEditForm ? (
-            <MyForm
-              title="Informations de l'organisation"
-              fields={organizationFields}
-              initialValues={organizationForm}
-              onSubmit={handleSave}
-              onChange={handleChange}
-              loading={saving}
-              submitButtonLabel="Enregistrer les modifications"
-              onCancel={handleCancelEdit}
-              cancelButtonLabel="Annuler"
-              successMessage="L'organisation a été mise à jour avec succès"
-              errorMessage="Impossible d'enregistrer l'organisation"
-            />
-          ) : (
-            <OrganizationDetails
-              organization={organization}
-              onEdit={handleEdit}
-            />
-          )}
-        </div>
-      ),
-    },
-    {
-      label: "Adresse",
-      content: (
-        <div className="space-y-6">
-          <AddressManager
-            label="Adresse du siège social"
-            addresses={organization.address ? [organization.address] : []}
-            ownerId={organization.id}
-            ownerType="ORGANIZATION"
-            refreshAddresses={loadOrganization}
-            editable={true}
-            newAddressName={"Siège social"}
-            maxAddresses={1}
-          />
-        </div>
-      ),
-    },
-  ];
 
   return (
     <SceneLayout>
       <Title label="Organisation" />
 
-      <Tabs tabs={tabs} defaultIndex={0} />
+      <div className="space-y-6">
+        {/* Informations */}
+        <EditablePanel
+          title="Informations de l'organisation"
+          icon={BuildingOffice2Icon}
+          canEdit={true}
+          initialValues={{ ...organizationForm }}
+          fields={organizationFields.map((f) => ({
+            ...f,
+            defaultValue: organizationForm[f.name],
+          }))}
+          displayColumns={2}
+          onSubmit={handleSave}
+          renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
+            <MyForm
+              title="Informations de l'organisation"
+              fields={organizationFields.map((f) => ({
+                ...f,
+                defaultValue: initialValues[f.name],
+              }))}
+              initialValues={initialValues}
+              onSubmit={onSubmit}
+              onChange={handleChange}
+              loading={loading || saving}
+              submitButtonLabel="Enregistrer les modifications"
+              onCancel={onCancel}
+              cancelButtonLabel="Annuler"
+              successMessage="L'organisation a été mise à jour avec succès"
+              errorMessage="Impossible d'enregistrer l'organisation"
+            />
+          )}
+        >
+          <OrganizationDetails organization={organization} />
+        </EditablePanel>
+
+        {/* Adresse du siège social */}
+        <AddressManager
+          label="Adresse du siège social"
+          addresses={organization.address ? [organization.address] : []}
+          ownerId={organization.id}
+          ownerType="ORGANIZATION"
+          refreshAddresses={loadOrganization}
+          editable={true}
+          newAddressName={"Siège social"}
+          maxAddresses={1}
+        />
+      </div>
 
       {/* Notification */}
       {notification.show && (

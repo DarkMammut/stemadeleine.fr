@@ -9,7 +9,7 @@ import Utilities from "@/components/Utilities";
 import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
 import CardList from "@/components/CardList";
 import NewsletterCard from "@/components/NewsletterCard";
-import Notification from "@/components/Notification";
+import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function Newsletters() {

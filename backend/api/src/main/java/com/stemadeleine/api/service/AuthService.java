@@ -37,6 +37,16 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password())
         );
 
+        // Vérifier que le compte est actif
+        var principal = authentication.getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            // Optional: we can rely on userDetails.isEnabled/isAccountNonLocked etc.
+            if (!userDetails.isEnabled() || !userDetails.isAccountNonLocked() || !userDetails.isAccountNonExpired()) {
+                log.warn("Compte désactivé ou verrouillé pour l'utilisateur: {}", loginRequest.email());
+                throw new com.stemadeleine.api.exception.AccountDisabledException("Account disabled or locked");
+            }
+        }
+
         String jwt = jwtUtil.generateToken(authentication);
         log.debug("Token JWT généré avec succès");
 
@@ -101,6 +111,12 @@ public class AuthService {
         String email = jwtUtil.getEmailFromToken(token);
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Ensure account is active
+        if (account.getIsActive() == null || !account.getIsActive()) {
+            log.warn("Validation échouée: compte désactivé pour email {}", email);
+            throw new com.stemadeleine.api.exception.AccountDisabledException("Account disabled");
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("email", email);

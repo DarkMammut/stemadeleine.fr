@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -60,6 +61,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        // If a non-anonymous authentication is already present (e.g. @WithMockUser in tests), skip JWT check
+        var existingAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (existingAuth != null && existingAuth.isAuthenticated() && !(existingAuth instanceof AnonymousAuthenticationToken)) {
+            logger.debug("[JWT FILTER] Existing non-anonymous authentication present, skip JWT validation");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Fallback: essayer l'header Authorization pour la compatibilité
         if (jwt == null) {
             String authHeader = request.getHeader("Authorization");
@@ -75,6 +84,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
+
+                // Vérifier que le compte est actif / non locké / non expiré
+                if (!userDetails.isAccountNonExpired() || !userDetails.isAccountNonLocked() || !userDetails.isEnabled()) {
+                    logger.warn("[JWT FILTER] Compte inactif/locké/expiré pour l'utilisateur: {} - refuser l'authentication via JWT", username);
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Account disabled or locked");
+                    return;
+                }
+
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );
@@ -84,11 +101,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } else {
-            logger.warn("[JWT FILTER] Aucun token valide trouvé pour cette requête");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalide ou absent");
-            return;
+            // Invalid or missing JWT — do not send an error here. Let Spring Security handle authentication enforcement
+            if (jwt == null) {
+                logger.debug("[JWT FILTER] Aucun token fourni pour cette requête (will proceed without JWT)");
+            } else {
+                logger.warn("[JWT FILTER] Token fourni non valide (will proceed without JWT): {}", jwt);
+            }
         }
 
+        // Continue filter chain; Spring Security will enforce authentication/authorization as configured
         filterChain.doFilter(request, response);
     }
 }

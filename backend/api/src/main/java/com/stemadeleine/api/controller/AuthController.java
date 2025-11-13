@@ -41,6 +41,10 @@ public class AuthController {
             Map<String, String> responseBody = new HashMap<>();
             responseBody.put("message", "Login successful");
             return ResponseEntity.ok(responseBody);
+        } catch (org.springframework.security.authentication.DisabledException |
+                 com.stemadeleine.api.exception.AccountDisabledException ade) {
+            log.warn("Login blocked: account disabled - {}", loginRequest.email());
+            return ResponseEntity.status(403).body(ade.getMessage());
         } catch (Exception e) {
             log.error("Login failed for user: {} - Reason: {}",
                     loginRequest.email(), e.getMessage());

@@ -263,9 +263,10 @@ CREATE TABLE news_publications (
     description TEXT,
     is_visible BOOLEAN DEFAULT true NOT NULL,
     status publishing_status DEFAULT 'DRAFT' NOT NULL,
+    /* published_date keeps time with timezone; start_date/end_date are date-only */
     published_date TIMESTAMPTZ,
-    start_date TIMESTAMPTZ NOT NULL,
-    end_date TIMESTAMPTZ NOT NULL,
+    start_date DATE,
+    end_date DATE,
     media_id UUID,
     author_id UUID NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -443,8 +444,10 @@ CREATE TABLE memberships (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     date_adhesion DATE NOT NULL,
+    date_fin DATE,
     active BOOLEAN NOT NULL DEFAULT true,
-    date_fin DATE
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- =====================
@@ -495,3 +498,9 @@ CREATE TABLE organizations (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+-- In case the schema is applied incrementally or an older DB exists, ensure accounts.is_active exists
+ALTER TABLE accounts
+    ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true NOT NULL;
+
+-- End of migration

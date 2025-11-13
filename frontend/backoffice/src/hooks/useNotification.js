@@ -8,14 +8,26 @@ export function useNotification() {
     type: "success",
     title: "",
     message: "",
+    autoClose: true,
+    duration: 3000,
+    prominent: false,
   });
 
-  const showNotification = (type, title, message = "") => {
+  // options: { autoClose: boolean, duration: number }
+  const showNotification = (type, title, message = "", options = {}) => {
+    const {
+      autoClose = true,
+      duration = 3000,
+      prominent = false,
+    } = options || {};
     setNotification({
       show: true,
       type,
       title,
       message,
+      autoClose,
+      duration,
+      prominent,
     });
   };
 
@@ -25,17 +37,21 @@ export function useNotification() {
       type: "success",
       title: "",
       message: "",
+      autoClose: true,
+      duration: 3000,
+      prominent: false,
     });
   };
 
   // Méthodes de convenance
-  const showSuccess = (title, message) =>
-    showNotification("success", title, message);
-  const showError = (title, message) =>
-    showNotification("error", title, message);
-  const showInfo = (title, message) => showNotification("info", title, message);
-  const showWarning = (title, message) =>
-    showNotification("warning", title, message);
+  const showSuccess = (title, message, options) =>
+    showNotification("success", title, message, options);
+  const showError = (title, message, options) =>
+    showNotification("error", title, message, options);
+  const showInfo = (title, message, options) =>
+    showNotification("info", title, message, options);
+  const showWarning = (title, message, options) =>
+    showNotification("warning", title, message, options);
 
   return {
     notification,

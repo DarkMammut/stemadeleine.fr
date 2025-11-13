@@ -4,6 +4,9 @@ import React from 'react';
 import StatusTag from '@/components/ui/StatusTag';
 import PublishButton from '@/components/ui/PublishButton';
 import DeleteButton from '@/components/ui/DeleteButton';
+import Panel from '@/components/ui/Panel';
+import VariableDisplay from '@/components/ui/VariableDisplay';
+import PropTypes from 'prop-types';
 
 /**
  * Composant d'affichage des informations et du statut d'une publication
@@ -29,10 +32,10 @@ export default function PublicationInfoCard({
   additionalButtons = null, // Boutons supplémentaires à afficher
 }) {
   return (
-    <div className="bg-white shadow-xs outline outline-gray-900/5 sm:rounded-xl">
-      <div className="flex items-center justify-between px-4 py-6 sm:px-8 sm:pt-8 sm:pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <div className="flex items-center gap-2">
+    <Panel
+      title={title}
+      actions={
+        <>
           {additionalButtons}
           {onDelete && (
             <DeleteButton
@@ -55,11 +58,10 @@ export default function PublicationInfoCard({
               resetAfterDelay={true}
             />
           )}
-        </div>
-      </div>
-
-      {/* Information Grid */}
-      <div className="px-4 py-6 sm:p-8 space-y-4">
+        </>
+      }
+    >
+      <div className="space-y-4">
         {/* Statut - Ligne 1 complète */}
         <div className="flex items-center gap-3 text-sm">
           <span className="font-medium text-gray-900">Statut:</span>
@@ -70,31 +72,37 @@ export default function PublicationInfoCard({
         <div className="grid grid-cols-2 gap-4 text-sm">
           {/* Ligne 2 : ID | Auteur */}
           <div>
-            <span className="font-medium text-gray-900">{entityIdLabel}:</span>
-            <span className="text-gray-500 ml-2">{entityId}</span>
+            <VariableDisplay
+              label={`${entityIdLabel}:`}
+              value={entityId ?? "-"}
+            />
           </div>
           <div>
-            <span className="font-medium text-gray-900">Auteur:</span>
-            <span className="text-gray-500 ml-2">
-              {author ? `${author.firstname} ${author.lastname}` : "Non défini"}
-            </span>
+            <VariableDisplay
+              label="Auteur:"
+              value={
+                author ? `${author.firstname} ${author.lastname}` : "Non défini"
+              }
+            />
           </div>
 
           {/* Ligne 3 : Créée le | Publiée le */}
           <div>
-            <span className="font-medium text-gray-900">Créée le:</span>
-            <span className="text-gray-500 ml-2">
-              {new Date(createdAt).toLocaleDateString()}
-            </span>
+            <VariableDisplay
+              label="Créée le:"
+              value={
+                createdAt
+                  ? new Date(createdAt).toLocaleDateString("fr-FR")
+                  : "-"
+              }
+            />
           </div>
           <div>
             {publishedDate ? (
-              <>
-                <span className="font-medium text-gray-900">Publiée le:</span>
-                <span className="text-gray-500 ml-2">
-                  {new Date(publishedDate).toLocaleDateString()}
-                </span>
-              </>
+              <VariableDisplay
+                label="Publiée le:"
+                value={new Date(publishedDate).toLocaleDateString("fr-FR")}
+              />
             ) : (
               <span className="text-gray-400 text-xs">Non publiée</span>
             )}
@@ -102,23 +110,63 @@ export default function PublicationInfoCard({
 
           {/* Ligne 4 : Dernière modification | Contenus */}
           <div>
-            <span className="font-medium text-gray-900">
-              Dernière modification:
-            </span>
-            <span className="text-gray-500 ml-2">
-              {updatedAt
-                ? new Date(updatedAt).toLocaleDateString()
-                : "Non disponible"}
-            </span>
+            <VariableDisplay
+              label="Dernière modification:"
+              value={
+                updatedAt
+                  ? new Date(updatedAt).toLocaleDateString("fr-FR")
+                  : "Non disponible"
+              }
+            />
           </div>
           <div>
-            <span className="font-medium text-gray-900">Contenus:</span>
-            <span className="text-gray-500 ml-2">
-              {contentsCount} contenu(s)
-            </span>
+            <VariableDisplay
+              label="Contenus:"
+              value={`${contentsCount} contenu(s)`}
+            />
           </div>
         </div>
       </div>
-    </div>
+    </Panel>
   );
 }
+
+PublicationInfoCard.propTypes = {
+  title: PropTypes.node,
+  status: PropTypes.string,
+  createdAt: PropTypes.string,
+  publishedDate: PropTypes.string,
+  updatedAt: PropTypes.string,
+  author: PropTypes.object,
+  entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  entityIdLabel: PropTypes.string,
+  contentsCount: PropTypes.number,
+  onPublish: PropTypes.func,
+  canPublish: PropTypes.bool,
+  isPublishing: PropTypes.bool,
+  onDelete: PropTypes.func,
+  isDeleting: PropTypes.bool,
+  deleteConfirmTitle: PropTypes.string,
+  deleteConfirmMessage: PropTypes.string,
+  additionalButtons: PropTypes.node,
+};
+
+PublicationInfoCard.defaultProps = {
+  title: "Informations",
+  status: null,
+  createdAt: null,
+  publishedDate: null,
+  updatedAt: null,
+  author: null,
+  entityId: null,
+  entityIdLabel: "ID",
+  contentsCount: 0,
+  onPublish: null,
+  canPublish: false,
+  isPublishing: false,
+  onDelete: null,
+  isDeleting: false,
+  deleteConfirmTitle: null,
+  deleteConfirmMessage: null,
+  additionalButtons: null,
+};

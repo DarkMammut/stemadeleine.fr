@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stemadeleine.api.dto.LoginRequest;
 import com.stemadeleine.api.dto.SignupRequest;
 import com.stemadeleine.api.service.AuthService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SuppressWarnings("deprecation")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -39,6 +41,11 @@ class AuthControllerIntegrationTest {
 
     @MockBean
     private AuthService authService;
+
+    @BeforeEach
+    void resetMocks() {
+        org.mockito.Mockito.reset(authService);
+    }
 
     @Test
     @DisplayName("POST /api/auth/login - Should authenticate valid user")
@@ -132,5 +139,26 @@ class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.message", is("Logout successful")))
                 .andExpect(cookie().exists("authToken"))
                 .andExpect(cookie().maxAge("authToken", 0));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should reject disabled account (403)")
+    void shouldRejectDisabledAccount() throws Exception {
+        // Given
+        org.mockito.Mockito.reset(authService);
+        LoginRequest loginRequest = new LoginRequest("disabled@example.com", "password123");
+        org.mockito.Mockito.doAnswer(invocation -> {
+            System.out.println("[TEST-INTEGRATION] authService.authenticateUser invoked with: " + invocation.getArgument(0));
+            throw new com.stemadeleine.api.exception.AccountDisabledException("Account disabled");
+        }).when(authService).authenticateUser(any(LoginRequest.class));
+
+        // When & Then
+        mockMvc.perform(post("/api/auth/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isForbidden());
+
+        org.mockito.Mockito.verify(authService).authenticateUser(any(LoginRequest.class));
     }
 }
