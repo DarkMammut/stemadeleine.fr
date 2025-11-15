@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import MyForm from "@/components/ui/MyForm";
 import Button from "@/components/ui/Button";
-import DeleteButton from "@/components/ui/DeleteButton";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
@@ -12,7 +11,7 @@ import {
   MapPinIcon as MapPinOutlineIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import ModifyButton from "@/components/ui/ModifyButton";
+import AddressCard from "@/components/AddressCard";
 
 export default function AddressManager({
   label = "Mes Adresses",
@@ -23,6 +22,7 @@ export default function AddressManager({
   editable = true,
   newAddressName = "Nouvelle adresse",
   maxAddresses = undefined,
+  loading = false,
 }) {
   const handleAddClick = () => {
     if (!editable || isLimitReached) return;
@@ -150,6 +150,7 @@ export default function AddressManager({
         variant="primary"
         size="md"
         onClick={handleAddClick}
+        disabled={loading}
       />
     ) : null;
 
@@ -181,12 +182,28 @@ export default function AddressManager({
           </div>
         )}
 
-        {addresses.length > 0 ? (
-          <div className="divide-y divide-gray-200">
+        {loading && (!addresses || addresses.length === 0) ? (
+          <div className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="py-3">
+                <AddressCard
+                  fields={addressFields}
+                  data={{}}
+                  titleField="name"
+                  loading={true}
+                  editable={false}
+                  showLabels={false}
+                  compact={true}
+                />
+              </div>
+            ))}
+          </div>
+        ) : addresses.length > 0 ? (
+          <div className="space-y-3">
             {addresses.map((address) => (
-              <div key={address.id} className="py-4">
-                {editable && editingId === address.id ? (
-                  <div className="flex-1">
+              <div key={address.id} className="py-2">
+                {editingId === address.id ? (
+                  <div className="p-3 rounded-lg bg-white shadow-sm">
                     <MyForm
                       key={editingId}
                       fields={addressFields}
@@ -200,67 +217,29 @@ export default function AddressManager({
                     />
                   </div>
                 ) : (
-                  <div className="flex items-start justify-between gap-4">
-                    <div
-                      className={editable ? "cursor-pointer flex-1" : "flex-1"}
-                      onClick={editable ? () => handleEdit(address) : undefined}
-                    >
-                      <div className="space-y-2">
-                        <span className="text-lg font-semibold text-gray-900 block">
-                          {address.name}
-                        </span>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <div>{address.addressLine1}</div>
-                          {address.addressLine2 && (
-                            <div>{address.addressLine2}</div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="inline-block px-2 py-0.5 bg-gray-100 rounded text-xs font-medium text-gray-700">
-                              {address.postCode}
-                            </span>
-                            <span>{address.city}</span>
-                          </div>
-                          {(address.state || address.country) && (
-                            <div className="flex items-center gap-2 text-gray-500">
-                              {address.state && <span>{address.state}</span>}
-                              {address.state && address.country && (
-                                <span>•</span>
-                              )}
-                              {address.country && (
-                                <span>{address.country}</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {editable && (
-                      <div className="flex flex-col items-end gap-2">
-                        <ModifyButton
-                          size="sm"
-                          modifyLabel="Modifier"
-                          onModify={() => handleEdit(address)}
-                        />
-                        <DeleteButton
-                          onDelete={() => handleDelete(address.id)}
-                          size="sm"
-                          deleteLabel="Supprimer"
-                          confirmTitle="Supprimer l'adresse"
-                          confirmMessage={`Êtes-vous sûr de vouloir supprimer l'adresse "${address.name}" ?`}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  <AddressCard
+                    fields={addressFields}
+                    data={address}
+                    titleField="name"
+                    onEdit={() => handleEdit(address)}
+                    onDelete={() => handleDelete(address.id)}
+                    editable={editable}
+                    loading={loading}
+                    columns={1}
+                    gap={2}
+                    showLabels={false}
+                    compact={true}
+                  />
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">Aucune adresse enregistrée</p>
+          <p className="text-sm text-gray-500">Aucune adresse.</p>
         )}
 
         {/* Affiche le bouton bas uniquement si la liste est vide (évite une bordure vide sous la liste) */}
-        {editable && !isLimitReached && addresses && addresses.length === 0 && (
+        {editable && addresses && addresses.length === 0 && !loading && (
           <div className="mt-0">
             {!adding && (
               <Button variant="link" size="sm" onClick={handleAddClick}>

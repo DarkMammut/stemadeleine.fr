@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { ArrowPathIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { useContactOperations } from "@/hooks/useContactOperations";
 import { useContactsContext } from "@/contexts/ContactsContext";
-import CardList from "@/components/CardList";
-import ContactCard from "@/components/ContactCard";
+import CardList from "@/components/ui/CardList";
+import ContactCard from "@/components/ui/ContactCard";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
@@ -92,10 +93,7 @@ export default function Contacts() {
     return true;
   });
 
-  if (loading) {
-    return <div className="text-center py-8">Chargement des contacts...</div>;
-  }
-
+  // show header + utilities and skeleton to avoid flashes
   return (
     <SceneLayout>
       <Title label="Demandes" />
@@ -117,15 +115,21 @@ export default function Contacts() {
         ]}
       />
 
-      <CardList emptyMessage="Aucun contact trouvé.">
-        {filteredContacts.map((contact) => (
-          <ContactCard
-            key={contact.id}
-            contact={contact}
-            onClick={() => handleContactClick(contact)}
-          />
-        ))}
-      </CardList>
+      {loading ? (
+        <div className="mt-4">
+          <LoadingSkeleton variant="card" count={6} showActions={false} />
+        </div>
+      ) : (
+        <CardList emptyMessage="Aucun contact trouvé.">
+          {filteredContacts.map((contact) => (
+            <ContactCard
+              key={contact.id}
+              contact={contact}
+              onClick={() => handleContactClick(contact)}
+            />
+          ))}
+        </CardList>
+      )}
 
       <Notification
         show={notification.show}

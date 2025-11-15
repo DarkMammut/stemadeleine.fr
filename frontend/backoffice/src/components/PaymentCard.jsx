@@ -1,11 +1,15 @@
 "use client";
 
 import React from "react";
+import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 import { CreditCardIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import Currency from "@/components/Currency";
+import Currency from "@/components/ui/Currency";
 
-export default function PaymentCard({ payment, onClick }) {
+export default function PaymentCard({ payment, onClick, loading = false }) {
+  if (loading) return <CardSkeleton showActions={false} />;
+
   const formatDate = (date) => {
     if (!date) return "Non renseignée";
     return new Date(date).toLocaleDateString("fr-FR", {
@@ -84,3 +88,9 @@ export default function PaymentCard({ payment, onClick }) {
     </Card>
   );
 }
+
+PaymentCard.propTypes = {
+  payment: PropTypes.object,
+  onClick: PropTypes.func,
+  loading: PropTypes.bool,
+};

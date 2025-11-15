@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import MediaPicker from "@/components/MediaPicker";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
@@ -12,12 +12,12 @@ export default function TextModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs spécifiques au module texte
   const fields = [
@@ -53,10 +53,7 @@ export default function TextModuleEditor({
     }
   };
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -78,8 +75,7 @@ export default function TextModuleEditor({
   };
 
   const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+    // No-op: EditablePanelV2 gère l'annulation
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -107,19 +103,15 @@ export default function TextModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "text-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module texte"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du module texte"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={handleCancelEdit}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Sélecteur de média */}
       <MediaPicker

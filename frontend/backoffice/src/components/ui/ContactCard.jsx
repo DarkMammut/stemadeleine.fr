@@ -1,10 +1,14 @@
 "use client";
 
 import React from "react";
+import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/outline";
 
-export default function ContactCard({ contact, onClick }) {
+export default function ContactCard({ contact, onClick, loading = false }) {
+  if (loading) return <CardSkeleton showActions={false} />;
+
   const getFullName = () => {
     return (
       [contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
@@ -81,3 +85,9 @@ export default function ContactCard({ contact, onClick }) {
     </Card>
   );
 }
+
+ContactCard.propTypes = {
+  contact: PropTypes.object,
+  onClick: PropTypes.func,
+  loading: PropTypes.bool,
+};

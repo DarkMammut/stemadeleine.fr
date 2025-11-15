@@ -3,7 +3,6 @@ import EditablePanel from "@/components/ui/EditablePanel";
 import AddressManager from "@/components/AddressManager";
 import MembershipManager from "@/components/MembershipManager";
 import AccountManager from "@/components/AccountManager";
-import UserForm from "@/components/UserForm";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import PropTypes from "prop-types";
 import { useNotification } from "@/hooks/useNotification";
@@ -19,8 +18,10 @@ export default function UserDetails({
   refreshUser = null,
   editable = false,
   changePassword = false,
+  loading = false,
 }) {
-  if (!user) return null;
+  // When loading, we render placeholders even if `user` is not yet available
+  if (!user && !loading) return null;
 
   const { updateUser } = useUserOperations();
   const { notification, showSuccess, showError } = useNotification();
@@ -28,13 +29,13 @@ export default function UserDetails({
 
   // Form baseline derived from user — passed to EditablePanel as initialValues
   const [userForm, setUserForm] = useState({
-    firstname: user.firstname || "",
-    lastname: user.lastname || "",
-    email: user.email || "",
-    birthDate: user.birthDate || "",
-    phoneMobile: user.phoneMobile || "",
-    phoneLandline: user.phoneLandline || "",
-    newsletter: !!user.newsletter,
+    firstname: user?.firstname || "",
+    lastname: user?.lastname || "",
+    email: user?.email || "",
+    birthDate: user?.birthDate || "",
+    phoneMobile: user?.phoneMobile || "",
+    phoneLandline: user?.phoneLandline || "",
+    newsletter: !!user?.newsletter,
   });
 
   // Keep local userForm synced with prop `user` when not editing
@@ -53,9 +54,9 @@ export default function UserDetails({
   }, [user]);
 
   const userFields = [
-    { name: "firstname", label: "Prénom", type: "text" },
-    { name: "lastname", label: "Nom", type: "text" },
-    { name: "email", label: "Email", type: "text" },
+    { name: "firstname", label: "Prénom", type: "text", required: true },
+    { name: "lastname", label: "Nom", type: "text", required: true },
+    { name: "email", label: "Email", type: "text", required: true },
     { name: "birthDate", label: "Date de naissance", type: "date" },
     { name: "phoneMobile", label: "Téléphone mobile", type: "text" },
     { name: "phoneLandline", label: "Téléphone fixe", type: "text" },
@@ -68,17 +69,14 @@ export default function UserDetails({
         title="Profil"
         icon={UserCircleIcon}
         canEdit={editable}
-        onDelete={onDelete}
-        loading={savingUser}
-        // Afficher les boutons Annuler / Enregistrer ici (EditUser souhaité)
+        loading={savingUser || loading}
         showFooterButtons={true}
-        // Désactiver le bouton Enregistrer automatiquement si aucune modification
         disableSaveWhenNoChanges={true}
         initialValues={userForm}
         fields={userFields}
         displayColumns={2}
+        onDelete={onDelete}
         onSubmit={async (vals) => {
-          // call save
           setSavingUser(true);
           try {
             await updateUser(user.id, vals);
@@ -95,81 +93,18 @@ export default function UserDetails({
             setSavingUser(false);
           }
         }}
-        renderForm={({
-          initialValues,
-          onCancel,
-          onSubmit,
-          onChange,
-          loading,
-        }) => (
-          <UserForm
-            initialValues={initialValues}
-            onSubmit={onSubmit}
-            onChange={onChange}
-            loading={loading}
-            onCancel={onCancel}
-          />
-        )}
-      >
-        <div className="space-y-4">
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">Nom</span>
-            <span> {user.lastname || "-"}</span>
-            <span className="text-sm font-semibold text-gray-500">Prénom</span>
-            <span> {user.firstname || "-"}</span>
-            <span className="text-sm font-semibold text-gray-500">Email</span>
-            <span className="text-sm text-gray-900">{user.email || "-"}</span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">
-              Téléphone mobile
-            </span>
-            <span className="text-sm text-gray-900">
-              {user.phoneMobile || "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">
-              Téléphone fixe
-            </span>
-            <span className="text-sm text-gray-900">
-              {user.phoneLandline || "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">
-              Date de naissance
-            </span>
-            <span className="text-sm text-gray-900">
-              {user.birthDate
-                ? new Date(user.birthDate).toLocaleDateString("fr-FR")
-                : "-"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-[140px_1fr] gap-4">
-            <span className="text-sm font-semibold text-gray-500">
-              Newsletter
-            </span>
-            <span className="text-sm text-gray-900">
-              {user.newsletter ? "Oui" : "Non"}
-            </span>
-          </div>
-        </div>
-      </EditablePanel>
+      />
 
       {/* Adresses (gérées par AddressManager lorsque showAddresses = true) */}
       {showAddresses && (
         <AddressManager
           label="Adresses"
-          addresses={user.addresses || []}
-          ownerId={user.id}
+          addresses={user?.addresses || []}
+          ownerId={user?.id}
           ownerType="USER"
           refreshAddresses={refreshUser}
           editable={editable}
+          loading={loading}
         />
       )}
 
@@ -177,11 +112,12 @@ export default function UserDetails({
       {showAccountsManager ? (
         <AccountManager
           label="Comptes"
-          accounts={user.accounts || []}
-          userId={user.id}
+          accounts={user?.accounts || []}
+          userId={user?.id}
           refreshUser={refreshUser}
           editable={editAccounts}
           changePassword={changePassword}
+          loading={loading}
         />
       ) : null}
 
@@ -189,17 +125,17 @@ export default function UserDetails({
       {showMemberships && (
         <MembershipManager
           label="Adhésions"
-          memberships={user.memberships || []}
-          userId={user.id}
+          memberships={user?.memberships || []}
+          userId={user?.id}
           refreshUser={refreshUser}
           editable={editable}
+          loading={loading}
         />
       )}
 
       {/* Notification (user-level) */}
       {notification.show && (
         <div className="mt-2">
-          {/* Reuse project's Notification component */}
           <div />
         </div>
       )}

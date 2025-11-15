@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useGetModule from "@/hooks/useGetModule";
@@ -17,6 +17,7 @@ export default function ArticleModuleEditor({
   moduleData: _initialModuleData,
   setModuleData: setParentModuleData,
   refetch: _parentRefetch,
+  loading: parentLoading = false,
 }) {
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
@@ -51,7 +52,6 @@ export default function ArticleModuleEditor({
   // Synchroniser avec les données du module
   useEffect(() => {
     if (module) {
-      console.log("📦 Données de module chargées:", module);
       setModuleData(module);
     }
   }, [module]);
@@ -59,10 +59,6 @@ export default function ArticleModuleEditor({
   // Synchroniser avec les données de l'article
   useEffect(() => {
     if (article) {
-      console.log("📝 Données d'article chargées:", article);
-      console.log("  - variant:", article.variant);
-      console.log("  - writer:", article.writer);
-      console.log("  - writingDate:", article.writingDate);
       setArticleData(article);
     }
   }, [article]);
@@ -121,21 +117,17 @@ export default function ArticleModuleEditor({
 
   // Soumission du formulaire Module
   const handleModuleSubmit = async (values) => {
-    console.log("📝 Soumission du formulaire Module avec values:", values);
     setSavingModule(true);
     try {
       const payload = {
         name: values.name,
         title: values.title,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
 
       const response = await axios.put(
         `/api/modules/${module.moduleId}`,
         payload,
       );
-
-      console.log("📥 Réponse du serveur:", response.data);
 
       // Mettre à jour moduleData
       setModuleData((prev) => ({
@@ -143,9 +135,9 @@ export default function ArticleModuleEditor({
         ...response.data,
       }));
 
-      console.log("✅ Module mis à jour");
+      showSuccess("Module mis à jour avec succès");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      console.error("Erreur lors de la sauvegarde du module:", err);
       throw err;
     } finally {
       setSavingModule(false);
@@ -154,7 +146,6 @@ export default function ArticleModuleEditor({
 
   // Soumission du formulaire Article
   const handleArticleSubmit = async (values) => {
-    console.log("📝 Soumission du formulaire Article avec values:", values);
     setSavingArticle(true);
     try {
       const payload = {
@@ -162,14 +153,8 @@ export default function ArticleModuleEditor({
         writer: values.writer || null,
         writingDate: values.writingDate || null,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/articles):", payload);
 
       const response = await axios.put(`/api/articles/${article.id}`, payload);
-
-      console.log("📥 Réponse du serveur:", response.data);
-      console.log("  - variant dans réponse:", response.data?.variant);
-      console.log("  - writer dans réponse:", response.data?.writer);
-      console.log("  - writingDate dans réponse:", response.data?.writingDate);
 
       // Mettre à jour articleData
       setArticleData((prev) => ({
@@ -177,9 +162,9 @@ export default function ArticleModuleEditor({
         ...response.data,
       }));
 
-      console.log("✅ Article mis à jour");
+      showSuccess("Article mis à jour avec succès");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde de l'article:", err);
+      console.error("Erreur lors de la sauvegarde de l'article:", err);
       throw err;
     } finally {
       setSavingArticle(false);
@@ -220,14 +205,10 @@ export default function ArticleModuleEditor({
     }
   };
 
-  // Afficher un loader pendant le chargement initial
-  if (
-    (moduleLoading && !moduleData) ||
-    (articleLoading && !articleData) ||
-    variantsLoading
-  ) {
-    return <div className="text-center py-8">Chargement de l'article...</div>;
-  }
+  // Ne pas return tôt: laisser les composants afficher leur propre loading via props
+  const effectiveLoading = Boolean(
+    parentLoading || moduleLoading || articleLoading || variantsLoading,
+  );
 
   return (
     <div className="space-y-6">
@@ -241,36 +222,26 @@ export default function ArticleModuleEditor({
       />
 
       {/* Formulaire Module (name, title) */}
-      {moduleData && (
-        <MyForm
-          title="Détails de l'article"
-          fields={moduleFields}
-          initialValues={moduleData}
-          onSubmit={handleModuleSubmit}
-          loading={savingModule}
-          submitButtonLabel="Enregistrer"
-          onCancel={handleCancelModuleEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Les informations du module ont été mises à jour avec succès"
-          errorMessage="Impossible de mettre à jour le module"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails de l'article"
+        fields={moduleFields}
+        initialValues={moduleData || {}}
+        onSubmit={handleModuleSubmit}
+        onCancelExternal={handleCancelModuleEdit}
+        loading={savingModule || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Formulaire Article (variant, writer, writingDate) */}
-      {articleData && (
-        <MyForm
-          title="Paramètres de l'article"
-          fields={articleFields}
-          initialValues={articleData}
-          onSubmit={handleArticleSubmit}
-          loading={savingArticle}
-          submitButtonLabel="Enregistrer"
-          onCancel={handleCancelArticleEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Les paramètres de l'article ont été mis à jour avec succès"
-          errorMessage="Impossible de mettre à jour l'article"
-        />
-      )}
+      <EditablePanelV2
+        title="Paramètres de l'article"
+        fields={articleFields}
+        initialValues={articleData || {}}
+        onSubmit={handleArticleSubmit}
+        onCancelExternal={handleCancelArticleEdit}
+        loading={savingArticle || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Gestion des contenus */}
       <ContentManager

@@ -32,16 +32,13 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <div>Chargement...</div>;
-
   return (
     <SceneLayout>
       <Title label="Mon profil" />
 
       <UserDetails
         user={user}
-        // onEdit deliberately not provided so UserDetails handles inline editing
-        // Afficher uniquement Adresses et Comptes (AccountManager) dans la vue profil
+        loading={loading}
         showAddresses={true}
         showMemberships={false}
         showAccountsManager={true}

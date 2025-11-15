@@ -30,17 +30,20 @@ export default function PublicationInfoCard({
   deleteConfirmTitle,
   deleteConfirmMessage,
   additionalButtons = null, // Boutons supplémentaires à afficher
+  loading = false,
 }) {
+  const effectiveLoading = loading || isPublishing || isDeleting;
   return (
     <Panel
       title={title}
+      loading={effectiveLoading}
       actions={
         <>
           {additionalButtons}
           {onDelete && (
             <DeleteButton
               onDelete={onDelete}
-              disabled={isDeleting}
+              disabled={effectiveLoading}
               deleteLabel="Supprimer"
               confirmTitle={deleteConfirmTitle}
               confirmMessage={deleteConfirmMessage}
@@ -51,7 +54,7 @@ export default function PublicationInfoCard({
           {canPublish && (
             <PublishButton
               onPublish={onPublish}
-              disabled={isPublishing}
+              disabled={effectiveLoading}
               publishLabel="Publier"
               publishedLabel="Publiée"
               size="sm"
@@ -65,7 +68,7 @@ export default function PublicationInfoCard({
         {/* Statut - Ligne 1 complète */}
         <div className="flex items-center gap-3 text-sm">
           <span className="font-medium text-gray-900">Statut:</span>
-          <StatusTag status={status} />
+          <StatusTag status={status} loading={effectiveLoading} />
         </div>
 
         {/* Grid 2 colonnes pour les autres infos */}
@@ -75,6 +78,7 @@ export default function PublicationInfoCard({
             <VariableDisplay
               label={`${entityIdLabel}:`}
               value={entityId ?? "-"}
+              loading={effectiveLoading}
             />
           </div>
           <div>
@@ -83,6 +87,7 @@ export default function PublicationInfoCard({
               value={
                 author ? `${author.firstname} ${author.lastname}` : "Non défini"
               }
+              loading={effectiveLoading}
             />
           </div>
 
@@ -95,6 +100,7 @@ export default function PublicationInfoCard({
                   ? new Date(createdAt).toLocaleDateString("fr-FR")
                   : "-"
               }
+              loading={effectiveLoading}
             />
           </div>
           <div>
@@ -102,6 +108,7 @@ export default function PublicationInfoCard({
               <VariableDisplay
                 label="Publiée le:"
                 value={new Date(publishedDate).toLocaleDateString("fr-FR")}
+                loading={effectiveLoading}
               />
             ) : (
               <span className="text-gray-400 text-xs">Non publiée</span>
@@ -117,12 +124,14 @@ export default function PublicationInfoCard({
                   ? new Date(updatedAt).toLocaleDateString("fr-FR")
                   : "Non disponible"
               }
+              loading={effectiveLoading}
             />
           </div>
           <div>
             <VariableDisplay
               label="Contenus:"
               value={`${contentsCount} contenu(s)`}
+              loading={effectiveLoading}
             />
           </div>
         </div>
@@ -149,6 +158,7 @@ PublicationInfoCard.propTypes = {
   deleteConfirmTitle: PropTypes.string,
   deleteConfirmMessage: PropTypes.string,
   additionalButtons: PropTypes.node,
+  loading: PropTypes.bool,
 };
 
 PublicationInfoCard.defaultProps = {
@@ -169,4 +179,5 @@ PublicationInfoCard.defaultProps = {
   deleteConfirmTitle: null,
   deleteConfirmMessage: null,
   additionalButtons: null,
+  loading: false,
 };

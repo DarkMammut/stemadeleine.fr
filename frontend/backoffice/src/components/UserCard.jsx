@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 import {
   CheckBadgeIcon,
   EnvelopeIcon,
@@ -9,7 +11,14 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function UserCard({ user, onClick, showAdherentFlag = false }) {
+export default function UserCard({
+  user,
+  onClick,
+  showAdherentFlag = false,
+  loading = false,
+}) {
+  if (loading) return <CardSkeleton showActions={false} />;
+
   const getFullName = () => {
     return (
       [user.firstname, user.lastname].filter(Boolean).join(" ") ||
@@ -86,3 +95,10 @@ export default function UserCard({ user, onClick, showAdherentFlag = false }) {
     </Card>
   );
 }
+
+UserCard.propTypes = {
+  user: PropTypes.object,
+  onClick: PropTypes.func,
+  showAdherentFlag: PropTypes.bool,
+  loading: PropTypes.bool,
+};

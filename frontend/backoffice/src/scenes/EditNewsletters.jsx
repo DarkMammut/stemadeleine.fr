@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
-import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
@@ -30,7 +29,6 @@ export default function EditNewsletters({ newsletterId }) {
   const [error, setError] = useState(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [formKey, setFormKey] = useState(0);
 
   const axios = useAxiosClient();
   const router = useRouter();
@@ -59,6 +57,7 @@ export default function EditNewsletters({ newsletterId }) {
       const data = await getNewsletterPublicationById(newsletterId);
       setNewsletterData(data);
     } catch (error) {
+      // Use notification for user-facing error and keep console for development
       console.error("Error loading newsletter:", error);
       setError(error);
       showError("Erreur de chargement", "Impossible de charger la newsletter");
@@ -126,10 +125,6 @@ export default function EditNewsletters({ newsletterId }) {
     },
   ];
 
-  const handleFormChange = (name, value, allValues) => {
-    setNewsletterData((prev) => ({ ...prev, ...allValues }));
-  };
-
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
@@ -156,7 +151,6 @@ export default function EditNewsletters({ newsletterId }) {
 
   const handleCancelEdit = () => {
     loadNewsletter();
-    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -218,17 +212,16 @@ export default function EditNewsletters({ newsletterId }) {
 
   const handleDownloadPDF = async () => {
     // TODO: Implémenter la génération de PDF
-    console.log("Téléchargement PDF de la newsletter:", newsletterId);
-    alert("Fonctionnalité de téléchargement PDF à venir !");
+    showError("Non implémenté", "Téléchargement PDF non encore disponible");
   };
 
   const handleSend = async () => {
     // TODO: Implémenter le publipostage
-    console.log("Envoi de la newsletter:", newsletterId);
-    alert("Fonctionnalité d'envoi à venir !");
+    showError("Non implémenté", "Envoi de newsletter non encore disponible");
   };
 
-  if (loading) return <div className="text-center py-8">Chargement...</div>;
+  const effectiveLoading = loading;
+
   if (error)
     return (
       <div className="text-center py-8 text-red-600">
@@ -242,9 +235,43 @@ export default function EditNewsletters({ newsletterId }) {
 
       <Utilities actions={[]} />
 
-      {!newsletterData ? (
-        <div className="text-center py-8 text-text-muted">
-          Chargement des données...
+      {effectiveLoading || !newsletterData ? (
+        <div className="space-y-6">
+          <PublicationInfoCard loading={effectiveLoading} />
+          <VisibilitySwitch loading={effectiveLoading} />
+          <EditablePanel
+            title="Informations de la newsletter"
+            loading={effectiveLoading}
+            canEdit={false}
+            fields={fields}
+            initialValues={newsletterData || {}}
+            displayColumns={2}
+          />
+          <ContentManager
+            parentId={newsletterId}
+            parentType="newsletter-publication"
+            customLabels={{
+              header: "Contenus de la newsletter",
+              addButton: "Ajouter un contenu",
+              empty: "Aucun contenu pour cette newsletter.",
+              loading: "Chargement des contenus...",
+              saveContent: "Enregistrer le contenu",
+              bodyLabel: "Contenu de la newsletter",
+            }}
+            loading={effectiveLoading}
+          />
+          <MediaManager
+            title="Image de la newsletter"
+            content={{
+              id: newsletterId,
+              medias: newsletterData?.media ? [newsletterData.media] : [],
+            }}
+            onMediaAdd={handleAddMedia}
+            onMediaRemove={handleRemoveMedia}
+            onMediaChanged={loadNewsletter}
+            maxMedias={1}
+            loading={effectiveLoading}
+          />
         </div>
       ) : (
         <div className="space-y-6">
@@ -303,34 +330,20 @@ export default function EditNewsletters({ newsletterId }) {
             isVisible={newsletterData?.isVisible || false}
             onChange={handleVisibilityChange}
             savingVisibility={savingVisibility}
+            loading={effectiveLoading}
           />
 
           {/* Main Form */}
           {newsletterData && Object.keys(newsletterData).length > 0 && (
             <EditablePanel
               title="Informations de la newsletter"
+              loading={effectiveLoading}
               canEdit={true}
               initialValues={newsletterData}
               fields={fields}
               displayColumns={2}
               onSubmit={handleSubmit}
               onCancelExternal={handleCancelEdit}
-              renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
-                <MyForm
-                  key={`newsletter-form-${formKey}`}
-                  title="Informations de la newsletter"
-                  fields={fields}
-                  initialValues={initialValues}
-                  onSubmit={onSubmit}
-                  onChange={handleFormChange}
-                  loading={loading}
-                  submitButtonLabel="Enregistrer la newsletter"
-                  onCancel={onCancel}
-                  cancelButtonLabel="Annuler"
-                  successMessage="La newsletter a été mise à jour avec succès"
-                  errorMessage="Impossible d'enregistrer la newsletter"
-                />
-              )}
             />
           )}
 
@@ -346,6 +359,7 @@ export default function EditNewsletters({ newsletterId }) {
               saveContent: "Enregistrer le contenu",
               bodyLabel: "Contenu de la newsletter",
             }}
+            loading={effectiveLoading}
           />
         </div>
       )}
@@ -362,6 +376,7 @@ export default function EditNewsletters({ newsletterId }) {
           onMediaRemove={handleRemoveMedia}
           onMediaChanged={loadNewsletter}
           maxMedias={1}
+          loading={effectiveLoading}
         />
       )}
 

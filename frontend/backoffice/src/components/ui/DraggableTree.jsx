@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import { buildTree, flattenTree, getProjection } from "@/utils/treeHelpers";
-import SortableItem from "@/components/SortableItem";
+import SortableItem from "@/components/ui/SortableItem";
 
 export default function DraggableTree({
   initialData,
@@ -26,6 +26,7 @@ export default function DraggableTree({
   canHaveChildren,
   canDrop, // nouvelle prop pour la validation générique du drop
   onAddChild, // nouvelle prop optionnelle pour ajouter un enfant
+  loading = false, // nouvelle prop pour indiquer l'état de chargement
 }) {
   const [tree, setTree] = useState(initialData);
   const [activeId, setActiveId] = useState(null);
@@ -37,10 +38,8 @@ export default function DraggableTree({
     setTree(initialData);
   }, [initialData]);
 
-  const flattened = useMemo(() => flattenTree(tree), [tree]);
-  const sensorContext = useRef({ items: flattened, offset: offsetLeft });
+  const flattened = useMemo(() => flattenTree(tree || []), [tree]);
   const sensors = useSensors(useSensor(PointerSensor));
-  const activeItem = activeId ? flattened.find((i) => i.id === activeId) : null;
   const projected =
     activeId && overId
       ? getProjection(flattened, activeId, overId, offsetLeft)
@@ -103,6 +102,22 @@ export default function DraggableTree({
     onChange?.(newTree);
   };
 
+  // Si on est en mode loading, afficher 3 placeholders pulse sans activer DnD
+  if (loading) {
+    const placeholders = [1, 2, 3];
+    return (
+      <div>
+        {placeholders.map((p) => (
+          <SortableItem
+            key={`placeholder-${p}`}
+            isPlaceholder={true}
+            depth={0}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -116,7 +131,7 @@ export default function DraggableTree({
         items={flattened.map((i) => i.id)}
         strategy={verticalListSortingStrategy}
       >
-        {flattened.map((item, index) => (
+        {flattened.map((item) => (
           <SortableItem
             key={`${item.type}-${item.id}`}
             item={item}

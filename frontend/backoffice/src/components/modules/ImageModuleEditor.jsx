@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
@@ -12,12 +12,12 @@ export default function ImageModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs spécifiques au module image
   const fields = [
@@ -60,7 +60,7 @@ export default function ImageModuleEditor({
     await setModuleMedia(moduleId, mediaId);
   };
 
-  const handleMediaRemove = async (contentId, mediaId) => {
+  const handleMediaRemove = async (_mediaId) => {
     await setModuleMedia(moduleId, null);
   };
 
@@ -70,10 +70,7 @@ export default function ImageModuleEditor({
     medias: moduleData?.media ? [moduleData.media] : [],
   };
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -97,8 +94,7 @@ export default function ImageModuleEditor({
   };
 
   const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+    // No-op: EditablePanelV2 will reset on cancel externally
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -126,19 +122,15 @@ export default function ImageModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "image-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module image"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails de l'image"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={handleCancelEdit}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Sélecteur de média */}
       <MediaManager

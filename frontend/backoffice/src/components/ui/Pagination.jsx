@@ -1,5 +1,6 @@
 import React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import Select from "@/components/ui/Select";
 
 export default function Pagination({
   page,
@@ -156,15 +157,16 @@ export default function Pagination({
 
         <div className="ml-4 flex items-center space-x-2">
           {onPageSizeChange && (
-            <select
+            <Select
               value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              onValueChange={(v) => onPageSizeChange(Number(v))}
+              options={[
+                { value: 10, label: "10 / page" },
+                { value: 20, label: "20 / page" },
+                { value: 50, label: "50 / page" },
+              ]}
               className="border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value={10}>10 / page</option>
-              <option value={20}>20 / page</option>
-              <option value={50}>50 / page</option>
-            </select>
+            />
           )}
         </div>
       </div>

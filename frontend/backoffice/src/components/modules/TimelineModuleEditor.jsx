@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 
@@ -10,11 +10,11 @@ export default function TimelineModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule, updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs basés sur le modèle Java Timeline
   const fields = [
@@ -45,10 +45,7 @@ export default function TimelineModuleEditor({
     },
   ];
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -67,11 +64,6 @@ export default function TimelineModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
-  };
-
-  const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -99,21 +91,15 @@ export default function TimelineModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "timeline-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module chronologie"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Le module chronologie a été mis à jour avec succès"
-          errorMessage="Impossible d'enregistrer le module chronologie"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du module chronologie"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={() => {}}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
     </div>
   );
 }

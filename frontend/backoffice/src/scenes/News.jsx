@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { useNewsPublicationOperations } from "@/hooks/useNewsPublicationOperations";
-import CardList from "@/components/CardList";
+import CardList from "@/components/ui/CardList";
 import NewsCard from "@/components/NewsCard";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
@@ -69,9 +70,7 @@ export default function News() {
     router.push(`/news/${newsItem.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center py-8">Chargement des news...</div>;
-  }
+  const isLoading = loading;
 
   return (
     <SceneLayout>
@@ -83,19 +82,26 @@ export default function News() {
             icon: PlusIcon,
             label: "Nouvelle News",
             callback: handleCreateNews,
+            disabled: isLoading,
           },
         ]}
       />
 
-      <CardList emptyMessage="Aucune news trouvée.">
-        {news.map((newsItem) => (
-          <NewsCard
-            key={newsItem.id}
-            news={newsItem}
-            onClick={() => handleNewsClick(newsItem)}
-          />
-        ))}
-      </CardList>
+      {isLoading ? (
+        <div className="mt-4">
+          <LoadingSkeleton variant="card" count={6} showActions={true} />
+        </div>
+      ) : (
+        <CardList emptyMessage="Aucune news trouvée.">
+          {news.map((newsItem) => (
+            <NewsCard
+              key={newsItem.id}
+              news={newsItem}
+              onClick={() => handleNewsClick(newsItem)}
+            />
+          ))}
+        </CardList>
+      )}
 
       <Notification
         show={notification.show}

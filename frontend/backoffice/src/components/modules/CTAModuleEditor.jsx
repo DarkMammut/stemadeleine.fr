@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
@@ -12,12 +12,13 @@ export default function CTAModuleEditor({
   setModuleData,
   refetch,
   onCancel,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formValues, setFormValues] = useState({});
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   // Champs basés sur le modèle Java CTA
   const fields = [
@@ -71,12 +72,6 @@ export default function CTAModuleEditor({
     variant: moduleData?.variant || "BUTTON",
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    setFormValues(allValues);
-    // Optionnel: mettre à jour moduleData en temps réel pour l'aperçu
-    setModuleData((prev) => ({ ...prev, ...allValues }));
-  };
-
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
@@ -101,7 +96,6 @@ export default function CTAModuleEditor({
   const handleCancel = () => {
     // Remettre les valeurs originales dans moduleData
     setModuleData((prev) => ({ ...prev, ...initialValues }));
-    setFormValues({});
 
     // Appeler la fonction onCancel du parent si elle existe
     if (onCancel) {
@@ -122,10 +116,6 @@ export default function CTAModuleEditor({
     }
   };
 
-  // Valeurs à afficher dans l'aperçu (utiliser formValues s'il y en a, sinon initialValues)
-  const previewValues =
-    Object.keys(formValues).length > 0 ? formValues : initialValues;
-
   return (
     <div className="space-y-6">
       {/* Section Visibilité */}
@@ -138,35 +128,30 @@ export default function CTAModuleEditor({
       />
 
       {/* Formulaire principal */}
-      <MyForm
+      <EditablePanelV2
+        title="Détails du CTA"
         fields={fields}
         initialValues={initialValues}
-        formValues={formValues}
-        setFormValues={setFormValues}
         onSubmit={handleSubmit}
-        onChange={handleFormChange}
-        onCancel={handleCancel}
-        loading={saving}
-        submitButtonLabel="Enregistrer le module CTA"
-        cancelButtonLabel="Annuler les modifications"
+        onCancelExternal={handleCancel}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
       />
 
       {/* Aperçu du CTA */}
       <div className="bg-surface border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold text-text mb-4">Aperçu du CTA</h3>
-        {previewValues?.label && previewValues?.url ? (
+        {moduleData?.label && moduleData?.url ? (
           <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="font-medium text-text mb-2">
-              {previewValues.title}
-            </div>
+            <div className="font-medium text-text mb-2">{moduleData.title}</div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-text-muted">
-                Type: {previewValues.variant || "BUTTON"}
+                Type: {moduleData.variant || "BUTTON"}
               </span>
               <span className="text-sm text-text-muted">→</span>
-              <span className="text-sm font-medium">{previewValues.label}</span>
+              <span className="text-sm font-medium">{moduleData.label}</span>
               <span className="text-sm text-text-muted">
-                ({previewValues.url})
+                ({moduleData.url})
               </span>
             </div>
           </div>

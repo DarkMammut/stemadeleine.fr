@@ -2,6 +2,7 @@
 
 import React from "react";
 import PropTypes from "prop-types";
+import { mapMyFormToVariableFields } from "@/utils/mapMyFormToVariableFields";
 
 function renderSingle({
   label,
@@ -16,6 +17,7 @@ function renderSingle({
   valueClassName = "text-gray-500",
   size = "md",
   format = null,
+  loading = false,
 }) {
   const displayValue = () => {
     if (children) return children;
@@ -25,9 +27,8 @@ function renderSingle({
     return value;
   };
 
-  const containerClass = inline ? "flex items-center gap-3" : "";
+  const containerClass = inline ? "flex items-center gap-3" : "flex flex-col";
   // Map logical size to Tailwind class. small boolean takes precedence and maps to text-sm
-  // Réduire la taille par défaut : md devient text-sm pour un rendu plus discret
   const sizeMap = {
     sm: "text-xs",
     md: "text-sm",
@@ -38,10 +39,18 @@ function renderSingle({
   const vClass = `${valueClassName} ${sizeClass}`.trim();
 
   return (
-    <dl className={`${containerClass} ${className}`.trim()}>
-      {label ? <dt className={labelClassName}>{label}</dt> : null}
-      <dd className={vClass}>{displayValue()}</dd>
-    </dl>
+    <div className={`${containerClass} ${className}`.trim()}>
+      {label ? <div className={labelClassName}>{label}</div> : null}
+      <div className={vClass}>
+        {loading ? (
+          <div className="w-full">
+            <div className={`skeleton-light h-4`} />
+          </div>
+        ) : (
+          displayValue()
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -63,67 +72,104 @@ export default function VariableDisplay({
   format = null,
   // New API: fields layout
   fields = null,
+  // data object used to fill fields when fields are provided in MyForm format
+  data = null,
   columns = 1,
   gap = 4, // tailwind gap-x/gap-y numeric (will be mapped to class)
   layout = "grid", // 'grid' or 'stack'
+  loading = false,
 }) {
-  // If fields provided, render a grid/stack of field entries
+  // If fields provided, render a responsive layout (mobile-first flex column, desktop grid)
   if (Array.isArray(fields) && fields.length > 0) {
-    const style =
+    // Map MyForm-style fields to display fields when `data` is provided
+    let effectiveFields = fields;
+
+    try {
+      const looksLikeMyForm = fields.some(
+        (f) =>
+          f &&
+          typeof f === "object" &&
+          f.name &&
+          f.value === undefined &&
+          f.children === undefined &&
+          typeof f.render !== "function",
+      );
+      if (looksLikeMyForm && data) {
+        effectiveFields = mapMyFormToVariableFields(fields, data);
+      }
+    } catch (e) {
+      effectiveFields = fields;
+    }
+
+    // Build responsive classes: mobile = flex-col, desktop = grid with columns
+    const gapClass = `gap-${gap}`;
+    const inlineGap = { gap: `${gap * 0.25}rem` };
+    const gridStyle =
       layout === "grid"
         ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
         : {};
-    // Tailwind JIT may purge dynamic class names like `gap-${gap}`. To be safe,
-    // compute a gapClass and also provide an inline style fallback for the gap.
-    const gapClass = `gap-${gap}`;
-    const inlineGap = { gap: `${gap * 0.25}rem` };
-    const mergedStyle = { ...(style || {}), ...(inlineGap || {}) };
-    return (
-      <div className={`grid ${gapClass} ${className}`} style={mergedStyle}>
-        {fields.map((f, idx) => {
-          // Field can be a string (name) or an object
-          const fld =
-            typeof f === "string" ? { name: f, label: f, value: "" } : f || {};
-          const {
-            label: fldLabel,
-            value: fldValue,
-            children: fldChildren,
-            inline: fldInline,
-            small: fldSmall,
-            placeholder: fldPlaceholder,
-            labelClassName: fldLabelClassName,
-            valueClassName: fldValueClassName,
-            format: fldFormat,
-            render: fldRender,
-          } = fld;
+    const mergedStyle = { ...(gridStyle || {}), ...(inlineGap || {}) };
 
-          if (typeof fldRender === "function") {
+    return (
+      <div className={`flex flex-col ${className}`} style={mergedStyle}>
+        {/* On small screens stack fields; on larger screens switch to grid */}
+        <div className={`sm:grid ${gapClass}`} style={mergedStyle}>
+          {effectiveFields.map((f, idx) => {
+            const fld =
+              typeof f === "string"
+                ? { name: f, label: f, value: data?.[f] ?? "" }
+                : f || {};
+            const {
+              label: fldLabel,
+              value: fldValue,
+              children: fldChildren,
+              inline: fldInline,
+              small: fldSmall,
+              placeholder: fldPlaceholder,
+              labelClassName: fldLabelClassName,
+              valueClassName: fldValueClassName,
+              format: fldFormat,
+              render: fldRender,
+            } = fld;
+
+            // If field lacks explicit value but has a name and data available, resolve it
+            let resolvedValue = fldValue;
+            if (
+              (resolvedValue === undefined || resolvedValue === null) &&
+              fld.name &&
+              data
+            ) {
+              resolvedValue = data[fld.name];
+            }
+
+            if (typeof fldRender === "function") {
+              return (
+                <div key={fld.name || idx}>
+                  {fldRender({ field: fld, index: idx, data })}
+                </div>
+              );
+            }
+
             return (
-              <div key={fld.name || idx}>
-                {fldRender({ field: fld, index: idx })}
+              <div key={fld.name || idx} className="py-2">
+                {renderSingle({
+                  label: fldLabel,
+                  value: resolvedValue,
+                  children: fldChildren,
+                  inline: fldInline ?? inline,
+                  small: fldSmall ?? small,
+                  size: fld.size ?? size,
+                  placeholder: fldPlaceholder ?? placeholder,
+                  className: "",
+                  labelClassName: fldLabelClassName ?? labelClassName,
+                  valueClassName: fldValueClassName ?? valueClassName,
+                  format: fldFormat ?? format,
+                  loading: loading,
+                })}
               </div>
             );
-          }
-
-          return (
-            <div key={fld.name || idx}>
-              {renderSingle({
-                label: fldLabel,
-                value: fldValue,
-                children: fldChildren,
-                inline: fldInline ?? inline,
-                // inherit global `small` when field doesn't specify it
-                small: fldSmall ?? small,
-                size: fld.size ?? size,
-                placeholder: fldPlaceholder ?? placeholder,
-                className: "",
-                labelClassName: fldLabelClassName ?? labelClassName,
-                valueClassName: fldValueClassName ?? valueClassName,
-                format: fldFormat ?? format,
-              })}
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
     );
   }
@@ -141,6 +187,7 @@ export default function VariableDisplay({
     valueClassName,
     size,
     format,
+    loading,
   });
 }
 
@@ -175,10 +222,12 @@ VariableDisplay.propTypes = {
       }),
     ]),
   ),
+  data: PropTypes.object,
   columns: PropTypes.number,
   gap: PropTypes.number,
   layout: PropTypes.oneOf(["grid", "stack"]),
   size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
+  loading: PropTypes.bool,
 };
 
 VariableDisplay.defaultProps = {
@@ -194,7 +243,9 @@ VariableDisplay.defaultProps = {
   format: null,
   size: "md",
   fields: null,
+  data: null,
   columns: 1,
   gap: 4,
   layout: "grid",
+  loading: false,
 };

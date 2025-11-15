@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MyForm from "@/components/MyForm";
+import MyForm from "@/components/ui/MyForm";
 import Button from "@/components/ui/Button";
 import ModifyButton from "@/components/ui/ModifyButton";
 import DeleteButton from "@/components/ui/DeleteButton";
@@ -23,6 +23,7 @@ export default function AccountManager({
   refreshUser = null,
   editable = true,
   changePassword = false,
+  loading = false,
 }) {
   const accountOps = useAccountOperations();
   const { notification, showSuccess, showError, hideNotification } =
@@ -149,6 +150,7 @@ export default function AccountManager({
       variant="primary"
       size="md"
       onClick={handleAddClick}
+      disabled={loading}
     />
   ) : null;
 
@@ -181,6 +183,7 @@ export default function AccountManager({
                 cancelButtonLabel="Annuler"
                 allowNoChanges={true}
                 inline={true}
+                loading={loading}
               />
             </div>
           )}
@@ -196,13 +199,19 @@ export default function AccountManager({
                 submitButtonLabel="Enregistrer"
                 onCancel={() => setEditingId(null)}
                 inline={true}
-                loading={loadingSubmit}
+                loading={loadingSubmit || loading}
               />
             </div>
           )}
 
           {/* Liste des comptes */}
-          {localAccounts && localAccounts.length > 0 ? (
+          {loading ? (
+            <div className="space-y-3 px-4 py-8">
+              <div className="skeleton-light h-4 w-1/3 rounded" />
+              <div className="skeleton-light h-4 w-1/2 rounded" />
+              <div className="skeleton-light h-4 w-2/3 rounded" />
+            </div>
+          ) : localAccounts && localAccounts.length > 0 ? (
             <div className="divide-y divide-gray-200">
               {localAccounts.map((account) => (
                 <div key={account.id} className="py-4">
@@ -269,13 +278,16 @@ export default function AccountManager({
           )}
 
           {/* Affiche le bouton bas uniquement si la liste est vide (évite une bordure vide sous la liste) */}
-          {editable && localAccounts && localAccounts.length === 0 && (
-            <div className="mt-0">
-              <Button variant="link" size="sm" onClick={handleAddClick}>
-                + Ajouter un compte
-              </Button>
-            </div>
-          )}
+          {editable &&
+            !loading &&
+            localAccounts &&
+            localAccounts.length === 0 && (
+              <div className="mt-0">
+                <Button variant="link" size="sm" onClick={handleAddClick}>
+                  + Ajouter un compte
+                </Button>
+              </div>
+            )}
         </div>
 
         {notification.show && (

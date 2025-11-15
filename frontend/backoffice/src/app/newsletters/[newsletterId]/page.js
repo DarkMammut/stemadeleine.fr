@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import Layout from "@/components/Layout";
+import Layout from "@/components/ui/Layout";
 import EditNewsletters from "@/scenes/EditNewsletters";
 
 export default function NewsletterPage() {

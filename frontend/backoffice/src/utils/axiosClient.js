@@ -9,23 +9,27 @@ export function useAxiosClient() {
   const router = useRouter();
   const { logout } = useAuth();
 
-  const client = useMemo(() => {
+  return useMemo(() => {
     const instance = axios.create({
       baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
       withCredentials: true,
     });
 
-    // Log outgoing requests for debug (temporary)
+    // Log outgoing requests when explicit debug flag is set
+    const shouldLogRequests = process.env.NEXT_PUBLIC_AXIOS_DEBUG === "true";
+
     instance.interceptors.request.use((config) => {
-      try {
-        console.log("Axios request ->", {
-          method: config.method,
-          url: config.url,
-          baseURL: config.baseURL,
-          data: config.data,
-        });
-      } catch (e) {
-        // ignore logging errors
+      if (shouldLogRequests) {
+        try {
+          console.debug("Axios request ->", {
+            method: config.method,
+            url: config.url,
+            baseURL: config.baseURL,
+            data: config.data,
+          });
+        } catch (e) {
+          // ignore logging errors
+        }
       }
       return config;
     });
@@ -48,6 +52,4 @@ export function useAxiosClient() {
 
     return instance;
   }, [router, logout]);
-
-  return client;
 }

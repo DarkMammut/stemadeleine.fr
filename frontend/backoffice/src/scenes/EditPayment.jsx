@@ -4,12 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/ui/Title";
-import PaymentDetails from "@/components/PaymentDetails";
-import LinkUser from "@/components/LinkUser";
+import EditablePanel from "@/components/ui/EditablePanel";
+import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import SceneLayout from "@/components/ui/SceneLayout";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
+import LinkUser from "@/components/LinkUser";
 
 export default function EditPayment() {
   const { id } = useParams();
@@ -63,20 +64,6 @@ export default function EditPayment() {
     }
   };
 
-  const handleChange = (nameOrEvent, value) => {
-    if (typeof nameOrEvent === "string") {
-      // Appel direct depuis CurrencyInput ou MyForm
-      setPaymentForm((f) => ({ ...f, [nameOrEvent]: value }));
-    } else if (nameOrEvent && nameOrEvent.target) {
-      // Appel depuis un input classique
-      const { name, value: val, type, checked } = nameOrEvent.target;
-      setPaymentForm((f) => ({
-        ...f,
-        [name]: type === "checkbox" ? checked : val,
-      }));
-    }
-  };
-
   const handleSave = async (formValues) => {
     setSaving(true);
     try {
@@ -110,12 +97,6 @@ export default function EditPayment() {
     }
   };
 
-  const handleUserNavigate = () => {
-    if (payment?.user?.id) {
-      window.location.href = `/users/${payment.user.id}`;
-    }
-  };
-
   const handleLinkUser = async (userId) => {
     setSaving(true);
     try {
@@ -140,10 +121,8 @@ export default function EditPayment() {
     await handleLinkUser(userId);
   };
 
-  // Fallback si rien n'est retourné
-  if (loading) return <div>Chargement...</div>;
-
-  if (!payment) {
+  // Si le paiement n'est pas trouvé et que ce n'est pas (encore) en chargement, afficher l'erreur
+  if (!payment && !loading) {
     return (
       <SceneLayout>
         <Title label="Modifier le paiement" />
@@ -162,18 +141,79 @@ export default function EditPayment() {
     <SceneLayout>
       <Title label="Modifier le paiement" />
 
-      <PaymentDetails
-        payment={payment}
-        onDelete={handleDelete}
-        onUserNavigate={handleUserNavigate}
-        editable={true}
-        initialValues={paymentForm}
-        onSave={handleSave}
-        onChange={handleChange}
-        loading={loading}
-        saving={saving}
-        paymentEnums={paymentEnums}
-      />
+      {/* Editable panel for payment (fields defined below) */}
+      {(() => {
+        const paymentFields = [
+          {
+            name: "amount",
+            label: "Montant",
+            type: "currency",
+            currency: "EUR",
+            required: true,
+            defaultValue: paymentForm.amount,
+          },
+          {
+            name: "type",
+            label: "Type",
+            type: "select",
+            required: true,
+            defaultValue: paymentForm.type,
+            options: (paymentEnums.type || []).map((v) => ({
+              label: v,
+              value: v,
+            })),
+          },
+          {
+            name: "status",
+            label: "Statut",
+            type: "select",
+            required: true,
+            defaultValue: paymentForm.status,
+            flag: true,
+            flagKey: "statusFlag",
+            options: (paymentEnums.status || []).map((v) => ({
+              label: v,
+              value: v,
+            })),
+          },
+          {
+            name: "formSlug",
+            label: "Slug formulaire",
+            type: "text",
+            required: false,
+            defaultValue: paymentForm.formSlug,
+          },
+          {
+            name: "receiptUrl",
+            label: "URL reçu",
+            type: "url",
+            required: false,
+            defaultValue: paymentForm.receiptUrl,
+          },
+          {
+            name: "paymentDate",
+            label: "Date de paiement",
+            type: "date",
+            required: false,
+            defaultValue: paymentForm.paymentDate,
+          },
+        ];
+
+        return (
+          <EditablePanel
+            title={payment ? `Paiement #${payment.id}` : "Paiement"}
+            icon={CurrencyDollarIcon}
+            canEdit={true}
+            initialValues={paymentForm}
+            fields={paymentFields}
+            displayColumns={2}
+            onSubmit={handleSave}
+            onCancelExternal={() => loadPayment()}
+            onDelete={handleDelete}
+            loading={loading}
+          />
+        );
+      })()}
 
       {/* Lier / Détacher un utilisateur - section séparée */}
       <LinkUser
@@ -182,7 +222,7 @@ export default function EditPayment() {
         onCreateAndLink={handleCreateAndLinkUser}
         onLinked={loadPayment}
         currentUser={payment?.user || null}
-        loading={saving}
+        loading={loading || saving}
         operations={{
           // attach expects just userId
           attach: async (userId) => {

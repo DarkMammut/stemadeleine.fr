@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useGetModule from "@/hooks/useGetModule";
@@ -17,6 +17,7 @@ export default function NewsModuleEditor({
   moduleData: _initialModuleData,
   setModuleData: setParentModuleData,
   refetch: _parentRefetch,
+  loading: parentLoading = false,
 }) {
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
@@ -51,7 +52,6 @@ export default function NewsModuleEditor({
   // Synchroniser avec les données du module
   useEffect(() => {
     if (module) {
-      console.log("📦 Données de module chargées:", module);
       setModuleData(module);
     }
   }, [module]);
@@ -59,10 +59,6 @@ export default function NewsModuleEditor({
   // Synchroniser avec les données de l'actualité
   useEffect(() => {
     if (news) {
-      console.log("📝 Données d'actualité chargées:", news);
-      console.log("  - variant:", news.variant);
-      console.log("  - writer:", news.writer);
-      console.log("  - writingDate:", news.writingDate);
       setNewsData(news);
     }
   }, [news]);
@@ -108,21 +104,17 @@ export default function NewsModuleEditor({
 
   // Soumission du formulaire Module
   const handleModuleSubmit = async (values) => {
-    console.log("📝 Soumission du formulaire Module avec values:", values);
     setSavingModule(true);
     try {
       const payload = {
         name: values.name,
         title: values.title,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
 
       const response = await axios.put(
         `/api/modules/${module.moduleId}`,
         payload,
       );
-
-      console.log("📥 Réponse du serveur:", response.data);
 
       // Mettre à jour moduleData
       setModuleData((prev) => ({
@@ -131,9 +123,8 @@ export default function NewsModuleEditor({
       }));
 
       showSuccess("Module mis à jour avec succès");
-      console.log("✅ Module mis à jour");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      console.error("Erreur lors de la sauvegarde du module:", err);
       showError("Erreur lors de la sauvegarde du module");
       throw err;
     } finally {
@@ -143,7 +134,6 @@ export default function NewsModuleEditor({
 
   // Soumission du formulaire News
   const handleNewsSubmit = async (values) => {
-    console.log("📝 Soumission du formulaire News avec values:", values);
     setSavingNews(true);
     try {
       const payload = {
@@ -151,14 +141,8 @@ export default function NewsModuleEditor({
         writer: values.writer || null,
         writingDate: values.writingDate || null,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/news):", payload);
 
       const response = await axios.put(`/api/news/${news.id}`, payload);
-
-      console.log("📥 Réponse du serveur:", response.data);
-      console.log("  - variant dans réponse:", response.data?.variant);
-      console.log("  - writer dans réponse:", response.data?.writer);
-      console.log("  - writingDate dans réponse:", response.data?.writingDate);
 
       // Mettre à jour newsData
       setNewsData((prev) => ({
@@ -167,9 +151,8 @@ export default function NewsModuleEditor({
       }));
 
       showSuccess("Actualité mise à jour avec succès");
-      console.log("✅ Actualité mise à jour");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde de l'actualité:", err);
+      console.error("Erreur lors de la sauvegarde de l'actualité:", err);
       showError("Erreur lors de la sauvegarde de l'actualité");
       throw err;
     } finally {
@@ -199,9 +182,9 @@ export default function NewsModuleEditor({
     }
   };
 
-  if (moduleLoading || newsLoading || variantsLoading) {
-    return <div className="p-4">Chargement...</div>;
-  }
+  const effectiveLoading = Boolean(
+    parentLoading || moduleLoading || newsLoading || variantsLoading,
+  );
 
   return (
     <div className="space-y-6">
@@ -223,34 +206,26 @@ export default function NewsModuleEditor({
       />
 
       {/* Formulaire Module (name, title) */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`module-${moduleId}`}
-          title="Détails du module"
-          fields={moduleFields}
-          initialValues={moduleData}
-          onSubmit={handleModuleSubmit}
-          loading={savingModule}
-          submitButtonLabel="Enregistrer les informations du module"
-          onCancel={handleCancelModuleEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du module"
+        fields={moduleFields}
+        initialValues={moduleData || {}}
+        onSubmit={handleModuleSubmit}
+        onCancelExternal={handleCancelModuleEdit}
+        loading={savingModule || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Formulaire News (variant, writer, writingDate) */}
-      {newsData && Object.keys(newsData).length > 0 && (
-        <MyForm
-          key={`news-${news?.id}`}
-          title="Détails de l'actualité"
-          fields={newsFields}
-          initialValues={newsData}
-          onSubmit={handleNewsSubmit}
-          loading={savingNews}
-          submitButtonLabel="Enregistrer les détails de l'actualité"
-          onCancel={handleCancelNewsEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails de l'actualité"
+        fields={newsFields}
+        initialValues={newsData || {}}
+        onSubmit={handleNewsSubmit}
+        onCancelExternal={handleCancelNewsEdit}
+        loading={savingNews || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Gestion des contenus */}
       <ContentManager

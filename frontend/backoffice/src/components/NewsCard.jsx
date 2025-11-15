@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -9,7 +11,8 @@ import {
 } from "@heroicons/react/24/outline";
 import StatusTag from "@/components/ui/StatusTag";
 
-export default function NewsCard({ news, onClick }) {
+export default function NewsCard({ news, onClick, loading = false }) {
+  if (loading) return <CardSkeleton showActions={true} />;
   const formatDate = (date) => {
     if (!date) return "Non renseignée";
     return new Date(date).toLocaleDateString("fr-FR", {
@@ -65,3 +68,9 @@ export default function NewsCard({ news, onClick }) {
     </Card>
   );
 }
+
+NewsCard.propTypes = {
+  news: PropTypes.object,
+  onClick: PropTypes.func,
+  loading: PropTypes.bool,
+};

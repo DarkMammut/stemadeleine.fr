@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Button from "./ui/Button";
 import { useRouter } from "next/navigation";
-import EditablePanel from "@/components/ui/EditablePanel";
+import Panel from "@/components/ui/Panel";
 import AddUserModal from "@/components/AddUserModal";
 
 export default function LinkUser({
@@ -37,13 +37,16 @@ export default function LinkUser({
   const router = useRouter();
 
   const [userOptions, setUserOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
   const [selected, setSelected] = useState(currentUser ? currentUser.id : "");
   const [saving, setSaving] = useState(false);
   const [showConfirmLink, setShowConfirmLink] = useState(false);
   const [showConfirmUnlink, setShowConfirmUnlink] = useState(false);
   const [editing, setEditing] = useState(!currentUser);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // combined loading state to control UI disabled state and skeleton display
+  const combinedLoading = Boolean(parentLoading || localLoading || saving);
 
   useEffect(() => {
     setSelected(currentUser ? currentUser.id : "");
@@ -55,7 +58,7 @@ export default function LinkUser({
     let mounted = true;
     (async () => {
       try {
-        setLoading(true);
+        setLocalLoading(true);
         const res = await getAllUsers(false, 0, 200);
         const list = res && res.content ? res.content : res;
         const mapped = (list || []).map((u) => ({
@@ -69,7 +72,7 @@ export default function LinkUser({
       } catch (err) {
         console.error("Erreur chargement utilisateurs", err);
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) setLocalLoading(false);
       }
     })();
     return () => {
@@ -196,7 +199,7 @@ export default function LinkUser({
           label="Modifier"
           size="md"
           onClick={() => setEditing(true)}
-          disabled={saving || parentLoading}
+          disabled={combinedLoading}
         />
       )}
       {!editing && currentUser ? (
@@ -207,7 +210,7 @@ export default function LinkUser({
           size="md"
           hoverExpand={true}
           onClick={() => setShowConfirmUnlink(true)}
-          disabled={saving || parentLoading}
+          disabled={combinedLoading}
         />
       ) : null}
     </>
@@ -217,18 +220,25 @@ export default function LinkUser({
   const panelContent =
     !editing && currentUser ? (
       <div className="flex items-center gap-3">
-        <Button
-          onClick={() =>
-            currentUser.id && router.push(`/users/${currentUser.id}`)
-          }
-          variant="link"
-          disabled={!currentUser.id}
-        >
-          {(currentUser.firstname || "") +
-            (currentUser.lastname ? " " + currentUser.lastname : "") ||
-            currentUser.email ||
-            "Utilisateur"}
-        </Button>
+        {combinedLoading ? (
+          <div className="w-48">
+            <div className="skeleton-light h-5 rounded" />
+          </div>
+        ) : (
+          <Button
+            onClick={() =>
+              currentUser.id && router.push(`/users/${currentUser.id}`)
+            }
+            variant="link"
+            disabled={!currentUser.id}
+          >
+            {(currentUser.firstname || "") +
+              (currentUser.lastname ? " " + currentUser.lastname : "") ||
+              currentUser.email ||
+              "Utilisateur"}
+          </Button>
+        )}
+
         <div className="ml-auto flex items-center gap-2" />
 
         <DeleteModal
@@ -256,13 +266,13 @@ export default function LinkUser({
               labelKey="label"
               valueKey="value"
               placeholder="-- Aucun --"
-              disabled={saving || parentLoading}
+              disabled={combinedLoading}
             />
           </div>
           <IconButton
             label="Ajouter un nouvel utilisateur"
             onClick={() => setShowCreateModal(true)}
-            disabled={saving || parentLoading}
+            disabled={combinedLoading}
             size="md"
             variant="link"
             icon={PlusIcon}
@@ -281,7 +291,7 @@ export default function LinkUser({
             variant="primary"
           />
 
-          {loading && (
+          {combinedLoading && (
             <div className="text-sm text-gray-500">
               Chargement utilisateurs...
             </div>
@@ -295,7 +305,7 @@ export default function LinkUser({
               setEditing(false);
               setSelected(currentUser ? currentUser.id : "");
             }}
-            disabled={saving || parentLoading}
+            disabled={combinedLoading}
             size="md"
             variant="outline"
           >
@@ -305,7 +315,7 @@ export default function LinkUser({
             variant="primary"
             size="sm"
             onClick={() => setShowConfirmLink(true)}
-            disabled={saving || parentLoading || !selected}
+            disabled={combinedLoading || !selected}
           >
             Enregistrer
           </Button>
@@ -314,13 +324,7 @@ export default function LinkUser({
     );
 
   return (
-    <EditablePanel
-      title={title}
-      icon={LinkIcon}
-      actions={headerActions}
-      initialValues={{}}
-      canEdit={false}
-    >
+    <Panel title={title} icon={LinkIcon} actions={headerActions}>
       {panelContent}
 
       {/* Create user modal (shared) */}
@@ -353,7 +357,7 @@ export default function LinkUser({
           }
         }}
       />
-    </EditablePanel>
+    </Panel>
   );
 }
 

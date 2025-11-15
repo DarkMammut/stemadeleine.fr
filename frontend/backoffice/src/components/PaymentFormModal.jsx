@@ -2,7 +2,7 @@
 
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { CreditCardIcon } from '@heroicons/react/24/outline';
-import MyForm from '@/components/MyForm';
+import MyForm from '@/components/ui/MyForm';
 import { useEffect, useState } from 'react';
 import { useAxiosClient } from '@/utils/axiosClient';
 

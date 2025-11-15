@@ -16,7 +16,11 @@ import PropTypes from 'prop-types';
 /**
  * MediaPickerWrapper - Zone de drag & drop ou recherche de média
  */
-const MediaPickerWrapper = ({ onUploadComplete, onBrowseClick }) => {
+const MediaPickerWrapper = ({
+  onUploadComplete,
+  onBrowseClick,
+  disabled = false,
+}) => {
   const axios = useAxiosClient();
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -146,8 +150,8 @@ const MediaPickerWrapper = ({ onUploadComplete, onBrowseClick }) => {
         <Button
           variant="secondary"
           size="sm"
-          onClick={onBrowseClick}
-          disabled={uploading}
+          onClick={!disabled && !uploading ? onBrowseClick : undefined}
+          disabled={disabled || uploading}
           className="flex items-center gap-2"
         >
           <MagnifyingGlassIcon className="w-4 h-4" />
@@ -165,7 +169,9 @@ const MediaManager = ({
   onMediaChanged,
   maxMedias = null, // Limite optionnelle du nombre de médias
   title = "Galerie de médias", // Titre personnalisable
+  loading = false,
 }) => {
+  const effectiveLoading = loading;
   const [showMediaSelector, setShowMediaSelector] = useState(false);
   const [showMediaModifier, setShowMediaModifier] = useState(false);
   const [selectedMediaId, setSelectedMediaId] = useState(null);
@@ -240,33 +246,36 @@ const MediaManager = ({
   return (
     <Panel
       title={`${title} (${content.medias?.length || 0}${maxMedias ? ` / ${maxMedias}` : ""})`}
+      loading={effectiveLoading}
     >
       <div className="space-y-4">
         {/* Avertissement si pas de content.id */}
-        {!content.id && (
+        {!content.id && !effectiveLoading && (
           <div className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg p-4">
             Vous devez d'abord sauvegarder le contenu avant d'ajouter un média.
           </div>
         )}
 
-        {/* MediaGrid pour afficher les médias existants */}
-        {content.medias && content.medias.length > 0 && (
+        {/* MediaGrid pour afficher les médias existants (ou placeholders en loading) */}
+        {content.medias && (
           <MediaGrid
             medias={content.medias || []}
             onRemove={handleRemoveMedia}
             onEdit={handleEditMedia}
+            loading={effectiveLoading}
           />
         )}
 
-        {/* MediaPicker pour ajouter de nouveaux médias */}
+        {/* MediaPicker pour ajouter de nouveaux médias (désactivé en loading) */}
         {content.id && canAddMedia && (
           <MediaPickerWrapper
             onUploadComplete={handleMediaUploaded}
             onBrowseClick={() => setShowMediaSelector(true)}
+            disabled={effectiveLoading}
           />
         )}
 
-        {!canAddMedia && maxMedias && (
+        {!canAddMedia && maxMedias && !effectiveLoading && (
           <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-4">
             Limite de {maxMedias} média{maxMedias > 1 ? "s" : ""} atteinte.
             Supprimez un média existant pour en ajouter un nouveau.
@@ -275,7 +284,7 @@ const MediaManager = ({
       </div>
 
       {/* Modal de sélection de média */}
-      {showMediaSelector && (
+      {showMediaSelector && !effectiveLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-5xl w-full max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between mb-4">
@@ -300,7 +309,7 @@ const MediaManager = ({
       )}
 
       {/* Modal de modification de média */}
-      {showMediaModifier && selectedMediaId && (
+      {showMediaModifier && selectedMediaId && !effectiveLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between mb-4">
@@ -356,6 +365,7 @@ MediaManager.propTypes = {
   onMediaChanged: PropTypes.func,
   maxMedias: PropTypes.number,
   title: PropTypes.string,
+  loading: PropTypes.bool,
 };
 
 MediaManager.defaultProps = {
@@ -364,6 +374,7 @@ MediaManager.defaultProps = {
   onMediaChanged: null,
   maxMedias: null,
   title: "Galerie de médias",
+  loading: false,
 };
 
 export default MediaManager;

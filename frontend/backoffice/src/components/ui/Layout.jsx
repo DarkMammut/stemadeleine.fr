@@ -1,4 +1,4 @@
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/ui/Sidebar";
 import SearchBar from "./SearchBar";
 
 export default function Layout({ children, current, setCurrent }) {

@@ -80,7 +80,7 @@ export default function NavigationStepper() {
       <nav className="flex mb-4" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
           <li className="flex items-center">
-            <div className="h-4 w-20 bg-gray-200 animate-pulse rounded"></div>
+            <div className="h-4 w-20 skeleton rounded"></div>
           </li>
         </ol>
       </nav>

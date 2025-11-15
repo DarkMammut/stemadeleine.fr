@@ -4,12 +4,10 @@ import React, { useEffect, useState } from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
-import MyForm from "@/components/MyForm";
-import OrganizationDetails from "@/components/OrganizationDetails";
+import EditablePanel from "@/components/ui/EditablePanel";
 import AddressManager from "@/components/AddressManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import EditablePanel from "@/components/ui/EditablePanel";
 import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
 
 export default function Organization() {
@@ -17,7 +15,6 @@ export default function Organization() {
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
   const [organization, setOrganization] = useState(null);
-  const [organizationForm, setOrganizationForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -33,14 +30,6 @@ export default function Organization() {
     try {
       const res = await axios.get(`/api/organizations`);
       setOrganization(res.data);
-      setOrganizationForm({
-        name: res.data.name || "",
-        legalForm: res.data.legalInfo?.legalForm || "",
-        siret: res.data.legalInfo?.siret || "",
-        siren: res.data.legalInfo?.siren || "",
-        vatNumber: res.data.legalInfo?.vatNumber || "",
-        apeCode: res.data.legalInfo?.apeCode || "",
-      });
     } catch (e) {
       showError("Erreur de chargement", "Impossible de charger l'organisation");
     } finally {
@@ -48,12 +37,25 @@ export default function Organization() {
     }
   };
 
+  // Helper to compute flat initialValues for forms from the organization object
+  const computeInitialValues = (org) => {
+    if (!org) return {};
+    return {
+      name: org.name || "",
+      legalForm: org.legalInfo?.legalForm || "",
+      siret: org.legalInfo?.siret || "",
+      siren: org.legalInfo?.siren || "",
+      vatNumber: org.legalInfo?.vatNumber || "",
+      apeCode: org.legalInfo?.apeCode || "",
+    };
+  };
+
   const organizationFields = [
     {
       name: "name",
       label: "Nom de l'organisation",
       type: "text",
-      required: false,
+      required: true,
     },
     {
       name: "legalForm",
@@ -87,21 +89,6 @@ export default function Organization() {
     },
   ];
 
-  const handleChange = (nameOrEvent, value) => {
-    if (nameOrEvent && nameOrEvent.target) {
-      const { name, value: val, type, checked } = nameOrEvent.target;
-      setOrganizationForm((f) => ({
-        ...f,
-        [name]: type === "checkbox" ? checked : val,
-      }));
-    } else if (typeof nameOrEvent === "string") {
-      setOrganizationForm((f) => ({
-        ...f,
-        [nameOrEvent]: value,
-      }));
-    }
-  };
-
   const handleSave = async (formValues) => {
     setSaving(true);
     try {
@@ -124,7 +111,7 @@ export default function Organization() {
     }
   };
 
-  if (loading) return <div>Chargement...</div>;
+  // Ne pas rendre tôt pendant le chargement : laisser EditablePanel afficher les skeletons via la prop `loading`.
 
   return (
     <SceneLayout>
@@ -136,40 +123,20 @@ export default function Organization() {
           title="Informations de l'organisation"
           icon={BuildingOffice2Icon}
           canEdit={true}
-          initialValues={{ ...organizationForm }}
-          fields={organizationFields.map((f) => ({
-            ...f,
-            defaultValue: organizationForm[f.name],
-          }))}
+          initialValues={computeInitialValues(organization)}
+          fields={organizationFields}
           displayColumns={2}
+          loading={loading || saving}
           onSubmit={handleSave}
-          renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
-            <MyForm
-              title="Informations de l'organisation"
-              fields={organizationFields.map((f) => ({
-                ...f,
-                defaultValue: initialValues[f.name],
-              }))}
-              initialValues={initialValues}
-              onSubmit={onSubmit}
-              onChange={handleChange}
-              loading={loading || saving}
-              submitButtonLabel="Enregistrer les modifications"
-              onCancel={onCancel}
-              cancelButtonLabel="Annuler"
-              successMessage="L'organisation a été mise à jour avec succès"
-              errorMessage="Impossible d'enregistrer l'organisation"
-            />
-          )}
-        >
-          <OrganizationDetails organization={organization} />
-        </EditablePanel>
+        />
 
         {/* Adresse du siège social */}
         <AddressManager
           label="Adresse du siège social"
-          addresses={organization.address ? [organization.address] : []}
-          ownerId={organization.id}
+          addresses={
+            organization && organization.address ? [organization.address] : []
+          }
+          ownerId={organization ? organization.id : null}
           ownerType="ORGANIZATION"
           refreshAddresses={loadOrganization}
           editable={true}

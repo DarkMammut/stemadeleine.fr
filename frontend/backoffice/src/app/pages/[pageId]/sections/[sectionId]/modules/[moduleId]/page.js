@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
-import Layout from "@/components/Layout";
+import Layout from "@/components/ui/Layout";
 import EditModule from "@/scenes/EditModule";
 
 export default function EditModulePage() {

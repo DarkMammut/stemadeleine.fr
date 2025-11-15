@@ -2,21 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import SectionsTabs from "@/components/SectionsTabs";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
 import useGetSection from "@/hooks/useGetSection";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import EditablePanel from "@/components/ui/EditablePanel";
-import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
+import SceneLayout from "@/components/ui/SceneLayout";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
-import SceneLayout from "@/components/ui/SceneLayout";
 
 export default function EditSection({ sectionId, pageId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
@@ -84,11 +83,6 @@ export default function EditSection({ sectionId, pageId }) {
     }
   };
 
-  const handleFormChange = (name, value, allValues) => {
-    // Synchroniser les changements du formulaire avec sectionData
-    setSectionData((prev) => ({ ...prev, ...allValues }));
-  };
-
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
@@ -144,13 +138,10 @@ export default function EditSection({ sectionId, pageId }) {
     }
   };
 
-  if (loading) return <div className="text-center py-8">Chargement...</div>;
-  if (error)
-    return (
-      <div className="text-center py-8 text-red-600">
-        Erreur: {error.message}
-      </div>
-    );
+  // Suppression gérée par les scènes parent (Sections/Modules) via DraggableTree.
+
+  // On ne retourne plus tôt : on laisse `Title` et `Utilities` gérer le disabled via `loading`.
+  // Les erreurs restent affichées dans la zone de contenu.
 
   // Construire les breadcrumbs
   const breadcrumbs = section
@@ -167,76 +158,49 @@ export default function EditSection({ sectionId, pageId }) {
         onPublish={handlePublishSection}
         showBreadcrumbs={!!section}
         breadcrumbs={breadcrumbs}
+        loading={loading}
       />
 
       <SectionsTabs pageId={pageId} sectionId={sectionId} />
 
-      <Utilities actions={[]} />
+      <Utilities actions={[]} loading={loading} />
 
-      {!sectionData ? (
-        <div className="text-center py-8 text-text-muted">
-          Chargement des données...
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Section Visibilité séparée */}
-          <VisibilitySwitch
-            title="Visibilité de la section"
-            label="Section visible sur le site"
-            isVisible={sectionData?.isVisible || false}
-            onChange={handleVisibilityChange}
-            savingVisibility={savingVisibility}
-          />
+      <div className="space-y-6">
+        {/* Section Visibilité séparée */}
+        <VisibilitySwitch
+          title="Visibilité de la section"
+          label="Section visible sur le site"
+          isVisible={sectionData?.isVisible || false}
+          onChange={handleVisibilityChange}
+          savingVisibility={savingVisibility}
+          loading={!sectionData}
+        />
 
-          {/* Formulaire principal - Ne s'affiche que quand sectionData est complètement chargé */}
-          {sectionData && Object.keys(sectionData).length > 0 && (
-            <EditablePanel
-              key={`${sectionData.sectionId || "section-form"}-${formKey}`} // Clé combinée pour forcer le remontage
-              title="Détails de la section"
-              fields={fields}
-              initialValues={sectionData}
-              onSubmit={handleSubmit}
-              loading={saving}
-              onCancelExternal={handleCancelEdit}
-              renderForm={({
-                initialValues,
-                onCancel,
-                onSubmit,
-                onChange,
-                loading,
-              }) => (
-                <MyForm
-                  title="Détails de la section"
-                  fields={fields}
-                  initialValues={initialValues}
-                  onSubmit={onSubmit}
-                  onChange={onChange}
-                  loading={loading}
-                  submitButtonLabel="Enregistrer"
-                  onCancel={onCancel}
-                  cancelButtonLabel="Annuler"
-                  successMessage="La section a été mise à jour avec succès"
-                  errorMessage="Impossible d'enregistrer la section"
-                />
-              )}
-            />
-          )}
+        <EditablePanel
+          key={`${(sectionData && sectionData.sectionId) || "section-form"}-${formKey}`}
+          title="Détails de la section"
+          fields={fields}
+          initialValues={sectionData || {}}
+          onSubmit={handleSubmit}
+          loading={saving || !sectionData}
+          onCancelExternal={handleCancelEdit}
+          displayColumns={2}
+        />
 
-          {/* Rich Text Content Editor */}
-          <ContentManager
-            parentId={section?.sectionId}
-            parentType="section"
-            customLabels={{
-              header: "Contenus de la section",
-              addButton: "Ajouter un contenu",
-              empty: "Aucun contenu pour cette section.",
-              loading: "Chargement des contenus...",
-              saveContent: "Enregistrer le contenu",
-              bodyLabel: "Contenu de la section",
-            }}
-          />
-        </div>
-      )}
+        {/* Rich Text Content Editor */}
+        <ContentManager
+          parentId={section?.sectionId}
+          parentType="section"
+          customLabels={{
+            header: "Contenus de la section",
+            addButton: "Ajouter un contenu",
+            empty: "Aucun contenu pour cette section.",
+            loading: "Chargement des contenus...",
+            saveContent: "Enregistrer le contenu",
+            bodyLabel: "Contenu de la section",
+          }}
+        />
+      </div>
 
       {/* Gestion de l'image de la section (Section Media) */}
       {sectionData && (
@@ -251,6 +215,13 @@ export default function EditSection({ sectionId, pageId }) {
           onMediaChanged={refetch}
           maxMedias={1}
         />
+      )}
+
+      {/* Affichage d'erreur global si besoin */}
+      {error && (
+        <div className="text-center py-4 text-red-600">
+          Erreur: {error.message}
+        </div>
       )}
 
       {/* Notification */}

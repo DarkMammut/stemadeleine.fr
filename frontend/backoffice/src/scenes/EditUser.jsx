@@ -37,7 +37,16 @@ export default function EditUser() {
     }
   };
 
-  if (loading) return <div>Chargement...</div>;
+  const effectiveLoading = loading;
+  if (effectiveLoading && !user)
+    return (
+      <SceneLayout>
+        <Title label="Modifier l'utilisateur" />
+        <div className="space-y-6">
+          <UserDetails loading={true} editable={false} />
+        </div>
+      </SceneLayout>
+    );
 
   return (
     <SceneLayout>
@@ -51,6 +60,7 @@ export default function EditUser() {
         showMemberships={true}
         refreshUser={fetchUser}
         editable={true}
+        loading={effectiveLoading}
       />
     </SceneLayout>
   );

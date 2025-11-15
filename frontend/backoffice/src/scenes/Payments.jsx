@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Title from "@/components/ui/Title";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
-import CardList from "@/components/CardList";
+import CardList from "@/components/ui/CardList";
 import PaymentCard from "@/components/PaymentCard";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
@@ -79,10 +80,7 @@ export default function Payments() {
     router.push(`/payments/${payment.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center py-8">Chargement des paiements...</div>;
-  }
-
+  // Afficher header + actions et skeleton pour éviter les flashs
   return (
     <SceneLayout>
       <Title label="Paiements" />
@@ -103,15 +101,21 @@ export default function Payments() {
         ]}
       />
 
-      <CardList emptyMessage="Aucun paiement trouvé.">
-        {payments.map((payment) => (
-          <PaymentCard
-            key={payment.id}
-            payment={payment}
-            onClick={() => handlePaymentClick(payment)}
-          />
-        ))}
-      </CardList>
+      {loading ? (
+        <div className="mt-4">
+          <LoadingSkeleton variant="card" count={6} showActions={true} />
+        </div>
+      ) : (
+        <CardList emptyMessage="Aucun paiement trouvé.">
+          {payments.map((payment) => (
+            <PaymentCard
+              key={payment.id}
+              payment={payment}
+              onClick={() => handlePaymentClick(payment)}
+            />
+          ))}
+        </CardList>
+      )}
 
       <PaymentFormModal
         open={isModalOpen}

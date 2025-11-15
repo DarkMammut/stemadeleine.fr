@@ -4,12 +4,9 @@ import Title from "@/components/ui/Title";
 import SceneLayout from "@/components/ui/SceneLayout";
 import LinkUser from "@/components/LinkUser";
 import { useAccountOperations } from "@/hooks/useAccountOperations";
-import Panel from "@/components/ui/Panel";
 import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/components/ui/Notification";
-import DeleteButton from "@/components/ui/DeleteButton";
 import EditablePanel from "@/components/ui/EditablePanel";
-import MyForm from "@/components/MyForm";
 import { UserIcon } from "@heroicons/react/24/outline";
 import ActiveSwitch from "@/components/ActiveSwitch";
 
@@ -82,9 +79,41 @@ export default function EditAccount() {
     }
   };
 
+  // noop cancel handler used by EditablePanel when edit is cancelled externally
+  const handleCancelEdit = () => {
+    hideNotification();
+  };
+
+  // handler to update account (used by EditablePanel)
+  const handleUpdateAccount = async (vals) => {
+    // map fields to payload
+    const payload = {
+      username: vals.username,
+      provider: vals.provider,
+      roles: vals.roles ? vals.roles.split(/\s*,\s*/) : [],
+    };
+    setSaving(true);
+    try {
+      await accountOps.updateAccount(id, payload);
+      await fetchAccount();
+      showSuccess(
+        "Compte mis à jour",
+        "Les modifications ont été enregistrées",
+      );
+      // redirect to list with selected
+      router.push(`/settings/accounts?selected=${id}`);
+    } catch (e) {
+      showError("Erreur lors de la mise à jour du compte", e?.message || "");
+      throw e;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // debug render
   console.debug("EditAccount render, account:", account);
-  if (loading) return <div>Chargement...</div>;
+  // NOTE: Ne pas retourner tôt lors du chargement — on laisse les composants (Panel, EditablePanel, LinkUser)
+  // afficher leurs skeletons via la prop `loading` pour une expérience utilisateur plus fluide.
 
   return (
     <SceneLayout>
@@ -93,9 +122,13 @@ export default function EditAccount() {
       <div className="space-y-6">
         <ActiveSwitch
           isActive={account ? !!account.isActive : false}
-          onChange={async () => {
+          onChange={async (next) => {
             try {
-              const updated = await accountOps.setActive(id, !account.isActive);
+              setSaving(true);
+              const updated = await accountOps.setActive(
+                id,
+                typeof next === "boolean" ? next : !account.isActive,
+              );
               const normalized = {
                 ...updated,
                 user: updated.user
@@ -121,9 +154,12 @@ export default function EditAccount() {
               setAccount(normalized);
             } catch (e) {
               showError("Erreur lors du changement d'état", e?.message || "");
+            } finally {
+              setSaving(false);
             }
           }}
-          saving={false}
+          saving={saving}
+          loading={loading}
           accountId={id}
           accountOwnerId={
             account ? (account.user ? account.user.id : account.userId) : null
@@ -135,133 +171,33 @@ export default function EditAccount() {
           title={getDisplayName(account) || "Compte"}
           icon={UserIcon}
           canEdit={true}
-          initialValues={{
-            // use account directly so initial values reflect fetched data
-            username: account ? getDisplayName(account) || "" : "",
-            provider: account ? account.provider || "" : "",
-            roles: account
-              ? (account.roles && account.roles.join(", ")) || ""
-              : "",
-          }}
+          initialValues={account || {}}
           fields={[
-            { name: "provider", label: "Provider", type: "text" },
-            { name: "username", label: "Username", type: "text" },
-            { name: "roles", label: "Roles (csv)", type: "text" },
+            {
+              name: "provider",
+              label: "Provider",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "username",
+              label: "Username",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "roles",
+              label: "Roles (csv)",
+              type: "text",
+              required: true,
+            },
           ]}
           displayColumns={2}
-          onSubmit={async (vals) => {
-            // map fields to payload
-            const payload = {
-              username: vals.username,
-              provider: vals.provider,
-              roles: vals.roles ? vals.roles.split(/\s*,\s*/) : [],
-            };
-            setSaving(true);
-            try {
-              await accountOps.updateAccount(id, payload);
-              await fetchAccount();
-              showSuccess(
-                "Compte mis à jour",
-                "Les modifications ont été enregistrées",
-              );
-              // redirect to list with selected
-              router.push(`/settings/accounts?selected=${id}`);
-            } catch (e) {
-              showError(
-                "Erreur lors de la mise à jour du compte",
-                e?.message || "",
-              );
-              throw e;
-            } finally {
-              setSaving(false);
-            }
-          }}
-          renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
-            <MyForm
-              fields={[
-                {
-                  name: "provider",
-                  label: "Provider",
-                  type: "text",
-                  defaultValue: initialValues.provider || "",
-                },
-                {
-                  name: "username",
-                  label: "Username",
-                  type: "text",
-                  defaultValue: initialValues.username || "",
-                },
-                {
-                  name: "roles",
-                  label: "Roles (csv)",
-                  type: "text",
-                  defaultValue: initialValues.roles || "",
-                },
-              ]}
-              initialValues={initialValues}
-              onSubmit={onSubmit}
-              loading={loading || saving}
-              submitButtonLabel="Enregistrer"
-              onCancel={onCancel}
-              cancelButtonLabel="Annuler"
-            />
-          )}
-        >
-          <Panel
-            icon={UserIcon}
-            title={getDisplayName(account) || "Compte"}
-            actions={
-              <>
-                <DeleteButton
-                  onDelete={handleDelete}
-                  deleteLabel="Supprimer"
-                  confirmTitle="Supprimer le compte"
-                  confirmMessage="Voulez-vous vraiment supprimer ce compte ? Cette action est irréversible."
-                  confirmLabel="Supprimer"
-                  size="sm"
-                />
-              </>
-            }
-          >
-            <div className="space-y-4">
-              <div className="grid grid-cols-[140px_1fr] gap-4">
-                <span className="text-sm font-semibold text-gray-500">
-                  Provider
-                </span>
-                <span className="text-sm text-gray-900">
-                  {account.provider || "-"}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-[140px_1fr] gap-4">
-                <span className="text-sm font-semibold text-gray-500">
-                  Username
-                </span>
-                <span className="text-sm text-gray-900">
-                  {getDisplayName(account) || "-"}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-[140px_1fr] gap-4">
-                <span className="text-sm font-semibold text-gray-500">
-                  Roles
-                </span>
-                <span className="text-sm text-gray-900">
-                  {(account.roles && account.roles.join(", ")) || "-"}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-[140px_1fr] gap-4">
-                <span className="text-sm font-semibold text-gray-500">
-                  Activé
-                </span>
-                <span className="text-sm text-gray-900">
-                  {account.isActive ? "Oui" : "Non"}
-                </span>
-              </div>
-            </div>
-          </Panel>
-        </EditablePanel>
+          loading={loading || saving}
+          onSubmit={handleUpdateAccount}
+          onCancelExternal={handleCancelEdit}
+          onDelete={handleDelete}
+        />
 
         {/* LinkUser moved below the EditablePanel as requested */}
         <div className="mt-4">
@@ -269,6 +205,7 @@ export default function EditAccount() {
             accountId={id}
             currentUser={account ? account.user : null}
             onLinked={fetchAccount}
+            loading={loading || saving}
             operations={{
               attach: async (userId) => {
                 const updated = await attachUser(id, userId);

@@ -22,12 +22,10 @@ export default function useGetSection({ sectionId }) {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching section with ID:", sectionId);
 
       // Stratégie 1: Essayer l'endpoint direct
       try {
         const response = await axios.get(`/api/sections/${sectionId}`);
-        console.log("Section response (direct):", response);
         setSection(response.data);
         return;
       } catch (directError) {
@@ -38,15 +36,12 @@ export default function useGetSection({ sectionId }) {
 
         // Stratégie 2: Fallback - récupérer via la page si on a le pageId
         if (pageId) {
-          console.log("Trying fallback via page:", pageId);
           const pageResponse = await axios.get(`/api/pages/${pageId}/sections`);
-          console.log("Page sections response:", pageResponse);
 
           const foundSection = pageResponse.data.sections?.find(
             (s) => s.sectionId === sectionId,
           );
           if (foundSection) {
-            console.log("Found section via fallback:", foundSection);
             setSection(foundSection);
             return;
           } else {
@@ -58,14 +53,10 @@ export default function useGetSection({ sectionId }) {
         }
       }
     } catch (err) {
-      console.error("Erreur lors de la récupération de la section :", err);
-      console.error("Error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        config: err.config,
-      });
-
+      console.error(
+        "Erreur lors de la récupération de la section :",
+        err?.response?.status,
+      );
       // Améliorer la gestion d'erreur
       const errorMessage =
         err.response?.data?.message ||

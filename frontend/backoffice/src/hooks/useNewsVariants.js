@@ -14,9 +14,7 @@ export default function useNewsVariants() {
     const fetchVariants = async () => {
       try {
         setLoading(true);
-        console.log("🔍 Récupération des variantes de news depuis le backend");
         const response = await axiosClient.get("/api/news/variants");
-        console.log("📥 Variantes récupérées:", response.data);
 
         // Transformer en format compatible avec MyForm (options de select)
         const formattedVariants = response.data.map((variant) => ({
@@ -26,7 +24,10 @@ export default function useNewsVariants() {
 
         setVariants(formattedVariants);
       } catch (err) {
-        console.error("❌ Erreur lors de la récupération des variantes:", err);
+        console.error(
+          "Erreur lors de la récupération des variantes:",
+          err?.response?.status,
+        );
         setError(err);
         // Fallback vers des variantes par défaut en cas d'erreur
         setVariants([

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import CurrencyInput from "@/components/CurrencyInput";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 import Button from "@/components/ui/Button";
 import Panel from "@/components/ui/Panel";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import FormPanelContext from "@/components/ui/FormPanelContext";
+import Select from "@/components/ui/Select";
 
 export default function MyForm({
   title = null,
@@ -103,53 +104,11 @@ export default function MyForm({
     return "";
   };
 
-  // Convert a local datetime-local string (YYYY-MM-DDTHH:MM) to an ISO string (UTC)
-  const toISOStringFromLocal = (local) => {
-    if (!local) return null;
-    // Expect formats like 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM' or with seconds
-    const [datePart, timePart] = String(local).split("T");
-    const [y, m, d] = (datePart || "").split("-").map((v) => parseInt(v, 10));
-    if (!y || !m || !d) return null;
-    let hh = 0;
-    let mm = 0;
-    let ss = 0;
-    if (timePart) {
-      const t = timePart.split(":");
-      hh = parseInt(t[0] || 0, 10);
-      mm = parseInt(t[1] || 0, 10);
-      ss = parseInt((t[2] || "0").split(".")[0] || 0, 10);
-    }
-    // Construct a Date in local timezone using components
-    const dt = new Date(y, m - 1, d, hh, mm, ss);
-    if (isNaN(dt)) return null;
-    // Compute timezone offset at that date (in minutes)
-    const tzOffsetMin = -dt.getTimezoneOffset(); // minutes east of UTC
-    const sign = tzOffsetMin >= 0 ? "+" : "-";
-    const absOff = Math.abs(tzOffsetMin);
-    const offH = String(Math.floor(absOff / 60)).padStart(2, "0");
-    const offM = String(absOff % 60).padStart(2, "0");
-    const offsetStr = `${sign}${offH}:${offM}`;
-    // Build local ISO with offset (YYYY-MM-DDTHH:MM:SS+HH:MM)
-    const YYYY = String(dt.getFullYear()).padStart(4, "0");
-    const MM = String(dt.getMonth() + 1).padStart(2, "0");
-    const DD = String(dt.getDate()).padStart(2, "0");
-    const HH = String(dt.getHours()).padStart(2, "0");
-    const MIN = String(dt.getMinutes()).padStart(2, "0");
-    const SEC = String(dt.getSeconds()).padStart(2, "0");
-    return `${YYYY}-${MM}-${DD}T${HH}:${MIN}:${SEC}${offsetStr}`;
-  };
-
   // Synchroniser formValues avec initialValues quand ils changent (ex: après sauvegarde)
   useEffect(() => {
-    console.log(
-      "🔄 MyForm - initialValues changé, mise à jour:",
-      initialValues,
-    );
+    // InitialValues changed: update internal state
     // If the user just interacted, ignore this external update to avoid flicker
     if (ignoreInitialUpdatesRef.current) {
-      console.log(
-        "MyForm - skipping initialValues sync due to recent user interaction",
-      );
       return;
     }
     // Normalize date fields so that <input type="date"> receives YYYY-MM-DD
@@ -219,11 +178,6 @@ export default function MyForm({
       // Les deux vides => pas de changement
       if (a === "" && b === "") continue;
       if (a !== b) {
-        // debug
-        console.log(`MyForm hasChanges -> changed field: ${field.name}`, {
-          before: a,
-          after: b,
-        });
         return true;
       }
     }
@@ -247,11 +201,9 @@ export default function MyForm({
 
     // Gestion spécifique pour les champs de type "date"
     if (type === "date") {
-      console.log("MyForm date change event", { name, value });
       updatedValue = normalizeDateForInput(e.target.value);
     }
     if (type === "datetime-local") {
-      console.log("MyForm datetime-local change event", { name, value });
       // keep the value as provided by input (YYYY-MM-DDTHH:MM)
       updatedValue = formatForDatetimeLocal(e.target.value);
     }
@@ -363,11 +315,6 @@ export default function MyForm({
       return;
     }
     // debug: log new internal state after change
-    console.log("MyForm updatedValues after change", { name, nextValues });
-    // debug: also log formValues after state set (async) using a short timeout
-    setTimeout(() => {
-      console.log("MyForm formValues (post setState)", nextValues);
-    }, 0);
     // Debounce the call to parent onChange to avoid parent overwriting local typing on every keystroke
     if (typeof onChangeExternal === "function") {
       if (changeDebounceRef.current) clearTimeout(changeDebounceRef.current);
@@ -404,85 +351,6 @@ export default function MyForm({
     }
   };
 
-  // debug: log formValues whenever they change to trace source of truth
-  useEffect(() => {
-    console.log("MyForm state formValues changed:", formValues);
-  }, [formValues]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    fields.forEach((field) => {
-      if (field.required && field.type !== "readonly") {
-        const value = formValues[field.name];
-        if (value === "" || value === null || value === undefined) {
-          newErrors[field.name] = "Ce champ est requis";
-        }
-      }
-    });
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      showError(
-        "Formulaire incomplet",
-        "Veuillez remplir tous les champs requis",
-      );
-      return;
-    }
-    setErrors({});
-
-    try {
-      // Prepare payload: convert date/datetime-local fields to ISO strings (with offset)
-      const payload = { ...formValues };
-      try {
-        fields?.forEach((field) => {
-          if (!field || !field.name) return;
-          const raw = payload[field.name];
-          if (!raw) return;
-          if (field.type === "datetime-local") {
-            // Convert local datetime-local -> ISO UTC
-            const iso = toISOStringFromLocal(raw);
-            if (iso) payload[field.name] = iso;
-          } else if (field.type === "date") {
-            // date-only: keep YYYY-MM-DD string (avoid toISOString which applies timezone)
-            const [y, m, d] = String(raw)
-              .split("-")
-              .map((v) => parseInt(v, 10));
-            if (y && m && d) {
-              payload[field.name] =
-                `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-            }
-          }
-        });
-      } catch (err) {
-        // ignore normalization errors and submit original values
-      }
-
-      // Debug/logging: surface payload and ensure parent handler is invoked
-      console.log(
-        "MyForm.handleSubmit - calling onSubmit with payload:",
-        payload,
-      );
-      const result = await onSubmit(payload);
-      console.log("MyForm.handleSubmit - onSubmit resolved", { result });
-      // Clear field errors on success
-      setErrors({});
-      showSuccess("Succès", successMessage);
-    } catch (error) {
-      console.error("Erreur lors de la soumission du formulaire:", error);
-      // If the error contains fieldErrors, surface them inline
-      if (error && error.fieldErrors && typeof error.fieldErrors === "object") {
-        setErrors(error.fieldErrors || {});
-        // Show a summarized message as well
-        showError(
-          "Erreur de validation",
-          Object.values(error.fieldErrors).join("; "),
-        );
-        return;
-      }
-      showError("Erreur", errorMessage);
-    }
-  };
-
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -491,6 +359,54 @@ export default function MyForm({
         clearTimeout(ignoreInitialTimeoutRef.current);
     };
   }, []);
+
+  // Local submitting state to avoid double submits
+  const [submitting, setSubmitting] = useState(false);
+
+  // Handle form submission. Accepts an event (with preventDefault) or a plain object
+  const handleSubmit = async (e) => {
+    // Support being called with an event-like object used elsewhere in the code
+    if (e && typeof e.preventDefault === "function") {
+      try {
+        e.preventDefault();
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    if (typeof onSubmit !== "function") return;
+    if (submitting) return; // prevent double submit
+
+    setSubmitting(true);
+    try {
+      // Call parent submit handler with current form values
+      const result = await onSubmit(formValues);
+
+      // Treat successful resolution as saved: update baseline so hasChanges() becomes false
+      baselineRef.current = { ...(formValues || {}) };
+
+      // Notify success (safe-guard if hook not provided)
+      try {
+        if (typeof showSuccess === "function") showSuccess(successMessage);
+      } catch (notifErr) {
+        // ignore notification errors
+      }
+
+      setSubmitting(false);
+      return result;
+    } catch (err) {
+      // Log and show notification
+      try {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      } catch (e) {}
+      try {
+        if (typeof showError === "function") showError(errorMessage);
+      } catch (notifErr) {}
+      setSubmitting(false);
+      throw err;
+    }
+  };
 
   // Helper that renders the fields grid (used in inline and panel modes)
   const renderFields = () => (
@@ -519,6 +435,9 @@ export default function MyForm({
                   className="font-medium text-gray-900"
                 >
                   {field.label}
+                  {field.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </label>
               </div>
             </div>
@@ -530,6 +449,9 @@ export default function MyForm({
                   className="block text-sm/6 font-medium text-gray-900"
                 >
                   {field.label}
+                  {field.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </label>
               )}
               <div className="mt-2">
@@ -542,11 +464,9 @@ export default function MyForm({
                       try {
                         // Prefer object signature
                         onChangeExternal(updatedValues);
-                        return;
                       } catch (err) {
                         try {
                           onChangeExternal(field.name, val, updatedValues);
-                          return;
                         } catch (e) {
                           // ignore
                         }
@@ -588,7 +508,7 @@ export default function MyForm({
                     disabled={field.disabled}
                   />
                 ) : field.type === "select" ? (
-                  <select
+                  <Select
                     id={field.name}
                     name={field.name}
                     value={
@@ -597,18 +517,13 @@ export default function MyForm({
                         : formValues[field.name] || ""
                     }
                     onChange={handleChange}
-                    className={`block w-full rounded-md px-3 py-2 text-base outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-pointer min-h-[2.5rem] ${field.disabled ? "bg-gray-200 text-gray-600 cursor-not-allowed" : "bg-white text-gray-900"} ${errors[field.name] ? "outline-red-500" : ""}`}
+                    options={field.options}
+                    placeholder={
+                      field.placeholder || "Sélectionnez une option..."
+                    }
                     disabled={field.disabled}
-                  >
-                    <option value="">
-                      {field.placeholder || "Sélectionnez une option..."}
-                    </option>
-                    {field.options?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                    className={`block w-full rounded-md px-3 py-2 text-base outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-pointer min-h-[2.5rem] ${field.disabled ? "bg-gray-200 text-gray-600 cursor-not-allowed" : "bg-white text-gray-900"} ${errors[field.name] ? "outline-red-500" : ""}`}
+                  />
                 ) : field.type === "readonly" ? (
                   <input
                     type="text"

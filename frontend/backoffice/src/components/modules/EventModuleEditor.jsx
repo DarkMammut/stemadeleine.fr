@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
-import MediaPicker from "@/components/MediaPicker";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
@@ -12,6 +11,7 @@ export default function EventModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
@@ -84,10 +84,7 @@ export default function EventModuleEditor({
     }
   };
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -143,29 +140,14 @@ export default function EventModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "event-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module événement"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Le module événement a été mis à jour avec succès"
-          errorMessage="Impossible d'enregistrer le module événement"
-        />
-      )}
-
-      {/* Sélecteur de média */}
-      <MediaPicker
-        mediaId={moduleData?.media?.id}
-        attachToEntity={attachToEntity}
-        entityType="modules"
-        entityId={moduleId}
-        label="Image de l'événement"
+      <EditablePanelV2
+        title="Détails de l'événement"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={handleCancelEdit}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
       />
     </div>
   );

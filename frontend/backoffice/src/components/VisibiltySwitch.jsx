@@ -9,22 +9,31 @@ export default function VisibilitySwitch({
   isVisible = false,
   onChange,
   savingVisibility,
+  loading = false,
 }) {
+  const effectiveLoading = loading || savingVisibility;
+
   return (
-    <Panel title={title}>
+    <Panel title={title} loading={effectiveLoading}>
       <label
         htmlFor="visibility-switch"
-        className="flex items-center gap-3 cursor-pointer"
+        className={`flex items-center gap-3 ${
+          effectiveLoading ? "pointer-events-none" : "cursor-pointer"
+        }`}
       >
         <Switch
           id="visibility-switch"
           checked={isVisible}
           onChange={onChange}
-          disabled={savingVisibility}
+          disabled={effectiveLoading}
         />
         <span className="font-medium text-gray-900">
-          {label}
-          {savingVisibility && (
+          {effectiveLoading ? (
+            <span className="inline-block w-40 h-4 skeleton rounded" />
+          ) : (
+            label
+          )}
+          {savingVisibility && !loading && (
             <span className="text-gray-500 ml-2">(Sauvegarde...)</span>
           )}
         </span>
@@ -42,6 +51,7 @@ VisibilitySwitch.propTypes = {
   isVisible: PropTypes.bool,
   onChange: PropTypes.func,
   savingVisibility: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 VisibilitySwitch.defaultProps = {
@@ -50,4 +60,5 @@ VisibilitySwitch.defaultProps = {
   isVisible: false,
   onChange: null,
   savingVisibility: false,
+  loading: false,
 };

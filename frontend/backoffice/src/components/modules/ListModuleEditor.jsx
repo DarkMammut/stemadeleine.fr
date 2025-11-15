@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
+import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 
@@ -10,12 +11,12 @@ export default function ListModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
 
   // Champs basés sur le modèle Java List
   const fields = [
@@ -46,10 +47,7 @@ export default function ListModuleEditor({
     },
   ];
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -71,8 +69,7 @@ export default function ListModuleEditor({
   };
 
   const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+    // No-op: EditablePanelV2 handles cancel behavior
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -100,21 +97,15 @@ export default function ListModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "list-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module liste"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Le module liste a été mis à jour avec succès"
-          errorMessage="Impossible d'enregistrer le module liste"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du module liste"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={handleCancelEdit}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
     </div>
   );
 }

@@ -633,18 +633,6 @@ import { cn } from '@/utils/cn';
 </div>
 ```
 
-### `generateSlug`
-
-**Fichier** : `src/utils/generateSlug.js`
-
-Génère un slug URL-friendly à partir d'une chaîne.
-
-```javascript
-import { generateSlug } from '@/utils/generateSlug';
-
-const slug = generateSlug("Mon Article Génial !"); // "mon-article-genial"
-```
-
 ### `breadcrumbs`
 
 **Fichier** : `src/utils/breadcrumbs.js`
@@ -656,12 +644,6 @@ Utilitaires pour gérer les fils d'Ariane.
 **Fichier** : `src/utils/treeHelpers.js`
 
 Utilitaires pour manipuler des structures arborescentes.
-
-### `deletePage`
-
-**Fichier** : `src/utils/deletePage.js`
-
-Utilitaire pour supprimer une page et ses dépendances.
 
 ---
 

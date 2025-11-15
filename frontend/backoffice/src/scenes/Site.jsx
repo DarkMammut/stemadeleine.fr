@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
 import MediaManager from "@/components/MediaManager";
-import ColorInputWithPicker from "@/components/ColorInputWithPicker";
+import ColorInputWithPicker from "@/components/ui/ColorInputWithPicker";
 import EditablePanel from "@/components/ui/EditablePanel";
-import MyForm from "@/components/MyForm";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
@@ -66,8 +65,7 @@ export default function Site() {
     }
   };
 
-  if (loading) return <div>Chargement...</div>;
-
+  // Ne pas rendre tôt : déléguer le rendu du loading aux composants (EditablePanel, MediaManager...)
   return (
     <SceneLayout>
       <Title label="Paramètres du site" />
@@ -76,16 +74,18 @@ export default function Site() {
         <MediaManager
           title="Logo de l'organisation"
           content={{
-            id: organization.id,
-            medias: organization.logo ? [organization.logo] : [],
+            id: organization ? organization.id : null,
+            medias: organization?.logo ? [organization.logo] : [],
           }}
           onMediaAdd={async (contentId, mediaId) => {
+            if (!organization?.id) return;
             await axios.put(
               `/api/organizations/${organization.id}/logo?mediaId=${mediaId}`,
             );
             await loadOrganization();
           }}
           onMediaRemove={async () => {
+            if (!organization?.id) return;
             await axios.delete(`/api/organizations/${organization.id}/media`);
             await loadOrganization();
           }}
@@ -112,28 +112,10 @@ export default function Site() {
           onSubmit={async (vals) => {
             await handleSaveSetting("description")(vals.description);
           }}
-          renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
-            <MyForm
-              fields={[
-                {
-                  name: "description",
-                  label: "Description",
-                  type: "textarea",
-                  defaultValue: initialValues.description || "",
-                  required: false,
-                },
-              ]}
-              initialValues={initialValues}
-              onSubmit={(vals) => onSubmit(vals)}
-              loading={loading || saving}
-              submitButtonLabel="Enregistrer"
-              onCancel={onCancel}
-              cancelButtonLabel="Annuler"
-            />
-          )}
+          loading={loading || saving}
         >
           <div className="prose max-w-none">
-            {organization.description || "Aucune description fournie."}
+            {organization?.description || "Aucune description fournie."}
           </div>
         </EditablePanel>
 

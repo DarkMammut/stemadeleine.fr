@@ -20,15 +20,15 @@ export default function useGetGallery({ moduleId }) {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔍 Récupération de la galerie pour moduleId:", moduleId);
       const response = await axiosClient.get(
         `/api/galleries/by-module-id/${moduleId}`,
       );
-      console.log("📥 Galerie récupérée:", response.data);
-      console.log("  - variant:", response.data.variant);
       setGallery(response.data);
     } catch (err) {
-      console.error("❌ Erreur lors de la récupération de la galerie:", err);
+      console.error(
+        "Erreur lors de la récupération de la galerie:",
+        err?.response?.status,
+      );
       setError(err.response?.data || err);
     } finally {
       setLoading(false);

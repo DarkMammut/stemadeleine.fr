@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/ui/Layout";
 import Contacts from "@/scenes/Contacts";
 
 export default function ContactsPage() {

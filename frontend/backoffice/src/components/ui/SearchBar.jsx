@@ -6,7 +6,7 @@ import { Dialog, Menu, Transition } from "@headlessui/react"; // Import Menu, Tr
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useLogout from "@/utils/auth/useLogout";
-import NAV_ITEMS from "./navigation";
+import NAV_ITEMS from "../navigation";
 
 export default function SearchBar() {
   const [hoverOpen, setHoverOpen] = useState(false);

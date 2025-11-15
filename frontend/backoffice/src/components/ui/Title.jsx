@@ -12,6 +12,7 @@ export default function Title({
   showBreadcrumbs = false,
   breadcrumbs = [],
   autoHideBackButton = true, // Nouvelle prop pour contrôler l'auto-hide
+  loading = false, // nouvelle prop pour désactiver actions pendant le chargement
 }) {
   const router = useRouter();
 
@@ -101,6 +102,7 @@ export default function Title({
               publishLabel="Publier"
               publishedLabel="À jour"
               size="md"
+              disabled={loading}
             />
           </div>
         )}

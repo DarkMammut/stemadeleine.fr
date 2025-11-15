@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAxiosClient } from '@/utils/axiosClient';
-import MyForm from '@/components/MyForm';
+import MyForm from '@/components/ui/MyForm';
 import { useNotification } from '@/hooks/useNotification';
 import Notification from '@/components/ui/Notification';
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
-import Utilities from "@/components/Utilities";
-import CardList from "@/components/CardList";
+import Utilities from "@/components/ui/Utilities";
+import CardList from "@/components/ui/CardList";
 import CampaignCard from "@/components/CampaignCard";
 
 export default function Campaigns({ onNotifySuccess, onNotifyError }) {

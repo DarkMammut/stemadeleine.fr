@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useGetModule from "@/hooks/useGetModule";
@@ -18,6 +18,7 @@ export default function GalleryModuleEditor({
   moduleData: _initialModuleData,
   setModuleData: setParentModuleData,
   refetch: _parentRefetch,
+  loading: parentLoading = false,
 }) {
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
@@ -55,7 +56,6 @@ export default function GalleryModuleEditor({
   // Synchroniser avec les données du module
   useEffect(() => {
     if (module) {
-      console.log("📦 Données de module chargées:", module);
       setModuleData(module);
     }
   }, [module]);
@@ -63,8 +63,6 @@ export default function GalleryModuleEditor({
   // Synchroniser avec les données de la galerie
   useEffect(() => {
     if (gallery) {
-      console.log("🖼️ Données de galerie chargées:", gallery);
-      console.log("  - variant:", gallery.variant);
       setGalleryData(gallery);
     }
   }, [gallery]);
@@ -110,21 +108,17 @@ export default function GalleryModuleEditor({
 
   // Soumission du formulaire Module
   const handleModuleSubmit = async (values) => {
-    console.log("📝 Soumission du formulaire Module avec values:", values);
     setSavingModule(true);
     try {
       const payload = {
         name: values.name,
         title: values.title,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/modules):", payload);
 
       const response = await axios.put(
         `/api/modules/${module.moduleId}`,
         payload,
       );
-
-      console.log("📥 Réponse du serveur:", response.data);
 
       // Mettre à jour moduleData
       setModuleData((prev) => ({
@@ -132,9 +126,9 @@ export default function GalleryModuleEditor({
         ...response.data,
       }));
 
-      console.log("✅ Module mis à jour");
+      showSuccess("Module mis à jour avec succès");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du module:", err);
+      console.error("Erreur lors de la sauvegarde du module:", err);
       throw err;
     } finally {
       setSavingModule(false);
@@ -143,18 +137,13 @@ export default function GalleryModuleEditor({
 
   // Soumission du formulaire Gallery
   const handleGallerySubmit = async (values) => {
-    console.log("📝 Soumission du formulaire Gallery avec values:", values);
     setSavingGallery(true);
     try {
       const payload = {
         variant: values.variant,
       };
-      console.log("📤 Envoi au serveur (endpoint: /api/galleries):", payload);
 
       const response = await axios.put(`/api/galleries/${gallery.id}`, payload);
-
-      console.log("📥 Réponse du serveur:", response.data);
-      console.log("  - variant dans réponse:", response.data?.variant);
 
       // Mettre à jour galleryData
       setGalleryData((prev) => ({
@@ -162,9 +151,9 @@ export default function GalleryModuleEditor({
         ...response.data,
       }));
 
-      console.log("✅ Galerie mise à jour");
+      showSuccess("Galerie mise à jour avec succès");
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde de la galerie:", err);
+      console.error("Erreur lors de la sauvegarde de la galerie:", err);
       throw err;
     } finally {
       setSavingGallery(false);
@@ -205,14 +194,10 @@ export default function GalleryModuleEditor({
     }
   };
 
-  // Afficher un loader pendant le chargement initial
-  if (
-    (moduleLoading && !moduleData) ||
-    (galleryLoading && !galleryData) ||
-    variantsLoading
-  ) {
-    return <div className="text-center py-8">Chargement de la galerie...</div>;
-  }
+  // Ne pas return tôt: laisser les composants gérer leurs states de loading/saving.
+  const effectiveLoading = Boolean(
+    parentLoading || moduleLoading || galleryLoading || variantsLoading,
+  );
 
   return (
     <div className="space-y-6">
@@ -226,36 +211,26 @@ export default function GalleryModuleEditor({
       />
 
       {/* Formulaire Module (name, title) */}
-      {moduleData && (
-        <MyForm
-          title="Détails de la galerie"
-          fields={moduleFields}
-          initialValues={moduleData}
-          onSubmit={handleModuleSubmit}
-          loading={savingModule}
-          submitButtonLabel="Enregistrer"
-          onCancel={handleCancelModuleEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="Les informations du module ont été mises à jour avec succès"
-          errorMessage="Impossible de mettre à jour le module"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails de la galerie"
+        fields={moduleFields}
+        initialValues={moduleData || {}}
+        onSubmit={handleModuleSubmit}
+        onCancelExternal={handleCancelModuleEdit}
+        loading={savingModule || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Formulaire Gallery (variant) */}
-      {galleryData && (
-        <MyForm
-          title="Paramètres de la galerie"
-          fields={galleryFields}
-          initialValues={galleryData}
-          onSubmit={handleGallerySubmit}
-          loading={savingGallery}
-          submitButtonLabel="Enregistrer"
-          onCancel={handleCancelGalleryEdit}
-          cancelButtonLabel="Annuler"
-          successMessage="La variante de la galerie a été mise à jour avec succès"
-          errorMessage="Impossible de mettre à jour la galerie"
-        />
-      )}
+      <EditablePanelV2
+        title="Paramètres de la galerie"
+        fields={galleryFields}
+        initialValues={galleryData || {}}
+        onSubmit={handleGallerySubmit}
+        onCancelExternal={handleCancelGalleryEdit}
+        loading={savingGallery || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Gestion des médias avec MediaManager */}
       <MediaManager

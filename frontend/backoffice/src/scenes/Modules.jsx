@@ -4,20 +4,22 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
+// Hooks
+import useGetSection from "@/hooks/useGetSection";
+import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useAxiosClient } from "@/utils/axiosClient";
+import { useNotification } from "@/hooks/useNotification";
+import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
+import { removeItem } from "@/utils/treeHelpers";
+
+// UI / Components
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
 import SectionsTabs from "@/components/SectionsTabs";
-import DraggableTree from "@/components/DraggableTree";
-import { useAxiosClient } from "@/utils/axiosClient";
-import { useModuleOperations } from "@/hooks/useModuleOperations";
-import { removeItem } from "@/utils/treeHelpers";
-import ConfirmModal from "@/components/ui/ConfirmModal";
+import DraggableTree from "@/components/ui/DraggableTree";
 import AddModuleModal from "@/components/AddModuleModal";
+import Utilities from "@/components/ui/Utilities";
 import Notification from "@/components/ui/Notification";
-import { useNotification } from "@/hooks/useNotification";
-import useGetSection from "@/hooks/useGetSection";
-import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
-import Utilities from "@/components/Utilities";
 
 export default function Modules({ pageId, sectionId }) {
   const router = useRouter();
@@ -29,9 +31,6 @@ export default function Modules({ pageId, sectionId }) {
 
   const [treeData, setTreeData] = useState([]);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     if (section?.modules) {
@@ -119,29 +118,20 @@ export default function Modules({ pageId, sectionId }) {
     [router, pageId, sectionId],
   );
 
-  const handleDelete = useCallback(async (item) => {
-    setItemToDelete(item);
-    setShowDeleteModal(true);
-  }, []);
-
-  const confirmDelete = useCallback(async () => {
-    if (!itemToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      await deleteModule(itemToDelete.moduleId);
-      showSuccess("Module supprimé", "Le module a été supprimé avec succès");
-      await refetch();
-      setTreeData((prev) => removeItem(prev, itemToDelete.id));
-    } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
-      showError("Erreur de suppression", "Impossible de supprimer le module");
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      setItemToDelete(null);
-    }
-  }, [itemToDelete, deleteModule, refetch, showSuccess, showError]);
+  const handleDelete = useCallback(
+    async (item) => {
+      try {
+        await deleteModule(item.moduleId);
+        showSuccess("Module supprimé", "Le module a été supprimé avec succès");
+        await refetch();
+        setTreeData((prev) => removeItem(prev, item.id));
+      } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+        showError("Erreur de suppression", "Impossible de supprimer le module");
+      }
+    },
+    [deleteModule, refetch, showSuccess, showError],
+  );
 
   const handleConfirmAddModule = async (moduleType) => {
     if (!moduleType) {
@@ -185,7 +175,6 @@ export default function Modules({ pageId, sectionId }) {
     }
   };
 
-  if (loading) return <p>Chargement...</p>;
   if (error) return <p>Erreur: {error.message}</p>;
 
   // Construire les breadcrumbs
@@ -202,6 +191,7 @@ export default function Modules({ pageId, sectionId }) {
         label={`Modules de ${section?.name || "la section"}`}
         showBreadcrumbs={!!section}
         breadcrumbs={breadcrumbs}
+        loading={loading}
       />
 
       <SectionsTabs pageId={pageId} sectionId={sectionId} />
@@ -214,6 +204,7 @@ export default function Modules({ pageId, sectionId }) {
             callback: () => setShowAddModuleModal(true),
           },
         ]}
+        loading={loading}
       />
 
       <DraggableTree
@@ -224,6 +215,7 @@ export default function Modules({ pageId, sectionId }) {
         onDelete={handleDelete}
         canHaveChildren={() => false}
         canDrop={() => true}
+        loading={loading}
       />
 
       {/* Modal d'ajout de module */}
@@ -233,17 +225,7 @@ export default function Modules({ pageId, sectionId }) {
         onConfirm={handleConfirmAddModule}
       />
 
-      {/* Modal de confirmation de suppression */}
-      <ConfirmModal
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={confirmDelete}
-        title="Supprimer le module"
-        message={`Êtes-vous sûr de vouloir supprimer "${itemToDelete?.name}" ?`}
-        confirmLabel="Supprimer"
-        cancelLabel="Annuler"
-        isLoading={isDeleting}
-      />
+      {/* ConfirmModal removed: DeleteButton shows its own confirmation modal */}
 
       {/* Notification */}
       <Notification {...notification} onClose={hideNotification} />

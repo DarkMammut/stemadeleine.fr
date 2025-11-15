@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 import {
   EnvelopeIcon,
   EyeIcon,
@@ -9,7 +11,12 @@ import {
 } from "@heroicons/react/24/outline";
 import StatusTag from "@/components/ui/StatusTag";
 
-export default function NewsletterCard({ newsletter, onClick }) {
+export default function NewsletterCard({
+  newsletter,
+  onClick,
+  loading = false,
+}) {
+  if (loading) return <CardSkeleton showActions={true} />;
   const formatDate = (date) => {
     if (!date) return "Non renseignée";
     return new Date(date).toLocaleDateString("fr-FR", {
@@ -65,3 +72,9 @@ export default function NewsletterCard({ newsletter, onClick }) {
     </Card>
   );
 }
+
+NewsletterCard.propTypes = {
+  newsletter: PropTypes.object,
+  onClick: PropTypes.func,
+  loading: PropTypes.bool,
+};

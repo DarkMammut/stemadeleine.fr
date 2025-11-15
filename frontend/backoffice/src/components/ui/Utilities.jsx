@@ -9,18 +9,13 @@ import { useAxiosClient } from '@/utils/axiosClient';
 
 /**
  * Composant Utilities - Affiche une barre d'actions avec boutons spécialisés
- * @param {Array} actions - Liste des actions à afficher
- *   - {string} variant - Type de bouton : 'refresh', 'publish', 'download', 'delete', 'send', ou variant Button classique
- *   - {string} label - Label du bouton
- *   - {function} callback - Fonction appelée au clic
- *   - {Object} icon - Icône Heroicons (pour boutons génériques uniquement)
- *   - {boolean} disabled - Désactive le bouton
- *   - {string} size - Taille du bouton (défaut: 'sm')
- *   - {boolean} hoverExpand - Label apparaît au survol (pour boutons spécialisés)
- * @param {string} apiUrl - URL pour sauvegarder les données
- * @param {Object} data - Données à sauvegarder (format { current, initial })
  */
-export default function Utilities({ actions = [], apiUrl, data }) {
+export default function Utilities({
+  actions = [],
+  apiUrl,
+  data,
+  loading = false,
+}) {
   const axios = useAxiosClient();
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -57,6 +52,8 @@ export default function Utilities({ actions = [], apiUrl, data }) {
       confirmLabel,
     } = action;
 
+    const isDisabled = Boolean(loading) || Boolean(disabled);
+
     // Boutons spécialisés
     switch (variant) {
       case "refresh":
@@ -66,7 +63,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onRefresh={callback}
             refreshLabel={label}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
             hoverExpand={hoverExpand}
           />
         );
@@ -78,7 +75,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onPublish={callback}
             publishLabel={label}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
           />
         );
 
@@ -89,7 +86,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onDownload={callback}
             downloadLabel={label}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
             hoverExpand={hoverExpand}
           />
         );
@@ -101,7 +98,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onDelete={callback}
             deleteLabel={label}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
             hoverExpand={hoverExpand}
             requireConfirmation={
               requireConfirmation !== undefined ? requireConfirmation : true
@@ -119,7 +116,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onSend={callback}
             sendLabel={label}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
           />
         );
 
@@ -132,7 +129,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             onClick={callback}
             variant={variant || "primary"}
             size={size}
-            disabled={disabled}
+            disabled={isDisabled}
           >
             {Icon && <Icon className="w-4 h-4 mr-1" />}
             {label}
@@ -154,6 +151,7 @@ export default function Utilities({ actions = [], apiUrl, data }) {
             variant="secondary"
             size="sm"
             loading={saving}
+            disabled={Boolean(loading) || saving}
           >
             Sauvegarder
           </Button>

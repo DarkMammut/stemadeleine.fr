@@ -16,7 +16,27 @@ export default function SortableItem({
   onEdit,
   onDelete,
   onAddChild, // nouvelle prop optionnelle
+  isPlaceholder = false, // nouvelle prop pour les placeholders
 }) {
+  // Si c'est un placeholder, on rend une version non-draggable avec animation "pulse"
+  if (isPlaceholder) {
+    return (
+      <div className={`mb-2 relative ${depth > 0 ? "child-line" : ""}`}>
+        <div className="flex items-center justify-between rounded-xl px-3 py-2 border border-gray-200 shadow bg-white">
+          <div className="flex items-center gap-3 flex-1 animate-pulse">
+            <div className="w-6 h-6 bg-gray-200 rounded" />
+            <div className="w-12 h-6 bg-gray-200 rounded" />
+            <div className="ml-4 w-48 h-6 bg-gray-200 rounded" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-6 bg-gray-200 rounded" />
+            <div className="w-8 h-6 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const {
     attributes,
     listeners,
@@ -77,7 +97,6 @@ export default function SortableItem({
             variant="link"
             size="sm"
             onClick={() => {
-              console.log("🟢 Add module button clicked for section:", item);
               onAddChild(item);
             }}
             className="ml-2"

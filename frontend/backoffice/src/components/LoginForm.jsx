@@ -28,7 +28,7 @@ export default function LoginForm() {
 
   const handleForgotPassword = () => {
     // TODO: Implémenter la logique de récupération de mot de passe
-    console.log("Mot de passe oublié cliqué");
+    // Placeholder pour future fonctionnalité (pas de console.log ici)
   };
 
   return (

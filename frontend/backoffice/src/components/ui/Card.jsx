@@ -2,8 +2,16 @@
 
 import React from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import CardSkeleton from "@/components/ui/CardSkeleton";
 
-export default function Card({ onClick, children, className = "" }) {
+export default function Card({
+  onClick,
+  children,
+  className = "",
+  loading = false,
+}) {
+  if (loading) return <CardSkeleton className={className} />;
+
   return (
     <li
       className={`px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors cursor-pointer ${className}`}

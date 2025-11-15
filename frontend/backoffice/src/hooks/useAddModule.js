@@ -6,8 +6,6 @@ export function useAddModule() {
 
   const addModule = useCallback(
     async (moduleData) => {
-      console.log("useAddModule: Starting API call with data:", moduleData);
-
       try {
         // Utiliser l'endpoint du backend: POST /api/modules avec la structure correcte
         const response = await axiosClient.post("/api/modules", {
@@ -16,16 +14,9 @@ export function useAddModule() {
           type: moduleData.type,
         });
 
-        console.log("useAddModule: API call successful:", response.data);
         return response.data;
       } catch (error) {
-        console.error("useAddModule: API call failed:", error);
-        console.error("useAddModule: Error details:", {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          config: error.config,
-        });
+        console.error("useAddModule: API call failed", error?.response?.status);
         throw error;
       }
     },

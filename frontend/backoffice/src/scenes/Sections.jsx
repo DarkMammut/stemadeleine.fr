@@ -3,22 +3,26 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/16/solid";
-import Utilities from "@/components/Utilities";
+
+// Hooks
 import useGetPage from "@/hooks/useGetPage";
-import Title from "@/components/ui/Title";
 import useAddSection from "@/hooks/useAddSection";
-import DraggableTree from "@/components/DraggableTree";
-import PagesTabs from "@/components/PagesTabs";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useUpdateSectionOrder from "@/hooks/useUpdateSectionOrder";
 import { useAxiosClient } from "@/utils/axiosClient";
-import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
-import ConfirmModal from "@/components/ui/ConfirmModal";
-import AddModuleModal from "@/components/AddModuleModal";
-import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
+import { removeItem } from "@/utils/treeHelpers";
+
+// UI / Components
 import SceneLayout from "@/components/ui/SceneLayout";
+import Title from "@/components/ui/Title";
+import Notification from "@/components/ui/Notification";
+import Utilities from "@/components/ui/Utilities";
+import PagesTabs from "@/components/PagesTabs";
+import DraggableTree from "@/components/ui/DraggableTree";
+import AddModuleModal from "@/components/AddModuleModal";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
@@ -37,9 +41,6 @@ export default function Sections({ pageId }) {
   const [treeData, setTreeData] = useState([]);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [targetSection, setTargetSection] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     if (page?.sections) {
@@ -156,47 +157,34 @@ export default function Sections({ pageId }) {
     [router, pageId],
   );
 
-  const handleDelete = useCallback(async (item) => {
-    setItemToDelete(item);
-    setShowDeleteModal(true);
-  }, []);
-
-  const confirmDelete = useCallback(async () => {
-    if (!itemToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      if (itemToDelete.type === "section") {
-        await deleteSection(itemToDelete.sectionId);
-        showSuccess(
-          "Section supprimée",
-          "La section a été supprimée avec succès",
+  const handleDelete = useCallback(
+    async (item) => {
+      try {
+        if (item.type === "section") {
+          await deleteSection(item.sectionId);
+          showSuccess(
+            "Section supprimée",
+            "La section a été supprimée avec succès",
+          );
+        } else if (item.type === "module") {
+          await deleteModule(item.moduleId);
+          showSuccess(
+            "Module supprimé",
+            "Le module a été supprimé avec succès",
+          );
+        }
+        await refetch();
+        setTreeData((prev) => removeItem(prev, item.id));
+      } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+        showError(
+          "Erreur de suppression",
+          `Impossible de supprimer ${item.type === "section" ? "la section" : "le module"}`,
         );
-      } else if (itemToDelete.type === "module") {
-        await deleteModule(itemToDelete.moduleId);
-        showSuccess("Module supprimé", "Le module a été supprimé avec succès");
       }
-      await refetch();
-      setTreeData((prev) => removeItem(prev, itemToDelete.id));
-    } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
-      showError(
-        "Erreur de suppression",
-        `Impossible de supprimer ${itemToDelete.type === "section" ? "la section" : "le module"}`,
-      );
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      setItemToDelete(null);
-    }
-  }, [
-    itemToDelete,
-    deleteSection,
-    deleteModule,
-    refetch,
-    showSuccess,
-    showError,
-  ]);
+    },
+    [deleteSection, deleteModule, refetch, showSuccess, showError],
+  );
 
   const handleAddModule = useCallback((section) => {
     setTargetSection(section);
@@ -257,9 +245,6 @@ export default function Sections({ pageId }) {
     await refetch();
   };
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
   // Construire les breadcrumbs pour la page sections
   const breadcrumbs = page ? buildPageBreadcrumbs(page) : [];
 
@@ -270,6 +255,7 @@ export default function Sections({ pageId }) {
         onPublish={handlePublishSections}
         showBreadcrumbs={!!page}
         breadcrumbs={breadcrumbs}
+        loading={loading}
       />
 
       <PagesTabs pageId={pageId} />
@@ -285,23 +271,30 @@ export default function Sections({ pageId }) {
             },
           },
         ]}
+        loading={loading}
       />
 
-      <DraggableTree
-        initialData={treeData}
-        onChange={handleTreeChange}
-        onToggle={handleToggle}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        canHaveChildren={(item) => item.type !== "module"}
-        canDrop={({ dragged, targetParent, projected }) => {
-          if (dragged.type === "section") return projected.parentId === null;
-          if (dragged.type === "module")
-            return targetParent && targetParent.type === "section";
-          return true;
-        }}
-        onAddChild={handleAddModule}
-      />
+      {/* Le DraggableTree gère désormais l'affichage de chargement via sa prop `loading` */}
+      {error ? (
+        <p>Error: {error.message}</p>
+      ) : (
+        <DraggableTree
+          initialData={treeData}
+          onChange={handleTreeChange}
+          onToggle={handleToggle}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          canHaveChildren={(item) => item.type !== "module"}
+          canDrop={({ dragged, targetParent, projected }) => {
+            if (dragged.type === "section") return projected.parentId === null;
+            if (dragged.type === "module")
+              return targetParent && targetParent.type === "section";
+            return true;
+          }}
+          onAddChild={handleAddModule}
+          loading={loading}
+        />
+      )}
 
       {/* Modal d'ajout de module */}
       <AddModuleModal
@@ -315,19 +308,7 @@ export default function Sections({ pageId }) {
         isLoading={false}
       />
 
-      {/* Modal de confirmation de suppression */}
-      <ConfirmModal
-        open={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setItemToDelete(null);
-        }}
-        onConfirm={confirmDelete}
-        title={`Supprimer ${itemToDelete?.type === "section" ? "la section" : "le module"}`}
-        message={`Êtes-vous sûr de vouloir supprimer ${itemToDelete?.type === "section" ? "cette section" : "ce module"} ? Cette action est irréversible.`}
-        isLoading={isDeleting}
-        variant="danger"
-      />
+      {/* ConfirmModal removed: DeleteButton shows its own confirmation modal */}
 
       {/* Notifications */}
       <Notification

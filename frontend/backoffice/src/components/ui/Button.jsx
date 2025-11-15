@@ -5,12 +5,14 @@ export default function Button({
   children,
   variant = "primary",
   size = "md",
-  as = "button",
+  as: Component = "button",
   loading = false,
   className,
   ...props
 }) {
-  const Component = as;
+  // Définir un type par défaut 'button' pour éviter les submit involontaires
+  const typeAttr =
+    props.type ?? (Component === "button" ? "button" : undefined);
 
   const baseStyles =
     "inline-flex items-center justify-center font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
@@ -45,6 +47,7 @@ export default function Button({
       className={clsx(baseStyles, variants[variant], sizes[size], className)}
       disabled={loading || props.disabled}
       {...props}
+      type={typeAttr}
     >
       {loading ? "Chargement..." : children}
     </Component>

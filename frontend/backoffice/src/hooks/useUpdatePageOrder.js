@@ -8,7 +8,6 @@ export default function useUpdatePageOrder() {
     async (treeData) => {
       try {
         await axios.put("/api/pages/tree", treeData);
-        console.log("Page order saved successfully");
         return true;
       } catch (error) {
         console.error("Error saving page order:", error);

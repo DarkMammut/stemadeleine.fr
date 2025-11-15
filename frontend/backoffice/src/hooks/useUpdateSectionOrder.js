@@ -13,7 +13,6 @@ export default function useUpdateSectionOrder() {
           pageId,
           sectionIds,
         });
-        console.log("Section order saved successfully");
         return true;
       } catch (error) {
         console.error("Error saving section order:", error);

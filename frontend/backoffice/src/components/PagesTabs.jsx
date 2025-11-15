@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
-import Tabs from "@/components/Tabs";
+import Tabs from "@/components/ui/Tabs";
 
 export default function PagesTabs({ pageId }) {
   const pathname = usePathname();

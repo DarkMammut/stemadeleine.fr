@@ -44,18 +44,13 @@ export const useMembershipOperations = () => {
   const createMembership = useCallback(
     async (userId, data) => {
       try {
-        // Debug: log payload
-        console.log("useMembershipOperations.createMembership - payload:", {
-          userId,
-          data,
-        });
         // send userId as query param because backend expects it as request param
         const res = await axios.post(`/api/memberships`, data, {
           params: { userId },
         });
         return res.data;
       } catch (err) {
-        console.error("Error creating membership:", err);
+        console.error("Error creating membership:", err?.response?.status);
         throw err;
       }
     },
@@ -65,14 +60,13 @@ export const useMembershipOperations = () => {
   const updateMembership = useCallback(
     async (id, data) => {
       try {
-        console.log("useMembershipOperations.updateMembership - payload:", {
-          id,
-          data,
-        });
         const res = await axios.put(`/api/memberships/${id}`, data);
         return res.data;
       } catch (err) {
-        console.error(`Error updating membership ${id}:`, err);
+        console.error(
+          `Error updating membership ${id}:`,
+          err?.response?.status,
+        );
         throw err;
       }
     },

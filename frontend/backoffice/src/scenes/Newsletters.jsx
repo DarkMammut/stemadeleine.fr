@@ -2,15 +2,22 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+// Icons
 import { PlusIcon } from "@heroicons/react/24/outline";
+
+// Hooks (business)
+import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
+import { useNotification } from "@/hooks/useNotification";
+
+// UI / Components
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Utilities from "@/components/Utilities";
-import { useNewsletterPublicationOperations } from "@/hooks/useNewsletterPublicationOperations";
-import CardList from "@/components/CardList";
+import Utilities from "@/components/ui/Utilities";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import CardList from "@/components/ui/CardList";
 import NewsletterCard from "@/components/NewsletterCard";
 import Notification from "@/components/ui/Notification";
-import { useNotification } from "@/hooks/useNotification";
 
 export default function Newsletters() {
   const router = useRouter();
@@ -65,11 +72,7 @@ export default function Newsletters() {
     router.push(`/newsletters/${newsletter.id}`);
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">Chargement des newsletters...</div>
-    );
-  }
+  const isLoading = loading;
 
   return (
     <SceneLayout>
@@ -81,19 +84,26 @@ export default function Newsletters() {
             icon: PlusIcon,
             label: "Nouvelle Newsletter",
             callback: handleCreateNewsletter,
+            disabled: isLoading,
           },
         ]}
       />
 
-      <CardList emptyMessage="Aucune newsletter trouvée.">
-        {newsletters.map((newsletter) => (
-          <NewsletterCard
-            key={newsletter.id}
-            newsletter={newsletter}
-            onClick={() => handleNewsletterClick(newsletter)}
-          />
-        ))}
-      </CardList>
+      {isLoading ? (
+        <div className="mt-4">
+          <LoadingSkeleton variant="card" count={6} showActions={true} />
+        </div>
+      ) : (
+        <CardList emptyMessage="Aucune newsletter trouvée.">
+          {newsletters.map((newsletter) => (
+            <NewsletterCard
+              key={newsletter.id}
+              newsletter={newsletter}
+              onClick={() => handleNewsletterClick(newsletter)}
+            />
+          ))}
+        </CardList>
+      )}
 
       <Notification
         show={notification.show}

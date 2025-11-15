@@ -29,10 +29,11 @@ const ContentManager = ({
   onContentsChange,
   customLabels = {},
   showSaveButton = false,
+  loading: externalLoading = false,
 }) => {
   const [contents, setContents] = useState([]);
   const [expandedContents, setExpandedContents] = useState(new Set());
-  const [loading, setLoading] = useState(false);
+  const [loadingLocal, setLoadingLocal] = useState(false);
   const [savingStates, setSavingStates] = useState({});
   const [editingContent, setEditingContent] = useState({});
   const [showPublishAllModal, setShowPublishAllModal] = useState(false);
@@ -61,7 +62,7 @@ const ContentManager = ({
 
   const loadContents = async () => {
     try {
-      setLoading(true);
+      setLoadingLocal(true);
       const uniqueContents = await getContents(parentId);
       setContents(uniqueContents);
       if (onContentsChange) onContentsChange(uniqueContents);
@@ -72,7 +73,7 @@ const ContentManager = ({
         "Erreur lors du chargement des contenus",
       );
     } finally {
-      setLoading(false);
+      setLoadingLocal(false);
     }
   };
 
@@ -90,7 +91,7 @@ const ContentManager = ({
   // Add new content
   const handleAddContent = async () => {
     try {
-      setLoading(true);
+      setLoadingLocal(true);
       const newContent = await createContent(
         parentId,
         customLabels.defaultTitle || "Nouveau contenu",
@@ -105,7 +106,7 @@ const ContentManager = ({
       console.error("Error adding content:", error);
       showError("Erreur", "Erreur lors de l'ajout du contenu");
     } finally {
-      setLoading(false);
+      setLoadingLocal(false);
     }
   };
 
@@ -299,6 +300,8 @@ const ContentManager = ({
   };
 
   // Rendu UI (labels personnalisables)
+  const effectiveLoading = externalLoading || loadingLocal;
+
   return (
     <Panel
       title={customLabels.header || "Contenus"}
@@ -306,7 +309,9 @@ const ContentManager = ({
         <div className="flex items-center gap-2">
           <PublishButton
             onPublish={handleOpenPublishAllModal}
-            disabled={loading || contents.length === 0 || isPublishingAll}
+            disabled={
+              effectiveLoading || contents.length === 0 || isPublishingAll
+            }
             publishLabel={customLabels.publishButton || "Publier tous"}
             publishedLabel="Tous publiés"
             size="md"
@@ -314,22 +319,28 @@ const ContentManager = ({
           />
           <Button
             onClick={handleAddContent}
-            disabled={loading}
+            disabled={effectiveLoading}
             className="flex items-center gap-2"
           >
             <PlusIcon className="w-4 h-4" />
-            {customLabels.addButton || "Ajouter un contenu"}
+            {effectiveLoading ? (
+              <span className="skeleton-light w-32 h-4 inline-block" />
+            ) : (
+              customLabels.addButton || "Ajouter un contenu"
+            )}
           </Button>
         </div>
       }
     >
       <div className="content-manager">
-        {loading && contents.length === 0 && (
-          <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
-            {customLabels.loading || "Chargement des contenus..."}
+        {effectiveLoading && contents.length === 0 && (
+          <div className="space-y-3 px-4 py-8">
+            <div className="skeleton-light h-4 w-1/3 rounded" />
+            <div className="skeleton-light h-4 w-1/2 rounded" />
+            <div className="skeleton-light h-4 w-2/3 rounded" />
           </div>
         )}
-        {!loading && contents.length === 0 && (
+        {!effectiveLoading && contents.length === 0 && (
           <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
             <p>
               {customLabels.empty ||
@@ -339,9 +350,9 @@ const ContentManager = ({
         )}
         <div className="space-y-3">
           <AnimatePresence>
-            {contents.map((content, index) => (
+            {(!effectiveLoading ? contents : contents).map((content, index) => (
               <CollapsibleCard
-                key={`content-${content.contentId}-${content.version}-${index}`}
+                key={`content-${content.contentId || index}-${content.version || 0}`}
                 isOpen={expandedContents.has(content.contentId)}
                 onToggle={() => toggleContentExpansion(content.contentId)}
                 leading={
@@ -350,7 +361,9 @@ const ContentManager = ({
                     onChange={(checked) =>
                       handleVisibilityToggle(content.contentId, checked)
                     }
-                    disabled={savingStates[content.contentId]}
+                    disabled={
+                      savingStates[content.contentId] || effectiveLoading
+                    }
                     size="sm"
                   />
                 }
@@ -380,7 +393,9 @@ const ContentManager = ({
                       <Button
                         type="submit"
                         size="sm"
-                        disabled={savingStates[content.contentId]}
+                        disabled={
+                          savingStates[content.contentId] || effectiveLoading
+                        }
                       >
                         {customLabels.save || "Enregistrer"}
                       </Button>
@@ -389,29 +404,43 @@ const ContentManager = ({
                         variant="secondary"
                         size="sm"
                         onClick={() => stopEditing(content.contentId, "title")}
-                        disabled={savingStates[content.contentId]}
+                        disabled={
+                          savingStates[content.contentId] || effectiveLoading
+                        }
                       >
                         {customLabels.cancel || "Annuler"}
                       </Button>
                     </form>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <h4
-                        className="font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors truncate"
-                        onClick={() => startEditing(content.contentId, "title")}
-                        title={
-                          content.title ||
-                          customLabels.untitled ||
-                          "Contenu sans titre"
-                        }
-                      >
-                        {content.title ||
-                          customLabels.untitled ||
-                          "Contenu sans titre"}
-                      </h4>
+                      {effectiveLoading ? (
+                        <div className="skeleton-light w-48 h-5 rounded" />
+                      ) : (
+                        <h4
+                          className="font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors truncate"
+                          onClick={() =>
+                            startEditing(content.contentId, "title")
+                          }
+                          title={
+                            content.title ||
+                            customLabels.untitled ||
+                            "Contenu sans titre"
+                          }
+                        >
+                          {content.title ||
+                            customLabels.untitled ||
+                            "Contenu sans titre"}
+                        </h4>
+                      )}
                       <div className="text-xs text-gray-500 flex-shrink-0">
-                        v{content.version} • {content.authorUsername}
-                        {content.hasLocalChanges && (
+                        {effectiveLoading ? (
+                          <span className="skeleton-light w-20 h-3 inline-block rounded" />
+                        ) : (
+                          <>
+                            v{content.version} • {content.authorUsername}
+                          </>
+                        )}
+                        {content.hasLocalChanges && !effectiveLoading && (
                           <span className="text-orange-600 ml-2">
                             • Modifications non sauvegardées
                           </span>
@@ -424,7 +453,9 @@ const ContentManager = ({
                   <>
                     <DeleteButton
                       onDelete={() => handleDeleteContent(content.contentId)}
-                      disabled={savingStates[content.contentId]}
+                      disabled={
+                        savingStates[content.contentId] || effectiveLoading
+                      }
                       deleteLabel="Supprimer"
                       confirmTitle="Supprimer le contenu"
                       confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
@@ -435,53 +466,64 @@ const ContentManager = ({
                 }
               >
                 <div className="space-y-6">
-                  <RichTextEditor
-                    value={content.body?.html || ""}
-                    onChange={(newBody) =>
-                      handleContentUpdate(content.contentId, newBody)
-                    }
-                    placeholder={
-                      customLabels.bodyPlaceholder || "Commencez à écrire..."
-                    }
-                    height="200px"
-                    disabled={savingStates[content.contentId]}
-                  />
-                  {(() => {
-                    const shouldShow =
-                      showSaveButton === true ||
-                      (showSaveButton === false && content.hasLocalChanges);
-                    return (
-                      shouldShow && (
-                        <div className="flex justify-end mt-4">
-                          <Button
-                            onClick={() =>
-                              handleSaveContentBody(content.contentId)
-                            }
-                            disabled={
-                              savingStates[content.contentId] ||
-                              !content.hasLocalChanges
-                            }
-                          >
-                            {customLabels.saveContent ||
-                              "Enregistrer le contenu"}
-                          </Button>
-                        </div>
-                      )
-                    );
-                  })()}
-
-                  <MediaManager
-                    content={content}
-                    onMediaAdd={handleAddMediaToContent}
-                    onMediaRemove={handleRemoveMediaFromContent}
-                    onMediaChanged={loadContents}
-                  />
-
-                  {savingStates[content.contentId] && (
-                    <div className="text-sm text-blue-600 flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                      {customLabels.saving || "Sauvegarde..."}
+                  {effectiveLoading ? (
+                    <div className="space-y-3">
+                      <div className="skeleton-light h-40 rounded" />
+                      <div className="skeleton-light h-4 w-1/3 rounded" />
                     </div>
+                  ) : (
+                    <>
+                      <RichTextEditor
+                        value={content.body?.html || ""}
+                        onChange={(newBody) =>
+                          handleContentUpdate(content.contentId, newBody)
+                        }
+                        placeholder={
+                          customLabels.bodyPlaceholder ||
+                          "Commencez à écrire..."
+                        }
+                        height="200px"
+                        disabled={savingStates[content.contentId]}
+                      />
+                      {(() => {
+                        const shouldShow =
+                          showSaveButton === true ||
+                          (showSaveButton === false && content.hasLocalChanges);
+                        return (
+                          shouldShow && (
+                            <div className="flex justify-end mt-4">
+                              <Button
+                                onClick={() =>
+                                  handleSaveContentBody(content.contentId)
+                                }
+                                disabled={
+                                  savingStates[content.contentId] ||
+                                  !content.hasLocalChanges
+                                }
+                              >
+                                {customLabels.saveContent ||
+                                  "Enregistrer le contenu"}
+                              </Button>
+                            </div>
+                          )
+                        );
+                      })()}
+
+                      <MediaManager
+                        content={content}
+                        onMediaAdd={handleAddMediaToContent}
+                        onMediaRemove={handleRemoveMediaFromContent}
+                        onMediaChanged={loadContents}
+                        loading={effectiveLoading}
+                      />
+
+                      {savingStates[content.contentId] && (
+                        <div className="text-sm text-blue-600 flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                          {customLabels.saving || "Sauvegarde..."}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </CollapsibleCard>
@@ -509,6 +551,7 @@ const ContentManager = ({
 };
 
 ContentManager.propTypes = {
+  loading: PropTypes.bool,
   parentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   parentType: PropTypes.string,
   onContentsChange: PropTypes.func,
@@ -520,6 +563,7 @@ ContentManager.defaultProps = {
   parentType: "section",
   customLabels: {},
   showSaveButton: false,
+  loading: false,
 };
 
 export default ContentManager;

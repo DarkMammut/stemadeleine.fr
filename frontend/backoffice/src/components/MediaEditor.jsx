@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useAxiosClient } from "@/utils/axiosClient";
-import MyForm from "@/components/MyForm";
+import MyForm from "@/components/ui/MyForm";
 import Button from "@/components/ui/Button";
 
 export default function MediaEditor({

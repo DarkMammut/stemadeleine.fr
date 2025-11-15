@@ -4,19 +4,21 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/16/solid";
 
-import SceneLayout from "@/components/ui/SceneLayout";
-import Utilities from "@/components/Utilities";
-import DraggableTree from "@/components/DraggableTree";
+// Hooks
 import useGetPages from "@/hooks/useGetPages";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
 import useUpdatePageOrder from "@/hooks/useUpdatePageOrder";
-import { removeItem } from "@/utils/treeHelpers";
-import Title from "@/components/ui/Title";
 import { useAxiosClient } from "@/utils/axiosClient";
-import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import ConfirmModal from "@/components/ui/ConfirmModal";
+import { removeItem } from "@/utils/treeHelpers";
+
+// UI / Components
+import SceneLayout from "@/components/ui/SceneLayout";
+import Title from "@/components/ui/Title";
+import Utilities from "@/components/ui/Utilities";
+import DraggableTree from "@/components/ui/DraggableTree";
+import Notification from "@/components/ui/Notification";
 
 export default function Pages() {
   const router = useRouter();
@@ -29,9 +31,6 @@ export default function Pages() {
   const [treeData, setTreeData] = useState([]);
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     if (pages) setTreeData(pages);
@@ -44,7 +43,6 @@ export default function Pages() {
       try {
         // Automatically save page order
         await updatePageOrder(newTree);
-        console.log("Page order saved automatically");
       } catch (error) {
         console.error("Error during automatic order saving:", error);
         // Optional: show error notification to user
@@ -75,8 +73,6 @@ export default function Pages() {
           };
           return updateRecursive(prev);
         });
-
-        console.log(`Visibilité mise à jour pour ${item.name}: ${newVal}`);
       } catch (error) {
         console.error(
           "Erreur lors de la mise à jour de la visibilité :",
@@ -95,30 +91,21 @@ export default function Pages() {
     [router],
   );
 
-  // Delete - avec axiosClient
-  const handleDelete = useCallback((item) => {
-    setItemToDelete(item);
-    setShowDeleteModal(true);
-  }, []);
-
-  const confirmDelete = useCallback(async () => {
-    if (!itemToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      await axios.delete(`/api/pages/${itemToDelete.pageId}`);
-      await refetch();
-      setTreeData((prev) => removeItem(prev, itemToDelete.id));
-      showSuccess("Page supprimée", "La page a été supprimée avec succès");
-    } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
-      showError("Erreur de suppression", "Impossible de supprimer la page");
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      setItemToDelete(null);
-    }
-  }, [itemToDelete, axios, refetch, showSuccess, showError]);
+  // Delete - appelé après confirmation interne du DeleteButton
+  const handleDelete = useCallback(
+    async (item) => {
+      try {
+        await axios.delete(`/api/pages/${item.pageId}`);
+        await refetch();
+        setTreeData((prev) => removeItem(prev, item.id));
+        showSuccess("Page supprimée", "La page a été supprimée avec succès");
+      } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+        showError("Erreur de suppression", "Impossible de supprimer la page");
+      }
+    },
+    [axios, refetch, showSuccess, showError],
+  );
 
   // Création directe d'une page racine
   const handleCreateRootPage = useCallback(async () => {
@@ -153,12 +140,11 @@ export default function Pages() {
     }
   };
 
-  if (loading) return <p>Chargement…</p>;
   if (error) return <p>Erreur: {error.message}</p>;
 
   return (
     <SceneLayout>
-      <Title label="Website" onPublish={handlePublishPages} />
+      <Title label="Website" onPublish={handlePublishPages} loading={loading} />
 
       <Utilities
         actions={[
@@ -168,6 +154,7 @@ export default function Pages() {
             callback: handleCreateRootPage,
           },
         ]}
+        loading={loading}
       />
 
       <DraggableTree
@@ -177,6 +164,7 @@ export default function Pages() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         canHaveChildren={() => true}
+        loading={loading}
       />
 
       <Notification
@@ -187,18 +175,7 @@ export default function Pages() {
         message={notification.message}
       />
 
-      <ConfirmModal
-        open={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setItemToDelete(null);
-        }}
-        onConfirm={confirmDelete}
-        title="Supprimer la page"
-        message={`Êtes-vous sûr de vouloir supprimer "${itemToDelete?.name}" ? Cette action est irréversible.`}
-        isLoading={isDeleting}
-        variant="danger"
-      />
+      {/* ConfirmModal removed: DeleteButton shows its own confirmation modal */}
     </SceneLayout>
   );
 }

@@ -23,6 +23,24 @@ export default function MediaGrid({
   const gridClasses =
     "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4";
 
+  // If loading, show 3 placeholder boxes resembling images
+  if (loading) {
+    return (
+      <div className={`${gridClasses} ${className}`}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <motion.div
+            key={`placeholder-${i}`}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative group aspect-square skeleton rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center"
+          >
+            <div className="w-3/4 h-3/4 bg-white/10 rounded" />
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className={`${gridClasses} ${className}`}>
       <AnimatePresence>

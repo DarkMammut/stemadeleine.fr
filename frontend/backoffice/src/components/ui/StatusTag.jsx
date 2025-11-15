@@ -38,6 +38,7 @@ const StatusTag = ({
   size = "default",
   className,
   children,
+  loading = false,
   ...props
 }) => {
   // Auto-detect variant based on status if not provided
@@ -62,27 +63,27 @@ const StatusTag = ({
   const displayText = children || status;
   const statusVariant = getStatusVariant(status);
 
+  if (loading) {
+    // Display a placeholder badge (animate-pulse) when loading is true
+    const sizeClass =
+      size === "lg" ? "h-6 w-20" : size === "sm" ? "h-4 w-16" : "h-5 w-20";
+    return (
+      <span
+        className={cn(
+          `inline-block rounded-full bg-gray-50 dark:bg-gray-600 animate-pulse ${sizeClass}`,
+          className,
+        )}
+        style={{ display: "inline-block" }}
+      />
+    );
+  }
+
   return (
     <span
       className={cn(tagVariants({ variant: statusVariant, size }), className)}
       {...props}
     >
       {displayText}
-    </span>
-  );
-};
-
-// Export individual Tag component for general use
-export const Tag = ({
-  variant = "default",
-  size = "default",
-  className,
-  children,
-  ...props
-}) => {
-  return (
-    <span className={cn(tagVariants({ variant, size }), className)} {...props}>
-      {children}
     </span>
   );
 };

@@ -11,6 +11,7 @@ export default function ActiveSwitch({
   isActive = false,
   onChange,
   saving = false,
+  loading = false,
   accountOwnerId = null,
 }) {
   const [open, setOpen] = useState(false);
@@ -39,8 +40,10 @@ export default function ActiveSwitch({
     };
   }, [getCurrentUser]);
 
+  const effectiveLoading = Boolean(loading || saving);
+
   const handleToggle = (nextChecked) => {
-    if (saving) return;
+    if (effectiveLoading) return;
 
     // If trying to deactivate the account we're currently logged with -> forbidden
     const ownerId = accountOwnerId || null;
@@ -84,20 +87,26 @@ export default function ActiveSwitch({
 
   return (
     <>
-      <Panel title={title}>
+      <Panel title={title} loading={effectiveLoading}>
         <label
           htmlFor="active-switch"
-          className="flex items-center gap-3 cursor-pointer"
+          className={`flex items-center gap-3 ${
+            effectiveLoading ? "pointer-events-none" : "cursor-pointer"
+          }`}
         >
           <Switch
             id="active-switch"
             checked={!!isActive}
             onChange={handleToggle}
-            disabled={saving}
+            disabled={effectiveLoading}
           />
           <span className="font-medium text-gray-900">
-            {label}
-            {saving && (
+            {effectiveLoading ? (
+              <span className="inline-block w-40 h-4 skeleton rounded" />
+            ) : (
+              label
+            )}
+            {saving && !loading && (
               <span className="text-gray-500 ml-2">(Sauvegarde...)</span>
             )}
           </span>
@@ -136,6 +145,7 @@ ActiveSwitch.propTypes = {
   isActive: PropTypes.bool,
   onChange: PropTypes.func,
   saving: PropTypes.bool,
+  loading: PropTypes.bool,
   accountOwnerId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
@@ -145,5 +155,6 @@ ActiveSwitch.defaultProps = {
   isActive: false,
   onChange: null,
   saving: false,
+  loading: false,
   accountOwnerId: null,
 };

@@ -3,13 +3,12 @@
 import React, { useEffect, useState } from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import PagesTabs from "@/components/PagesTabs";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
 import useGetPage from "@/hooks/useGetPage";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
-import EditablePanel from "@/components/ui/EditablePanel";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAxiosClient } from "@/utils/axiosClient";
@@ -166,60 +165,34 @@ export default function EditPage({ pageId }) {
         onPublish={handlePublishPage}
         showBreadcrumbs={!!pageData}
         breadcrumbs={breadcrumbs}
+        loading={!page}
       />
       <PagesTabs pageId={pageId} />
-      <Utilities actions={[]} />
-      {!pageData ? (
-        <div className="text-center py-8 text-gray-500">
-          Chargement des données...
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Section Visibilité séparée */}
-          <VisibilitySwitch
-            title="Visibilité de la page"
-            label="Page visible sur le site"
-            isVisible={pageData?.isVisible || false}
-            onChange={handleVisibilityChange}
-            savingVisibility={savingVisibility}
-          />
+      <Utilities actions={[]} loading={!page} />
+      {/* On laisse les composants gérer le loading via leurs props */}
+      <div className="space-y-6">
+        {/* Section Visibilité séparée */}
+        <VisibilitySwitch
+          title="Visibilité de la page"
+          label="Page visible sur le site"
+          isVisible={pageData?.isVisible || false}
+          onChange={handleVisibilityChange}
+          savingVisibility={savingVisibility}
+          loading={!pageData}
+        />
 
-          {/* Formulaire principal - Ne s'affiche que quand pageData est complètement chargé */}
-          {pageData && Object.keys(pageData).length > 0 && (
-            <EditablePanel
-              key={`${pageData.id || "page-form"}-${formKey}`}
-              title="Détails de la page"
-              fields={fields}
-              initialValues={pageData}
-              onSubmit={handleSubmit}
-              loading={saving}
-              onCancelExternal={handleCancelEdit}
-              renderForm={({
-                initialValues,
-                onCancel,
-                onSubmit,
-                onChange,
-                loading,
-              }) => (
-                // MyForm se contente d'appeler onSubmit / onCancel fournis par EditablePanel
-                <MyForm
-                  title="Détails de la page"
-                  fields={fields}
-                  initialValues={initialValues}
-                  onSubmit={onSubmit}
-                  onChange={onChange}
-                  loading={loading}
-                  submitButtonLabel="Enregistrer la page"
-                  onCancel={onCancel}
-                  cancelButtonLabel="Annuler"
-                  successMessage="La page a été mise à jour avec succès"
-                  errorMessage="Impossible d'enregistrer la page"
-                />
-              )}
-            />
-          )}
-        </div>
-      )}
+        {/* Formulaire principal */}
+        <EditablePanelV2
+          key={`${(pageData && pageData.id) || "page-form"}-${formKey}`}
+          title="Détails de la page"
+          fields={fields}
+          initialValues={pageData || {}}
+          onSubmit={handleSubmit}
+          loading={saving || !pageData}
+          onCancelExternal={handleCancelEdit}
+          displayColumns={2}
+        />
+      </div>
       {/* Gestion de l'image de bannière (Hero Media) */}
       {pageData && (
         <MediaManager

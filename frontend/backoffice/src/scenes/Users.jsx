@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { useUserOperations } from "@/hooks/useUserOperations";
-import CardList from "@/components/CardList";
+import CardList from "@/components/ui/CardList";
 import UserCard from "@/components/UserCard";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Notification from "@/components/ui/Notification";
@@ -110,12 +111,7 @@ export default function Users() {
     router.push(`/users/${user.id}`);
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">Chargement des utilisateurs...</div>
-    );
-  }
-
+  // show header + utilities and skeleton to avoid flashes
   return (
     <SceneLayout>
       <Title label="Adhérents" />
@@ -143,16 +139,22 @@ export default function Users() {
         ]}
       />
 
-      <CardList emptyMessage="Aucun utilisateur trouvé.">
-        {users.map((user) => (
-          <UserCard
-            key={user.id}
-            user={user}
-            onClick={() => handleUserClick(user)}
-            showAdherentFlag={showAdherentsOnly}
-          />
-        ))}
-      </CardList>
+      {loading ? (
+        <div className="mt-4">
+          <LoadingSkeleton variant="card" count={10} showActions={false} />
+        </div>
+      ) : (
+        <CardList emptyMessage="Aucun utilisateur trouvé.">
+          {users.map((user) => (
+            <UserCard
+              key={user.id}
+              user={user}
+              onClick={() => handleUserClick(user)}
+              showAdherentFlag={showAdherentsOnly}
+            />
+          ))}
+        </CardList>
+      )}
 
       <Pagination
         page={pageInfo.page}

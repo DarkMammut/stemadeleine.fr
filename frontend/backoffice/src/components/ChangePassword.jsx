@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Panel from "@/components/ui/Panel";
-import MyForm from "@/components/MyForm";
+import MyForm from "@/components/ui/MyForm";
 import PropTypes from "prop-types";
 import { useNotification } from "@/hooks/useNotification";
 import { useAccountOperations } from "@/hooks/useAccountOperations";

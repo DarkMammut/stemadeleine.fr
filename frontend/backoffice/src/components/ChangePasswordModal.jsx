@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import Button from "@/components/ui/Button";
-import MyForm from "@/components/MyForm";
+import MyForm from "@/components/ui/MyForm";
 import { useAccountOperations } from "@/hooks/useAccountOperations";
 import { useNotification } from "@/hooks/useNotification";
 import PropTypes from "prop-types";

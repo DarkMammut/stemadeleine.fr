@@ -3,7 +3,7 @@
 import React from "react";
 import Card from "@/components/ui/Card";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
-import Currency from "@/components/Currency";
+import Currency from "@/components/ui/Currency";
 
 export default function CampaignCard({ campaign, onClick }) {
   const getStatusColor = (state) => {

@@ -29,8 +29,8 @@ const ReactQuill = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-32 bg-gray-100 animate-pulse rounded flex items-center justify-center">
-        <span className="text-gray-500">Loading editor...</span>
+      <div className="h-32 skeleton rounded flex items-center justify-center">
+        <span className="text-gray-500">Chargement éditeur...</span>
       </div>
     ),
   },
@@ -60,7 +60,7 @@ const RichTextEditor = ({
         link.rel = "stylesheet";
         link.href = "https://cdn.quilljs.com/1.3.6/quill.snow.css";
         link.onload = () => {
-          console.log("Quill CSS loaded successfully");
+          // Quill CSS loaded — no debug logs to avoid console noise
         };
         link.onerror = () => {
           console.warn("Failed to load Quill CSS from CDN");
@@ -129,8 +129,8 @@ const RichTextEditor = ({
   // N'afficher l'éditeur que côté client
   if (!isMounted) {
     return (
-      <div className="h-32 bg-gray-100 animate-pulse rounded flex items-center justify-center">
-        <span className="text-gray-500">Loading editor...</span>
+      <div className="h-32 skeleton rounded flex items-center justify-center">
+        <span className="text-gray-500">Chargement éditeur...</span>
       </div>
     );
   }

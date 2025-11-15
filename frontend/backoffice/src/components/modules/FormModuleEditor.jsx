@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
@@ -12,12 +12,12 @@ export default function FormModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0);
 
   // Champs basés sur le modèle Java Form
   const fields = [
@@ -66,10 +66,7 @@ export default function FormModuleEditor({
     }
   };
 
-  const handleFormChange = () => {
-    // MyForm gère déjà son état interne
-    // Cette fonction peut être utilisée pour des effets de bord si nécessaire
-  };
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   const handleSubmit = async (values) => {
     try {
@@ -88,11 +85,6 @@ export default function FormModuleEditor({
       alert("Erreur lors de la sauvegarde du module");
       setSaving(false);
     }
-  };
-
-  const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -120,19 +112,15 @@ export default function FormModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "form-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module formulaire"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du formulaire"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={() => {}}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Media manager (remplace MediaPicker) */}
       <MediaManager

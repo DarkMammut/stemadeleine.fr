@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
@@ -12,12 +12,13 @@ export default function VideoModuleEditor({
   moduleData,
   setModuleData,
   refetch,
+  loading: parentLoading = false,
 }) {
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [formKey, setFormKey] = useState(0); // Clé pour forcer le remontage du formulaire
+  const effectiveLoading = Boolean(parentLoading || saving);
 
   // Champs spécifiques au module vidéo
   const fields = [
@@ -58,18 +59,6 @@ export default function VideoModuleEditor({
     },
   ];
 
-  const attachToEntity = async (mediaId) => {
-    try {
-      await setModuleMedia(moduleId, mediaId);
-      refetch();
-    } catch (error) {
-      console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
-    }
-  };
-
-  const handleFormChange = () => {};
-
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
@@ -93,8 +82,7 @@ export default function VideoModuleEditor({
   };
 
   const handleCancelEdit = () => {
-    // Force le remontage du formulaire pour revenir aux valeurs initiales
-    setFormKey((prev) => prev + 1);
+    // No-op
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -115,7 +103,7 @@ export default function VideoModuleEditor({
     await setModuleMedia(moduleId, mediaId);
   };
 
-  const handleMediaRemove = async (contentId, mediaId) => {
+  const handleMediaRemove = async (_contentId, _mediaId) => {
     await setModuleMedia(moduleId, null);
   };
 
@@ -137,19 +125,15 @@ export default function VideoModuleEditor({
       />
 
       {/* Formulaire principal */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`${moduleId || "video-module"}-${formKey}`}
-          fields={fields}
-          initialValues={moduleData}
-          onSubmit={handleSubmit}
-          onChange={handleFormChange}
-          loading={saving}
-          submitButtonLabel="Enregistrer le module vidéo"
-          onCancel={handleCancelEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails du module vidéo"
+        fields={fields}
+        initialValues={moduleData || {}}
+        onSubmit={handleSubmit}
+        onCancelExternal={handleCancelEdit}
+        loading={saving || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Sélecteur de média */}
       <MediaManager

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MyForm from "@/components/MyForm";
+import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
 import useGetModule from "@/hooks/useGetModule";
@@ -17,6 +17,7 @@ export default function NewsletterModuleEditor({
   moduleData: _initialModuleData,
   setModuleData: setParentModuleData,
   refetch: _parentRefetch,
+  loading: parentLoading = false,
 }) {
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
@@ -184,9 +185,10 @@ export default function NewsletterModuleEditor({
     }
   };
 
-  if (moduleLoading || newsletterLoading || variantsLoading) {
-    return <div className="p-4">Chargement...</div>;
-  }
+  // Ne pas return tôt; les panels gèreront leur loading via props
+  const effectiveLoading = Boolean(
+    parentLoading || moduleLoading || newsletterLoading || variantsLoading,
+  );
 
   return (
     <div className="space-y-6">
@@ -208,34 +210,26 @@ export default function NewsletterModuleEditor({
       />
 
       {/* Formulaire Module (name, title) */}
-      {moduleData && Object.keys(moduleData).length > 0 && (
-        <MyForm
-          key={`module-${moduleId}`}
-          title="Informations du module"
-          fields={moduleFields}
-          initialValues={moduleData}
-          onSubmit={handleModuleSubmit}
-          loading={savingModule}
-          submitButtonLabel="Enregistrer les informations du module"
-          onCancel={handleCancelModuleEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Informations du module"
+        fields={moduleFields}
+        initialValues={moduleData || {}}
+        onSubmit={handleModuleSubmit}
+        onCancelExternal={handleCancelModuleEdit}
+        loading={savingModule || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Formulaire Newsletter (variant, writer, writingDate) */}
-      {newsletterData && Object.keys(newsletterData).length > 0 && (
-        <MyForm
-          key={`newsletter-${newsletter?.id}`}
-          title="Détails de la newsletter"
-          fields={newsletterFields}
-          initialValues={newsletterData}
-          onSubmit={handleNewsletterSubmit}
-          loading={savingNewsletter}
-          submitButtonLabel="Enregistrer les détails de la newsletter"
-          onCancel={handleCancelNewsletterEdit}
-          cancelButtonLabel="Annuler"
-        />
-      )}
+      <EditablePanelV2
+        title="Détails de la newsletter"
+        fields={newsletterFields}
+        initialValues={newsletterData || {}}
+        onSubmit={handleNewsletterSubmit}
+        onCancelExternal={handleCancelNewsletterEdit}
+        loading={savingNewsletter || effectiveLoading}
+        displayColumns={2}
+      />
 
       {/* Gestion des contenus */}
       <ContentManager

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ColorPicker from "@/components/ColorPicker";
+import ColorPicker from "@/components/ui/ColorPicker";
 import Button from "@/components/ui/Button";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";

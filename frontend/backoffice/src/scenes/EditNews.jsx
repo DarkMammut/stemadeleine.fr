@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Utilities from "@/components/Utilities";
+import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
-import MyForm from "@/components/MyForm";
 import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
@@ -24,7 +23,6 @@ export default function EditNews({ newsId }) {
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [error, setError] = useState(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
-  const [formKey, setFormKey] = useState(0);
 
   const axios = useAxiosClient();
   const router = useRouter();
@@ -132,10 +130,6 @@ export default function EditNews({ newsId }) {
     },
   ];
 
-  const handleFormChange = (name, value, allValues) => {
-    setNewsData((prev) => ({ ...prev, ...allValues }));
-  };
-
   const handleSubmit = async (values) => {
     try {
       setSaving(true);
@@ -182,7 +176,6 @@ export default function EditNews({ newsId }) {
 
   const handleCancelEdit = () => {
     loadNews();
-    setFormKey((prev) => prev + 1);
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -240,7 +233,8 @@ export default function EditNews({ newsId }) {
     }
   };
 
-  if (loading) return <div className="text-center py-8">Chargement...</div>;
+  const effectiveLoading = loading;
+
   if (error)
     return (
       <div className="text-center py-8 text-red-600">
@@ -254,9 +248,48 @@ export default function EditNews({ newsId }) {
 
       <Utilities actions={[]} />
 
-      {!newsData ? (
-        <div className="text-center py-8 text-text-muted">
-          Chargement des données...
+      {effectiveLoading || !newsData ? (
+        <div className="space-y-6">
+          <PublicationInfoCard loading={effectiveLoading} />
+
+          <VisibilitySwitch loading={effectiveLoading} />
+
+          <EditablePanel
+            title="Informations de l'actualité"
+            loading={effectiveLoading}
+            canEdit={false}
+            fields={fields}
+            initialValues={newsData || {}}
+            displayColumns={2}
+            displayGap={4}
+          />
+
+          <ContentManager
+            parentId={newsId}
+            parentType="news-publication"
+            customLabels={{
+              header: "Contenus de l'actualité",
+              addButton: "Ajouter un contenu",
+              empty: "Aucun contenu pour cette actualité.",
+              loading: "Chargement des contenus...",
+              saveContent: "Enregistrer le contenu",
+              bodyLabel: "Contenu de l'actualité",
+            }}
+            loading={effectiveLoading}
+          />
+
+          <MediaManager
+            title="Image de l'actualité"
+            content={{
+              id: newsId,
+              medias: newsData?.media ? [newsData.media] : [],
+            }}
+            onMediaAdd={handleAddMedia}
+            onMediaRemove={handleRemoveMedia}
+            onMediaChanged={loadNews}
+            maxMedias={1}
+            loading={effectiveLoading}
+          />
         </div>
       ) : (
         <div className="space-y-6">
@@ -287,6 +320,7 @@ export default function EditNews({ newsId }) {
             isVisible={newsData?.isVisible || false}
             onChange={handleVisibilityChange}
             savingVisibility={savingVisibility}
+            loading={effectiveLoading}
           />
 
           {/* Main Form */}
@@ -297,23 +331,9 @@ export default function EditNews({ newsId }) {
               initialValues={newsData}
               fields={fields}
               displayColumns={2}
-              displayGap={4}
               onSubmit={handleSubmit}
               onCancelExternal={handleCancelEdit}
-              renderForm={({ initialValues, onCancel, onSubmit, loading }) => (
-                <MyForm
-                  key={`news-form-${formKey}`}
-                  fields={fields}
-                  initialValues={initialValues}
-                  onSubmit={onSubmit}
-                  onChange={handleFormChange}
-                  loading={loading}
-                  submitButtonLabel="Enregistrer l'actualité"
-                  onCancel={onCancel}
-                  cancelButtonLabel="Annuler"
-                />
-              )}
-            />
+            ></EditablePanel>
           )}
 
           {/* Rich Text Content Editor */}
@@ -328,6 +348,7 @@ export default function EditNews({ newsId }) {
               saveContent: "Enregistrer le contenu",
               bodyLabel: "Contenu de l'actualité",
             }}
+            loading={effectiveLoading}
           />
         </div>
       )}
@@ -344,6 +365,7 @@ export default function EditNews({ newsId }) {
           onMediaRemove={handleRemoveMedia}
           onMediaChanged={loadNews}
           maxMedias={1}
+          loading={effectiveLoading}
         />
       )}
 

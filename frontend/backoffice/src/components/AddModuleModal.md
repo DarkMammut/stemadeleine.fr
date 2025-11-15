@@ -385,8 +385,8 @@ onConfirm = {(moduleType)
 
 - [ConfirmModal](./ConfirmModal.jsx) - Modale de confirmation générique
 - [DeleteModal](./DeleteModal.jsx) - Modale de suppression
-- [DraggableTree](./DraggableTree.jsx) - Arbre draggable
-- [SortableItem](./SortableItem.jsx) - Élément sortable avec bouton d'ajout
+- [DraggableTree](ui/DraggableTree.jsx) - Arbre draggable
+- [SortableItem](ui/SortableItem.jsx) - Élément sortable avec bouton d'ajout
 
 ## Support
 
