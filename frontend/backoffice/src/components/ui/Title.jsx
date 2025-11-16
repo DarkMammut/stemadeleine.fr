@@ -13,6 +13,7 @@ export default function Title({
   breadcrumbs = [],
   autoHideBackButton = true, // Nouvelle prop pour contrôler l'auto-hide
   loading = false, // nouvelle prop pour désactiver actions pendant le chargement
+  rightActions = null, // nouveaux boutons à afficher à droite (React node ou array)
 }) {
   const router = useRouter();
 
@@ -95,8 +96,10 @@ export default function Title({
           </div>
         </div>
 
-        {onPublish && (
-          <div className="mt-4 flex shrink-0 md:mt-0 md:ml-4">
+        <div className="mt-4 flex shrink-0 md:mt-0 md:ml-4 items-center gap-2">
+          {rightActions}
+
+          {onPublish && (
             <PublishButton
               onPublish={onPublish}
               publishLabel="Publier"
@@ -104,8 +107,8 @@ export default function Title({
               size="md"
               disabled={loading}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/ui/Utilities";
-import CardList from "@/components/ui/CardList";
 import CampaignCard from "@/components/CampaignCard";
+import CardLayout from "@/components/ui/CardLayout";
 
-export default function Campaigns({ onNotifySuccess, onNotifyError }) {
+export default function Campaigns({ onNotifyError, refreshSignal }) {
   const axios = useAxiosClient();
   const [campaigns, setCampaigns] = useState([]);
 
@@ -41,22 +41,12 @@ export default function Campaigns({ onNotifySuccess, onNotifyError }) {
     fetchCampaigns();
   }, [axios]);
 
-  const handleImportHelloAsso = async () => {
-    try {
-      await axios.post("/api/helloasso/import");
-      await fetchCampaigns();
-      onNotifySuccess?.(
-        "Import HelloAsso terminé",
-        "Les données ont été mises à jour avec succès",
-      );
-    } catch (error) {
-      console.error("Erreur lors de l'import HelloAsso:", error);
-      onNotifyError?.(
-        "Erreur d'import",
-        "Impossible d'importer les données HelloAsso",
-      );
+  // when parent increments refreshSignal, refetch campaigns
+  useEffect(() => {
+    if (typeof refreshSignal !== "undefined") {
+      fetchCampaigns();
     }
-  };
+  }, [refreshSignal]);
 
   const handleCampaignClick = (campaign) => {
     if (campaign.url) {
@@ -70,17 +60,10 @@ export default function Campaigns({ onNotifySuccess, onNotifyError }) {
 
   return (
     <>
-      <Utilities
-        actions={[
-          {
-            variant: "refresh",
-            label: "Actualiser HelloAsso",
-            callback: handleImportHelloAsso,
-          },
-        ]}
-      />
+      {/* Utilities left empty here - refresh is provided by parent Title */}
+      <Utilities actions={[]} />
 
-      <CardList emptyMessage="Aucune campagne trouvée.">
+      <CardLayout emptyMessage="Aucune campagne trouvée.">
         {filteredCampaigns.map((campaign) => (
           <CampaignCard
             key={campaign.id}
@@ -88,7 +71,7 @@ export default function Campaigns({ onNotifySuccess, onNotifyError }) {
             onClick={() => handleCampaignClick(campaign)}
           />
         ))}
-      </CardList>
+      </CardLayout>
     </>
   );
 }

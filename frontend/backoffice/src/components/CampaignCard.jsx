@@ -2,7 +2,7 @@
 
 import React from "react";
 import Card from "@/components/ui/Card";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, UsersIcon } from "@heroicons/react/24/outline";
 import Currency from "@/components/ui/Currency";
 
 export default function CampaignCard({ campaign, onClick }) {
@@ -17,12 +17,23 @@ export default function CampaignCard({ campaign, onClick }) {
     }
   };
 
+  // choisir icône et couleurs selon campaign.formType
+  const type = (campaign.formType || "").toString().toUpperCase();
+  const isMembership = type === "MEMBERSHIP";
+  const Icon = isMembership ? UsersIcon : BanknotesIcon;
+  const iconBgClass = isMembership ? "bg-blue-200" : "bg-green-200";
+  const iconColorClass = isMembership ? "text-blue-600" : "text-green-600";
+
   return (
-    <Card onClick={onClick}>
+    <Card
+      as="div"
+      className={"overflow-hidden h-full bg-white shadow-sm sm:rounded-md"}
+      onClick={onClick}
+    >
       <div className="flex items-start gap-4">
         {/* Icon */}
-        <div className="flex-shrink-0 mt-1">
-          <BanknotesIcon className="h-6 w-6 text-gray-400" />
+        <div className={`flex-shrink-0 mt-1 rounded-full ${iconBgClass} p-3`}>
+          <Icon className={`w-6 h-6 ${iconColorClass}`} />
         </div>
 
         {/* Content */}

@@ -3,13 +3,39 @@
 import React from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
-import Link from "next/link";
+import BigButton from "@/components/ui/BigButton";
+import { useRouter } from "next/navigation";
+import {
+  BuildingOffice2Icon,
+  UserGroupIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Settings() {
-  const items = [
-    { href: "/settings/organization", label: "Organisation" },
-    { href: "/settings/site", label: "Paramètres du site" },
-    { href: "/settings/accounts", label: "Comptes" },
+  const router = useRouter();
+
+  const tabs = [
+    {
+      label: "Organisation",
+      icon: BuildingOffice2Icon,
+      href: "/settings/organization",
+      bg: "bg-blue-600",
+      color: "white",
+    },
+    {
+      label: "Site",
+      icon: WrenchScrewdriverIcon,
+      href: "/settings/site",
+      bg: "bg-green-600",
+      color: "white",
+    },
+    {
+      label: "Comptes",
+      icon: UserGroupIcon,
+      href: "/settings/accounts",
+      bg: "bg-orange-600", // shorthand -> bg-blue-300
+      color: "white", // shorthand -> text-purple-600
+    },
   ];
 
   return (
@@ -17,20 +43,21 @@ export default function Settings() {
       <Title label="Paramètres" />
 
       <div className="space-y-6">
-        <p className="text-gray-600">Choisissez une section des paramètres :</p>
+        <p className="sr-only text-gray-600">
+          Choisissez une section des paramètres :
+        </p>
 
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {items.map((it) => (
-            <li key={it.href}>
-              <Link
-                href={it.href}
-                className="block p-4 bg-white shadow-sm rounded-md hover:shadow-md border border-gray-100"
-              >
-                <div className="text-lg font-medium text-gray-900">
-                  {it.label}
-                </div>
-                <div className="text-sm text-gray-500">Voir et modifier</div>
-              </Link>
+          {tabs.map((tab) => (
+            <li key={tab.href}>
+              <BigButton
+                label={tab.label}
+                icon={tab.icon}
+                onClick={() => router.push(tab.href)}
+                bg={tab.bg}
+                color={tab.color}
+                className="w-full"
+              />
             </li>
           ))}
         </ul>
