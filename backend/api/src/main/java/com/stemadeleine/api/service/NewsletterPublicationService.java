@@ -10,6 +10,8 @@ import com.stemadeleine.api.repository.NewsletterPublicationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -31,8 +33,41 @@ public class NewsletterPublicationService {
     public List<NewsletterPublication> getAllNewsletterPublications() {
         log.info("Fetching all newsletter publications (excluding deleted)");
         List<NewsletterPublication> publications = newsletterPublicationRepository
-                .findByStatusNotOrderByCreatedAtDesc(PublishingStatus.DELETED);
+                .findByStatusNot(PublishingStatus.DELETED);
         log.debug("Found {} newsletter publications", publications.size());
+        return publications;
+    }
+
+    /**
+     * Get paginated newsletter publications excluding deleted ones
+     */
+    public Page<NewsletterPublication> getAllNewsletterPublications(Pageable pageable) {
+        log.info("Fetching paginated newsletter publications (excluding deleted)");
+        Page<NewsletterPublication> publications = newsletterPublicationRepository
+                .findByStatusNot(PublishingStatus.DELETED, pageable);
+        log.debug("Found {} newsletter publications (page)", publications.getTotalElements());
+        return publications;
+    }
+
+    /**
+     * Get paginated newsletter publications with optional published filter
+     */
+    public Page<NewsletterPublication> getAllNewsletterPublications(Pageable pageable, Boolean published) {
+        log.info("Fetching paginated newsletter publications with published filter={}", published);
+        Page<NewsletterPublication> publications = newsletterPublicationRepository.findByPublishedFilter(published, pageable);
+        log.debug("Found {} newsletter publications (page) with filter", publications.getTotalElements());
+        return publications;
+    }
+
+    public Page<NewsletterPublication> getAllNewsletterPublications(Pageable pageable, Boolean published, String search) {
+        log.info("Fetching paginated newsletter publications with published filter={} and search={}", published, search);
+        Page<NewsletterPublication> publications;
+        if (search != null && !search.isBlank()) {
+            publications = newsletterPublicationRepository.findByPublishedFilterWithSearch(published, search.toLowerCase(), pageable);
+        } else {
+            publications = newsletterPublicationRepository.findByPublishedFilter(published, pageable);
+        }
+        log.debug("Found {} newsletter publications (page) with filter/search", publications.getTotalElements());
         return publications;
     }
 
@@ -65,8 +100,19 @@ public class NewsletterPublicationService {
     public List<NewsletterPublication> getPublishedNewsletters() {
         log.info("Fetching all published newsletters for public display");
         List<NewsletterPublication> newsletters = newsletterPublicationRepository
-                .findPublishedNewslettersOrderByPublishedDateDesc();
+                .findByStatusAndIsVisible(PublishingStatus.PUBLISHED, true);
         log.debug("Found {} published newsletters", newsletters.size());
+        return newsletters;
+    }
+
+    /**
+     * Get paginated published newsletters for public display
+     */
+    public Page<NewsletterPublication> getPublishedNewsletters(Pageable pageable) {
+        log.info("Fetching paginated published newsletters for public display");
+        Page<NewsletterPublication> newsletters = newsletterPublicationRepository
+                .findByStatusAndIsVisible(PublishingStatus.PUBLISHED, true, pageable);
+        log.debug("Found {} published newsletters (page)", newsletters.getTotalElements());
         return newsletters;
     }
 

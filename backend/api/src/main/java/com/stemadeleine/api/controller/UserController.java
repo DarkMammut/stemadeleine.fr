@@ -32,9 +32,37 @@ public class UserController {
     private final HelloAssoImportService helloAssoImportService;
 
     @GetMapping
-    public Page<UserBackofficeDto> getAllUsers(Pageable pageable) {
-        Page<com.stemadeleine.api.model.User> page = userRepository.findAll(pageable);
+    public Page<UserBackofficeDto> getAllUsers(Pageable pageable,
+                                               @RequestParam(value = "search", required = false) String search,
+                                               @RequestParam(value = "sortField", required = false) String sortField,
+                                               @RequestParam(value = "sortDir", required = false) String sortDir) {
+
+        // apply sortField and sortDir if provided by building a new Pageable
+        org.springframework.data.domain.Pageable appliedPageable = pageable;
+        if (sortField != null && !sortField.isBlank()) {
+            // whitelist allowed sort fields to avoid accidental injection or invalid properties
+            java.util.Set<String> allowedFields = java.util.Set.of("firstname", "lastname", "email", "id");
+            if (allowedFields.contains(sortField)) {
+                org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.ASC;
+                if ("desc".equalsIgnoreCase(sortDir)) direction = org.springframework.data.domain.Sort.Direction.DESC;
+                appliedPageable = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(direction, sortField));
+            } else {
+                log.warn("Ignoring invalid sortField requested: {}", sortField);
+            }
+        }
+
+        Page<com.stemadeleine.api.model.User> page;
+        if (search != null && !search.isBlank()) {
+            page = userRepository.search(search.toLowerCase(), appliedPageable);
+        } else {
+            page = userRepository.findAll(appliedPageable);
+        }
         return page.map(userMapper::toBackofficeDto);
+    }
+
+    // Backwards-compatible overload for direct Java calls (tests / internal callers)
+    public Page<UserBackofficeDto> getAllUsers(Pageable pageable) {
+        return getAllUsers(pageable, null, null, null);
     }
 
     @PostMapping

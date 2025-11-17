@@ -29,11 +29,17 @@ export default function Dashboard() {
   const [campaignsRefreshCounter, setCampaignsRefreshCounter] =
     React.useState(0);
 
+  // New: dashboard refresh counter to signal KPI and chart reloads
+  const [dashboardRefreshCounter, setDashboardRefreshCounter] =
+    React.useState(0);
+
   const handleImportHelloAsso = async () => {
     try {
       await axios.post("/api/helloasso/import");
       // bump counter to signal Campaigns to refetch
       setCampaignsRefreshCounter((c) => c + 1);
+      // also bump dashboard counter to refresh KPIs and charts
+      setDashboardRefreshCounter((c) => c + 1);
       showSuccess?.(
         "Import HelloAsso terminé",
         "Les données ont été mises à jour avec succès",
@@ -52,64 +58,14 @@ export default function Dashboard() {
     let mounted = true;
     const loadKpis = async () => {
       try {
-        // Load payments
-        const payments = (await getAllPayments()) || [];
+        // Prefer server-side aggregated KPIs
+        const res = await axios.get("/api/stats/dashboard");
+        const data = res.data || {};
 
-        // Active members count via users endpoint (adherents). Use page size 1 to get totalElements
-        let membersCount;
-        try {
-          const usersPage = await getAllUsers(true, 0, 1);
-          if (usersPage) {
-            if (
-              typeof usersPage.totalElements !== "undefined" &&
-              usersPage.totalElements !== null
-            ) {
-              membersCount = usersPage.totalElements;
-            } else if (
-              typeof usersPage.total !== "undefined" &&
-              usersPage.total !== null
-            ) {
-              membersCount = usersPage.total;
-            } else if (
-              typeof usersPage.length !== "undefined" &&
-              usersPage.length !== null
-            ) {
-              membersCount = usersPage.length;
-            } else {
-              membersCount = 0;
-            }
-          } else {
-            membersCount = 0;
-          }
-        } catch (e) {
-          // fallback: try to call full list
-          membersCount = 0;
-        }
-
-        const membershipPayments = payments.filter(
-          (p) => (p.type || "").toUpperCase() === "MEMBERSHIP",
-        );
-        const donationPayments = payments.filter(
-          (p) => (p.type || "").toUpperCase() === "DONATION",
-        );
-
-        const membershipAmount = membershipPayments.reduce(
-          (s, p) => s + Number(p.amount || p.value || 0),
-          0,
-        );
-        const donationsAmount = donationPayments.reduce(
-          (s, p) => s + Number(p.amount || p.value || 0),
-          0,
-        );
-
-        // count unique donors by userId (exclude null/empty)
-        const donorIds = new Set(
-          donationPayments
-            .map((p) => (p.user && p.user.id) || p.userId || null)
-            .filter((id) => id != null && id !== ""),
-        );
-
-        const donorsCount = donorIds.size;
+        const membersCount = data.activeMembers || 0;
+        const membershipAmount = data.membershipAmount || 0;
+        const donationsAmount = data.donationsAmount || 0;
+        const donorsCount = data.donorsCount || 0;
 
         if (!mounted) return;
         setKpis({
@@ -126,7 +82,7 @@ export default function Dashboard() {
     };
     loadKpis();
     return () => (mounted = false);
-  }, [getAllPayments, getAllUsers]);
+  }, [getAllPayments, getAllUsers, dashboardRefreshCounter]);
 
   return (
     <SceneLayout>
@@ -175,6 +131,8 @@ export default function Dashboard() {
               "col-span-2 h-96 rounded-2xl shadow-md bg-blue-50 px-3 py-4"
             }
             chartHeight="h-60"
+            // pass refresh signal so chart reloads after import
+            refreshSignal={dashboardRefreshCounter}
           />
 
           {/* KPI Cards */}

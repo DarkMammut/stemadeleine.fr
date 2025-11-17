@@ -23,11 +23,22 @@ export function useUserOperations() {
   }, [axios]);
 
   // now pageable: page (0-based) and size
+  // getAllUsers supporte désormais en 4ème paramètre un objet options:
+  // { search, sortField, sortDir }
   const getAllUsers = useCallback(
-    async (adherentsOnly = false, page = 0, size = 20) => {
+    async (adherentsOnly = false, page = 0, size = 20, options = {}) => {
+      const { search, sortField, sortDir, signal } = options || {};
       const urlBase = adherentsOnly ? `${apiUrl}/adherents` : apiUrl;
-      const params = `?page=${page}&size=${size}`;
-      const res = await axios.get(`${urlBase}${params}`);
+      const params = new URLSearchParams();
+      params.set("page", page);
+      params.set("size", size);
+      if (search) params.set("search", search);
+      if (sortField) params.set("sortField", sortField);
+      if (sortDir) params.set("sortDir", sortDir);
+
+      const config = {};
+      if (signal) config.signal = signal;
+      const res = await axios.get(`${urlBase}?${params.toString()}`, config);
       // expecting a Page<T> structure from backend: { content: [...], totalElements, totalPages, number, size }
       return res.data;
     },

@@ -40,4 +40,7 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
     void softDeleteById(@Param("id") UUID id);
 
     List<Page> findByParentPage(Page parentPage);
+
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Page p WHERE LOWER(p.title) LIKE CONCAT('%',:q,'%') OR LOWER(p.name) LIKE CONCAT('%',:q,'%') OR LOWER(p.slug) LIKE CONCAT('%',:q,'%')")
+    java.util.List<com.stemadeleine.api.model.Page> search(@org.springframework.data.repository.query.Param("q") String q, org.springframework.data.domain.Pageable pageable);
 }

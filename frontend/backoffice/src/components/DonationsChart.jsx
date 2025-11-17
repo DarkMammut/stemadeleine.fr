@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { normalizeToArray } from "@/utils/normalizeApiResponse";
 import Card from "@/components/ui/Card";
 import Currency from "@/components/ui/Currency";
 import Select from "@/components/ui/Select";
@@ -24,6 +25,7 @@ const MONTHS = [
 export default function DonationsChart({
   className = "",
   chartHeight = "h-56",
+  refreshSignal = 0,
 }) {
   const axios = useAxiosClient();
   const [payments, setPayments] = useState([]);
@@ -35,19 +37,40 @@ export default function DonationsChart({
     const load = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("/api/payments");
+        // Prefer server-side aggregated monthly totals for the current year
+        const yearToFetch = year;
+        const res = await axios.get(`/api/stats/donations?year=${yearToFetch}`);
         if (!mounted) return;
-        setPayments(res.data || []);
+        const data = res.data || {};
+        // data.monthlyTotals is expected as array of 12 numbers
+        const monthly = Array.isArray(data.monthlyTotals)
+          ? data.monthlyTotals
+          : [];
+        // build payments-like array where each month has a pseudo-payment sum so existing logic can reuse
+        const paymentsArray = monthly.flatMap((amount, monthIdx) => {
+          if (!amount || amount === 0) return [];
+          // create a synthetic payment object per month to allow years set extraction
+          const pd = new Date(yearToFetch, monthIdx, 1).toISOString();
+          return [{ paymentDate: pd, amount }];
+        });
+        setPayments(paymentsArray);
       } catch (e) {
         console.error("Erreur chargement paiements pour le graphique", e);
-        setPayments([]);
+        // fallback: try legacy payments endpoint
+        try {
+          const res2 = await axios.get("/api/payments");
+          const paymentsArray = normalizeToArray(res2.data);
+          setPayments(paymentsArray);
+        } catch (e2) {
+          setPayments([]);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     };
     load();
     return () => (mounted = false);
-  }, [axios]);
+  }, [axios, year, refreshSignal]);
 
   const years = useMemo(() => {
     const set = new Set();

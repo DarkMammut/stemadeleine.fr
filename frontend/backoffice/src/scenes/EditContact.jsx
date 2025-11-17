@@ -32,7 +32,13 @@ export default function EditContact() {
     setLoading(true);
     try {
       // Load all contacts to enable navigation
-      const allContactsData = await getAllContacts();
+      const allContactsDataRaw = await getAllContacts();
+
+      // Normalize possible Page<T> shape to an array
+      const allContactsData = Array.isArray(allContactsDataRaw)
+        ? allContactsDataRaw
+        : (allContactsDataRaw?.content ?? allContactsDataRaw?.items ?? []);
+
       setAllContacts(allContactsData);
 
       // Find current contact index

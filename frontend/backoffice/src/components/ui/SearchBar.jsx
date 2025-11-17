@@ -1,331 +1,211 @@
 "use client";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import { BellIcon, Cog6ToothIcon, UserIcon } from "@heroicons/react/24/outline";
-import { Dialog, Menu, Transition } from "@headlessui/react"; // Import Menu, Transition and Dialog from @headlessui/react
-import { Fragment, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import useLogout from "@/utils/auth/useLogout";
-import NAV_ITEMS from "../navigation";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function SearchBar() {
-  const [hoverOpen, setHoverOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { signout, loading } = useLogout();
-  const router = useRouter();
-  const containerRef = useRef(null);
-  const menuButtonRef = useRef(null);
-  const leaveTimerRef = useRef(null);
+export default function SearchBar({
+  value,
+  onChange,
+  placeholder = "Search",
+  name = "search",
+  className = "",
+  // optional: function(query) => Promise<array of suggestion items>
+  // suggestion item: { id, title, subtitle?, url?, type? }
+  fetchSuggestions,
+  // called when user hits Enter without selecting a suggestion
+  onSubmit,
+  // called when user selects a suggestion: onSelect(item)
+  onSelect,
+  // enable/disable suggestions explicitly
+  enableSuggestions = !!fetchSuggestions,
+  ...props
+}) {
+  // onChange attend la nouvelle valeur pour simplifier l'utilisation
+  // support controlled (value) ou non (lorsque value === undefined)
+  const [localValue, setLocalValue] = useState(
+    value === undefined ? "" : value,
+  );
 
-  const handleSignOut = async () => {
-    const result = await signout();
-    setHoverOpen(false);
-    return result;
+  useEffect(() => {
+    if (value !== undefined) setLocalValue(value);
+  }, [value]);
+
+  const handleChange = (e) => {
+    const v = e.target.value;
+    if (onChange) onChange(v);
+    if (value === undefined) setLocalValue(v);
   };
 
+  const inputRef = useRef(null);
+
+  const handleClear = () => {
+    if (onChange) onChange("");
+    if (value === undefined) setLocalValue("");
+    try {
+      inputRef.current?.focus();
+    } catch (e) {}
+  };
+
+  // suggestions state
+  const [suggestions, setSuggestions] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState(-1);
+  const debounceRef = useRef(null);
+
+  const getQueryValue = () => (value === undefined ? localValue : value || "");
+
+  const runFetch = useCallback(
+    async (q) => {
+      if (!fetchSuggestions || !q) {
+        setSuggestions([]);
+        setOpen(false);
+        return;
+      }
+      try {
+        const res = await fetchSuggestions(q);
+        setSuggestions(Array.isArray(res) ? res : []);
+        setOpen(true);
+        setHighlight(-1);
+      } catch (e) {
+        setSuggestions([]);
+        setOpen(false);
+      }
+    },
+    [fetchSuggestions],
+  );
+
+  // debounce effect when query changes
+  useEffect(() => {
+    if (!enableSuggestions) return;
+    const q = getQueryValue();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!q) {
+      setSuggestions([]);
+      setOpen(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => runFetch(q), 260);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localValue, value, enableSuggestions, runFetch]);
+
+  // close on outside click
   useEffect(() => {
     const onOutside = (e) => {
-      if (!containerRef.current) return;
-      if (containerRef.current.contains(e.target)) return;
-      setHoverOpen(false);
+      if (!inputRef.current) return;
+      if (inputRef.current.contains(e.target)) return;
+      setOpen(false);
+      setHighlight(-1);
     };
-
-    const onKey = (e) => {
-      if (e.key === "Escape") setHoverOpen(false);
-    };
-
     document.addEventListener("mousedown", onOutside);
-    document.addEventListener("touchstart", onOutside);
-    document.addEventListener("keydown", onKey);
-
-    return () => {
-      document.removeEventListener("mousedown", onOutside);
-      document.removeEventListener("touchstart", onOutside);
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("mousedown", onOutside);
   }, []);
 
-  // focus management: focus first actionable item when opened, restore focus to avatar when closed
-  useEffect(() => {
-    if (hoverOpen) {
-      // clear any pending close timer
-      if (leaveTimerRef.current) {
-        clearTimeout(leaveTimerRef.current);
-        leaveTimerRef.current = null;
+  const submitQuery = (q) => {
+    if (onSubmit) return onSubmit(q);
+    // default does nothing; parent can navigate
+    return null;
+  };
+
+  const handleSelect = (item) => {
+    if (onSelect) return onSelect(item);
+    // fallback: if item.url provided, navigate may be handled by parent; otherwise do nothing
+    return null;
+  };
+
+  const onKeyDown = (e) => {
+    if (!enableSuggestions) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setOpen(true);
+      setHighlight((h) => Math.min(h + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlight((h) => Math.max(h - 1, 0));
+    } else if (e.key === "Enter") {
+      const q = getQueryValue();
+      if (open && highlight >= 0 && suggestions[highlight]) {
+        e.preventDefault();
+        handleSelect(suggestions[highlight]);
+        setOpen(false);
+        return;
       }
-      // focus first button inside the menu
-      const first = containerRef.current?.querySelector(
-        '[role="menu"] button:not([disabled])',
-      );
-      first?.focus();
-    } else {
-      // restore focus to menu button when menu closes
-      menuButtonRef.current?.focus();
+      // submit
+      submitQuery(q);
+      setOpen(false);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+      setHighlight(-1);
     }
-  }, [hoverOpen]);
-
-  const handleMouseEnter = () => {
-    if (leaveTimerRef.current) {
-      clearTimeout(leaveTimerRef.current);
-      leaveTimerRef.current = null;
-    }
-    setHoverOpen(true);
   };
-
-  const handleMouseLeave = () => {
-    // small delay to avoid flicker when moving between avatar and menu
-    leaveTimerRef.current = setTimeout(() => {
-      setHoverOpen(false);
-      leaveTimerRef.current = null;
-    }, 150);
-  };
-
-  const mobileItems = NAV_ITEMS;
-
-  // prevent background scrolling when mobile menu is open
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-gray-900 shadow-xs">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative flex justify-between items-center h-14">
-          {/* Mobile burger - visible on small screens */}
-          <div className="md:hidden flex items-center">
-            <button
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-menu"
-              onClick={() => setMobileOpen((s) => !s)}
-              className="p-2 rounded-md text-white hover:bg-gray-700"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
+    <div className={`relative grid w-full grid-cols-1 ${className}`}>
+      <input
+        ref={inputRef}
+        name={name}
+        placeholder={placeholder}
+        // value controlled/uncontrolled
+        value={value === undefined ? localValue : value}
+        onChange={handleChange}
+        onKeyDown={onKeyDown}
+        aria-autocomplete={enableSuggestions ? "list" : undefined}
+        aria-expanded={enableSuggestions ? open : undefined}
+        className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pr-10 pl-10 text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+        {...props}
+      />
 
-          {/* Title - hidden on mobile */}
-          <div className="hidden md:flex flex-shrink-0 mr-4">
-            <div className="text-white font-semibold leading-tight text-xs md:text-sm">
-              <span className="block">Les Amis de Sainte</span>
-              <span className="block">Madeleine de la Jarrie</span>
-            </div>
-          </div>
-          <div className="min-w-0 flex-1 md:px-8 lg:px-0">
-            <div className="flex items-center px-6 py-3.5 md:mx-auto md:max-w-3xl lg:mx-0 lg:max-w-none">
-              <div className="grid w-full grid-cols-1">
-                <input
-                  name="search"
-                  placeholder="Search"
-                  className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pr-3 pl-10 text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-                <MagnifyingGlassIcon
-                  aria-hidden="true"
-                  className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              className="relative rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 cursor-pointer"
-            >
-              <span className="sr-only">View notifications</span>
-              <BellIcon aria-hidden="true" className="w-6 h-6" />
-            </button>
+      <MagnifyingGlassIcon
+        aria-hidden="true"
+        className="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400"
+      />
 
-            <Menu
-              as="div"
-              className="relative"
-              ref={containerRef}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Menu.Button
-                as="button"
-                type="button"
-                ref={menuButtonRef}
-                onClick={() => {
-                  router.push("/profile");
-                  setHoverOpen(false);
-                }}
-                className="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
-                aria-expanded={hoverOpen}
-              >
-                <span className="sr-only">Open user menu</span>
-                {/* remplaced the avatar image with the UserIcon and a subtle circular bg */}
-                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                  <UserIcon className="w-5 h-5 text-white" />
-                </div>
-              </Menu.Button>
-
-              <Transition
-                as={Fragment}
-                show={hoverOpen}
-                enter="transition ease-out duration-150"
-                enterFrom="transform opacity-0 -translate-y-2"
-                enterTo="transform opacity-100 translate-y-0"
-                leave="transition ease-in duration-100"
-                leaveFrom="transform opacity-100 translate-y-0"
-                leaveTo="transform opacity-0 -translate-y-2"
-              >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg outline-1 outline-black/5 ring-1 ring-black/5">
-                  <Menu.Item>
-                    {() => (
-                      <button
-                        onClick={() => {
-                          router.push("/profile");
-                          setHoverOpen(false);
-                        }}
-                        className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <UserIcon className="w-5 h-5 mr-3 text-gray-500" />
-                        Your Profile
-                      </button>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {() => (
-                      <button
-                        className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => {
-                          router.push("/settings");
-                          setHoverOpen(false);
-                        }}
-                      >
-                        <Cog6ToothIcon className="w-5 h-5 mr-3 text-gray-500" />
-                        Settings
-                      </button>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {() => (
-                      <button
-                        type="button"
-                        onClick={handleSignOut}
-                        disabled={loading}
-                        className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5 mr-3 text-gray-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12H3m0 0l3-3m-3 3l3 3M21 12v6a2 2 0 01-2 2H13"
-                          />
-                        </svg>
-                        {loading ? "Signing out..." : "Sign out"}
-                      </button>
-                    )}
-                  </Menu.Item>
-                </Menu.Items>
-              </Transition>
-            </Menu>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile overlay navigation */}
-      <Transition show={mobileOpen} as={Fragment} appear>
-        <Dialog
-          as="div"
-          className="fixed inset-0 z-50 md:hidden"
-          onClose={setMobileOpen}
-          aria-modal={true}
+      {/* Clear button */}
+      {onChange && (value || localValue) ? (
+        <button
+          type="button"
+          onClick={handleClear}
+          aria-label="Clear search"
+          className="col-start-1 row-start-1 justify-self-end mr-2 text-gray-400 hover:text-gray-600 cursor-pointer"
         >
-          <div
-            className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
-            aria-hidden="true"
-          />
+          <XMarkIcon className="h-4 w-4" />
+        </button>
+      ) : null}
 
-          <div className="fixed inset-0 flex">
-            <Transition.Child
-              as={Fragment}
-              enter="transition ease-out duration-300 transform"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transition ease-in duration-200 transform"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
+      {/* suggestions dropdown */}
+      {enableSuggestions && open && suggestions && suggestions.length > 0 ? (
+        <ul
+          role="listbox"
+          aria-label="Search suggestions"
+          className="absolute left-0 right-0 z-50 mt-10 max-h-64 overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black/5"
+        >
+          {suggestions.map((it, idx) => (
+            <li
+              key={it.id ?? `${it.type}-${idx}`}
+              role="option"
+              aria-selected={highlight === idx}
+              onMouseDown={(e) => {
+                // prevent blur before click, then perform selection immediately
+                e.preventDefault();
+                handleSelect(it);
+                setOpen(false);
+              }}
+              onMouseEnter={() => setHighlight(idx)}
+              className={`px-3 py-2 cursor-pointer hover:bg-gray-50 ${highlight === idx ? "bg-gray-100" : ""}`}
             >
-              <Dialog.Panel
-                id="mobile-menu"
-                className="relative w-full bg-gray-900 bg-opacity-95 p-6 backdrop-blur-sm overflow-auto"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <Dialog.Title className="text-white font-semibold leading-tight text-sm">
-                    <span className="block">Les Amis de Sainte</span>
-                    <span className="block">Madeleine de la Jarrie</span>
-                  </Dialog.Title>
-                  <button
-                    onClick={() => setMobileOpen(false)}
-                    className="p-2 rounded-md text-white hover:bg-gray-800"
-                    aria-label="Close menu"
-                  >
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <nav className="flex flex-col space-y-3">
-                  {mobileItems.map((it) => (
-                    <button
-                      key={it.key}
-                      onClick={() => {
-                        router.push(it.url);
-                        setMobileOpen(false);
-                      }}
-                      className="text-left px-4 py-3 rounded-md hover:bg-gray-800 text-white"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-gray-300">{it.icon}</span>
-                        <span className="text-white">{it.label}</span>
-                      </div>
-                    </button>
-                  ))}
-                </nav>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition>
-    </header>
+              <div className="text-sm font-medium text-gray-900">
+                {it.title || it.label}
+              </div>
+              {it.subtitle ? (
+                <div className="text-xs text-gray-500">{it.subtitle}</div>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }

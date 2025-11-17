@@ -85,9 +85,9 @@ export default function Title({
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+            <h1 className="text-2xl font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
               {label}
-            </h2>
+            </h1>
             {badge !== null && badge > 0 && (
               <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                 {badge}

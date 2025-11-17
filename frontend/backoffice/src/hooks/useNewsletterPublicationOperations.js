@@ -9,16 +9,41 @@ import { useCallback } from 'react';
 export const useNewsletterPublicationOperations = () => {
   const axios = useAxiosClient();
 
-  // Get all newsletter publications
-  const getAllNewsletterPublications = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/newsletter-publication");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching newsletter publications:", error);
-      throw error;
-    }
-  }, [axios]);
+  // Get all newsletter publications (paginated)
+  const getAllNewsletterPublications = useCallback(
+    async (page = 0, size = 20, options = {}) => {
+      try {
+        const config = {};
+        if (options.signal) config.signal = options.signal;
+        const params = new URLSearchParams();
+        params.set("page", String(page));
+        params.set("size", String(size));
+        if (options.search) params.set("search", options.search);
+        if (options.sortField) {
+          // Build Spring Data 'sort' param (e.g. sort=createdAt,desc)
+          const dir = options.sortDir || "asc";
+          params.set("sort", `${options.sortField},${dir}`);
+        }
+        if (typeof options.isPublished !== "undefined") {
+          params.set("published", String(options.isPublished));
+        }
+
+        const response = await axios.get(
+          `/api/newsletter-publication?${params.toString()}`,
+          config,
+        );
+        return response.data;
+      } catch (error) {
+        // If request was cancelled, let the caller handle it without logging
+        if (error?.name === "CanceledError" || error?.message === "canceled") {
+          throw error;
+        }
+        console.error("Error fetching newsletter publications:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
 
   // Get newsletter publication by ID
   const getNewsletterPublicationById = useCallback(
@@ -53,16 +78,21 @@ export const useNewsletterPublicationOperations = () => {
     [axios],
   );
 
-  // Get published newsletters (public)
-  const getPublishedNewsletters = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/newsletter-publication/public");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching published newsletters:", error);
-      throw error;
-    }
-  }, [axios]);
+  // Get published newsletters (public) - paginated
+  const getPublishedNewsletters = useCallback(
+    async (page = 0, size = 10) => {
+      try {
+        const response = await axios.get(
+          `/api/newsletter-publication/public?page=${page}&size=${size}`,
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching published newsletters:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
 
   // Create new newsletter publication
   const createNewsletterPublication = useCallback(

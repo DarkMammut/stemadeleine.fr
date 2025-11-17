@@ -9,6 +9,8 @@ import com.stemadeleine.api.model.PaymentType;
 import com.stemadeleine.api.service.HelloAssoImportService;
 import com.stemadeleine.api.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +24,26 @@ public class PaymentController {
     private final HelloAssoImportService helloAssoImportService;
 
     @GetMapping
-    public List<Payment> getAllPayments() {
-        return paymentService.getAllPayments();
+    public Page<Payment> getAllPayments(Pageable pageable,
+                                        @RequestParam(value = "status", required = false) List<String> statuses,
+                                        @RequestParam(value = "type", required = false) List<String> types,
+                                        @RequestParam(value = "sortField", required = false) String sortField,
+                                        @RequestParam(value = "sortDir", required = false) String sortDir,
+                                        @RequestParam(value = "search", required = false) String search) {
+        // apply sortField and sortDir if provided by building a new Pageable
+        org.springframework.data.domain.Pageable appliedPageable = pageable;
+        if (sortField != null && !sortField.isBlank()) {
+            // whitelist allowed sort fields to avoid accidental injection or invalid properties
+            java.util.Set<String> allowedFields = java.util.Set.of("paymentDate", "amount", "id");
+            if (allowedFields.contains(sortField)) {
+                org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.ASC;
+                if ("desc".equalsIgnoreCase(sortDir)) direction = org.springframework.data.domain.Sort.Direction.DESC;
+                appliedPageable = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(direction, sortField));
+            }
+        }
+
+        // delegate to service which accepts lists (can be null) and optional search
+        return paymentService.getAllPayments(appliedPageable, statuses, types, search);
     }
 
     @GetMapping("/{id}")

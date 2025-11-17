@@ -4,6 +4,50 @@ import { useAxiosClient } from "@/utils/axiosClient";
 export const useAccountOperations = () => {
   const axios = useAxiosClient();
 
+  const getAccounts = useCallback(
+    async (page = 0, size = 10, options = {}) => {
+      try {
+        // build params map similar to other hooks (payments/users)
+        const params = {};
+        if (typeof page === "number") params.page = page;
+        if (typeof size === "number") params.size = size;
+        if (options.search) params.search = options.search;
+        if (options.sortField) params.sortField = options.sortField;
+        if (options.sortDir) params.sortDir = options.sortDir;
+        // allow arbitrary filters like role, provider or multi-values (arrays)
+        if (options.role) params.role = options.role;
+        if (options.provider) params.provider = options.provider;
+        if (options.statuses && Array.isArray(options.statuses)) {
+          options.statuses.forEach((s) => {
+            // axios will serialize duplicate keys when using params with array
+            if (!params.status) params.status = [];
+            params.status.push(s);
+          });
+        }
+
+        const config = { params };
+        if (options.signal) config.signal = options.signal;
+
+        const res = await axios.get(`/api/accounts`, config);
+        return res.data;
+      } catch (err) {
+        // Don't log cancellation errors (they are expected when aborting requests)
+        if (
+          err &&
+          (err.code === "ERR_CANCELED" ||
+            err.name === "CanceledError" ||
+            err.message === "canceled")
+        ) {
+          // return null on cancellation to avoid throwing and noisy console errors
+          return null;
+        }
+        console.error("Error fetching accounts (paged):", err);
+        throw err;
+      }
+    },
+    [axios],
+  );
+
   const getAccountsByUserId = useCallback(
     async (userId) => {
       try {
@@ -145,6 +189,9 @@ export const useAccountOperations = () => {
   );
 
   return {
+    // new paged API
+    getAccounts,
+    // legacy / existing API
     getAccountsByUserId,
     getAllAccounts,
     getAccountById,

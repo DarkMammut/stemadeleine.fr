@@ -6,6 +6,8 @@ import com.stemadeleine.api.repository.ContactRepository;
 import com.stemadeleine.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +56,13 @@ public class ContactService {
     }
 
     /**
+     * Finds paginated contacts sorted by creation date descending
+     */
+    public Page<Contact> findAllOrderByCreatedAtDesc(Pageable pageable) {
+        return contactRepository.findAllOrderByCreatedAtDesc(pageable);
+    }
+
+    /**
      * Finds a contact by its ID
      */
     public Optional<Contact> findById(UUID id) {
@@ -65,6 +74,13 @@ public class ContactService {
      */
     public List<Contact> findByEmail(String email) {
         return contactRepository.findByEmailIgnoreCase(email);
+    }
+
+    /**
+     * Finds paginated contacts by email
+     */
+    public Page<Contact> findByEmail(String email, Pageable pageable) {
+        return contactRepository.findByEmailIgnoreCase(email, pageable);
     }
 
     /**
@@ -82,10 +98,24 @@ public class ContactService {
     }
 
     /**
+     * Finds paginated unlinked contacts
+     */
+    public Page<Contact> findUnlinkedContacts(Pageable pageable) {
+        return contactRepository.findByUserIsNull(pageable);
+    }
+
+    /**
      * Finds all contacts within a given date range
      */
     public List<Contact> findByDateRange(OffsetDateTime startDate, OffsetDateTime endDate) {
         return contactRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(startDate, endDate);
+    }
+
+    /**
+     * Finds paginated contacts within a given date range
+     */
+    public Page<Contact> findByDateRange(OffsetDateTime startDate, OffsetDateTime endDate, Pageable pageable) {
+        return contactRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(startDate, endDate, pageable);
     }
 
     /**
@@ -164,5 +194,27 @@ public class ContactService {
 
         log.warn("Contact {} not found", contactId);
         return Optional.empty();
+    }
+
+    /**
+     * Search and filter (isRead) with pagination
+     */
+    public Page<Contact> searchAndFilter(String search, Boolean isRead, Pageable pageable) {
+        try {
+            // If search is empty and we only filter by isRead, use the simpler repository method
+            if ((search == null || search.isBlank()) && isRead != null) {
+                return contactRepository.findByIsReadExplicit(isRead, pageable);
+            }
+            // otherwise use the combined search and filter query
+            return contactRepository.searchAndFilter(search, isRead, pageable);
+        } catch (Exception ex) {
+            log.error("Error in ContactService.searchAndFilter (search='{}' isRead={})", search, isRead, ex);
+            throw new RuntimeException("Failed to execute contact search/filter", ex);
+        }
+    }
+
+    // explicit alias to ensure controller can call a stable method name
+    public Page<Contact> searchAndFilterContacts(String search, Boolean isRead, Pageable pageable) {
+        return searchAndFilter(search, isRead, pageable);
     }
 }

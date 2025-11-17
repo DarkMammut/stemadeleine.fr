@@ -3,12 +3,14 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.model.Account;
 import com.stemadeleine.api.repository.AccountRepository;
 import com.stemadeleine.api.security.JwtUtil;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AccountService {
@@ -88,6 +90,50 @@ public class AccountService {
             account.setUser(u);
         }
         return accountRepository.save(account);
+    }
+
+    // Search with pagination and filters using Specification
+    public Page<Account> searchAccounts(Pageable pageable, String search, Map<String, Object> filters) {
+        Specification<Account> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (search != null && !search.trim().isEmpty()) {
+                String like = "%" + search.trim().toLowerCase() + "%";
+                predicates.add(
+                        cb.or(
+                                cb.like(cb.lower(root.get("email")), like),
+                                cb.like(cb.lower(root.get("provider")), like)
+                        )
+                );
+            }
+
+            if (filters != null) {
+                Object roleObj = filters.get("role");
+                if (roleObj != null) {
+                    predicates.add(cb.equal(root.get("role"), roleObj.toString()));
+                }
+                Object providerObj = filters.get("provider");
+                if (providerObj != null) {
+                    predicates.add(cb.equal(root.get("provider"), providerObj.toString()));
+                }
+                Object statusObj = filters.get("status");
+                if (statusObj != null) {
+                    // status can be a single string or a collection
+                    if (statusObj instanceof Iterable) {
+                        List<Predicate> statusPreds = new ArrayList<>();
+                        for (Object s : (Iterable) statusObj) {
+                            statusPreds.add(cb.equal(root.get("isActive"), Boolean.valueOf(s.toString())));
+                        }
+                        predicates.add(cb.or(statusPreds.toArray(new Predicate[0])));
+                    } else {
+                        predicates.add(cb.equal(root.get("isActive"), Boolean.valueOf(statusObj.toString())));
+                    }
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return accountRepository.findAll(spec, pageable);
     }
 
     // New method: change password with basic validation (keeps old signature for compatibility)

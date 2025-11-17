@@ -5,8 +5,12 @@ import com.stemadeleine.api.dto.PaymentUpdateDto;
 import com.stemadeleine.api.model.Payment;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.PaymentRepository;
+import com.stemadeleine.api.repository.PaymentSpecifications;
 import com.stemadeleine.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,23 @@ public class PaymentService {
 
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();
+    }
+
+    public Page<Payment> getAllPayments(Pageable pageable) {
+        return paymentRepository.findAll(pageable);
+    }
+
+    // New: pageable with filters (status, type) via lists of strings
+    public Page<Payment> getAllPayments(Pageable pageable, List<String> statuses, List<String> types) {
+        return getAllPayments(pageable, statuses, types, null);
+    }
+
+    public Page<Payment> getAllPayments(Pageable pageable, List<String> statuses, List<String> types, String search) {
+        Specification<Payment> spec = Specification.where(null);
+        if (statuses != null && !statuses.isEmpty()) spec = spec.and(PaymentSpecifications.hasStatuses(statuses));
+        if (types != null && !types.isEmpty()) spec = spec.and(PaymentSpecifications.hasTypes(types));
+        if (search != null && !search.isBlank()) spec = spec.and(PaymentSpecifications.hasSearch(search));
+        return paymentRepository.findAll(spec, pageable);
     }
 
     public Optional<Payment> getPaymentById(UUID id) {

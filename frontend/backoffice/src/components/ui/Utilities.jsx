@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
 import RefreshButton from '@/components/ui/RefreshButton';
@@ -6,6 +8,7 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import DeleteButton from '@/components/ui/DeleteButton';
 import SendButton from '@/components/ui/SendButton';
 import { useAxiosClient } from '@/utils/axiosClient';
+import Filters from '@/components/ui/Filters';
 
 /**
  * Composant Utilities - Affiche une barre d'actions avec boutons spécialisés
@@ -15,6 +18,9 @@ export default function Utilities({
   apiUrl,
   data,
   loading = false,
+  // config optionnelle pour afficher Filters :
+  // filtersConfig = { fields: [], onSortChange, onSearch, initialSort, placeholder }
+  filtersConfig = null,
 }) {
   const axios = useAxiosClient();
   const [saving, setSaving] = useState(false);
@@ -144,7 +150,13 @@ export default function Utilities({
         {actions.map((action, idx) => renderActionButton(action, idx))}
       </div>
 
-      <div>
+      <div className="flex items-center gap-2">
+        {filtersConfig && (
+          <div>
+            <Filters {...filtersConfig} />
+          </div>
+        )}
+
         {isDirty && (
           <Button
             onClick={handleSave}

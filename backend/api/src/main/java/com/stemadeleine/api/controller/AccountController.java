@@ -5,12 +5,18 @@ import com.stemadeleine.api.dto.AccountUserDto;
 import com.stemadeleine.api.mapper.AccountMapper;
 import com.stemadeleine.api.model.Account;
 import com.stemadeleine.api.service.AccountService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -25,7 +31,46 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AccountDto>> getAccounts(@RequestParam(required = false) UUID userId) {
+    public ResponseEntity<?> getAccounts(
+            @RequestParam(required = false) UUID userId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false) String sortDir,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String provider,
+            @RequestParam(required = false, name = "status") List<String> statuses
+    ) {
+        // If pagination requested (page param provided) - use paged search
+        if (page != null) {
+            int p = page != null ? page : 0;
+            int s = size != null ? size : 10;
+            Sort sort = Sort.unsorted();
+            if (sortField != null) {
+                sort = Sort.by(sortField);
+                if ("desc".equalsIgnoreCase(sortDir)) sort = sort.descending();
+                else sort = sort.ascending();
+            }
+            Pageable pageable = PageRequest.of(p, s, sort);
+
+            Map<String, Object> filters = new HashMap<>();
+            if (role != null) filters.put("role", role);
+            if (provider != null) filters.put("provider", provider);
+            if (statuses != null && !statuses.isEmpty()) filters.put("status", statuses);
+
+            Page<Account> result = accountService.searchAccounts(pageable, search, filters);
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("content", result.getContent().stream().map(accountMapper::toDto).collect(Collectors.toList()));
+            resp.put("number", result.getNumber());
+            resp.put("size", result.getSize());
+            resp.put("totalPages", result.getTotalPages());
+            resp.put("totalElements", result.getTotalElements());
+            return ResponseEntity.ok(resp);
+        }
+
+        // legacy behavior: list all or by user
         List<Account> accounts;
         if (userId != null) {
             accounts = accountService.getAccountsByUserId(userId);

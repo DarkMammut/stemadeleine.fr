@@ -29,16 +29,14 @@ export default function AddUserModal({ open, onClose, onCreate }) {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Créer un utilisateur</h3>
-        <UserForm
-          initialValues={{}}
-          onSubmit={handleSubmit}
-          onChange={() => {}}
-          loading={saving}
-          onCancel={onClose}
-        />
-      </div>
+      <UserForm
+        title={"Ajouter un utilisateur"}
+        initialValues={{}}
+        onSubmit={handleSubmit}
+        onChange={() => {}}
+        loading={saving}
+        onCancel={onClose}
+      />
     </Modal>
   );
 }

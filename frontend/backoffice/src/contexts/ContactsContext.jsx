@@ -14,8 +14,17 @@ export function ContactsProvider({ children }) {
 
   const refreshUnreadCount = async () => {
     try {
-      const contacts = await getAllContacts();
-      const count = contacts.filter((c) => !c.isRead).length;
+      // getAllContacts now returns a paginated response (Page<T>).
+      // Request first page with a reasonably large size to include most items for counting.
+      const data = await getAllContacts(0, 1000);
+
+      // If the hook returns an array (legacy), handle it
+      let contactsList = [];
+      if (Array.isArray(data)) contactsList = data;
+      else if (data && Array.isArray(data.content)) contactsList = data.content;
+      else if (data && Array.isArray(data.items)) contactsList = data.items; // defensive
+
+      const count = contactsList.filter((c) => !c.isRead).length;
       setUnreadCount(count);
     } catch (error) {
       console.error("Error fetching unread count:", error);

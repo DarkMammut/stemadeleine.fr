@@ -6,16 +6,16 @@ import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -31,16 +31,56 @@ public class ContactController {
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
-    public ResponseEntity<List<ContactDto>> getAllContacts() {
-        log.info("GET /api/contacts - Retrieving all contacts");
+    public ResponseEntity<Page<ContactDto>> getAllContacts(Pageable pageable,
+                                                           @RequestParam(value = "search", required = false) String search,
+                                                           @RequestParam(value = "sortField", required = false) String sortField,
+                                                           @RequestParam(value = "sortDir", required = false) String sortDir,
+                                                           @RequestParam(value = "filter", required = false) String filter) {
 
-        List<Contact> contacts = contactService.findAllOrderByCreatedAtDesc();
-        List<ContactDto> contactDtos = contacts.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        log.info("GET /api/contacts - Retrieving contacts (paginated) with search/sort/filter");
+        Page<ContactDto> dtoPage = fetchContactsPage(pageable, search, sortField, sortDir, filter);
+        return ResponseEntity.ok(dtoPage);
+    }
 
-        log.debug("Found {} contacts", contactDtos.size());
-        return ResponseEntity.ok(contactDtos);
+    // Backwards-compatible overload for direct Java calls (tests / internal callers)
+    public ResponseEntity<Page<ContactDto>> getAllContacts(Pageable pageable) {
+        Page<ContactDto> dtoPage = fetchContactsPage(pageable, null, null, null, null);
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    // Shared logic extracted to avoid proxy/self-invocation issues with @PreAuthorize
+    private Page<ContactDto> fetchContactsPage(Pageable pageable, String search, String sortField, String sortDir, String filter) {
+        org.springframework.data.domain.Pageable appliedPageable = pageable;
+        // default sort: createdAt desc if not provided
+        if (sortField == null || sortField.isBlank()) {
+            appliedPageable = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        }
+        if (sortField != null && !sortField.isBlank()) {
+            java.util.Set<String> allowed = java.util.Set.of("firstName", "lastName", "email", "createdAt");
+            if (allowed.contains(sortField)) {
+                org.springframework.data.domain.Sort.Direction dir = org.springframework.data.domain.Sort.Direction.ASC;
+                if ("desc".equalsIgnoreCase(sortDir)) dir = org.springframework.data.domain.Sort.Direction.DESC;
+                appliedPageable = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(dir, sortField));
+            } else {
+                log.warn("Ignoring invalid sortField: {}", sortField);
+            }
+        }
+
+        Page<Contact> page;
+        Boolean isRead = null;
+        if (filter != null) {
+            if ("unread".equalsIgnoreCase(filter)) isRead = false;
+            else if ("read".equalsIgnoreCase(filter)) isRead = true;
+        }
+
+        if ((search != null && !search.isBlank()) || isRead != null) {
+            String s = (search == null || search.isBlank()) ? null : search.toLowerCase();
+            page = contactService.searchAndFilterContacts(s, isRead, appliedPageable);
+        } else {
+            page = contactService.findAllOrderByCreatedAtDesc(appliedPageable);
+        }
+
+        return page.map(this::convertToDto);
     }
 
     /**
@@ -66,15 +106,13 @@ public class ContactController {
      */
     @GetMapping("/search/email")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
-    public ResponseEntity<List<ContactDto>> getContactsByEmail(@RequestParam String email) {
+    public ResponseEntity<Page<ContactDto>> getContactsByEmail(@RequestParam String email, Pageable pageable) {
         log.info("GET /api/contacts/search/email?email={} - Searching by email", email);
 
-        List<Contact> contacts = contactService.findByEmail(email);
-        List<ContactDto> contactDtos = contacts.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        Page<Contact> contacts = contactService.findByEmail(email, pageable);
+        Page<ContactDto> contactDtos = contacts.map(this::convertToDto);
 
-        log.debug("Found {} contacts for email {}", contactDtos.size(), email);
+        log.debug("Found {} contacts for email {}", contactDtos.getTotalElements(), email);
         return ResponseEntity.ok(contactDtos);
     }
 
@@ -83,15 +121,13 @@ public class ContactController {
      */
     @GetMapping("/unlinked")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
-    public ResponseEntity<List<ContactDto>> getUnlinkedContacts() {
+    public ResponseEntity<Page<ContactDto>> getUnlinkedContacts(Pageable pageable) {
         log.info("GET /api/contacts/unlinked - Retrieving unlinked contacts");
 
-        List<Contact> contacts = contactService.findUnlinkedContacts();
-        List<ContactDto> contactDtos = contacts.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        Page<Contact> contacts = contactService.findUnlinkedContacts(pageable);
+        Page<ContactDto> contactDtos = contacts.map(this::convertToDto);
 
-        log.debug("Found {} unlinked contacts", contactDtos.size());
+        log.debug("Found {} unlinked contacts", contactDtos.getTotalElements());
         return ResponseEntity.ok(contactDtos);
     }
 
@@ -100,17 +136,16 @@ public class ContactController {
      */
     @GetMapping("/date-range")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
-    public ResponseEntity<List<ContactDto>> getContactsByDateRange(
+    public ResponseEntity<Page<ContactDto>> getContactsByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
+            Pageable pageable) {
         log.info("GET /api/contacts/date-range - Retrieving contacts between {} and {}", startDate, endDate);
 
-        List<Contact> contacts = contactService.findByDateRange(startDate, endDate);
-        List<ContactDto> contactDtos = contacts.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        Page<Contact> contacts = contactService.findByDateRange(startDate, endDate, pageable);
+        Page<ContactDto> contactDtos = contacts.map(this::convertToDto);
 
-        log.debug("Found {} contacts in date range", contactDtos.size());
+        log.debug("Found {} contacts in date range", contactDtos.getTotalElements());
         return ResponseEntity.ok(contactDtos);
     }
 

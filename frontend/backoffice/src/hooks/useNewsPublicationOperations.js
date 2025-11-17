@@ -9,16 +9,43 @@ import { useCallback } from 'react';
 export const useNewsPublicationOperations = () => {
   const axios = useAxiosClient();
 
-  // Get all news publications
-  const getAllNewsPublications = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/news-publications");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching news publications:", error);
-      throw error;
-    }
-  }, [axios]);
+  // Get all news publications (paginated)
+  const getAllNewsPublications = useCallback(
+    async (page = 0, size = 20, options = {}) => {
+      try {
+        const config = {};
+        if (options.signal) config.signal = options.signal;
+        const params = new URLSearchParams();
+        params.set("page", String(page));
+        params.set("size", String(size));
+        if (options.search) params.set("search", options.search);
+        if (options.sortField) {
+          const dir = options.sortDir || "asc";
+          params.set("sort", `${options.sortField},${dir}`);
+        }
+        if (typeof options.isPublished !== "undefined") {
+          params.set("published", String(options.isPublished));
+        }
+        if (typeof options.isActive !== "undefined") {
+          params.set("active", String(options.isActive));
+        }
+
+        const response = await axios.get(
+          `/api/news-publications?${params.toString()}`,
+          config,
+        );
+        return response.data;
+      } catch (error) {
+        // If request was cancelled, let the caller handle it without logging
+        if (error?.name === "CanceledError" || error?.message === "canceled") {
+          throw error;
+        }
+        console.error("Error fetching news publications:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
 
   // Get news publication by ID
   const getNewsPublicationById = useCallback(
@@ -39,7 +66,7 @@ export const useNewsPublicationOperations = () => {
     async (newsId) => {
       try {
         const response = await axios.get(
-          `/api/news-publications/news/${newsId}`,
+          `/api/news-publications/by-news/${newsId}`,
         );
         return response.data;
       } catch (error) {
@@ -50,16 +77,21 @@ export const useNewsPublicationOperations = () => {
     [axios],
   );
 
-  // Get published news (public)
-  const getPublishedNews = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/news-publications/public");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching published news:", error);
-      throw error;
-    }
-  }, [axios]);
+  // Get published news (public) - paginated
+  const getPublishedNews = useCallback(
+    async (page = 0, size = 10) => {
+      try {
+        const response = await axios.get(
+          `/api/news-publications/public?page=${page}&size=${size}`,
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching published news:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
 
   // Create new news publication
   const createNewsPublication = useCallback(

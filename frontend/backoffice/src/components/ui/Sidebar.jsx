@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useContactsContext } from "@/contexts/ContactsContext";
-import NAV_ITEMS from "../navigation";
+import NAV_ITEMS from "../../utils/navigation";
 
 export default function Sidebar({ current, setCurrent }) {
   const router = useRouter();

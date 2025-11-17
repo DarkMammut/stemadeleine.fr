@@ -10,6 +10,8 @@ import com.stemadeleine.api.repository.NewsPublicationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -31,8 +33,42 @@ public class NewsPublicationService {
     public List<NewsPublication> getAllNewsPublications() {
         log.info("Fetching all news publications (excluding deleted)");
         List<NewsPublication> publications = newsPublicationRepository
-                .findByStatusNotOrderByCreatedAtDesc(PublishingStatus.DELETED);
+                .findByStatusNot(PublishingStatus.DELETED);
         log.debug("Found {} news publications", publications.size());
+        return publications;
+    }
+
+    /**
+     * Get paginated news publications excluding deleted ones
+     */
+    public Page<NewsPublication> getAllNewsPublications(Pageable pageable) {
+        log.info("Fetching paginated news publications (excluding deleted)");
+        Page<NewsPublication> publications = newsPublicationRepository
+                .findByStatusNot(PublishingStatus.DELETED, pageable);
+        log.debug("Found {} news publications (page)", publications.getTotalElements());
+        return publications;
+    }
+
+    /**
+     * Get paginated news publications with optional published and active filters
+     */
+    public Page<NewsPublication> getAllNewsPublications(Pageable pageable, Boolean published, Boolean active) {
+        log.info("Fetching paginated news publications with filters published={} active={}", published, active);
+        // default without search
+        Page<NewsPublication> publications = newsPublicationRepository.findByFilters(published, active, pageable);
+        log.debug("Found {} news publications (page) with filters", publications.getTotalElements());
+        return publications;
+    }
+
+    public Page<NewsPublication> getAllNewsPublications(Pageable pageable, Boolean published, Boolean active, String search) {
+        log.info("Fetching paginated news publications with filters published={} active={} search={}", published, active, search);
+        Page<NewsPublication> publications;
+        if (search != null && !search.isBlank()) {
+            publications = newsPublicationRepository.findByFiltersWithSearch(published, active, search.toLowerCase(), pageable);
+        } else {
+            publications = newsPublicationRepository.findByFilters(published, active, pageable);
+        }
+        log.debug("Found {} news publications (page) with filters/search", publications.getTotalElements());
         return publications;
     }
 
@@ -65,8 +101,19 @@ public class NewsPublicationService {
     public List<NewsPublication> getPublishedNews() {
         log.info("Fetching all published news for public display");
         List<NewsPublication> news = newsPublicationRepository
-                .findPublishedNewsOrderByPublishedDateDesc();
+                .findByStatusAndIsVisible(PublishingStatus.PUBLISHED, true);
         log.debug("Found {} published news", news.size());
+        return news;
+    }
+
+    /**
+     * Get paginated published news for public display
+     */
+    public Page<NewsPublication> getPublishedNews(Pageable pageable) {
+        log.info("Fetching paginated published news for public display");
+        Page<NewsPublication> news = newsPublicationRepository
+                .findByStatusAndIsVisible(PublishingStatus.PUBLISHED, true, pageable);
+        log.debug("Found {} published news (page)", news.getTotalElements());
         return news;
     }
 

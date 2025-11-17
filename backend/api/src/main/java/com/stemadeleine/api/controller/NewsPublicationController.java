@@ -16,6 +16,8 @@ import com.stemadeleine.api.service.NewsPublicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,11 +41,15 @@ public class NewsPublicationController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Get all news publications (admin only)
+     * Get all news publications (admin only) - paginated
      */
     @GetMapping
-    public ResponseEntity<List<NewsPublicationDto>> getAllNewsPublications(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<Page<NewsPublicationDto>> getAllNewsPublications(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            Pageable pageable,
+            @RequestParam(name = "published", required = false) Boolean published,
+            @RequestParam(name = "active", required = false) Boolean active,
+            @RequestParam(name = "search", required = false) String search) {
         if (customUserDetails == null) {
             log.error("Attempt to fetch news publications without authentication");
             throw new RuntimeException("User not authenticated");
@@ -53,9 +59,9 @@ public class NewsPublicationController {
         log.info("GET /api/news-publications - Fetching all news publications by user: {}",
                 currentUser.getFirstname() + " " + currentUser.getLastname());
         try {
-            List<NewsPublication> publications = newsPublicationService.getAllNewsPublications();
-            List<NewsPublicationDto> publicationsDto = newsPublicationMapper.toDtoList(publications);
-            log.debug("Returning {} news publications", publicationsDto.size());
+            Page<NewsPublication> publications = newsPublicationService.getAllNewsPublications(pageable, published, active, search);
+            Page<NewsPublicationDto> publicationsDto = publications.map(newsPublicationMapper::toDto);
+            log.debug("Returning {} news publications", publicationsDto.getTotalElements());
             return ResponseEntity.ok(publicationsDto);
         } catch (Exception e) {
             log.error("Error fetching news publications: {}", e.getMessage());
@@ -128,15 +134,15 @@ public class NewsPublicationController {
     }
 
     /**
-     * Get published news for public display (no authentication required)
+     * Get published news for public display (no authentication required) - paginated
      */
     @GetMapping("/public")
-    public ResponseEntity<List<NewsPublicationDto>> getPublishedNews() {
+    public ResponseEntity<Page<NewsPublicationDto>> getPublishedNews(Pageable pageable) {
         log.info("GET /api/news-publications/public - Fetching published news");
         try {
-            List<NewsPublication> news = newsPublicationService.getPublishedNews();
-            List<NewsPublicationDto> newsDto = newsPublicationMapper.toDtoList(news);
-            log.debug("Returning {} published news", newsDto.size());
+            Page<NewsPublication> news = newsPublicationService.getPublishedNews(pageable);
+            Page<NewsPublicationDto> newsDto = news.map(newsPublicationMapper::toDto);
+            log.debug("Returning {} published news", newsDto.getTotalElements());
             return ResponseEntity.ok(newsDto);
         } catch (Exception e) {
             log.error("Error fetching published news: {}", e.getMessage());

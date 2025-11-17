@@ -7,6 +7,7 @@ export default function UserForm({
   onChange,
   loading,
   onCancel,
+  title = null,
 }) {
   const userFields = [
     { name: "firstname", label: "Prénom", type: "text", required: true },
@@ -50,6 +51,7 @@ export default function UserForm({
 
   return (
     <MyForm
+      title={title}
       fields={userFields}
       initialValues={initialValues}
       onSubmit={handleSubmit}

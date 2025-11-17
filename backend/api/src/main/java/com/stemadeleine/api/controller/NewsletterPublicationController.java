@@ -16,6 +16,8 @@ import com.stemadeleine.api.service.NewsletterPublicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,11 +41,14 @@ public class NewsletterPublicationController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Get all newsletter publications (admin only)
+     * Get all newsletter publications (admin only) - paginated
      */
     @GetMapping
-    public ResponseEntity<List<NewsletterPublicationDto>> getAllNewsletterPublications(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<Page<NewsletterPublicationDto>> getAllNewsletterPublications(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            Pageable pageable,
+            @RequestParam(name = "published", required = false) Boolean published,
+            @RequestParam(name = "search", required = false) String search) {
         if (customUserDetails == null) {
             log.error("Attempt to fetch newsletter publications without authentication");
             throw new RuntimeException("User not authenticated");
@@ -53,9 +58,10 @@ public class NewsletterPublicationController {
         log.info("GET /api/newsletter-publications - Fetching all newsletter publications by user: {}",
                 currentUser.getFirstname() + " " + currentUser.getLastname());
         try {
-            List<NewsletterPublication> publications = newsletterPublicationService.getAllNewsletterPublications();
-            List<NewsletterPublicationDto> publicationsDto = newsletterPublicationMapper.toDtoList(publications);
-            log.debug("Returning {} newsletter publications", publicationsDto.size());
+            Page<NewsletterPublication> publications =
+                    newsletterPublicationService.getAllNewsletterPublications(pageable, published, search);
+            Page<NewsletterPublicationDto> publicationsDto = publications.map(newsletterPublicationMapper::toDto);
+            log.debug("Returning {} newsletter publications", publicationsDto.getTotalElements());
             return ResponseEntity.ok(publicationsDto);
         } catch (Exception e) {
             log.error("Error fetching newsletter publications: {}", e.getMessage());
@@ -128,15 +134,15 @@ public class NewsletterPublicationController {
     }
 
     /**
-     * Get published newsletters for public display (no authentication required)
+     * Get published newsletters for public display (no authentication required) - paginated
      */
     @GetMapping("/public")
-    public ResponseEntity<List<NewsletterPublicationDto>> getPublishedNewsletters() {
+    public ResponseEntity<Page<NewsletterPublicationDto>> getPublishedNewsletters(Pageable pageable) {
         log.info("GET /api/newsletter-publications/public - Fetching published newsletters");
         try {
-            List<NewsletterPublication> newsletters = newsletterPublicationService.getPublishedNewsletters();
-            List<NewsletterPublicationDto> newslettersDto = newsletterPublicationMapper.toDtoList(newsletters);
-            log.debug("Returning {} published newsletters", newslettersDto.size());
+            Page<NewsletterPublication> newsletters = newsletterPublicationService.getPublishedNewsletters(pageable);
+            Page<NewsletterPublicationDto> newslettersDto = newsletters.map(newsletterPublicationMapper::toDto);
+            log.debug("Returning {} published newsletters", newslettersDto.getTotalElements());
             return ResponseEntity.ok(newslettersDto);
         } catch (Exception e) {
             log.error("Error fetching published newsletters: {}", e.getMessage());
@@ -395,6 +401,9 @@ public class NewsletterPublicationController {
             ContentDto contentDto = contentMapper.toDto(content);
             log.info("Newsletter content created successfully with ID: {}", content.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(contentDto);
+        } catch (RuntimeException e) {
+            log.error("Error creating newsletter content: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error("Error creating newsletter content: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

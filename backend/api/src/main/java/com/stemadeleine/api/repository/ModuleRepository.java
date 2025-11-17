@@ -31,4 +31,7 @@ public interface ModuleRepository extends JpaRepository<Module, UUID> {
     Optional<Module> findTopByModuleIdOrderByVersionDesc(UUID moduleId);
 
     Optional<Module> findByModuleId(UUID moduleId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT m FROM Module m WHERE LOWER(m.name) LIKE CONCAT('%',:q,'%') OR LOWER(m.type) LIKE CONCAT('%',:q,'%')")
+    java.util.List<com.stemadeleine.api.model.Module> search(@org.springframework.data.repository.query.Param("q") String q, org.springframework.data.domain.Pageable pageable);
 }
