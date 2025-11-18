@@ -44,9 +44,10 @@ public class Account {
     @Column(name = "provider_account_id")
     private String providerAccountId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String role = "ROLE_USER";
+    private Roles role = Roles.ROLE_USER;
 
     @Column(name = "is_active")
     @Builder.Default

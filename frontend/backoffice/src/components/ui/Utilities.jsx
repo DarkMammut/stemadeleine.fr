@@ -56,9 +56,55 @@ export default function Utilities({
       confirmTitle,
       confirmMessage,
       confirmLabel,
+      meta,
     } = action;
 
     const isDisabled = Boolean(loading) || Boolean(disabled);
+
+    // New: special variant 'reset-password'
+    if (variant === "reset-password") {
+      const providerRequired = meta?.provider || "local";
+      const disabledForProvider =
+        providerRequired &&
+        meta?.currentProvider &&
+        meta.currentProvider !== providerRequired;
+      const effectiveDisabled = isDisabled || disabledForProvider;
+
+      const handleClick = async () => {
+        // default behavior: call callback(accountId, newPassword) if provided; otherwise expect callback to be a function generating password
+        // If callback is provided, use it; else do nothing
+        if (!callback) return;
+        // generate password
+        const chars =
+          "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!%*";
+        let newPass = "";
+        for (let i = 0; i < 12; i++)
+          newPass += chars[Math.floor(Math.random() * chars.length)];
+        try {
+          await callback(newPass);
+          // copy to clipboard
+          try {
+            await navigator.clipboard.writeText(newPass);
+          } catch (e) {
+            // ignore clipboard errors
+          }
+        } catch (err) {
+          console.error("reset-password action failed", err);
+        }
+      };
+
+      return (
+        <Button
+          key={idx}
+          onClick={handleClick}
+          variant={"primary"}
+          size={size}
+          disabled={effectiveDisabled}
+        >
+          {label || "Réinitialiser mot de passe"}
+        </Button>
+      );
+    }
 
     // Boutons spécialisés
     switch (variant) {

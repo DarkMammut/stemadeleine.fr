@@ -251,9 +251,7 @@ export default function EditNews({ newsId }) {
       {effectiveLoading || !newsData ? (
         <div className="space-y-6">
           <PublicationInfoCard loading={effectiveLoading} />
-
           <VisibilitySwitch loading={effectiveLoading} />
-
           <EditablePanel
             title="Informations de l'actualité"
             loading={effectiveLoading}
@@ -263,7 +261,6 @@ export default function EditNews({ newsId }) {
             displayColumns={2}
             displayGap={4}
           />
-
           <ContentManager
             parentId={newsId}
             parentType="news-publication"
@@ -295,7 +292,7 @@ export default function EditNews({ newsId }) {
         <div className="space-y-6">
           {/* News Information, Status and Actions */}
           <PublicationInfoCard
-            title="Informations sur l'actualité"
+            title={newsData.name}
             status={newsData.status}
             createdAt={newsData.createdAt}
             publishedDate={newsData.publishedDate}

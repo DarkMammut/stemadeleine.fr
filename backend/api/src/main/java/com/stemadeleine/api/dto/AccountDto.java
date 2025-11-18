@@ -1,5 +1,6 @@
 package com.stemadeleine.api.dto;
 
+import com.stemadeleine.api.model.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ public class AccountDto {
     private UUID id;
     private UUID userId;
     private String email;
-    private String role;
+    private Roles role;
     private String provider;
     private Boolean isActive;
     private OffsetDateTime createdAt;

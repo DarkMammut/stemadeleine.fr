@@ -11,8 +11,8 @@ public record CustomUserDetails(Account account) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Le rôle contient déjà le préfixe ROLE_ (ex: "ROLE_USER", "ROLE_ADMIN")
-        return List.of(new SimpleGrantedAuthority(account.getRole()));
+        // Le rôle est maintenant un enum `Roles` ; on utilise son nom (ex: "ROLE_USER")
+        return List.of(new SimpleGrantedAuthority(account.getRole().name()));
     }
 
     @Override

@@ -14,6 +14,7 @@ CREATE TYPE timeline_variants AS ENUM ('TABS', 'TEXT');
 CREATE TYPE list_variants AS ENUM ('BULLET', 'CARD');
 CREATE TYPE payment_status AS ENUM ('PENDING','AUTHORIZED', 'PAID', 'REFUNDED', 'CANCELED', 'FAILED', 'DELETED', 'ARCHIVED');
 CREATE TYPE payment_type AS ENUM ('DONATION', 'MEMBERSHIP', 'EVENT', 'OTHER');
+CREATE TYPE roles AS ENUM ('ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER');
 
 -- =====================
 -- USERS
@@ -226,7 +227,7 @@ CREATE TABLE accounts (
     password_hash VARCHAR(255),
     provider VARCHAR(50) NOT NULL DEFAULT 'local',
     provider_account_id VARCHAR(255),
-    role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER',
+    role roles DEFAULT 'ROLE_USER' NOT NULL,
     is_active BOOLEAN DEFAULT true NOT NULL,
     email_verified BOOLEAN DEFAULT false NOT NULL,
     billing_address_id UUID,

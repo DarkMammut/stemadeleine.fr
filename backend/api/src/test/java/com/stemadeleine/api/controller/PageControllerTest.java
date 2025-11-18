@@ -14,17 +14,14 @@ import com.stemadeleine.api.service.SectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,39 +29,32 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc(addFilters = false) // Désactive tous les filtres de sécurité
-@ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration"
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("Tests unitaires du contrôleur PageController")
 class PageControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private PageService pageService;
 
-    @MockBean
+    @Mock
     private SectionService sectionService;
 
-    @MockBean
+    @Mock
     private PageMapper pageMapper;
 
-    @MockBean
+    @Mock
     private PageEditMapper pageEditMapper;
 
-    @MockBean
+    @Mock
     private PageSectionMapper pageSectionMapper;
 
     private Page testPage;
@@ -86,11 +76,15 @@ class PageControllerTest {
         Account testAccount = createTestAccount(testUser);
         testUserDetails = new CustomUserDetails(testAccount);
 
-        // Configuration des mocks par défaut pour les mappers
-        when(pageMapper.toDto(any(Page.class))).thenReturn(testPageDto);
-        when(pageMapper.toDtoList(anyList())).thenReturn(List.of(testPageDto));
-        when(pageEditMapper.toDto(any(Page.class))).thenReturn(testPageEditDto);
-        when(pageSectionMapper.toDto(any(Page.class), anyList())).thenReturn(testPageSectionDto);
+        // Configuration des mocks par défaut pour les mappers (lenient to avoid unnecessary stubbing)
+        lenient().when(pageMapper.toDto(any(Page.class))).thenReturn(testPageDto);
+        lenient().when(pageMapper.toDtoList(anyList())).thenReturn(List.of(testPageDto));
+        lenient().when(pageEditMapper.toDto(any(Page.class))).thenReturn(testPageEditDto);
+        lenient().when(pageSectionMapper.toDto(any(Page.class), anyList())).thenReturn(testPageSectionDto);
+
+        // build standalone MockMvc with controller using mocked dependencies
+        PageController controller = new PageController(pageService, sectionService, pageMapper, pageEditMapper, pageSectionMapper);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
@@ -190,23 +184,15 @@ class PageControllerTest {
         when(pageService.updatePage(any(UUID.class), eq("New Page"), eq("Title"), eq("Subtitle"), eq("new-page"), eq("Description"), eq(true), any(User.class)))
                 .thenReturn(testPage);
 
-        // Configuration du SecurityContext pour simuler une authentification
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                testUserDetails, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        try {
-            // When & Then
-            mockMvc.perform(post("/api/pages")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.name").value("Test Page"));
-        } finally {
-            // Nettoyage du SecurityContext
-            SecurityContextHolder.clearContext();
-        }
+        // When & Then — utiliser Security request post-processor 'user' pour fournir UserDetails
+        mockMvc.perform(post("/api/pages")
+                        .with(user(testUserDetails))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value("Test Page"));
     }
 
     @Test
@@ -218,23 +204,14 @@ class PageControllerTest {
         when(pageService.updatePage(eq(pageId), eq("Updated Page"), eq("Updated Title"), eq("Updated Subtitle"), eq("updated-page"), eq("Updated Description"), eq(true), any(User.class)))
                 .thenReturn(testPage);
 
-        // Configuration du SecurityContext pour simuler une authentification
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                testUserDetails, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        try {
-            // When & Then
-            mockMvc.perform(put("/api/pages/{pageId}", pageId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.name").value("Test Page"));
-        } finally {
-            // Nettoyage du SecurityContext
-            SecurityContextHolder.clearContext();
-        }
+        mockMvc.perform(put("/api/pages/{pageId}", pageId)
+                        .with(user(testUserDetails))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value("Test Page"));
     }
 
     @Test
@@ -243,19 +220,8 @@ class PageControllerTest {
         // Given
         UUID pageId = UUID.randomUUID();
 
-        // Configuration du SecurityContext pour simuler une authentification (maintenant requis)
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                testUserDetails, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        try {
-            // When & Then
-            mockMvc.perform(delete("/api/pages/{pageId}", pageId))
-                    .andExpect(status().isNoContent());
-        } finally {
-            // Nettoyage du SecurityContext
-            SecurityContextHolder.clearContext();
-        }
+        mockMvc.perform(delete("/api/pages/{pageId}", pageId).with(user(testUserDetails)).requestAttr("CUSTOM_USER", testUserDetails))
+                .andExpect(status().isNoContent());
     }
 
     // Méthodes utilitaires pour créer des objets de test
@@ -290,7 +256,7 @@ class PageControllerTest {
                 .id(UUID.randomUUID())
                 .email("test@example.com")
                 .password("password")
-                .role("ROLE_USER")
+                .role(Roles.ROLE_USER)
                 .isActive(true)
                 .emailVerified(true)
                 .user(user)

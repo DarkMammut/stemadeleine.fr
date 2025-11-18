@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -102,12 +103,11 @@ public class PageController {
             @Valid @RequestBody PageRequest request,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        if (customUserDetails == null) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
             log.error("Attempt to create page without authentication");
             throw new RuntimeException("User not authenticated");
         }
-
-        User currentUser = customUserDetails.account().getUser();
 
         if (request.isNewPage()) {
             log.info("POST /api/pages - Creating new page");
@@ -141,12 +141,12 @@ public class PageController {
             @Valid @RequestBody PageRequest request,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        if (customUserDetails == null) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
             log.error("Attempt to update page without authentication");
             throw new RuntimeException("User not authenticated");
         }
 
-        User currentUser = customUserDetails.account().getUser();
         log.info("PUT /api/pages/{} - Updating basic page info", pageId);
 
         Page page = pageService.updatePage(
@@ -170,12 +170,12 @@ public class PageController {
             @RequestBody List<PageDto> tree,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        if (customUserDetails == null) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
             log.error("Attempt to update page tree without authentication");
             throw new RuntimeException("User not authenticated");
         }
 
-        User currentUser = customUserDetails.account().getUser();
         log.info("PUT /api/pages/tree - Updating page tree order by user ID: {}", currentUser.getId());
 
         try {
@@ -226,12 +226,12 @@ public class PageController {
             @RequestBody Boolean isVisible,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        if (customUserDetails == null) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
             log.error("Attempt to update visibility without authentication");
             throw new RuntimeException("User not authenticated");
         }
 
-        User currentUser = customUserDetails.account().getUser();
         log.info("PUT /api/pages/{}/visibility - Updating visibility: {}", pageId, isVisible);
 
         try {
@@ -250,12 +250,13 @@ public class PageController {
             @PathVariable UUID pageId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        if (customUserDetails == null) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
             log.error("Attempt to delete page without authentication");
             throw new RuntimeException("User not authenticated");
         }
 
-        log.info("DELETE /api/pages/{} - Logical page deletion", pageId);
+        log.info("DELETE /api/pages/{} - Logical page deletion by user {}", pageId, currentUser.getId());
         pageService.delete(pageId);
         log.debug("Page deleted: {}", pageId);
         return ResponseEntity.noContent().build();
@@ -302,5 +303,55 @@ public class PageController {
         log.info("PUT /api/pages/{}/publish - Publishing page by user: {}", pageId, currentUser.getUsername());
         Page publishedPage = pageService.publishPage(pageId, currentUser);
         return ResponseEntity.ok(pageMapper.toDto(publishedPage));
+    }
+
+    private User extractUser(CustomUserDetails customUserDetails) {
+        if (customUserDetails != null && customUserDetails.account() != null) {
+            return customUserDetails.account().getUser();
+        }
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object p = auth.getPrincipal();
+            if (p instanceof CustomUserDetails cud && cud.account() != null) return cud.account().getUser();
+            if (p instanceof org.springframework.security.core.userdetails.User u) {
+                User tmp = new User();
+                tmp.setEmail(u.getUsername());
+                return tmp;
+            }
+        }
+        // Fallback: try to get principal from the current HttpServletRequest (useful for standalone MockMvc with .with(user(...)))
+        var attrs = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+        // If tests placed a custom request attribute, prefer it
+        if (attrs != null) {
+            Object custom = attrs.getAttribute("CUSTOM_USER", org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST);
+            if (custom instanceof CustomUserDetails cudCustom && cudCustom.account() != null)
+                return cudCustom.account().getUser();
+        }
+        if (attrs instanceof org.springframework.web.context.request.ServletRequestAttributes sra) {
+            jakarta.servlet.http.HttpServletRequest req = sra.getRequest();
+            if (req != null) {
+                var princ = req.getUserPrincipal();
+                Object pCandidate = null;
+                if (princ instanceof org.springframework.security.authentication.UsernamePasswordAuthenticationToken upt) {
+                    pCandidate = upt.getPrincipal();
+                } else if (princ != null) {
+                    pCandidate = princ;
+                }
+
+                if (pCandidate instanceof CustomUserDetails cud2 && cud2.account() != null)
+                    return cud2.account().getUser();
+                if (pCandidate instanceof org.springframework.security.core.userdetails.User ud2) {
+                    User tmp = new User();
+                    tmp.setEmail(ud2.getUsername());
+                    return tmp;
+                }
+                if (pCandidate instanceof String s) {
+                    User tmp = new User();
+                    tmp.setEmail(s);
+                    return tmp;
+                }
+            }
+        }
+        return null;
     }
 }

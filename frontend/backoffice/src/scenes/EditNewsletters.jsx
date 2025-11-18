@@ -247,6 +247,7 @@ export default function EditNewsletters({ newsletterId }) {
             initialValues={newsletterData || {}}
             displayColumns={2}
           />
+
           <ContentManager
             parentId={newsletterId}
             parentType="newsletter-publication"
@@ -277,7 +278,7 @@ export default function EditNewsletters({ newsletterId }) {
         <div className="space-y-6">
           {/* Newsletter Information, Status and Actions */}
           <PublicationInfoCard
-            title="Informations sur la newsletter"
+            title={newsletterData.name}
             status={newsletterData.status}
             createdAt={newsletterData.createdAt}
             publishedDate={newsletterData.publishedDate}

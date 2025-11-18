@@ -24,6 +24,10 @@ export default function MyForm({
   cancelButtonLabel = "Annuler",
   showSubmitButton = true,
   allowNoChanges = false,
+  // number of columns (fields per row) — default 2 keeps previous behavior
+  columns = 2,
+  // Tailwind max-width class applied to the grid container (default preserved)
+  maxWidthClass = "max-w-2xl",
 }) {
   // If a parent context indicates forms should not render their own panel, honor it
   const panelContext = useContext(FormPanelContext);
@@ -44,6 +48,11 @@ export default function MyForm({
   // Track last user interaction timestamp to avoid flicker of hasChanges
   const lastInteractionAtRef = useRef(0);
   const [errors, setErrors] = useState({});
+  // Track visibility toggles for password fields by field name
+  const [passwordVisible, setPasswordVisible] = useState({});
+  const togglePasswordVisible = (name) => {
+    setPasswordVisible((s) => ({ ...(s || {}), [name]: !s?.[name] }));
+  };
   const { notification, showSuccess, showError } = useNotification();
   const formRef = useRef(null);
 
@@ -137,6 +146,16 @@ export default function MyForm({
     const raw = formValues[field.name];
     if (field.type === "date") return normalizeDateForInput(raw);
     if (field.type === "datetime-local") return formatForDatetimeLocal(raw);
+    if (field.type === "select") {
+      // If the field expects multiple values, ensure we pass an array; otherwise pass a scalar
+      if (field.multiple) {
+        return Array.isArray(raw) ? raw : raw ? [raw] : [];
+      }
+      // single select: coerce arrays to first element
+      if (Array.isArray(raw)) return raw.length > 0 ? raw[0] : "";
+      if (raw === null || raw === undefined) return "";
+      return raw;
+    }
     if (raw === null || raw === undefined) return "";
     return raw;
   };
@@ -215,6 +234,17 @@ export default function MyForm({
       else if (value.includes(".")) updatedValue = parseFloat(value);
       else updatedValue = parseInt(value, 10);
     }
+
+    // Clear field error for this field when the user edits it
+    setErrors((prev) => {
+      if (!prev) return {};
+      if (prev[name]) {
+        const copy = { ...prev };
+        delete copy[name];
+        return copy;
+      }
+      return prev;
+    });
 
     // Build nextValues synchronously from current state to avoid relying on setState callback
     const current = formValues || {};
@@ -400,6 +430,40 @@ export default function MyForm({
         // eslint-disable-next-line no-console
         console.error(err);
       } catch (e) {}
+      // If the thrown error contains fieldErrors (object mapping fieldName -> message), surface them inline
+      try {
+        if (
+          err &&
+          typeof err === "object" &&
+          err.fieldErrors &&
+          typeof err.fieldErrors === "object"
+        ) {
+          setErrors(err.fieldErrors || {});
+          // autofocus first field with an error if possible
+          try {
+            const firstField = Object.keys(err.fieldErrors || {})[0];
+            if (firstField && formRef.current) {
+              setTimeout(() => {
+                const el = formRef.current.querySelector(
+                  `[name="${firstField}"]`,
+                );
+                if (el && typeof el.focus === "function") {
+                  try {
+                    el.focus();
+                  } catch (e) {}
+                  try {
+                    el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  } catch (e) {}
+                }
+              }, 60);
+            }
+          } catch (ee) {
+            // ignore focus errors
+          }
+        }
+      } catch (ee) {
+        // ignore
+      }
       try {
         if (typeof showError === "function") showError(errorMessage);
       } catch (notifErr) {}
@@ -410,11 +474,17 @@ export default function MyForm({
 
   // Helper that renders the fields grid (used in inline and panel modes)
   const renderFields = () => (
-    <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+    <div
+      className={`grid grid-cols-1 gap-x-6 gap-y-8 ${maxWidthClass}`}
+      style={{
+        gridTemplateColumns: `repeat(${Math.max(1, columns)}, minmax(0, 1fr))`,
+      }}
+    >
       {(fields || []).map((field) => (
         <div
           key={field.name}
-          className={`${field.type === "textarea" || field.fullWidth ? "col-span-full" : "sm:col-span-3"}`}
+          className={`${field.type === "textarea" || field.fullWidth ? "col-span-full" : ""}`}
+          // when columns==1 we want full width per field; otherwise each field occupies one column unless fullWidth
         >
           {field.type === "checkbox" ? (
             <div className="flex gap-3">
@@ -511,11 +581,7 @@ export default function MyForm({
                   <Select
                     id={field.name}
                     name={field.name}
-                    value={
-                      field.type === "date"
-                        ? normalizeDateForInput(formValues[field.name])
-                        : formValues[field.name] || ""
-                    }
+                    value={getFieldValueForInput(field)}
                     onChange={handleChange}
                     options={field.options}
                     placeholder={
@@ -524,6 +590,62 @@ export default function MyForm({
                     disabled={field.disabled}
                     className={`block w-full rounded-md px-3 py-2 text-base outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 cursor-pointer min-h-[2.5rem] ${field.disabled ? "bg-gray-200 text-gray-600 cursor-not-allowed" : "bg-white text-gray-900"} ${errors[field.name] ? "outline-red-500" : ""}`}
                   />
+                ) : field.type === "password" ? (
+                  <div className="relative">
+                    <input
+                      id={field.name}
+                      name={field.name}
+                      type={passwordVisible[field.name] ? "text" : "password"}
+                      value={getFieldValueForInput(field)}
+                      onChange={handleChange}
+                      disabled={field.disabled}
+                      placeholder={field.placeholder || ""}
+                      className={`block w-full rounded-md px-3 py-2 pr-10 text-base outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${field.disabled ? "bg-gray-200 text-gray-600 cursor-not-allowed" : "bg-white text-gray-900"} ${errors[field.name] ? "outline-red-500" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisible(field.name)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                      tabIndex={-1}
+                    >
+                      {passwordVisible[field.name] ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-5 h-5 text-gray-400 hover:text-gray-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-5 h-5 text-gray-400 hover:text-gray-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 ) : field.type === "readonly" ? (
                   <input
                     type="text"

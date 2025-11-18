@@ -19,14 +19,14 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Tests unitaires pour AdminAccountController")
-class AdminAccountControllerTest {
+@DisplayName("Tests unitaires pour AccountAdminController")
+class AccountAdminControllerTest {
 
     @Mock
     private AccountService accountService;
 
     @InjectMocks
-    private AdminAccountController adminAccountController;
+    private AccountAdminController accountAdminController;
 
     private UUID accountId;
 
@@ -42,7 +42,7 @@ class AdminAccountControllerTest {
 
         doNothing().when(accountService).resetPasswordByAdmin(accountId, "NewPass123!", null);
 
-        ResponseEntity<?> resp = adminAccountController.resetPasswordByAdmin(accountId, req, null);
+        ResponseEntity<?> resp = accountAdminController.resetPasswordByAdmin(accountId, req, null);
 
         assertEquals(HttpStatus.NO_CONTENT, resp.getStatusCode());
         verify(accountService).resetPasswordByAdmin(accountId, "NewPass123!", null);

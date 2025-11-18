@@ -3,6 +3,7 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.LoginRequest;
 import com.stemadeleine.api.dto.SignupRequest;
 import com.stemadeleine.api.model.Account;
+import com.stemadeleine.api.model.Roles;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.AccountRepository;
 import com.stemadeleine.api.repository.UserRepository;
@@ -70,7 +71,7 @@ class AuthServiceTest {
                 .id(UUID.randomUUID())
                 .email("test@example.com")
                 .password("encoded-password")
-                .role("ROLE_USER")
+                .role(Roles.ROLE_USER)
                 .provider("local")
                 .user(testUser)
                 .isActive(true)

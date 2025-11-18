@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Title from "@/components/ui/Title";
 import SceneLayout from "@/components/ui/SceneLayout";
@@ -9,18 +9,40 @@ import Notification from "@/components/ui/Notification";
 import EditablePanel from "@/components/ui/EditablePanel";
 import { UserIcon } from "@heroicons/react/24/outline";
 import ActiveSwitch from "@/components/ActiveSwitch";
+import Utilities from "@/components/ui/Utilities";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
+import Button from "@/components/ui/Button";
 
 export default function EditAccount() {
   const { id } = useParams();
   const router = useRouter();
   const accountOps = useAccountOperations();
-  const { attachUser, detachUser } = accountOps;
+  const { attachUser, detachUser, getRoles } = accountOps;
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
 
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [showChangePwd, setShowChangePwd] = useState(false);
+
+  // Build initialValues for the editable form: ensure `roles` is a scalar string (select expects a single value)
+  const formInitialValues = useMemo(() => {
+    if (!account) return {};
+    const copy = { ...account };
+    // Take first role if array, fallback to role string or empty
+    if (Array.isArray(copy.roles)) {
+      copy.roles = copy.roles.length > 0 ? copy.roles[0] : "";
+    } else if (typeof copy.roles === "string") {
+      // keep as-is
+    } else if (copy.role && typeof copy.role === "string") {
+      copy.roles = copy.role;
+    } else {
+      copy.roles = "";
+    }
+    return copy;
+  }, [account]);
 
   // Helper to compute a stable display name (avoid empty strings)
   const getDisplayName = (acc) => {
@@ -31,6 +53,22 @@ export default function EditAccount() {
     if (e) return e;
     return acc.id || null;
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const roles = await getRoles();
+        setRoleOptions(
+          (roles || []).map((r) => ({
+            value: r,
+            label: r.replace(/^ROLE_/, ""),
+          })),
+        );
+      } catch (e) {
+        console.warn("Unable to fetch roles for select", e);
+      }
+    })();
+  }, [getRoles]);
 
   useEffect(() => {
     if (id) fetchAccount();
@@ -90,7 +128,14 @@ export default function EditAccount() {
     const payload = {
       username: vals.username,
       provider: vals.provider,
-      roles: vals.roles ? vals.roles.split(/\s*,\s*/) : [],
+      // ensure roles is an array of strings (backend expects enum names or Role[])
+      roles: Array.isArray(vals.roles)
+        ? vals.roles
+        : typeof vals.roles === "string"
+          ? vals.roles.split(/\s*,\s*/).filter(Boolean)
+          : vals.roles
+            ? [vals.roles]
+            : [],
     };
     setSaving(true);
     try {
@@ -166,12 +211,54 @@ export default function EditAccount() {
           }
         />
 
+        <Utilities
+          actions={[
+            {
+              variant: "reset-password",
+              label: "Générer / réinitialiser le mot de passe",
+              // callback receives the generated password from Utilities (newPass)
+              callback: async (newPass) => {
+                try {
+                  await accountOps.resetPasswordByAdmin(id, newPass);
+                  showSuccess(
+                    "Mot de passe mis à jour",
+                    "Le mot de passe a été réinitialisé et copié dans le presse-papier",
+                  );
+                } catch (err) {
+                  // remonter l'erreur pour que Utilities puisse l'afficher si besoin
+                  console.error(err);
+                  // throw to let Utilities handle logging if necessary
+                  throw err;
+                }
+              },
+              // meta permet au composant Utilities de désactiver le bouton suivant le provider
+              meta: {
+                currentProvider: account ? account.provider : "local",
+                provider: "local",
+              },
+              size: "sm",
+            },
+          ]}
+        />
+
+        {/* Bouton pour ouvrir le modal de changement de mot de passe en mode admin */}
+        <div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowChangePwd(true)}
+          >
+            Modifier le mot de passe (admin)
+          </Button>
+        </div>
+
         <EditablePanel
           key={account ? account.id : "account"}
           title={getDisplayName(account) || "Compte"}
           icon={UserIcon}
           canEdit={true}
-          initialValues={account || {}}
+          initialValues={formInitialValues || {}}
           fields={[
             {
               name: "provider",
@@ -187,9 +274,10 @@ export default function EditAccount() {
             },
             {
               name: "roles",
-              label: "Roles (csv)",
-              type: "text",
+              label: "Roles",
+              type: "select",
               required: true,
+              options: [{ value: "", label: "-- Choisir --" }, ...roleOptions],
             },
           ]}
           displayColumns={2}
@@ -287,6 +375,18 @@ export default function EditAccount() {
           onClose={hideNotification}
         />
       )}
+
+      <ChangePasswordModal
+        open={showChangePwd}
+        onClose={() => setShowChangePwd(false)}
+        accountId={id}
+        allowAdminReset={true}
+        onSuccess={async () => {
+          setShowChangePwd(false);
+          // refresh account after password change
+          await fetchAccount();
+        }}
+      />
     </SceneLayout>
   );
 }

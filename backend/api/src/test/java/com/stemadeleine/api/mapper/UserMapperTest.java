@@ -2,6 +2,7 @@ package com.stemadeleine.api.mapper;
 
 import com.stemadeleine.api.dto.UserDto;
 import com.stemadeleine.api.model.Account;
+import com.stemadeleine.api.model.Roles;
 import com.stemadeleine.api.model.User;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ public class UserMapperTest {
         Account acc = new Account();
         acc.setId(UUID.randomUUID());
         acc.setEmail("admin@example.com");
-        acc.setRole("ROLE_ADMIN");
+        acc.setRole(Roles.ROLE_ADMIN);
         acc.setUser(user);
 
         user.setAccounts(Collections.singletonList(acc));
@@ -36,6 +37,6 @@ public class UserMapperTest {
         assertThat(dto).isNotNull();
         assertThat(dto.accounts()).isNotNull();
         assertThat(dto.accounts()).hasSize(1);
-        assertThat(dto.accounts().stream().findFirst().get().getRole()).isEqualTo("ROLE_ADMIN");
+        assertThat(dto.accounts().stream().findFirst().get().getRole()).isEqualTo(Roles.ROLE_ADMIN);
     }
 }

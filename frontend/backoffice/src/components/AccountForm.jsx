@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import Panel from "@/components/ui/Panel";
 import Autocomplete from "@/components/ui/Autocomplete";
@@ -12,18 +12,40 @@ import { useUserOperations } from "@/hooks/useUserOperations";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function AccountForm({
-  initialValues = { email: "", role: "USER", provider: "local" },
+  initialValues = { email: "", role: "ROLE_USER", provider: "local" },
   onCreated,
   onCancel,
 }) {
   const accountOps = useAccountOperations();
   const { getAllUsers } = useUserOperations();
+  // destructure stable callbacks to avoid triggering effects when the parent object is recreated
+  const { getRoles } = accountOps;
   const { showError, showSuccess } = useNotification();
 
-  const [formValues, setFormValues] = useState({ ...initialValues });
+  // Normalize incoming initial role to full enum name if needed
+  const normalizeInitial = (vals) => {
+    const copy = { ...(vals || {}) };
+    if (copy.role && typeof copy.role === "string") {
+      if (!copy.role.startsWith("ROLE_")) copy.role = `ROLE_${copy.role}`;
+    } else {
+      copy.role = "ROLE_USER";
+    }
+    return copy;
+  };
+
+  const [formValues, setFormValues] = useState(() =>
+    normalizeInitial(initialValues),
+  );
   const [errors, setErrors] = useState({});
   const [selectedUser, setSelectedUser] = useState("");
   const [userOptions, setUserOptions] = useState([]);
+  const [roleOptions, setRoleOptions] = useState([
+    { label: "-- Choisir --", value: "" },
+    { label: "Utilisateur", value: "ROLE_USER" },
+    { label: "Administrateur", value: "ROLE_ADMIN" },
+  ]);
+  // avoid repeated fetches if effect re-runs due to parent re-creations
+  const rolesLoadedRef = useRef(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,8 +73,45 @@ export default function AccountForm({
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Depend on getAllUsers (stable if hook uses useCallback/useMemo), avoids stale closures
+  }, [getAllUsers]);
+
+  // preload roles from backend (if available)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (rolesLoadedRef.current) return;
+        if (typeof getRoles === "function") {
+          const roles = await getRoles();
+          if (!mounted) return;
+          if (Array.isArray(roles) && roles.length > 0) {
+            const opts = roles.map((r) => ({
+              value: r,
+              label: r.replace(/^ROLE_/, ""),
+            }));
+            setRoleOptions([{ label: "-- Choisir --", value: "" }, ...opts]);
+            // If current formValues.role is short (e.g. USER), normalize it to ROLE_*
+            setFormValues((prev) => {
+              const cur = prev && prev.role ? prev.role : "ROLE_USER";
+              const normalized = cur.startsWith("ROLE_") ? cur : `ROLE_${cur}`;
+              // avoid setting state if identical to prevent extra rerenders
+              if (String(prev?.role) === String(normalized)) return prev;
+              return { ...(prev || {}), role: normalized };
+            });
+            // mark as loaded to avoid refetching in loops
+            rolesLoadedRef.current = true;
+          }
+        }
+      } catch (err) {
+        console.warn("Unable to fetch roles, keep defaults", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+    // depends on getRoles which is stable thanks to useCallback in the hook
+  }, [getRoles]);
 
   const validate = () => {
     const e = {};
@@ -117,7 +176,9 @@ export default function AccountForm({
                 type="text"
                 value={formValues.email || ""}
                 onChange={(e) => handleChange("email", e.target.value)}
-                className={`block w-full rounded-md px-3 py-2 text-base text-gray-700 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${errors.email ? "outline-red-500" : ""}`}
+                className={`block w-full rounded-md px-3 py-2 text-base text-gray-700 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                  errors.email ? "outline-red-500" : ""
+                }`}
               />
             </div>
             {errors.email && (
@@ -131,12 +192,9 @@ export default function AccountForm({
             </label>
             <div className="mt-2">
               <Select
-                value={formValues.role || "USER"}
+                value={formValues.role || "ROLE_USER"}
                 onValueChange={(v) => handleChange("role", v)}
-                options={[
-                  { label: "Utilisateur", value: "USER" },
-                  { label: "Administrateur", value: "ADMIN" },
-                ]}
+                options={roleOptions}
                 placeholder={null}
               />
             </div>
@@ -235,7 +293,7 @@ AccountForm.propTypes = {
 };
 
 AccountForm.defaultProps = {
-  initialValues: { email: "", role: "USER", provider: "local" },
+  initialValues: { email: "", role: "ROLE_USER", provider: "local" },
   onCreated: null,
   onCancel: null,
 };

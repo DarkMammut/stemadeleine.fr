@@ -82,7 +82,7 @@ class SectionControllerIntegrationTest {
         Account testAccount = Account.builder()
                 .email(testUser.getEmail())
                 .password("password")
-                .role("ROLE_USER")
+                .role(Roles.ROLE_USER)
                 .isActive(true)
                 .emailVerified(true)
                 .user(testUser)

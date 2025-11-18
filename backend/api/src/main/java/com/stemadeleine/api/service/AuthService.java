@@ -3,6 +3,7 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.LoginRequest;
 import com.stemadeleine.api.dto.SignupRequest;
 import com.stemadeleine.api.model.Account;
+import com.stemadeleine.api.model.Roles;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.AccountRepository;
 import com.stemadeleine.api.repository.UserRepository;
@@ -76,7 +77,7 @@ public class AuthService {
         Account account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role("ROLE_USER")
+                .role(Roles.ROLE_USER)
                 .provider("local")
                 .user(user)
                 .build();

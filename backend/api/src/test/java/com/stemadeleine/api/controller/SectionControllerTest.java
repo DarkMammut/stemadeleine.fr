@@ -12,17 +12,14 @@ import com.stemadeleine.api.service.SectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -30,35 +27,28 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration"
-})
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Tests unitaires du contrôleur SectionController")
 class SectionControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private SectionService sectionService;
 
-    @MockBean
+    @Mock
     private SectionMapper sectionMapper;
 
-    @MockBean
+    @Mock
     private ContentService contentService;
 
-    @MockBean
+    @Mock
     private ContentMapper contentMapper;
 
     private Section testSection;
@@ -81,15 +71,16 @@ class SectionControllerTest {
         testContent = createTestContent();
         testContentDto = createTestContentDto();
 
-        // Configuration du contexte de sécurité
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(testUserDetails, null,
-                        List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Configuration des mocks par défaut pour les mappers (lenient to avoid unnecessary stubbing)
+        lenient().when(sectionMapper.toDto(any(Section.class))).thenReturn(testSectionDto);
+        lenient().when(contentMapper.toDto(any(Content.class))).thenReturn(testContentDto);
 
-        // Configuration des mocks par défaut pour les mappers
-        when(sectionMapper.toDto(any(Section.class))).thenReturn(testSectionDto);
-        when(contentMapper.toDto(any(Content.class))).thenReturn(testContentDto);
+        // build standalone MockMvc with spring security support
+        SectionController controller = new SectionController(sectionService, sectionMapper, contentService, contentMapper);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new com.stemadeleine.api.exception.GlobalExceptionHandler())
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
     }
 
     @Test
@@ -159,9 +150,10 @@ class SectionControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/sections")
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testSectionDto.id().toString()));
@@ -175,9 +167,10 @@ class SectionControllerTest {
 
         // When & Then - Le GlobalExceptionHandler convertit l'erreur "is required" en 400
         mockMvc.perform(post("/api/sections")
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
@@ -195,9 +188,10 @@ class SectionControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/sections/{sectionId}", sectionId)
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testSectionDto.id().toString()));
@@ -214,9 +208,10 @@ class SectionControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/sections/{sectionId}", sectionId)
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
     }
 
@@ -229,9 +224,10 @@ class SectionControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/sections/{sectionId}/visibility", sectionId)
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"isVisible\": false}")
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content("{\"isVisible\": false}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testSectionDto.id().toString()));
@@ -246,9 +242,10 @@ class SectionControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/sections/{sectionId}/contents", sectionId)
+                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null))
+                        .requestAttr("CUSTOM_USER", testUserDetails)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"New Content\"}")
-                        .principal(new UsernamePasswordAuthenticationToken(testUserDetails, null)))
+                        .content("{\"title\": \"New Content\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(testContentDto.id().toString()));
@@ -285,7 +282,7 @@ class SectionControllerTest {
                 .id(UUID.randomUUID())
                 .email("test@example.com")
                 .password("password")
-                .role("ROLE_USER")
+                .role(Roles.ROLE_USER)
                 .isActive(true)
                 .emailVerified(true)
                 .user(user)

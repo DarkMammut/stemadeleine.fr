@@ -23,6 +23,7 @@ export default function AccountManager({
   refreshUser = null,
   editable = true,
   changePassword = false,
+  allowAdminReset = false,
   loading = false,
 }) {
   const accountOps = useAccountOperations();
@@ -305,6 +306,7 @@ export default function AccountManager({
         open={showChangePwd}
         onClose={() => setShowChangePwd(false)}
         accountId={changePwdAccountId}
+        allowAdminReset={allowAdminReset}
         onSuccess={async () => {
           setShowChangePwd(false);
           setChangePwdAccountId(null);
