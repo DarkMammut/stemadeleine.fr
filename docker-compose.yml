@@ -15,9 +15,9 @@ services:
     depends_on:
       - db
 
-  frontoffice:
-    build: frontend/frontoffice
-    container_name: frontoffice
+  stemadeleine:
+    build: frontend/stemadeleine
+    container_name: stemadeleine
     ports:
       - "3000:3000"
     environment:

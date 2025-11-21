@@ -1,0 +1,364 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Application globale de la police */
+@layer base {
+    /* Appliquer Fjord One comme police par défaut via la variable injectée par next/font
+       La variable --font-fjord-one sera définie par le loader next/font dans `layout.tsx`. */
+    html, body {
+        font-family: var(--font-fjord-one, 'Fjord One'), serif;
+    }
+}
+
+body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Organization Theme CSS Variables and Custom Classes */
+
+/* Variables CSS - seront définies dynamiquement par le backend */
+:root {
+    /* Couleurs par défaut - seront remplacées par les couleurs du backend */
+    --color-primary: #90cab4;
+    --color-secondary: #e2832b;
+    --color-primary-light: color-mix(in srgb, var(--color-primary), white 60%);
+    --color-primary-dark: color-mix(in srgb, var(--color-primary), black 40%);
+    --color-secondary-light: color-mix(in srgb, var(--color-secondary), white 60%);
+    --color-secondary-dark: color-mix(in srgb, var(--color-secondary), black 40%);
+    --color-primary-rgb: 144, 202, 180;
+    --color-secondary-rgb: 226, 131, 43;
+
+    /* Nuances par défaut en format RGB qui seront remplacées dynamiquement */
+    --color-primary-50: 240, 249, 245;
+    --color-primary-100: 220, 242, 231;
+    --color-primary-200: 188, 229, 209;
+    --color-primary-300: 144, 202, 180;
+    --color-primary-400: 107, 179, 153;
+    --color-primary-500: 144, 202, 180;
+    --color-primary-600: 61, 128, 102;
+    --color-primary-700: 50, 102, 84;
+    --color-primary-800: 42, 82, 69;
+    --color-primary-900: 35, 68, 57;
+
+    --color-secondary-50: 253, 246, 240;
+    --color-secondary-100: 251, 233, 214;
+    --color-secondary-200: 246, 209, 173;
+    --color-secondary-300: 240, 176, 121;
+    --color-secondary-400: 233, 146, 74;
+    --color-secondary-500: 226, 131, 43;
+    --color-secondary-600: 201, 109, 32;
+    --color-secondary-700: 168, 87, 28;
+    --color-secondary-800: 135, 71, 28;
+    --color-secondary-900: 110, 59, 26;
+}
+
+/* Custom Tailwind utilities using organization colors */
+@layer utilities {
+    /* ===== SHORTER ALIASES FOR EASIER USE ===== */
+    /* Primary color utilities - shorter syntax */
+    .bg-primary {
+        background-color: var(--color-primary);
+    }
+
+    .bg-primary-50 {
+        background-color: rgb(var(--color-primary-50));
+    }
+
+    .bg-primary-100 {
+        background-color: rgb(var(--color-primary-100));
+    }
+
+    .bg-primary-200 {
+        background-color: rgb(var(--color-primary-200));
+    }
+
+    .bg-primary-300 {
+        background-color: rgb(var(--color-primary-300));
+    }
+
+    .bg-primary-400 {
+        background-color: rgb(var(--color-primary-400));
+    }
+
+    .bg-primary-500 {
+        background-color: rgb(var(--color-primary-500));
+    }
+
+    .bg-primary-600 {
+        background-color: rgb(var(--color-primary-600));
+    }
+
+    .bg-primary-700 {
+        background-color: rgb(var(--color-primary-700));
+    }
+
+    .bg-primary-800 {
+        background-color: rgb(var(--color-primary-800));
+    }
+
+    .bg-primary-900 {
+        background-color: rgb(var(--color-primary-900));
+    }
+
+    /* Secondary color utilities - shorter syntax */
+    .bg-secondary {
+        background-color: var(--color-secondary);
+    }
+
+    .bg-secondary-50 {
+        background-color: rgb(var(--color-secondary-50));
+    }
+
+    .bg-secondary-100 {
+        background-color: rgb(var(--color-secondary-100));
+    }
+
+    .bg-secondary-200 {
+        background-color: rgb(var(--color-secondary-200));
+    }
+
+    .bg-secondary-300 {
+        background-color: rgb(var(--color-secondary-300));
+    }
+
+    .bg-secondary-400 {
+        background-color: rgb(var(--color-secondary-400));
+    }
+
+    .bg-secondary-500 {
+        background-color: rgb(var(--color-secondary-500));
+    }
+
+    .bg-secondary-600 {
+        background-color: rgb(var(--color-secondary-600));
+    }
+
+    .bg-secondary-700 {
+        background-color: rgb(var(--color-secondary-700));
+    }
+
+    .bg-secondary-800 {
+        background-color: rgb(var(--color-secondary-800));
+    }
+
+    .bg-secondary-900 {
+        background-color: rgb(var(--color-secondary-900));
+    }
+
+    /* NEW: classes explicites pour "-light" afin de préserver l'écriture utilisée dans les composants */
+    .bg-primary-light {
+        background-color: var(--color-primary-light);
+    }
+
+    .bg-primary-dark {
+        background-color: var(--color-primary-dark);
+    }
+
+    .bg-secondary-light {
+        background-color: var(--color-secondary-light);
+    }
+
+    .bg-secondary-dark {
+        background-color: var(--color-secondary-dark);
+    }
+
+    /* Text color utilities - shorter syntax */
+    .text-primary {
+        color: var(--color-primary);
+    }
+
+    .text-primary-50 {
+        color: rgb(var(--color-primary-50));
+    }
+
+    .text-primary-100 {
+        color: rgb(var(--color-primary-100));
+    }
+
+    .text-primary-200 {
+        color: rgb(var(--color-primary-200));
+    }
+
+    .text-primary-300 {
+        color: rgb(var(--color-primary-300));
+    }
+
+    .text-primary-400 {
+        color: rgb(var(--color-primary-400));
+    }
+
+    .text-primary-500 {
+        color: rgb(var(--color-primary-500));
+    }
+
+    .text-primary-600 {
+        color: rgb(var(--color-primary-600));
+    }
+
+    .text-primary-700 {
+        color: rgb(var(--color-primary-700));
+    }
+
+    .text-primary-800 {
+        color: rgb(var(--color-primary-800));
+    }
+
+    .text-primary-900 {
+        color: rgb(var(--color-primary-900));
+    }
+
+    .text-secondary {
+        color: var(--color-secondary);
+    }
+
+    .text-secondary-50 {
+        color: rgb(var(--color-secondary-50));
+    }
+
+    .text-secondary-100 {
+        color: rgb(var(--color-secondary-100));
+    }
+
+    .text-secondary-200 {
+        color: rgb(var(--color-secondary-200));
+    }
+
+    .text-secondary-300 {
+        color: rgb(var(--color-secondary-300));
+    }
+
+    .text-secondary-400 {
+        color: rgb(var(--color-secondary-400));
+    }
+
+    .text-secondary-500 {
+        color: rgb(var(--color-secondary-500));
+    }
+
+    .text-secondary-600 {
+        color: rgb(var(--color-secondary-600));
+    }
+
+    .text-secondary-700 {
+        color: rgb(var(--color-secondary-700));
+    }
+
+    .text-secondary-800 {
+        color: rgb(var(--color-secondary-800));
+    }
+
+    .text-secondary-900 {
+        color: rgb(var(--color-secondary-900));
+    }
+
+    /* Border color utilities - shorter syntax */
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .border-primary-200 {
+        border-color: rgb(var(--color-primary-200));
+    }
+
+    .border-primary-300 {
+        border-color: rgb(var(--color-primary-300));
+    }
+
+    .border-primary-500 {
+        border-color: rgb(var(--color-primary-500));
+    }
+
+    .border-primary-600 {
+        border-color: rgb(var(--color-primary-600));
+    }
+
+    .border-secondary {
+        border-color: var(--color-secondary);
+    }
+
+    .border-secondary-200 {
+        border-color: rgb(var(--color-secondary-200));
+    }
+
+    .border-secondary-300 {
+        border-color: rgb(var(--color-secondary-300));
+    }
+
+    .border-secondary-500 {
+        border-color: rgb(var(--color-secondary-500));
+    }
+
+    .border-secondary-600 {
+        border-color: rgb(var(--color-secondary-600));
+    }
+
+    /* Ring color utilities for focus states - shorter syntax */
+    .ring-primary {
+        --tw-ring-color: var(--color-primary);
+    }
+
+    .ring-secondary {
+        --tw-ring-color: var(--color-secondary);
+    }
+
+    /* Hover utilities - shorter syntax */
+    .hover\:bg-primary:hover {
+        background-color: var(--color-primary);
+    }
+
+    .hover\:bg-primary-600:hover {
+        background-color: rgb(var(--color-primary-600));
+    }
+
+    .hover\:bg-primary-700:hover {
+        background-color: rgb(var(--color-primary-700));
+    }
+
+    .hover\:bg-secondary:hover {
+        background-color: var(--color-secondary);
+    }
+
+    .hover\:bg-secondary-600:hover {
+        background-color: rgb(var(--color-secondary-600));
+    }
+
+    .hover\:bg-secondary-700:hover {
+        background-color: rgb(var(--color-secondary-700));
+    }
+
+    .hover\:text-primary:hover {
+        color: var(--color-primary);
+    }
+
+    .hover\:text-secondary:hover {
+        color: var(--color-secondary);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(
+                180deg,
+                var(--color-primary-dark) 0%,
+                var(--color-primary) 50%,
+                var(--color-primary-light) 100%
+        ) !important;
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(
+                180deg,
+                var(--color-secondary-dark) 0%,
+                var(--color-secondary) 50%,
+                var(--color-secondary-light) 100%
+        ) !important;
+    }
+}
