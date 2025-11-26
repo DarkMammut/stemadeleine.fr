@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +29,12 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    // Nouvelle méthode performante pour retrouver un utilisateur par email (ignorer la casse)
+    public Optional<User> findByEmailIgnoreCase(String email) {
+        if (email == null) return Optional.empty();
+        return userRepository.findByEmailIgnoreCase(email.trim());
     }
 
     public User findById(UUID id) {

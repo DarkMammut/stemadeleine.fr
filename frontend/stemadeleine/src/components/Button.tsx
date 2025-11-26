@@ -1,9 +1,32 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-const Button = React.forwardRef((props, ref) => {
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type Size = 'sm' | 'md' | 'lg';
+
+type PolymorphicRef<C extends React.ElementType> = React.ComponentPropsWithRef<C>['ref'];
+type PolymorphicProps<C extends React.ElementType, Props = Record<string, unknown>> = Props &
+  Omit<React.ComponentPropsWithoutRef<C>, keyof Props> & {
+  as?: C;
+};
+
+interface OwnProps {
+  children: React.ReactNode;
+  className?: string;
+  variant?: Variant;
+  size?: Size;
+  disabled?: boolean;
+  loading?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+type ButtonProps<C extends React.ElementType> = PolymorphicProps<C, OwnProps>;
+
+const ButtonInner = <C extends React.ElementType = 'button'>(
+  props: ButtonProps<C>,
+  ref: PolymorphicRef<C>,
+) => {
   const {
-    as,
+    as: asProp,
     children,
     className = '',
     variant = 'primary',
@@ -11,17 +34,15 @@ const Button = React.forwardRef((props, ref) => {
     disabled = false,
     loading = false,
     type = 'button',
-    onClick,
     ...restProps
-  } = props;
+  } = props as ButtonProps<C> & { as?: React.ElementType };
 
   // Classes de base
   const baseClasses =
     'inline-flex items-center justify-center font-semibold rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed';
 
   // Variantes de style
-  const variants = {
-    // Utiliser les couleurs définies dans tailwind.config.js
+  const variants: Record<Variant, string> = {
     primary:
       'bg-primary text-white hover:bg-primary-dark focus:ring-primary disabled:bg-gray-300 disabled:text-gray-500',
     secondary:
@@ -35,7 +56,7 @@ const Button = React.forwardRef((props, ref) => {
   };
 
   // Tailles
-  const sizes = {
+  const sizes: Record<Size, string> = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
     lg: 'px-6 py-3 text-lg',
@@ -44,61 +65,66 @@ const Button = React.forwardRef((props, ref) => {
   // Classes finales
   const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
 
-  // Sanitize "as" prop: n'envoyer que des valeurs valides (string ou component)
-  let Component = (typeof as === 'string' || typeof as === 'function') ? as : 'button';
+  // Sanitize "as" prop: accept strings or components; fallback to 'button' for invalid values
+  let Component: React.ElementType = (asProp as React.ElementType) ?? 'button';
+  if (Component == null) Component = 'button';
+  if (typeof Component !== 'string' && typeof Component !== 'function') {
+    Component = 'button';
+  }
 
   // Sanitize restProps: retirer explicitement les props null/undefined
   const sanitizedRest = Object.fromEntries(
-    Object.entries(restProps).filter(([, v]) => v != null),
-  );
+    Object.entries(restProps as Record<string, unknown>).filter(([, v]) => v != null),
+  ) as Record<string, unknown>;
 
-  const componentProps = {
+  const componentProps: Record<string, unknown> = {
     className: buttonClasses,
     disabled: disabled || loading,
-    onClick,
     ...sanitizedRest,
   };
 
   // N'ajouter "type" que si on rend un <button>
-  if (typeof Component === 'string' && Component === 'button') {
-    componentProps.type = type;
+  if (Component === 'button') {
+    (componentProps as Record<string, unknown>).type = type;
   }
 
+  // Utiliser un alias typé pour éviter `any` lors d'accès dynamiques
+  const compProps = componentProps as Record<string, unknown>;
+
   // Détecter un usage courant: Next.js Link sans href
-  // Si le composant est Link et qu'il n'y a pas de href, on fait un fallback vers <button>
-  // pour éviter l'avertissement PropTypes (href expects string/object but got undefined)
   const compName = typeof Component === 'function' ? (Component.displayName || Component.name) : Component;
 
   // Si l'appelant a utilisé `to` (pattern React Router) et que `href` est absent,
   // on copie `to` vers `href` (au lieu de supprimer `to`) pour supporter à la fois
   // Next.js `Link` (qui attend `href`) et react-router `Link` (qui attend `to`).
-  if (componentProps.to != null && componentProps.href == null) {
-    componentProps.href = componentProps.to;
+  if (compProps['to'] != null && compProps['href'] == null) {
+    compProps['href'] = compProps['to'];
   }
 
   // Si le composant est Link et qu'il n'y a vraiment pas de href/to, on fait un fallback vers <button>
-  if ((compName === 'Link' || compName === 'NextLink') && componentProps.href == null && componentProps.to == null) {
+  if ((compName === 'Link' || compName === 'NextLink') && compProps['href'] == null && compProps['to'] == null) {
     console.warn('Button: rendu en <button> car Link a été utilisé sans `href`/`to` (éviter d\'appliquer as=Link sans href)');
     Component = 'button';
     // retirer href/to si présents (sécurité)
-    delete componentProps.href;
-    delete componentProps.to;
+    delete compProps['href'];
+    delete compProps['to'];
   }
 
   // Sécurité additionnelle : n'envoyer `href` que si c'est un string ou un object (Next.js Link attend string|object)
-  if (componentProps.href != null && !(typeof componentProps.href === 'string' || typeof componentProps.href === 'object')) {
-    console.warn('Button: suppression de la prop `href` car sa valeur n\'est pas string|object', componentProps.href);
-    delete componentProps.href;
+  if (compProps['href'] != null && !(['string', 'object'] as Array<string>).includes(typeof compProps['href'])) {
+    console.warn('Button: suppression de la prop `href` car sa valeur n\'est pas string|object', compProps['href']);
+    delete compProps['href'];
   }
 
   // Nettoyer les props finales pour éviter de passer des valeurs `null`/`undefined`
   const cleanProps = Object.fromEntries(
     Object.entries(componentProps).filter(([, v]) => v != null),
-  );
+  ) as Record<string, unknown>;
 
+  // Rendu
   return (
-    <Component ref={ref} {...cleanProps}>
-      {loading && (
+    <Component ref={ref} {...(cleanProps as Record<string, unknown>)}>
+      {compProps['loading'] && (
         <svg
           className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
           xmlns="http://www.w3.org/2000/svg"
@@ -123,26 +149,15 @@ const Button = React.forwardRef((props, ref) => {
       {children}
     </Component>
   );
-});
-
-Button.displayName = 'Button';
-
-Button.propTypes = {
-  as: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  variant: PropTypes.oneOf([
-    'primary',
-    'secondary',
-    'outline',
-    'ghost',
-    'danger',
-  ]),
-  size: PropTypes.oneOf(['sm', 'md', 'lg']),
-  disabled: PropTypes.bool,
-  loading: PropTypes.bool,
-  type: PropTypes.oneOf(['button', 'submit', 'reset']),
-  onClick: PropTypes.func,
 };
 
+type ButtonComponent = <C extends React.ElementType = 'button'>(
+  props: ButtonProps<C> & { ref?: PolymorphicRef<C> },
+) => React.ReactElement | null;
+
+const Button = React.forwardRef(ButtonInner as unknown as React.ForwardRefRenderFunction<unknown, unknown>) as unknown as ButtonComponent;
+
+Object.defineProperty(Button, 'displayName', { value: 'Button', writable: false });
+
 export default Button;
+

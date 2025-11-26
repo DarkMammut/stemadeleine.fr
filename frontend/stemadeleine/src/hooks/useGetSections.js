@@ -1,7 +1,6 @@
 'use client';
 
-/* eslint-disable no-console */
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useAxiosClient } from '@/utils/axiosClient';
 
 const useGetSections = () => {
@@ -9,6 +8,9 @@ const useGetSections = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const axiosClient = useAxiosClient();
+
+  // Keep track of the last pageId we fetched sections for to avoid repeated requests
+  const lastFetchedPageId = useRef(null);
 
   /**
    * Fetch sections for a specific page by pageId
@@ -20,6 +22,12 @@ const useGetSections = () => {
       if (!pageId) {
         console.warn('useGetSections: pageId is required');
         return [];
+      }
+
+      // If we've already fetched for this pageId, return current sections to avoid duplicate fetches
+      if (lastFetchedPageId.current === String(pageId)) {
+        console.debug('useGetSections: already fetched sections for pageId', pageId);
+        return sections;
       }
 
       setLoading(true);
@@ -39,6 +47,8 @@ const useGetSections = () => {
         );
 
         setSections(data);
+        // Mark this pageId as fetched
+        lastFetchedPageId.current = String(pageId);
         return data;
       } catch (err) {
         let errorMessage;
@@ -46,6 +56,8 @@ const useGetSections = () => {
         if (err.response?.status === 404) {
           console.warn(`No sections found for pageId: ${pageId}`);
           setSections([]);
+          // Mark as fetched to avoid retrying repeatedly
+          lastFetchedPageId.current = String(pageId);
           return [];
         }
 
@@ -58,7 +70,8 @@ const useGetSections = () => {
         setLoading(false);
       }
     },
-    [axiosClient],
+    // sections is read here; include axiosClient and sections in deps
+    [axiosClient, sections],
   );
 
   /**
@@ -67,6 +80,7 @@ const useGetSections = () => {
   const clearSections = useCallback(() => {
     setSections([]);
     setError(null);
+    lastFetchedPageId.current = null;
   }, []);
 
   return {

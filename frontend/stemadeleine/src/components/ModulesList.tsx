@@ -1,9 +1,24 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import useGetModules from "../hooks/useGetModules";
-import ModuleRenderer from "./ModuleRenderer";
+import React, { useEffect } from 'react';
+import useGetModules from '../hooks/useGetModules';
+import ModuleRenderer from './ModuleRenderer';
 
-const ModulesList = ({ sectionId, className = "" }) => {
+export interface ModuleType {
+  id: string;
+  type: string;
+  title?: string;
+  name?: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+
+  [key: string]: unknown;
+}
+
+interface Props {
+  sectionId: string;
+  className?: string;
+}
+
+const ModulesList: React.FC<Props> = ({ sectionId, className = '' }) => {
   const { modules, loading, error, fetchModulesBySectionId } = useGetModules();
 
   useEffect(() => {
@@ -28,7 +43,7 @@ const ModulesList = ({ sectionId, className = "" }) => {
       <div className={`w-full py-8 ${className}`}>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800 text-sm">
-            Erreur lors du chargement des modules: {error}
+            Erreur lors du chargement des modules: {String(error)}
           </p>
         </div>
       </div>
@@ -47,21 +62,17 @@ const ModulesList = ({ sectionId, className = "" }) => {
 
   // Sort modules by sortOrder
   const sortedModules = [...modules].sort(
-    (a, b) => (a.sortOrder || 0) - (b.sortOrder || 0),
+    (a: ModuleType, b: ModuleType) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0),
   );
 
   return (
     <div className={`w-full ${className}`}>
-      {sortedModules.map((module) => (
+      {sortedModules.map((module: ModuleType) => (
         <ModuleRenderer key={module.id} module={module} />
       ))}
     </div>
   );
 };
 
-ModulesList.propTypes = {
-  sectionId: PropTypes.string.isRequired,
-  className: PropTypes.string,
-};
-
 export default ModulesList;
+

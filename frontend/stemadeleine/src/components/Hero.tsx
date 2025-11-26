@@ -1,36 +1,66 @@
+'use client';
+
 import React from 'react';
-import Image from 'next/image';
+import useGetMedia from '@/hooks/useGetMedia';
+
+type Variant = 'home' | 'default';
 
 type Props = {
-  mediaId?: string | number;
+  mediaId?: string | number | null;
   title?: string;
   subtitle?: string;
+  variant?: Variant;
 };
 
-export default function Hero(props: Props) {
-  const { mediaId, title, subtitle } = props;
+export default function Hero({ mediaId, title, subtitle, variant = 'default' }: Props) {
+  const mediaIdStr = mediaId ? String(mediaId) : undefined;
+  const { mediaUrl } = useGetMedia(mediaIdStr);
+
+  // Background div rendered only when mediaUrl exists
+  const bgDiv = mediaUrl ? (
+    <div
+      aria-hidden="true"
+      className="absolute inset-0"
+      style={{
+        backgroundImage: `url(${mediaUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        // pour la variante home on veut un effet fixé, sinon on laisse normal
+        backgroundAttachment: variant === 'home' ? 'fixed' : 'scroll',
+        zIndex: 0,
+      }}
+    />
+  ) : null;
+
+  // Classes diffèrent selon la variante
+  const sectionClassBase = 'relative overflow-hidden shadow-lg';
+  const homeClasses = 'h-[80vh] bg-fixed bg-center bg-cover rounded-b-[50%]';
+  const defaultClasses = 'h-60 bg-center bg-cover';
 
   return (
-    <section className="bg-primary-light">
-      <div className="container mx-auto px-4 py-12 text-center">
-        {mediaId ? (
-          // Affiche une image de bannière basique quand mediaId est fourni
-          <div className="mb-6">
-            <div className="mx-auto max-h-48 rounded-md overflow-hidden relative"
-                 style={{ width: '100%', maxWidth: '900px', height: '12rem' }}>
-              <Image
-                src={`/api/media/${mediaId}`}
-                alt={String(title || 'bannière')}
-                fill
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 1024px) 100vw, 900px"
-              />
-            </div>
-          </div>
-        ) : null}
+    <section className={`${sectionClassBase} ${variant === 'home' ? homeClasses : defaultClasses}`}>
+      {bgDiv}
 
-        <h1 className="text-4xl font-bold mb-4">{title || 'Sainte-Madeleine'}</h1>
-        {subtitle && <p className="text-lg text-gray-600">{subtitle}</p>}
+      {/* Overlay */}
+      <div className="absolute inset-0"
+           style={{ backgroundColor: variant === 'home' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.4)', zIndex: 5 }} />
+
+      {/* Content container */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 10 }}>
+        <div
+          className={variant === 'home' ? 'bg-primary/30 backdrop-blur-md rounded-lg px-10 py-8 text-center text-gray-900 shadow-xl max-w-2xl' : 'p-4 md:p-6'}>
+          {title && (
+            <h1
+              className={variant === 'home' ? 'text-4xl md:text-5xl font-serif font-semibold mb-4' : 'text-3xl md:text-4xl lg:text-5xl font-serif text-white text-center uppercase drop-shadow-lg'}>
+              {title}
+            </h1>
+          )}
+
+          {variant === 'home' && <hr className="border-primary/40 mb-4" />}
+
+          {subtitle && variant === 'home' && <h2 className="text-2xl font-light">{subtitle}</h2>}
+        </div>
       </div>
     </section>
   );

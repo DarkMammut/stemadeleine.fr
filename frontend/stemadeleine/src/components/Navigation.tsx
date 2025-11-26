@@ -1,18 +1,32 @@
+'use client';
+
 import React, { useState } from 'react';
 import { HeartIcon } from '@heroicons/react/24/solid';
-import useGetPages from '../hooks/useGetPages';
 import IconButton from './IconButton';
 import Link from 'next/link';
 
-function Navigation() {
+export type PageItem = {
+  id: string | number;
+  name: string;
+  slug: string;
+  isVisible?: boolean;
+  children?: PageItem[];
+};
+
+type NavigationProps = {
+  pagesTree?: PageItem[];
+};
+
+const Navigation: React.FC<NavigationProps> = ({ pagesTree = [] }) => {
   const [toggle, setToggle] = useState(false);
-  const [hoveredMenu, setHoveredMenu] = useState(null);
-  const { tree, loading, error } = useGetPages();
+  const [hoveredMenu, setHoveredMenu] = useState<string | number | null>(null);
+
+  const tree = Array.isArray(pagesTree) ? pagesTree : [];
 
   // Filtrer uniquement les pages visibles
-  const visiblePages = tree.filter((page) => page.isVisible);
+  const visiblePages = tree.filter((page) => page?.isVisible);
 
-  const handleMenuEnter = (pageId) => {
+  const handleMenuEnter = (pageId: string | number) => {
     setHoveredMenu(pageId);
   };
 
@@ -20,12 +34,9 @@ function Navigation() {
     setHoveredMenu(null);
   };
 
-  if (loading) {
-    return <div className="text-center p-4">Chargement...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center p-4">Erreur: {error}</div>;
+  if (!tree || tree.length === 0) {
+    // show nothing if pages not loaded yet (Layout handles fetch)
+    return null;
   }
 
   return (
@@ -74,11 +85,13 @@ function Navigation() {
           {visiblePages.map((page) => (
             <li
               key={page.id}
-              className={`
+              className={
+                `
                 relative flex items-center justify-center group
                 ${toggle ? 'flex-col py-5' : 'px-10'}
                 md:px-10 md:py-0
-              `}
+              `
+              }
               onMouseEnter={() => handleMenuEnter(page.id)}
               onMouseLeave={handleMenuLeave}
             >
@@ -102,12 +115,12 @@ function Navigation() {
               </Link>
 
               {/* Zone invisible pour maintenir le hover */}
-              {page.children.length > 0 && (
+              {page.children && page.children.length > 0 && (
                 <div className="absolute top-full left-0 w-full h-8 bg-transparent hidden md:block" />
               )}
 
               {/* Sous-menu */}
-              {page.children.length > 0 && (
+              {page.children && page.children.length > 0 && (
                 <ul
                   className={`absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 md:mt-8
                     ${hoveredMenu === page.id && !toggle ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}
@@ -142,7 +155,7 @@ function Navigation() {
         {/* Donate Button (Mobile only) */}
         <IconButton
           as={Link}
-          to="/association/don"
+          href="/association/don"
           icon={HeartIcon}
           label="Don"
           variant="secondary"
@@ -158,6 +171,7 @@ function Navigation() {
       </nav>
     </div>
   );
-}
+};
 
 export default Navigation;
+

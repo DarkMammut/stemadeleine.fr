@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -6,39 +5,56 @@ import { useAxiosClient } from '@/utils/axiosClient';
 import useGetOrganization from '@/hooks/useGetOrganization';
 import Button from '@/components/Button';
 import ReCaptcha from '@/components/ReCaptcha';
-import '@/pages/ContactPageContent.css';
+import '@/styles/ContactPageContent.css';
 
-function ValidateEmail(mail) {
+type FormState = {
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  subject?: string;
+  message?: string;
+  rgpd?: boolean;
+};
+
+type HeightState = Partial<Record<keyof FormState, number | string>>;
+
+type ReCaptchaHandle = {
+  getValue: () => string | null | undefined;
+  reset: () => void;
+  execute: () => void;
+};
+
+function ValidateEmail(mail: string | undefined): boolean {
   if (!mail) return false;
   const regexpEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
   return regexpEmail.test(mail);
 }
 
-function ValidateName(name) {
+function ValidateName(name: string | undefined): boolean {
   if (!name) return false;
   const regexpName =
-    /^[a-zA-ZàáâäãåąćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñčšžÀÁÂÄÃÅĄĆĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$/u;
+    /^[a-zA-ZàáâäãåąćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñčšžÀÁÂÄÃÅĄĆĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '\-]+$/u; // allow apostrophe and hyphen
   return regexpName.test(name);
 }
 
-function ValidateMessage(message) {
+function ValidateMessage(message: string | undefined): boolean {
   if (!message) return false;
   const strLength = message.length;
   return strLength >= 25;
 }
 
-const ContactPageContent = () => {
+const ContactPageContent: React.FC = () => {
   const axiosClient = useAxiosClient();
   const { fetchOrganizationInfo, fetchOrganizationSettings } =
     useGetOrganization();
-  const recaptchaRef = useRef(null);
-  const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [state, setState] = useState({});
-  const [height, setHeight] = useState({});
-  const [appear, setAppear] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-  const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const recaptchaRef = useRef<ReCaptchaHandle | null>(null);
+  const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+  const [state, setState] = useState<Partial<FormState>>({});
+  const [height, setHeight] = useState<HeightState>({});
+  const [appear, setAppear] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [organizationData, setOrganizationData] = useState({
     name: 'Les Amis de Sainte Madeleine de la Jarrie',
     address: '3 Rue des Canons',
@@ -46,34 +62,28 @@ const ContactPageContent = () => {
     city: 'La Jarrie',
     email: 'contact@stemadeleine.fr',
   });
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
-  // Fonction de chargement des données avec useCallback pour éviter les re-créations
   const loadOrganizationData = useCallback(async () => {
-    if (dataLoaded) return; // Éviter les appels multiples
+    if (dataLoaded) return;
 
     try {
       console.log('🔄 Chargement des données d\'organisation...');
 
-      // Récupérer à la fois les infos et les paramètres
       const [info, settings] = await Promise.all([
         fetchOrganizationInfo(),
-        fetchOrganizationSettings().catch(() => null), // Ne pas faire échouer si settings n'existe pas
+        fetchOrganizationSettings().catch(() => null),
       ]);
 
       if (info) {
         console.log('✅ Informations reçues:', info);
         console.log('⚙️ Paramètres reçus:', settings);
 
-        // Mapper les données selon la structure de l'API
         setOrganizationData({
           name: info.name || 'Les Amis de Sainte Madeleine de la Jarrie',
-          // Récupérer l'adresse depuis l'objet address
           address: info.address?.addressLine1 || '3 Rue des Canons',
           postalCode: info.address?.postCode || '17220',
-          // Nettoyer le nom de la ville (enlever le " (17)" s'il existe)
           city: info.address?.city?.replace(/ \(\d+\)/, '') || 'La Jarrie',
-          // Essayer de récupérer l'email des settings, sinon valeur par défaut
           email:
             settings?.contactEmail ||
             settings?.email ||
@@ -82,137 +92,115 @@ const ContactPageContent = () => {
       } else {
         console.warn('⚠️ Aucune information reçue de l\'API');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         '❌ Erreur lors du chargement des informations d\'organisation:',
         error,
       );
-      // Garder les valeurs par défaut en cas d'erreur
       console.warn(
         'Impossible de charger les informations d\'organisation, utilisation des valeurs par défaut',
       );
     } finally {
-      setDataLoaded(true); // Marquer comme chargé même en cas d'erreur
+      setDataLoaded(true);
     }
   }, [fetchOrganizationInfo, fetchOrganizationSettings, dataLoaded]);
 
-  // Charger les données d'organisation au montage du composant
   useEffect(() => {
     loadOrganizationData();
   }, [loadOrganizationData]);
 
-  const handleChange = (e) => {
-    setState({ ...state, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement;
 
-    switch (e.target.name) {
+    setState((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+
+    switch (name) {
       case 'firstname':
-        if (!ValidateName(e.target.value)) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
-        } else {
-          setHeight({ ...height, [e.target.name]: 0 });
-        }
-        break;
-
       case 'lastname':
-        if (!ValidateName(e.target.value)) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
+      case 'subject':
+        if (!ValidateName(value)) {
+          setHeight((prev) => ({ ...prev, [name]: '1rem' }));
         } else {
-          setHeight({ ...height, [e.target.name]: 0 });
+          setHeight((prev) => ({ ...prev, [name]: 0 }));
         }
         break;
 
       case 'email':
-        if (!ValidateEmail(e.target.value)) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
+        if (!ValidateEmail(value)) {
+          setHeight((prev) => ({ ...prev, [name]: '1rem' }));
         } else {
-          setHeight({ ...height, [e.target.name]: 0 });
-        }
-        break;
-
-      case 'subject':
-        if (!ValidateName(e.target.value)) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
-        } else {
-          setHeight({ ...height, [e.target.name]: 0 });
+          setHeight((prev) => ({ ...prev, [name]: 0 }));
         }
         break;
 
       case 'message':
-        if (!ValidateMessage(e.target.value)) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
+        if (!ValidateMessage(value)) {
+          setHeight((prev) => ({ ...prev, [name]: '1rem' }));
         } else {
-          setHeight({ ...height, [e.target.name]: 0 });
+          setHeight((prev) => ({ ...prev, [name]: 0 }));
         }
         break;
 
       case 'rgpd':
-        if (!e.target.checked) {
-          setHeight({ ...height, [e.target.name]: '1rem' });
+        if (!checked) {
+          setHeight((prev) => ({ ...prev, [name]: '1rem' }));
         } else {
-          setHeight({ ...height, [e.target.name]: 0 });
+          setHeight((prev) => ({ ...prev, [name]: 0 }));
         }
         break;
 
       default:
-        setHeight({ ...height, [e.target.name]: 0 });
+        setHeight((prev) => ({ ...prev, [name]: 0 }));
     }
 
-    // Vérifier si tous les champs sont valides pour activer/désactiver le bouton
-    const updatedState = {
+    const updatedState: Partial<FormState> = {
       ...state,
-      [e.target.name]:
-        e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+      [name]: type === 'checkbox' ? checked : value,
     };
 
     const isFormValid =
-      updatedState.firstname &&
+      !!updatedState.firstname &&
       ValidateName(updatedState.firstname) &&
-      updatedState.lastname &&
+      !!updatedState.lastname &&
       ValidateName(updatedState.lastname) &&
-      updatedState.email &&
+      !!updatedState.email &&
       ValidateEmail(updatedState.email) &&
-      updatedState.subject &&
+      !!updatedState.subject &&
       ValidateName(updatedState.subject) &&
-      updatedState.message &&
+      !!updatedState.message &&
       ValidateMessage(updatedState.message) &&
-      updatedState.rgpd &&
-      recaptchaToken; // Include reCAPTCHA validation
+      !!updatedState.rgpd &&
+      !!recaptchaToken;
 
     setButtonDisabled(!isFormValid);
   };
 
   const handleClick = () => {
     setAppear(0);
-    // eslint-disable-next-line no-undef
     window.location.reload();
   };
 
-  // Handle reCAPTCHA change
-  const handleRecaptchaChange = (token) => {
+  const handleRecaptchaChange = (token: string | null) => {
     setRecaptchaToken(token);
   };
 
-  // Handle reCAPTCHA expiration
   const handleRecaptchaExpired = () => {
     setRecaptchaToken(null);
   };
 
-  // Handle reCAPTCHA error
   const handleRecaptchaError = () => {
     setRecaptchaToken(null);
-    setSubmitError(
-      'Erreur reCAPTCHA. Veuillez recharger la page et réessayer.',
-    );
+    setSubmitError('Erreur reCAPTCHA. Veuillez recharger la page et réessayer.');
   };
 
   const handleSubmit = useCallback(
-    async (e) => {
+    async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      // Clear previous errors
       setSubmitError(null);
 
-      // Validate form before submission
       if (
         !state.firstname ||
         !ValidateName(state.firstname) ||
@@ -227,7 +215,6 @@ const ContactPageContent = () => {
         !state.rgpd ||
         !recaptchaToken
       ) {
-        // eslint-disable-next-line no-undef
         console.error('Form validation failed');
         return;
       }
@@ -235,7 +222,6 @@ const ContactPageContent = () => {
       setIsSubmitting(true);
 
       try {
-        // Prepare contact data according to CreateContactRequest DTO
         const contactData = {
           firstName: state.firstname,
           lastName: state.lastname,
@@ -245,27 +231,24 @@ const ContactPageContent = () => {
           recaptchaToken: recaptchaToken,
         };
 
-        // Send POST request to backend API
         await axiosClient.post('/api/public/contact', contactData);
 
-        // Success - show thank you modal and reset form
-        // eslint-disable-next-line no-undef
         console.log('Contact form submitted successfully');
         setAppear(1);
         setState({});
         setRecaptchaToken(null);
         recaptchaRef.current?.reset();
         setButtonDisabled(true);
-      } catch (error) {
-        // eslint-disable-next-line no-undef
+      } catch (error: unknown) {
         console.error('Error submitting contact form:', error);
 
-        // Handle different error types
-        if (error.response?.status === 400) {
+        const err = error as { response?: { status?: number }; code?: string };
+
+        if (err.response?.status === 400) {
           setSubmitError('Veuillez vérifier les informations saisies.');
-        } else if (error.response?.status >= 500) {
+        } else if (err.response?.status && err.response.status >= 500) {
           setSubmitError('Erreur serveur. Veuillez réessayer plus tard.');
-        } else if (error.code === 'ECONNABORTED') {
+        } else if (err.code === 'ECONNABORTED') {
           setSubmitError('Délai d\'attente dépassé. Veuillez réessayer.');
         } else {
           setSubmitError('Une erreur est survenue. Veuillez réessayer.');
@@ -334,7 +317,7 @@ const ContactPageContent = () => {
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2765.130235494945!2d-1.0144824226229212!3d46.128235588887435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48014b8dbeb53617%3A0x91605841ea9ff9e3!2sLes%20Amis%20de%20Sainte%20Madeleine%20de%20La%20Jarrie!5e0!3m2!1sfr!2sfr!4v1708610921512!5m2!1sfr!2sfr"
               width="100%"
               height="100%"
-              allowFullScreen=""
+              allowFullScreen={true}
               loading="lazy"
               className="border-0"
             />
@@ -368,7 +351,7 @@ const ContactPageContent = () => {
                         autoComplete="given-name"
                         onChange={handleChange}
                         required
-                        minLength="2"
+                        minLength={2}
                         className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 focus:outline-none"
                       />
                     </div>
@@ -394,7 +377,7 @@ const ContactPageContent = () => {
                         autoComplete="family-name"
                         onChange={handleChange}
                         required
-                        minLength="2"
+                        minLength={2}
                         className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 focus:outline-none"
                       />
                     </div>
@@ -444,7 +427,7 @@ const ContactPageContent = () => {
                         type="text"
                         onChange={handleChange}
                         required
-                        minLength="2"
+                        minLength={2}
                         className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 focus:outline-none"
                       />
                     </div>
@@ -475,7 +458,7 @@ const ContactPageContent = () => {
                         aria-describedby="message-description"
                         onChange={handleChange}
                         required
-                        minLength="25"
+                        minLength={25}
                         className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 focus:outline-none"
                         defaultValue={''}
                       />
@@ -517,7 +500,7 @@ const ContactPageContent = () => {
                 <div className="flex justify-center mt-8">
                   <ReCaptcha
                     ref={recaptchaRef}
-                    siteKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY} // eslint-disable-line no-undef
+                    siteKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                     onChange={handleRecaptchaChange}
                     onExpired={handleRecaptchaExpired}
                     onError={handleRecaptchaError}

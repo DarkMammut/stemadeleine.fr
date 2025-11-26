@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-const AboutPageContent = () => {
+const AboutPageContent: React.FC = () => {
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-lg p-8 mb-8">
       <div className="max-w-4xl mx-auto">
@@ -37,7 +37,7 @@ const AboutPageContent = () => {
                 Communauté
               </h3>
               <p className="text-gray-600">
-                Une famille spirituelle unie par la foi et l'entraide mutuelle.
+                Une famille spirituelle unie par la foi et l&apos;entraide mutuelle.
               </p>
             </div>
           </div>

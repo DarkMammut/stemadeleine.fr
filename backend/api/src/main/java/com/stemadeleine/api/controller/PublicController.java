@@ -1,9 +1,6 @@
 package com.stemadeleine.api.controller;
 
-import com.stemadeleine.api.dto.CreateContactRequest;
-import com.stemadeleine.api.dto.OrganizationDto;
-import com.stemadeleine.api.dto.OrganizationSettingsDTO;
-import com.stemadeleine.api.dto.PageDto;
+import com.stemadeleine.api.dto.*;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.service.*;
@@ -35,6 +32,7 @@ public class PublicController {
     private final ModuleService moduleService;
     private final ContactService contactService;
     private final RecaptchaService recaptchaService;
+    private final UserService userService; // ajout de l'injection
 
     // ==== PUBLIC PAGES ====
 
@@ -236,6 +234,45 @@ public class PublicController {
 
         } catch (Exception e) {
             log.error("Error creating contact: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Endpoint to subscribe an email to the newsletter.
+     * If a user with the given email exists, mark newsletter=true and save.
+     * Otherwise create a new user with the email and newsletter=true.
+     */
+    @PostMapping("/newsletter")
+    public ResponseEntity<?> subscribeNewsletter(@Valid @RequestBody CreateNewsletterRequest request) {
+        String email = request.getEmail().trim();
+        if (email.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email is required"));
+        }
+
+        try {
+            // Try to find existing user
+            Optional<com.stemadeleine.api.model.User> existing = userService.findByEmailIgnoreCase(email);
+
+            com.stemadeleine.api.model.User user;
+            if (existing.isPresent()) {
+                user = existing.get();
+                user.setNewsletter(true);
+                userService.save(user);
+                log.info("Updated existing user {} newsletter flag", user.getId());
+                return ResponseEntity.ok().build();
+            } else {
+                // Create minimal user with email and newsletter flag
+                user = com.stemadeleine.api.model.User.builder()
+                        .email(email)
+                        .newsletter(true)
+                        .build();
+                userService.save(user);
+                log.info("Created new user {} for newsletter", user.getEmail());
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }
+        } catch (Exception e) {
+            log.error("Error subscribing to newsletter for {}: {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

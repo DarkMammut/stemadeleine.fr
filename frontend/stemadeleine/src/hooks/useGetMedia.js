@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAxiosClient } from '@/utils/axiosClient';
 
 const useGetMedia = (mediaId) => {
@@ -8,40 +8,57 @@ const useGetMedia = (mediaId) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const axiosClient = useAxiosClient();
+  const currentBlobRef = useRef(null);
 
-  const fetchMedia = async (id) => {
-    if (!id) {
-      setMediaUrl(null);
-      return;
-    }
+  const fetchMedia = useCallback(
+    async (id) => {
+      if (!id) {
+        if (currentBlobRef.current) {
+          URL.revokeObjectURL(currentBlobRef.current);
+          currentBlobRef.current = null;
+        }
+        setMediaUrl(null);
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      // Appel du proxy backend
-      const response = await axiosClient.get(`/api/public/media/${id}`, {
-        responseType: 'blob',
-      });
-      const url = URL.createObjectURL(response.data);
-      setMediaUrl(url);
-    } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || 'Error loading media',
-      );
-      setMediaUrl(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        // Appel du proxy backend
+        const response = await axiosClient.get(`/api/public/media/${id}`, {
+          responseType: 'blob',
+        });
+        // Revoke previous blob if any
+        if (currentBlobRef.current) {
+          URL.revokeObjectURL(currentBlobRef.current);
+          currentBlobRef.current = null;
+        }
+        const url = URL.createObjectURL(response.data);
+        currentBlobRef.current = url;
+        setMediaUrl(url);
+      } catch (err) {
+        setError(
+          err.response?.data?.message || err.message || 'Error loading media',
+        );
+        setMediaUrl(null);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [axiosClient],
+  );
 
   useEffect(() => {
     fetchMedia(mediaId);
-    // Nettoyage de l'URL blob
+    // Nettoyage de l'URL blob au démontage
     return () => {
-      if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+      if (currentBlobRef.current) {
+        URL.revokeObjectURL(currentBlobRef.current);
+        currentBlobRef.current = null;
+      }
     };
-  }, [mediaId]);
+  }, [mediaId, fetchMedia]);
 
   return {
     mediaUrl,

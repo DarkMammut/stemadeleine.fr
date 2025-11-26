@@ -1,10 +1,35 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import useGetContents from "../../hooks/useGetContents";
-import Contents from "../Contents";
+import React, { useEffect } from 'react';
+import clsx from 'clsx';
+import useGetContents from '@/hooks/useGetContents';
+import Contents from '@/components/Contents';
 
-const ArticleModule = ({ module, className = "" }) => {
+interface Author {
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface ArticleModuleType {
+  id: string;
+  moduleId?: string;
+  title?: string;
+  name?: string;
+  type: string;
+  isVisible?: boolean;
+  sortOrder?: number;
+  mediaId?: string;
+  description?: string;
+  author?: Author;
+  createdAt?: string;
+
+  [key: string]: unknown;
+}
+
+interface Props {
+  module: ArticleModuleType;
+  className?: string;
+}
+
+const ArticleModule: React.FC<Props> = ({ module, className = '' }) => {
   const {
     contents,
     loading: contentsLoading,
@@ -24,7 +49,7 @@ const ArticleModule = ({ module, className = "" }) => {
   return (
     <article
       className={clsx(
-        "w-full py-8 md:py-12 px-4 md:px-8 rounded-lg shadow-md bg-gradient-to-b from-primary-light to-white",
+        'w-full my-6 md:my-12 py-6 md:py-12 px-4 md:px-8 rounded-lg shadow-lg bg-primary-light',
         className,
       )}
     >
@@ -39,7 +64,7 @@ const ArticleModule = ({ module, className = "" }) => {
       <div className="prose prose-lg max-w-none">
         <Contents
           contents={contents}
-          lmayout="staggered"
+          layout="staggered"
           loading={contentsLoading}
           loadingMessage="Chargement de l'article..."
         />
@@ -56,10 +81,10 @@ const ArticleModule = ({ module, className = "" }) => {
             )}
             {module.createdAt && (
               <time dateTime={module.createdAt}>
-                {new Date(module.createdAt).toLocaleDateString("fr-FR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                {new Date(module.createdAt).toLocaleDateString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </time>
             )}
@@ -68,26 +93,6 @@ const ArticleModule = ({ module, className = "" }) => {
       )}
     </article>
   );
-};
-
-ArticleModule.propTypes = {
-  module: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    moduleId: PropTypes.string,
-    title: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string.isRequired,
-    isVisible: PropTypes.bool,
-    sortOrder: PropTypes.number,
-    mediaId: PropTypes.string,
-    description: PropTypes.string,
-    author: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-    }),
-    createdAt: PropTypes.string,
-  }).isRequired,
-  className: PropTypes.string,
 };
 
 export default ArticleModule;
