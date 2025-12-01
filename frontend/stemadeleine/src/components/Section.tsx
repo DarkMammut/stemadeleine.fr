@@ -80,12 +80,12 @@ export default function Section({
     <section className={clsx('w-full py-16 md:py-20', 'bg-transparent', className)}>
       <div
         className={clsx(
-          'container mx-auto flex flex-col md:flex-row items-start gap-10 md:gap-16',
+          'w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col md:flex-row items-start gap-10 md:gap-16',
           align === 'right' && 'md:flex-row-reverse',
         )}
       >
         {/* Texte */}
-        <div className="flex-1">
+        <div className="w-full flex-1">
           <div className="flex items-center mb-10 gap-6 ">
             {/* Image */}
             {mediaId && mediaUrl && (
@@ -103,9 +103,13 @@ export default function Section({
               </div>
             )}
             {title && (
-              <h2 className="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl mb-6 justify-self-start">
-                {title}
-              </h2>
+              <div className="flex-1 flex flex-col items-start">
+                <h2
+                  className="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl mb-6 justify-self-start">
+                  {title}
+                </h2>
+                <div className="w-full border-b-1 border-secondary" />
+              </div>
             )}
           </div>
 
@@ -114,7 +118,6 @@ export default function Section({
             loading={!!(loading && sectionId)}
             loadingMessage="Chargement des contenus..."
           />
-          <div className="border-b-2"></div>
 
           {/* Modules Section */}
           {sectionId && showModules && (

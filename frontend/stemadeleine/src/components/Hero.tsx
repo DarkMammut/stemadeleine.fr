@@ -49,7 +49,7 @@ export default function Hero({ mediaId, title, subtitle, variant = 'default' }: 
       {/* Content container */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 10 }}>
         <div
-          className={variant === 'home' ? 'bg-primary/30 backdrop-blur-md rounded-lg px-10 py-8 text-center text-gray-900 shadow-xl max-w-2xl' : 'p-4 md:p-6'}>
+          className={variant === 'home' ? 'bg-primary/30 backdrop-blur-md rounded-lg px-10 py-8 text-center text-gray-800 shadow-xl max-w-2xl' : 'p-4 md:p-6'}>
           {title && (
             <h1
               className={variant === 'home' ? 'text-4xl md:text-5xl font-serif font-semibold mb-4' : 'text-3xl md:text-4xl lg:text-5xl font-serif text-white text-center uppercase drop-shadow-lg'}>
@@ -57,7 +57,7 @@ export default function Hero({ mediaId, title, subtitle, variant = 'default' }: 
             </h1>
           )}
 
-          {variant === 'home' && <hr className="border-primary/40 mb-4" />}
+          {variant === 'home' && <hr className="border-secondary mb-4" />}
 
           {subtitle && variant === 'home' && <h2 className="text-2xl font-light">{subtitle}</h2>}
         </div>

@@ -101,7 +101,7 @@ export default function Contents({
               </h3>
             )}
 
-            <div className="text-xl text-gray-700 dark:text-gray-200 leading-relaxed text-justify">
+            <div className="text-xl text-gray-700 leading-relaxed text-justify">
               {renderContentBody(content.body)}
             </div>
           </div>

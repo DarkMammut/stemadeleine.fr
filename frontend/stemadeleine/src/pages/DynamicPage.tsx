@@ -4,11 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import useGetPages from '@/hooks/useGetPages';
 import useGetSections from '@/hooks/useGetSections';
-import Meta from '@/components/Meta';
-import Hero from '@/components/Hero';
 import Section, { ContentItem } from '@/components/Section';
 import StaticPageContent from '@/pages/StaticPageContent';
-import Header from '@/components/Header';
+import Layout from '@/components/Layout';
 
 type PageShape = {
   name?: string;
@@ -175,48 +173,26 @@ export default function DynamicPage({ initialPage = null, initialSections = [] }
   const StaticPageContentComponent = StaticPageContent as unknown as React.ComponentType<{ pageSlug?: string }>;
 
   return (
-    <>
-      {/* Dynamic metadata for the page */}
-      <Meta
-        title={page.name}
-        description={
-          page.description ||
-          `Discover the ${page.name} page on the Sainte-Madeleine Parish website.`
-        }
-        keywords={page.keywords ? page.keywords.split(',') : []}
-        url={typeof window !== 'undefined' ? window.location.href : undefined}
-        type="article"
-        canonicalUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-      />
+    <Layout page={page}>
+      <main className="mt-12">
+        {effectiveSections && effectiveSections.length > 0 && (
+          <>
+            <StaticPageContentComponent pageSlug={String(page.slug || '')} />
+            {effectiveSections.map((section: SectionShape) => (
+              <Section
+                key={section.id}
+                sectionId={section.sectionId}
+                title={section.title || section.name}
+                mediaId={section.media?.id}
+                contents={((section.contents as unknown) as ContentItem[]) || []}
+                variant={section.variant || 'default'}
+                className="mb-8"
+              />
+            ))}
+          </>
+        )}
+      </main>
 
-      <Header />
-
-      <div className="pt-16 md:pt-20 min-h-screen">
-        {/* Hero Banner */}
-        <Hero mediaId={page.heroMedia?.id} title={page.name} />
-
-        <main className="container mx-auto px-4 py-8">
-          {/* Contenu fixe spécifique à certaines pages */}
-          <StaticPageContentComponent pageSlug={String(page.slug || '')} />
-
-          {/* Page sections - now loaded separately */}
-          {effectiveSections && effectiveSections.length > 0 && (
-            <div className="mt-12">
-              {effectiveSections.map((section: SectionShape) => (
-                <Section
-                  key={section.id}
-                  sectionId={section.sectionId} // Ajout du sectionId pour charger les contenus depuis l'API
-                  title={section.title || section.name}
-                  mediaId={section.media?.id}
-                  contents={((section.contents as unknown) as ContentItem[]) || []} // Garde les contenus statiques en fallback
-                  variant={section.variant || 'default'}
-                  className="mb-8"
-                />
-              ))}
-            </div>
-          )}
-        </main>
-      </div>
-    </>
+    </Layout>
   );
 }

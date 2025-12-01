@@ -71,12 +71,12 @@ export default function Layout({ children, page }: LayoutProps) {
 
       <Header pagesTree={tree} />
 
-      <div className="pt-16 md:pt-20 min-h-screen">
+      <div className={`pt-16 md:pt-20 ${page?.slug === '/' ? 'min-h-screen' : ''}`}>
         <Hero
           title={page?.title}
           mediaId={page?.heroMedia?.id}
           subtitle={page?.subtitle}
-          variant="home"
+          variant={page?.slug === '/' ? 'home' : 'default'}
         />
       </div>
 
