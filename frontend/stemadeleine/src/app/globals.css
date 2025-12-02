@@ -9,7 +9,7 @@
     /* Appliquer Fjord One comme police par défaut via la variable injectée par next/font
        La variable --font-fjord-one sera définie par le loader next/font dans `layout.tsx`. */
     html, body {
-        font-family: var(--font-fjord-one, 'Fjord One'), serif;
+        font-family: 'Fjord One', serif;
     }
 }
 
@@ -307,8 +307,49 @@ code {
         --tw-ring-color: var(--color-primary);
     }
 
+    .ring-primary-light {
+        --tw-ring-color: var(--color-primary-light);
+    }
+
+    .ring-primary-dark {
+        --tw-ring-color: var(--color-primary-dark);
+    }
+
     .ring-secondary {
         --tw-ring-color: var(--color-secondary);
+    }
+
+    .ring-secondary-light {
+        --tw-ring-color: var(--color-secondary-light);
+    }
+
+    .ring-secondary-dark {
+        --tw-ring-color: var(--color-secondary-dark);
+    }
+
+    /* Focus variants for ring colors */
+    .focus\:ring-primary:focus {
+        --tw-ring-color: var(--color-primary);
+    }
+
+    .focus\:ring-primary-light:focus {
+        --tw-ring-color: var(--color-primary-light);
+    }
+
+    .focus\:ring-primary-dark:focus {
+        --tw-ring-color: var(--color-primary-dark);
+    }
+
+    .focus\:ring-secondary:focus {
+        --tw-ring-color: var(--color-secondary);
+    }
+
+    .focus\:ring-secondary-light:focus {
+        --tw-ring-color: var(--color-secondary-light);
+    }
+
+    .focus\:ring-secondary-dark:focus {
+        --tw-ring-color: var(--color-secondary-dark);
     }
 
     /* Hover utilities - shorter syntax */

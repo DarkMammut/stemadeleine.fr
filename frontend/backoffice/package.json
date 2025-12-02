@@ -21,11 +21,11 @@
     "framer-motion": "^12.23.12",
     "lodash": "^4.17.21",
     "next": "15.4.7",
+    "prop-types": "^15.8.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-dropzone": "^14.3.8",
-    "react-quill": "^2.0.0",
-    "prop-types": "^15.8.1"
+    "react-quill-new": "^3.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

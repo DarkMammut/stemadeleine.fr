@@ -22,7 +22,7 @@ if (typeof window !== "undefined") {
 // Import dynamique sans chargement CSS intégré
 const ReactQuill = dynamic(
   () => {
-    return import("react-quill").then((mod) => {
+    return import("react-quill-new").then((mod) => {
       return mod.default;
     });
   },

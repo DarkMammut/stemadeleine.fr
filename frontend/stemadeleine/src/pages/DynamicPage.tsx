@@ -172,12 +172,18 @@ export default function DynamicPage({ initialPage = null, initialSections = [] }
 
   const StaticPageContentComponent = StaticPageContent as unknown as React.ComponentType<{ pageSlug?: string }>;
 
+  // Normaliser le slug pour StaticPageContent (doit commencer par /)
+  const normalizedPageSlug = normalizeSlug(page.slug);
+
   return (
     <Layout page={page}>
       <main className="mt-12">
+        {/* Afficher le contenu statique de la page (ex: ContactPageContent) */}
+        <StaticPageContentComponent pageSlug={normalizedPageSlug} />
+
+        {/* Afficher les sections dynamiques si elles existent */}
         {effectiveSections && effectiveSections.length > 0 && (
           <>
-            <StaticPageContentComponent pageSlug={String(page.slug || '')} />
             {effectiveSections.map((section: SectionShape) => (
               <Section
                 key={section.id}

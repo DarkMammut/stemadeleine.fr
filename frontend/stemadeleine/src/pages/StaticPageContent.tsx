@@ -10,16 +10,17 @@ interface Props {
  * Composant qui gère le contenu fixe spécifique à certaines pages
  */
 const StaticPageContent: React.FC<Props> = ({ pageSlug }) => {
-  // Configuration du contenu fixe par page
-  const staticContentConfig: Record<string, React.ReactNode> = {
-    '/contact': <ContactPageContent />,
-    '/about': <AboutPageContent />,
-    // Vous pouvez ajouter d'autres pages ici
-    // '/services': <ServicesPageContent />,
-  };
 
-  // Retourne le contenu fixe correspondant au slug, ou null
-  return (pageSlug && staticContentConfig[pageSlug]) || null;
+  // Retourner le composant correspondant au slug
+  if (pageSlug === '/contact') {
+    return <ContactPageContent />;
+  }
+
+  if (pageSlug === '/about') {
+    return <AboutPageContent />;
+  }
+
+  return null;
 };
 
 export default StaticPageContent;

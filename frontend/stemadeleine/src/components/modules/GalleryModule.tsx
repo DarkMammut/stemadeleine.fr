@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import useGetModules from '@/hooks/useGetModules';
 import GridGallery from './GridGallery';
 import CarouselGallery from './CarouselGallery';
-import SliderGallery from './SliderGallery';
 
 type ModuleType = {
   id?: string;
@@ -54,11 +53,11 @@ const GalleryModule: React.FC<Props> = ({ module }) => {
     }
   }, [module?.moduleId, fetchGalleryByModuleId]);
 
-  const variant = (gallery?.variant ?? 'Grid') as string;
+  const variant = (gallery?.variant ?? 'GRID') as string;
 
   // Choisir le composant en fonction de la variante
   switch (variant) {
-    case 'Grid':
+    case 'GRID':
       return (
         <GridGallery
           images={gallery?.medias ?? []}
@@ -66,10 +65,27 @@ const GalleryModule: React.FC<Props> = ({ module }) => {
           loading={Boolean(galleryLoading)}
         />
       );
-    case 'Carousel':
-      return <CarouselGallery module={module} gallery={gallery} loading={Boolean(galleryLoading)} />;
-    case 'Slider':
-      return <SliderGallery module={module} gallery={gallery} loading={Boolean(galleryLoading)} />;
+    case 'CAROUSEL':
+      return (
+        <CarouselGallery
+          module={module}
+          gallery={gallery}
+          loading={Boolean(galleryLoading)}
+        />
+      );
+    case 'SLIDER':
+      return (
+        <CarouselGallery
+          module={module}
+          gallery={gallery}
+          loading={Boolean(galleryLoading)}
+          autoPlay={true}
+          autoPlayInterval={5000}
+          showArrows={false}
+          showThumbnails={false}
+          showCounter={false}
+        />
+      );
     default:
       // fallback to grid
       return (
