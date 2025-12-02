@@ -109,6 +109,25 @@ const ContactPageContent: React.FC = () => {
     loadOrganizationData();
   }, [loadOrganizationData]);
 
+  // Effet pour recalculer l'état du bouton lorsque le formulaire ou le captcha change
+  useEffect(() => {
+    const isFormValid =
+      !!state.firstname &&
+      ValidateName(state.firstname) &&
+      !!state.lastname &&
+      ValidateName(state.lastname) &&
+      !!state.email &&
+      ValidateEmail(state.email) &&
+      !!state.subject &&
+      ValidateName(state.subject) &&
+      !!state.message &&
+      ValidateMessage(state.message) &&
+      !!state.rgpd &&
+      !!recaptchaToken;
+
+    setButtonDisabled(!isFormValid);
+  }, [state, recaptchaToken]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -154,27 +173,6 @@ const ContactPageContent: React.FC = () => {
       default:
         setHeight((prev) => ({ ...prev, [name]: 0 }));
     }
-
-    const updatedState: Partial<FormState> = {
-      ...state,
-      [name]: type === 'checkbox' ? checked : value,
-    };
-
-    const isFormValid =
-      !!updatedState.firstname &&
-      ValidateName(updatedState.firstname) &&
-      !!updatedState.lastname &&
-      ValidateName(updatedState.lastname) &&
-      !!updatedState.email &&
-      ValidateEmail(updatedState.email) &&
-      !!updatedState.subject &&
-      ValidateName(updatedState.subject) &&
-      !!updatedState.message &&
-      ValidateMessage(updatedState.message) &&
-      !!updatedState.rgpd &&
-      !!recaptchaToken;
-
-    setButtonDisabled(!isFormValid);
   };
 
   const handleClick = () => {

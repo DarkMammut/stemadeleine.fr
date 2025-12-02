@@ -43,13 +43,12 @@ export default function Hero({ mediaId, title, subtitle, variant = 'default' }: 
       {bgDiv}
 
       {/* Overlay */}
-      <div className="absolute inset-0"
-           style={{ backgroundColor: variant === 'home' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.4)', zIndex: 5 }} />
+      <div className="absolute inset-0 bg-primary-light z-5"/>
 
       {/* Content container */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 10 }}>
         <div
-          className={variant === 'home' ? 'bg-primary/30 backdrop-blur-md rounded-lg px-10 py-8 text-center text-gray-800 shadow-xl max-w-2xl' : 'p-4 md:p-6'}>
+          className={variant === 'home' ? 'bg-primary-light backdrop-blur-md rounded-lg px-10 py-8 text-center text-gray-800 shadow-xl max-w-2xl' : 'p-4 md:p-6'}>
           {title && (
             <h1
               className={variant === 'home' ? 'text-4xl md:text-5xl font-serif font-semibold mb-4' : 'text-3xl md:text-4xl lg:text-5xl font-serif text-white text-center uppercase drop-shadow-lg'}>

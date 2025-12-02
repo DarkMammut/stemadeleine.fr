@@ -39,7 +39,7 @@ const ButtonInner = <C extends React.ElementType = 'button'>(
 
   // Classes de base
   const baseClasses =
-    'inline-flex items-center justify-center font-semibold rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-semibold rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:cursor-not-allowed';
 
   // Variantes de style
   const variants: Record<Variant, string> = {
