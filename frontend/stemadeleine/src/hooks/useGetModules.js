@@ -189,6 +189,67 @@ const useGetModules = () => {
     setGalleryError(null);
   }, []);
 
+  // -----------------------------------------------------------------------
+  // New: fetch newsletter by moduleId
+  // Utilise l'endpoint défini dans ModulePublicController:
+  // GET /api/public/modules/newsletter/by-module-id/{moduleId}
+  // -----------------------------------------------------------------------
+
+  const [newsletter, setNewsletter] = useState(null);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterError, setNewsletterError] = useState(null);
+
+  /**
+   * Fetch latest newsletter (version) by moduleId
+   * @param {string} moduleId - UUID of the module
+   * @returns {Promise<Object|null>} - newsletter DTO or null if not found/error
+   */
+  const fetchNewsletterByModuleId = useCallback(
+    async (moduleId) => {
+      if (!moduleId) {
+        console.warn('useGetModules: moduleId is required to fetch newsletter');
+        return null;
+      }
+
+      setNewsletterLoading(true);
+      setNewsletterError(null);
+
+      try {
+        console.log(`Fetching newsletter for moduleId: ${moduleId}`);
+
+        const response = await axiosClient.get(
+          `/api/public/modules/newsletter/by-module-id/${moduleId}`,
+        );
+
+        const data = response.data;
+        console.log(`Fetched newsletter for moduleId: ${moduleId}`, data);
+
+        setNewsletter(data);
+        return data;
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.warn(`No newsletter found for moduleId: ${moduleId}`);
+          setNewsletter(null);
+          return null;
+        }
+
+        const errorMessage = `Error fetching newsletter for moduleId ${moduleId}: ${err.message}`;
+        console.error(errorMessage, err);
+        setNewsletterError(errorMessage);
+        setNewsletter(null);
+        return null;
+      } finally {
+        setNewsletterLoading(false);
+      }
+    },
+    [axiosClient],
+  );
+
+  const clearNewsletter = useCallback(() => {
+    setNewsletter(null);
+    setNewsletterError(null);
+  }, []);
+
   return {
     modules,
     loading,
@@ -207,6 +268,12 @@ const useGetModules = () => {
     galleryError,
     fetchGalleryByModuleId,
     clearGallery,
+    // newsletter helpers
+    newsletter,
+    newsletterLoading,
+    newsletterError,
+    fetchNewsletterByModuleId,
+    clearNewsletter,
   };
 };
 

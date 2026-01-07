@@ -403,3 +403,68 @@ code {
         ) !important;
     }
 }
+
+/* Print styles for Newsletter Magazine */
+@media print {
+    @page {
+        size: A4;
+        margin: 0 !important;
+    }
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Masquer tout sauf le newsletter root */
+    body > *:not(#__next) {
+        display: none !important;
+    }
+
+    #__next > *:not(:has(#newsletter-root)) {
+        display: none !important;
+    }
+
+    #newsletter-root {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-after: auto;
+        position: relative;
+    }
+
+    #newsletter-root header,
+    #newsletter-root main,
+    #newsletter-root aside {
+        page-break-inside: avoid;
+    }
+
+    #newsletter-root article {
+        page-break-inside: avoid;
+    }
+
+    #newsletter-root img {
+        page-break-inside: avoid;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Masquer les éléments non nécessaires à l'impression */
+    .print\:hidden {
+        display: none !important;
+    }
+}
+
