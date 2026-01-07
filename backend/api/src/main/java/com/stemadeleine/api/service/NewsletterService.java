@@ -3,8 +3,8 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.UpdateNewsletterPutRequest;
 import com.stemadeleine.api.dto.UpdateNewsletterRequest;
-import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.repository.NewsletterRepository;
 import com.stemadeleine.api.repository.SectionRepository;
 import jakarta.transaction.Transactional;
@@ -12,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,6 +22,19 @@ public class NewsletterService {
     private final NewsletterRepository newsletterRepository;
     private final ModuleService moduleService;
     private final SectionRepository sectionRepository;
+    private final PageService pageService;
+    private final SectionService sectionService;
+
+    /**
+     * Retourne l'URL de base pour les détails des newsletters.
+     * Toujours fixée à /newsletters pour simplifier la gestion.
+     *
+     * @return L'URL de base pour les détails des newsletters : /newsletters
+     */
+    private String getNewsletterDetailPageUrl() {
+        log.debug("URL de détail des newsletters : /newsletters");
+        return "/newsletters";
+    }
 
     public List<Newsletter> getAllNewsletters() {
         log.info("Récupération de toutes les newsletters non supprimées");
@@ -46,6 +57,13 @@ public class NewsletterService {
                 .filter(n -> n.getStatus() != PublishingStatus.DELETED);
         log.debug("Newsletter trouvée : {}", newsletter.isPresent());
         return newsletter;
+    }
+
+    public boolean existsNewsletterWithVariantAll() {
+        log.info("Vérification de l'existence d'une newsletter avec la variante ALL");
+        boolean exists = newsletterRepository.existsByVariantAndStatusNot(NewsVariants.ALL, PublishingStatus.DELETED);
+        log.debug("Newsletter avec variante ALL existe : {}", exists);
+        return exists;
     }
 
     @Transactional
@@ -152,5 +170,109 @@ public class NewsletterService {
         Newsletter savedNewsletter = newsletterRepository.save(newsletter);
         log.info("Nouvelle version de newsletter créée avec succès, ID : {}", savedNewsletter.getId());
         return savedNewsletter;
+    }
+
+    @Transactional
+    public Map<String, UUID> createNewsletterPagesStructure(User author) {
+        log.info("Création de la structure complète pour les pages Newsletter avec URL fixe /newsletters");
+
+        // 1. Créer la page "Newsletters" à la racine (parentPageId = null)
+        Page newslettersPage = pageService.createNewPage(null, "Newsletters", author);
+
+        // Mettre à jour le slug et publier la page
+        newslettersPage.setSlug("/newsletters");
+        newslettersPage.setIsVisible(false);
+        newslettersPage.setStatus(PublishingStatus.PUBLISHED);
+        newslettersPage = pageService.updatePage(
+                newslettersPage.getPageId(),
+                "Newsletters",
+                "Newsletters",
+                null,
+                "/newsletters",
+                null,
+                true,
+                author
+        );
+        log.debug("Page Newsletters créée et publiée avec l'ID : {}", newslettersPage.getPageId());
+
+        // 2. Créer une section dans cette page
+        Section section = sectionService.createNewSection(newslettersPage.getPageId(), "Section Newsletters", author);
+        section.setIsVisible(true);
+        section.setStatus(PublishingStatus.PUBLISHED);
+        section = sectionService.updateSection(section.getSectionId(), "Section Newsletters", "Section Newsletters", true, author);
+        log.debug("Section créée et publiée avec l'ID : {}", section.getSectionId());
+
+        // 3. Créer la page enfant dynamique [newsletterId]
+        Page detailPage = pageService.createNewPage(newslettersPage.getPageId(), "[newsletterId]", author);
+
+        // Mettre à jour le slug et publier la page (INVISIBLE pour ne pas apparaître dans la navigation)
+        detailPage.setSlug("/[newsletterId]");
+        detailPage.setIsVisible(false); // Invisible car c'est une route dynamique
+        detailPage.setStatus(PublishingStatus.PUBLISHED);
+        detailPage = pageService.updatePage(
+                detailPage.getPageId(),
+                "[newsletterId]",
+                "[newsletterId]",
+                null,
+                "/[newsletterId]",
+                null,
+                false, // Invisible dans la navigation
+                author
+        );
+        log.debug("Page détail créée et publiée (invisible) avec l'ID : {}", detailPage.getPageId());
+
+        // 4. URL de détail toujours fixée à /newsletters
+        String detailPageUrl = getNewsletterDetailPageUrl();
+        log.debug("URL de base pour les détails : {}", detailPageUrl);
+
+        // 5. Créer le module Newsletter avec variante ALL et l'URL de détail
+        Newsletter newsletter = Newsletter.builder()
+                .moduleId(UUID.randomUUID())
+                .variant(NewsVariants.ALL)
+                .contents(new ArrayList<>())
+                .section(section)
+                .name("Toutes les newsletters")
+                .title("Toutes les newsletters")
+                .type("NEWSLETTER")
+                .sortOrder(0)
+                .isVisible(true)
+                .status(PublishingStatus.PUBLISHED)
+                .author(author)
+                .version(1)
+                .description("Module pour afficher toutes les newsletters")
+                .detailPageUrl(detailPageUrl)
+                .build();
+
+        Newsletter savedNewsletter = newsletterRepository.save(newsletter);
+        log.debug("Module Newsletter créé et publié avec l'ID : {}, URL de détail : {}", savedNewsletter.getModuleId(), detailPageUrl);
+
+        // 6. Mettre à jour tous les modules Newsletter existants (non supprimés) avec l'URL /newsletters
+        log.info("Mise à jour de tous les modules Newsletter existants avec l'URL : {}", detailPageUrl);
+        List<Newsletter> existingNewsletters = newsletterRepository.findByStatusNot(PublishingStatus.DELETED);
+        int updatedCount = 0;
+
+        for (Newsletter existingNewsletter : existingNewsletters) {
+            // Ne pas mettre à jour le module qu'on vient de créer
+            if (!existingNewsletter.getId().equals(savedNewsletter.getId())) {
+                String previousUrl = existingNewsletter.getDetailPageUrl();
+                existingNewsletter.setDetailPageUrl(detailPageUrl);
+                newsletterRepository.save(existingNewsletter);
+                updatedCount++;
+                log.debug("Module Newsletter mis à jour : ID={}, ancienne URL={}, nouvelle URL={}",
+                        existingNewsletter.getModuleId(), previousUrl, detailPageUrl);
+            }
+        }
+
+        log.info("Mise à jour terminée : {} module(s) Newsletter mis à jour avec l'URL {}", updatedCount, detailPageUrl);
+        log.info("Structure Newsletter créée avec succès");
+
+        // Retourner les IDs créés
+        Map<String, UUID> result = new HashMap<>();
+        result.put("newslettersPageId", newslettersPage.getPageId());
+        result.put("detailPageId", detailPage.getPageId());
+        result.put("sectionId", section.getSectionId());
+        result.put("newsletterModuleId", savedNewsletter.getModuleId());
+
+        return result;
     }
 }

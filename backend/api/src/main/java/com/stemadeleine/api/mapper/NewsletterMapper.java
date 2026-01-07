@@ -23,6 +23,7 @@ public class NewsletterMapper {
                 newsletter.getType(),
                 newsletter.getVariant() != null ? newsletter.getVariant().name() : null,
                 newsletter.getDescription(),
+                newsletter.getDetailPageUrl(),
                 newsletter.getSortOrder(),
                 newsletter.getStatus() != null ? newsletter.getStatus().name() : null,
                 newsletter.getIsVisible(),

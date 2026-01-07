@@ -64,12 +64,23 @@ public class ContentService {
      * Get latest versions of all contents for a specific owner
      */
     public List<Content> getLatestContentsByOwner(UUID ownerId) {
-        log.debug("Retrieving latest contents by owner: {}", ownerId);
-        List<Content> latestContents = contentRepository.findLatestContentsByOwner(ownerId);
-        for (Content c : latestContents) {
-            log.info("Content {} version {} has medias: {}", c.getContentId(), c.getVersion(), c.getMedias().stream().map(m -> m.getId()).toList());
+        log.info("Retrieving latest contents by owner: {}", ownerId);
+
+        // Vérifier d'abord tous les contenus pour cet owner (debug)
+        List<Content> allContents = contentRepository.findByOwnerIdOrderBySortOrderAsc(ownerId);
+        log.info("Found {} total contents (all versions) for owner {}", allContents.size(), ownerId);
+        for (Content c : allContents) {
+            log.info("  - Content id={}, contentId={}, version={}, status={}, title={}",
+                    c.getId(), c.getContentId(), c.getVersion(), c.getStatus(), c.getTitle());
         }
-        log.debug("Found {} latest contents for owner: {}", latestContents.size(), ownerId);
+
+        List<Content> latestContents = contentRepository.findLatestContentsByOwner(ownerId);
+        log.info("Found {} latest contents (after filtering) for owner: {}", latestContents.size(), ownerId);
+        for (Content c : latestContents) {
+            log.info("  - Latest: id={}, contentId={}, version={}, status={}, medias: {}",
+                    c.getId(), c.getContentId(), c.getVersion(), c.getStatus(),
+                    c.getMedias().stream().map(m -> m.getId()).toList());
+        }
         return latestContents;
     }
 
@@ -336,23 +347,29 @@ public class ContentService {
      */
     @Transactional
     public Content updateContentStatus(UUID contentId, PublishingStatus status, User author) {
-        log.info("Updating content status: {} to {} by user: {}", contentId, status, author.getUsername());
+        log.info("Updating content status: contentId={} to status={} by user: {}", contentId, status, author.getUsername());
 
         Content latestVersion = getLatestContentVersion(contentId)
                 .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
 
+        log.info("Latest version found: id={}, version={}, current status={}",
+                latestVersion.getId(), latestVersion.getVersion(), latestVersion.getStatus());
+
         // Si le statut est déjà le même, on retourne le contenu existant
         if (latestVersion.getStatus().equals(status)) {
-            log.debug("Content {} already has status {}, no update needed", contentId, status);
+            log.info("Content {} already has status {}, no update needed", contentId, status);
             return latestVersion;
         }
 
         // Mettre à jour directement le statut de la version courante
+        log.info("Changing status from {} to {} for content id={}",
+                latestVersion.getStatus(), status, latestVersion.getId());
+
         latestVersion.setStatus(status);
         Content savedContent = contentRepository.save(latestVersion);
 
-        log.debug("Content status updated: contentId: {} -> {} (same version: {})",
-                savedContent.getContentId(), status, savedContent.getVersion());
+        log.info("Content status successfully updated: contentId={}, id={}, version={}, new status={}",
+                savedContent.getContentId(), savedContent.getId(), savedContent.getVersion(), savedContent.getStatus());
         return savedContent;
     }
 

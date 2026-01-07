@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stemadeleine.api.dto.ContentDto;
 import com.stemadeleine.api.dto.CreateNewsletterPublicationRequest;
+import com.stemadeleine.api.dto.NewsPublicationDto;
 import com.stemadeleine.api.dto.NewsletterPublicationDto;
 import com.stemadeleine.api.mapper.ContentMapper;
+import com.stemadeleine.api.mapper.NewsPublicationMapper;
 import com.stemadeleine.api.mapper.NewsletterPublicationMapper;
-import com.stemadeleine.api.model.Content;
-import com.stemadeleine.api.model.CustomUserDetails;
-import com.stemadeleine.api.model.NewsletterPublication;
-import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.service.ContentService;
 import com.stemadeleine.api.service.NewsletterPublicationService;
 import jakarta.validation.Valid;
@@ -36,6 +35,7 @@ public class NewsletterPublicationController {
 
     private final NewsletterPublicationService newsletterPublicationService;
     private final NewsletterPublicationMapper newsletterPublicationMapper;
+    private final NewsPublicationMapper newsPublicationMapper;
     private final ContentService contentService;
     private final ContentMapper contentMapper;
     private final ObjectMapper objectMapper;
@@ -388,15 +388,16 @@ public class NewsletterPublicationController {
                 newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the newsletter publication by its ID (not by newsletterId)
+            // Get the newsletter publication by newsletterId (module ID)
+            // This ensures we work with the correct newsletter regardless of version
             NewsletterPublication newsletter = newsletterPublicationService
-                    .getNewsletterPublicationById(newsletterId)
+                    .getNewsletterPublicationByNewsletterId(newsletterId)
                     .orElseThrow(() -> new RuntimeException("Newsletter not found"));
 
-            // Create content with newsletterId as owner (not the publication ID)
+            // Create content with newsletterId as owner
             // This ensures contents remain linked across different versions of the same newsletter
             JsonNode defaultBody = objectMapper.readTree("{\"html\": \"<p>Start writing your newsletter content here...</p>\"}");
-            Content content = contentService.createContent(title, defaultBody, newsletter.getNewsletterId(), currentUser);
+            Content content = contentService.createContent(title, defaultBody, newsletterId, currentUser);
 
             ContentDto contentDto = contentMapper.toDto(content);
             log.info("Newsletter content created successfully with ID: {}", content.getId());
@@ -425,14 +426,15 @@ public class NewsletterPublicationController {
                 newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
 
         try {
-            // Get the newsletter publication by its ID (not by newsletterId)
+            // Get the newsletter publication by newsletterId (module ID)
+            // This ensures we work with the correct newsletter regardless of version
             NewsletterPublication newsletter = newsletterPublicationService
-                    .getNewsletterPublicationById(newsletterId)
+                    .getNewsletterPublicationByNewsletterId(newsletterId)
                     .orElseThrow(() -> new RuntimeException("Newsletter not found"));
 
             // Get latest contents by newsletterId (owner)
             // This ensures contents are shared across all versions of the same newsletter
-            List<Content> contents = contentService.getLatestContentsByOwner(newsletter.getNewsletterId());
+            List<Content> contents = contentService.getLatestContentsByOwner(newsletterId);
             List<ContentDto> contentDtos = contents.stream()
                     .map(contentMapper::toDto)
                     .collect(Collectors.toList());
@@ -444,6 +446,110 @@ public class NewsletterPublicationController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error fetching newsletter contents {}: {}", newsletterId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // ----- NEWSLETTER NEWS LINKS MANAGEMENT ROUTES -----
+
+    /**
+     * Get all news linked to a newsletter
+     */
+    @GetMapping("/{newsletterId}/news")
+    public ResponseEntity<List<NewsPublicationDto>> getLinkedNews(
+            @PathVariable UUID newsletterId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        if (customUserDetails == null) {
+            log.error("Attempt to fetch linked news without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = customUserDetails.account().getUser();
+        log.info("GET /api/newsletter-publication/{}/news - Fetching linked news by user: {}",
+                newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        try {
+            List<NewsPublication> linkedNews = newsletterPublicationService.getLinkedNews(newsletterId);
+            List<NewsPublicationDto> linkedNewsDto = linkedNews.stream()
+                    .map(newsPublicationMapper::toDto)
+                    .collect(Collectors.toList());
+
+            log.debug("Found {} news linked to newsletter {}", linkedNews.size(), newsletterId);
+            return ResponseEntity.ok(linkedNewsDto);
+        } catch (RuntimeException e) {
+            log.error("Error fetching linked news for newsletter {}: {}", newsletterId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error fetching linked news for newsletter {}: {}", newsletterId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Add a news publication to a newsletter
+     */
+    @PostMapping("/{newsletterId}/news/{newsId}")
+    public ResponseEntity<NewsletterPublicationDto> addNewsToNewsletter(
+            @PathVariable UUID newsletterId,
+            @PathVariable UUID newsId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        if (customUserDetails == null) {
+            log.error("Attempt to add news to newsletter without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = customUserDetails.account().getUser();
+        log.info("POST /api/newsletter-publication/{}/news/{} - Adding news to newsletter by user: {}",
+                newsletterId, newsId, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        try {
+            NewsletterPublication updatedNewsletter = newsletterPublicationService
+                    .addNewsToNewsletter(newsletterId, newsId, currentUser);
+            NewsletterPublicationDto dto = newsletterPublicationMapper.toDto(updatedNewsletter);
+
+            log.info("News added successfully to newsletter");
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            log.error("Error adding news to newsletter: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error adding news to newsletter: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Remove a news publication from a newsletter
+     */
+    @DeleteMapping("/{newsletterId}/news/{newsId}")
+    public ResponseEntity<NewsletterPublicationDto> removeNewsFromNewsletter(
+            @PathVariable UUID newsletterId,
+            @PathVariable UUID newsId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        if (customUserDetails == null) {
+            log.error("Attempt to remove news from newsletter without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = customUserDetails.account().getUser();
+        log.info("DELETE /api/newsletter-publication/{}/news/{} - Removing news from newsletter by user: {}",
+                newsletterId, newsId, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        try {
+            NewsletterPublication updatedNewsletter = newsletterPublicationService
+                    .removeNewsFromNewsletter(newsletterId, newsId, currentUser);
+            NewsletterPublicationDto dto = newsletterPublicationMapper.toDto(updatedNewsletter);
+
+            log.info("News removed successfully from newsletter");
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            log.error("Error removing news from newsletter: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error removing news from newsletter: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

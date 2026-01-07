@@ -25,9 +25,9 @@ public interface NewsletterPublicationRepository extends JpaRepository<Newslette
     Page<NewsletterPublication> findByStatusNot(PublishingStatus status, Pageable pageable);
 
     /**
-     * Find newsletter publication by newsletter ID
+     * Find newsletter publication by newsletter ID (returns the latest version)
      */
-    Optional<NewsletterPublication> findByNewsletterId(UUID newsletterId);
+    Optional<NewsletterPublication> findFirstByNewsletterIdOrderByCreatedAtDesc(UUID newsletterId);
 
     /**
      * Find all published newsletter publications ordered by published date desc

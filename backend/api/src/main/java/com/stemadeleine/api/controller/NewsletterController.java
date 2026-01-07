@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,14 @@ public class NewsletterController {
                 .collect(Collectors.toList());
         log.debug("Newsletter variants: {}", variants);
         return ResponseEntity.ok(variants);
+    }
+
+    @GetMapping("/exists-with-variant-all")
+    public ResponseEntity<Boolean> existsNewsletterWithVariantAll() {
+        log.info("GET /api/newsletters/exists-with-variant-all - Checking if newsletter with variant ALL exists");
+        boolean exists = newsletterService.existsNewsletterWithVariantAll();
+        log.debug("Newsletter with variant ALL exists: {}", exists);
+        return ResponseEntity.ok(exists);
     }
 
     @GetMapping("/{id}")
@@ -127,5 +136,24 @@ public class NewsletterController {
         newsletterService.softDeleteNewsletter(id);
         log.debug("Newsletter deleted: {}", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/setup-pages")
+    public ResponseEntity<Map<String, UUID>> createNewsletterPagesStructure(
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to create newsletter pages structure without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        log.info("POST /api/newsletters/setup-pages - Creating complete newsletter pages structure at /newsletters");
+
+        Map<String, UUID> result = newsletterService.createNewsletterPagesStructure(
+                currentUserDetails.account().getUser()
+        );
+
+        log.info("Newsletter pages structure created successfully at /newsletters");
+        return ResponseEntity.ok(result);
     }
 }

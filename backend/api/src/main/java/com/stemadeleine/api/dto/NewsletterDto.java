@@ -13,6 +13,7 @@ public record NewsletterDto(
         String type,
         String variant,
         String description,
+        String detailPageUrl,
         Integer sortOrder,
         String status,
         Boolean isVisible,

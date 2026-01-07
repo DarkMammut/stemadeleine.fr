@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -56,6 +58,15 @@ public class NewsletterPublication {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "newsletter_publications_author_id_fkey"))
     private User author;
+
+    // News publications linked to this newsletter
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "newsletter_news_links",
+            joinColumns = @JoinColumn(name = "newsletter_publication_id"),
+            inverseJoinColumns = @JoinColumn(name = "news_publication_id")
+    )
+    private List<NewsPublication> linkedNews = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

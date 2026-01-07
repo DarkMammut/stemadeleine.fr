@@ -1,11 +1,9 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateNewsletterPublicationRequest;
-import com.stemadeleine.api.model.Media;
-import com.stemadeleine.api.model.NewsletterPublication;
-import com.stemadeleine.api.model.PublishingStatus;
-import com.stemadeleine.api.model.User;
+import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.MediaRepository;
+import com.stemadeleine.api.repository.NewsPublicationRepository;
 import com.stemadeleine.api.repository.NewsletterPublicationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,7 @@ public class NewsletterPublicationService {
 
     private final NewsletterPublicationRepository newsletterPublicationRepository;
     private final MediaRepository mediaRepository;
+    private final NewsPublicationRepository newsPublicationRepository;
 
     /**
      * Get all newsletter publications excluding deleted ones
@@ -83,14 +82,22 @@ public class NewsletterPublicationService {
     }
 
     /**
-     * Get newsletter publication by newsletter ID
+     * Get newsletter publication by newsletter ID (returns the latest version)
      */
     public Optional<NewsletterPublication> getNewsletterPublicationByNewsletterId(UUID newsletterId) {
-        log.info("Fetching newsletter publication with newsletter ID: {}", newsletterId);
+        log.info("Fetching latest newsletter publication with newsletter ID: {}", newsletterId);
         Optional<NewsletterPublication> publication = newsletterPublicationRepository
-                .findByNewsletterId(newsletterId)
+                .findFirstByNewsletterIdOrderByCreatedAtDesc(newsletterId)
                 .filter(p -> p.getStatus() != PublishingStatus.DELETED);
         log.debug("Newsletter publication found: {}", publication.isPresent());
+        if (publication.isPresent()) {
+            log.info("Found latest newsletter publication: id={}, newsletterId={}, createdAt={}",
+                    publication.get().getId(),
+                    publication.get().getNewsletterId(),
+                    publication.get().getCreatedAt());
+        } else {
+            log.warn("No newsletter publication found for newsletterId: {}", newsletterId);
+        }
         return publication;
     }
 
@@ -306,5 +313,81 @@ public class NewsletterPublicationService {
                             throw new RuntimeException("Newsletter publication not found");
                         }
                 );
+    }
+
+    /**
+     * Add a news publication to a newsletter
+     */
+    @Transactional
+    public NewsletterPublication addNewsToNewsletter(UUID newsletterId, UUID newsId, User currentUser) {
+        log.info("Adding news {} to newsletter {} by user: {}",
+                newsId, newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        NewsletterPublication newsletter = newsletterPublicationRepository
+                .findFirstByNewsletterIdOrderByCreatedAtDesc(newsletterId)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("Newsletter publication not found with newsletterId: {}", newsletterId);
+                    return new RuntimeException("Newsletter publication not found");
+                });
+
+        NewsPublication news = newsPublicationRepository.findById(newsId)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("News publication not found with ID: {}", newsId);
+                    return new RuntimeException("News publication not found");
+                });
+
+        if (!newsletter.getLinkedNews().contains(news)) {
+            newsletter.getLinkedNews().add(news);
+            newsletterPublicationRepository.save(newsletter);
+            log.info("News added successfully to newsletter");
+        } else {
+            log.warn("News {} already linked to newsletter {}", newsId, newsletterId);
+        }
+
+        return newsletter;
+    }
+
+    /**
+     * Remove a news publication from a newsletter
+     */
+    @Transactional
+    public NewsletterPublication removeNewsFromNewsletter(UUID newsletterId, UUID newsId, User currentUser) {
+        log.info("Removing news {} from newsletter {} by user: {}",
+                newsId, newsletterId, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        NewsletterPublication newsletter = newsletterPublicationRepository
+                .findFirstByNewsletterIdOrderByCreatedAtDesc(newsletterId)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("Newsletter publication not found with newsletterId: {}", newsletterId);
+                    return new RuntimeException("Newsletter publication not found");
+                });
+
+        newsletter.getLinkedNews().removeIf(news -> news.getId().equals(newsId));
+        newsletterPublicationRepository.save(newsletter);
+        log.info("News removed successfully from newsletter");
+
+        return newsletter;
+    }
+
+    /**
+     * Get all news publications linked to a newsletter
+     */
+    public List<NewsPublication> getLinkedNews(UUID newsletterId) {
+        log.info("Fetching news linked to newsletter {}", newsletterId);
+
+        NewsletterPublication newsletter = newsletterPublicationRepository
+                .findFirstByNewsletterIdOrderByCreatedAtDesc(newsletterId)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("Newsletter publication not found with newsletterId: {}", newsletterId);
+                    return new RuntimeException("Newsletter publication not found");
+                });
+
+        List<NewsPublication> linkedNews = newsletter.getLinkedNews();
+        log.debug("Found {} news linked to newsletter", linkedNews.size());
+        return linkedNews;
     }
 }

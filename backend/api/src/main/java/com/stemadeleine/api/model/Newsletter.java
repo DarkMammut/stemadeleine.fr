@@ -25,6 +25,9 @@ public class Newsletter extends Module {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "detail_page_url", length = 500)
+    private String detailPageUrl;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "media_id", referencedColumnName = "id")
     private Media media;

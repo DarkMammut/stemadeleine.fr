@@ -49,21 +49,35 @@ public class UserControllerFullIntegrationTest {
         u2.setFirstname("Adherent");
         u2.setLastname("User");
         u2.setEmail("adh@example.com");
-        userRepository.save(u2);
+
+        // Initialize memberships list before adding membership
+        java.util.List<Membership> memberships = new java.util.ArrayList<>();
+        u2.setMemberships(memberships);
+
+        // Save user first to get the ID
+        u2 = userRepository.save(u2);
 
         // membership for u2, active and dateFin this year
         Membership m = new Membership();
         m.setUser(u2);
         m.setActive(true);
-        m.setDateAdhesion(LocalDate.now().minusDays(10));
-        m.setDateFin(LocalDate.now().plusDays(10));
+        m.setDateAdhesion(LocalDate.now().minusMonths(1));
+        // Ensure dateFin is within current year (not spilling into next year)
+        LocalDate dateFin = LocalDate.now().plusDays(10);
+        int currentYear = LocalDate.now().getYear();
+        LocalDate lastDayOfYear = LocalDate.of(currentYear, 12, 31);
+        if (dateFin.isAfter(lastDayOfYear)) {
+            dateFin = lastDayOfYear;
+        }
+        m.setDateFin(dateFin);
         m.setCreatedAt(java.time.OffsetDateTime.now());
         m.setUpdatedAt(java.time.OffsetDateTime.now());
-        // use a mutable list so JPA can operate on the collection
-        java.util.List<Membership> memberships = new java.util.ArrayList<>();
-        memberships.add(m);
-        u2.setMemberships(memberships);
-        userRepository.save(u2);
+
+        // Add membership to user's list
+        u2.getMemberships().add(m);
+
+        // Save again to persist the membership relationship
+        u2 = userRepository.saveAndFlush(u2);
 
         userWithMembership = u2;
     }

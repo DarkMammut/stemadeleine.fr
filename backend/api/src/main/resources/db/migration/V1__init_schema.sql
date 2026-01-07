@@ -303,6 +303,7 @@ CREATE TABLE newsletters (
     variant news_variants DEFAULT 'LAST3' NOT NULL,
     description VARCHAR(1000),
     media_id UUID,
+    detail_page_url VARCHAR(500),
     FOREIGN KEY (id) REFERENCES modules(id) ON DELETE CASCADE,
     FOREIGN KEY (media_id) REFERENCES media(id)
 );

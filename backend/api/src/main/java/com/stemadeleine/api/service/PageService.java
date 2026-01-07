@@ -67,8 +67,14 @@ public class PageService {
                 .filter(p -> p.getStatus() != PublishingStatus.DELETED)
                 .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
 
-        // Nettoyer les enfants
-        latestPages.values().forEach(page -> page.setChildren(new ArrayList<>()));
+        // Nettoyer les enfants existants (clear au lieu de setChildren pour éviter l'erreur orphan deletion)
+        latestPages.values().forEach(page -> {
+            if (page.getChildren() != null) {
+                page.getChildren().clear();
+            } else {
+                page.setChildren(new ArrayList<>());
+            }
+        });
 
         // Recréer la hiérarchie
         for (Page page : latestPages.values()) {
@@ -390,8 +396,14 @@ public class PageService {
                 .filter(p -> p.getStatus() == PublishingStatus.PUBLISHED && p.getIsVisible())
                 .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
 
-        // Nettoyer les enfants
-        latestPages.values().forEach(page -> page.setChildren(new ArrayList<>()));
+        // Nettoyer les enfants existants (clear au lieu de setChildren pour éviter l'erreur orphan deletion)
+        latestPages.values().forEach(page -> {
+            if (page.getChildren() != null) {
+                page.getChildren().clear();
+            } else {
+                page.setChildren(new ArrayList<>());
+            }
+        });
 
         // Construire la hiérarchie
         List<Page> roots = new ArrayList<>();
@@ -491,4 +503,24 @@ public class PageService {
         List<Page> roots = findVisiblePagesHierarchy();
         return roots.stream().map(this::toPageDto).toList();
     }
+
+    /**
+     * Construit l'URL complète d'une page en remontant la hiérarchie des parents
+     *
+     * @param pageId L'ID de la page
+     * @return L'URL complète (ex: "/paroisse/newsletters")
+     */
+    public String buildFullPageUrl(UUID pageId) {
+        log.debug("Construction de l'URL complète pour la page avec pageId: {}", pageId);
+
+        Optional<Page> pageOpt = getLastVersion(pageId);
+        if (pageOpt.isEmpty()) {
+            log.warn("Page introuvable avec pageId: {}", pageId);
+            return null;
+        }
+
+        Page page = pageOpt.get();
+        return page.getSlug();
+    }
 }
+

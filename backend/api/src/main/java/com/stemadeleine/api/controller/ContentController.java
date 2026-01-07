@@ -219,30 +219,40 @@ public class ContentController {
                 ownerId, currentUser.getUsername());
 
         try {
-            // Récupérer toutes les dernières versions des contenus pour cet ownerId
+            log.info("Publishing contents for owner: {}", ownerId);
+
+            // Récupérer toutes les dernières versions des contenus pour l'ownerId
             var latestContents = contentService.getLatestContentsByOwner(ownerId);
+
+            log.info("Found {} latest contents for owner {}", latestContents.size(), ownerId);
 
             int publishedCount = 0;
             int skippedCount = 0;
 
             for (Content content : latestContents) {
+                log.info("Processing content: id={}, contentId={}, status={}, title={}",
+                        content.getId(), content.getContentId(), content.getStatus(), content.getTitle());
+
                 try {
                     // Publier seulement si le contenu n'est pas déjà publié et n'est pas supprimé
                     if (!content.getStatus().equals(com.stemadeleine.api.model.PublishingStatus.PUBLISHED)) {
+                        log.info("Publishing content: {} (contentId: {}) from status {} to PUBLISHED",
+                                content.getId(), content.getContentId(), content.getStatus());
+
                         contentService.updateContentStatus(
                                 content.getContentId(),
                                 com.stemadeleine.api.model.PublishingStatus.PUBLISHED,
                                 currentUser
                         );
                         publishedCount++;
-                        log.debug("Content published: {} (contentId: {})", content.getId(), content.getContentId());
+                        log.info("Content successfully published: {} (contentId: {})", content.getId(), content.getContentId());
                     } else {
                         skippedCount++;
-                        log.debug("Content already published, skipped: {} (contentId: {})", content.getId(), content.getContentId());
+                        log.info("Content already published, skipped: {} (contentId: {})", content.getId(), content.getContentId());
                     }
                 } catch (Exception e) {
-                    log.warn("Failed to publish content {} (contentId: {}): {}",
-                            content.getId(), content.getContentId(), e.getMessage());
+                    log.error("Failed to publish content {} (contentId: {}): {}",
+                            content.getId(), content.getContentId(), e.getMessage(), e);
                     skippedCount++;
                 }
             }
