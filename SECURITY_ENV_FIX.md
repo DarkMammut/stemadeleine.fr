@@ -7,7 +7,9 @@ Les fichiers `.env` contenant des informations sensibles ont été **retirés du
 ## Actions effectuées
 
 ### 1. Amélioration des règles `.gitignore`
+
 Tous les fichiers `.gitignore` ont été mis à jour pour ignorer explicitement :
+
 - `.env`
 - `.env.local`
 - `.env.development`
@@ -17,7 +19,9 @@ Tous les fichiers `.gitignore` ont été mis à jour pour ignorer explicitement 
 - **SAUF** `.env.example` qui peut être commité
 
 ### 2. Suppression des fichiers du tracking Git
+
 Les fichiers suivants ont été retirés du tracking Git (mais conservés localement) :
+
 - `.env` (racine)
 - `backend/api/.env.local`
 - `backend/api/.env.production`
@@ -26,7 +30,9 @@ Les fichiers suivants ont été retirés du tracking Git (mais conservés locale
 - `frontend/stemadeleine/.env`
 
 ### 3. Création de fichiers `.env.example`
+
 Des fichiers d'exemple ont été créés pour documenter les variables nécessaires :
+
 - `backend/api/.env.example`
 - `frontend/backoffice/.env.example`
 - `frontend/stemadeleine/.env.example`
@@ -34,7 +40,9 @@ Des fichiers d'exemple ont été créés pour documenter les variables nécessai
 ## 🚨 Prochaines étapes CRITIQUES
 
 ### 1. Révoquer les secrets exposés
-**IMPORTANT** : Les secrets qui étaient dans les fichiers `.env` sur GitHub doivent être considérés comme compromis. Vous devez :
+
+**IMPORTANT** : Les secrets qui étaient dans les fichiers `.env` sur GitHub doivent être considérés comme compromis.
+Vous devez :
 
 - [ ] **Changer TOUS les mots de passe de base de données**
 - [ ] **Régénérer les clés JWT/secrets**
@@ -43,19 +51,25 @@ Des fichiers d'exemple ont été créés pour documenter les variables nécessai
 - [ ] **Régénérer les tokens d'accès** (si présents)
 
 ### 2. Pousser les changements sur GitHub
+
 ```bash
 git push origin <votre-branche>
 ```
 
 ### 3. Vérifier l'historique Git (optionnel mais recommandé)
+
 Les anciens commits contiennent toujours les fichiers `.env`. Pour un nettoyage complet, vous pourriez utiliser :
+
 - `git filter-repo` (recommandé)
 - `BFG Repo-Cleaner`
 
-⚠️ **Attention** : Nettoyer l'historique Git nécessite un force push et peut causer des problèmes si d'autres personnes ont cloné le repo.
+⚠️ **Attention** : Nettoyer l'historique Git nécessite un force push et peut causer des problèmes si d'autres personnes
+ont cloné le repo.
 
 ### 4. Configurer les variables d'environnement en production
+
 Pour le déploiement, utilisez :
+
 - Variables d'environnement du serveur/plateforme
 - Secrets GitHub (pour CI/CD)
 - Services de gestion de secrets (AWS Secrets Manager, HashiCorp Vault, etc.)
@@ -75,6 +89,7 @@ Pour le déploiement, utilisez :
 ## 🔍 Vérification future
 
 Pour vérifier qu'aucun fichier `.env` n'est tracké :
+
 ```bash
 git ls-files | grep '\.env'
 ```
