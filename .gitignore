@@ -53,3 +53,4 @@ docker-compose.override.yml
 # Package management
 *copy.json
 *.backup.json
+.env
