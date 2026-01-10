@@ -1,4 +1,34 @@
-Stats endpoints
+# API Stemadeleine.fr
+
+API backend Spring Boot pour le site stemadeleine.fr
+
+## 🚀 Déploiement sur Render
+
+### Configuration rapide
+
+```
+Name: stemadeleine-api
+Language: Java
+Branch: main
+Region: Frankfurt (EU Central)
+Root Directory: backend/api
+Build Command: ./render-build.sh
+Start Command: ./render-start.sh
+```
+
+### Variables d'environnement requises
+
+Voir `.env.example` pour la liste complète des variables nécessaires.
+
+Pour plus de détails, consultez :
+
+- `/DEPLOYMENT_CHECKLIST.md` - Guide complet de déploiement
+- `/RENDER_FORM_VALUES.md` - Valeurs pour le formulaire Render
+- `/RENDER_DEPLOYMENT_GUIDE.md` - Guide détaillé Render
+
+---
+
+## 📊 Stats endpoints
 ================
 
 New endpoints added to provide aggregated KPIs for the backoffice dashboard and donations graph.

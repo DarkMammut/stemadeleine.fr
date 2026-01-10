@@ -16,9 +16,11 @@ public class CorsConfig {
                 // Unified configuration for all API endpoints
                 registry.addMapping("/api/**")
                         .allowedOrigins(
-                                "http://localhost:3000", // frontoffice
-                                "http://localhost:3001", // backoffice
-                                "https://stemadeleine.fr"
+                                "http://localhost:3000", // frontoffice local
+                                "http://localhost:3001", // backoffice local
+                                "https://stemadeleine.fr", // frontoffice production
+                                "https://www.stemadeleine.fr", // frontoffice production with www
+                                "https://backoffice.stemadeleine.fr" // backoffice production
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowCredentials(true)

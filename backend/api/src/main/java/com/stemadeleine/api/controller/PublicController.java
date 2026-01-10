@@ -34,6 +34,19 @@ public class PublicController {
     private final RecaptchaService recaptchaService;
     private final UserService userService; // ajout de l'injection
 
+    // ==== HEALTH CHECK ====
+
+    /**
+     * Health check endpoint for monitoring
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of(
+                "status", "UP",
+                "service", "stemadeleine-api"
+        ));
+    }
+
     // ==== PUBLIC PAGES ====
 
     /**

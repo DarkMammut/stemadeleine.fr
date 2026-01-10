@@ -1,0 +1,42 @@
+services:
+  # API Backend (Spring Boot + Java 21)
+  - type: web
+    name: stemadeleine-api
+    runtime: java
+    plan: free
+    region: frankfurt # EU region closest to France
+    rootDir: backend/api
+    buildCommand: ./render-build.sh
+    startCommand: ./render-start.sh
+    envVars:
+      # Database
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SUPABASE_DB_USER
+        sync: false
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      # S3/Supabase Storage
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET
+        value: medias-prod
+      - key: S3_REGION
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      # JWT
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      # HelloAsso
+      - key: HELLOASSO_CLIENT_ID
+        sync: false
+      - key: HELLOASSO_CLIENT_SECRET
+        sync: false
+      # reCAPTCHA
+      - key: RECAPTCHA_SECRET_KEY
+        sync: false
+    healthCheckPath: /api/health
+
