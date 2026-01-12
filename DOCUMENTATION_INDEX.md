@@ -14,6 +14,18 @@ Ce fichier liste toute la documentation disponible pour le projet Sainte-Madelei
 | **CONTACT_FORM_GUIDE.md**    | Configuration du formulaire de contact | Racine      |
 | **RECAPTCHA_SETUP_GUIDE.md** | Configuration de reCAPTCHA             | Racine      |
 
+### 🚀 Guides de Déploiement
+
+| Fichier                         | Description                                  | Priorité    |
+|---------------------------------|----------------------------------------------|-------------|
+| **README_DEPLOIEMENT.md**       | ⭐ Vue d'ensemble et plan de déploiement      | Lire en 1er |
+| **FORMULAIRE_RENDER_SIMPLE.md** | 🎯 Valeurs exactes pour le formulaire Render | Très utile  |
+| **DEPLOY_QUICK_START.md**       | Guide complet étape par étape                | Essentiel   |
+| **RENDER_DEPLOYMENT_GUIDE.md**  | Guide détaillé Render avec explications      | Référence   |
+| **RENDER_FORM_VALUES.md**       | Valeurs du formulaire (version alternative)  | Alternative |
+| **DEPLOYMENT_CHECKLIST.md**     | Liste de vérification avant déploiement      | Checklist   |
+| **render.yaml**                 | Configuration Blueprint pour Render          | Config      |
+
 ## 🎨 Documentation du Backoffice
 
 ### Guide Principal

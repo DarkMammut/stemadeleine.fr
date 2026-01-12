@@ -1,13 +1,12 @@
 services:
-  # API Backend (Spring Boot + Java 21)
+  # API Backend (Spring Boot + Java 21 avec Docker)
   - type: web
     name: stemadeleine-api
-    runtime: java
+    runtime: docker
     plan: free
     region: frankfurt # EU region closest to France
-    rootDir: backend/api
-    buildCommand: ./render-build.sh
-    startCommand: ./render-start.sh
+    dockerfilePath: ./backend/api/Dockerfile
+    dockerContext: ./backend/api
     envVars:
       # Database
       - key: SUPABASE_DB_URL
@@ -38,5 +37,34 @@ services:
       # reCAPTCHA
       - key: RECAPTCHA_SECRET_KEY
         sync: false
-    healthCheckPath: /api/health
+      # Spring Profile
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+    healthCheckPath: /api/public/health
+
+  # Frontend Site Public (Next.js)
+  - type: web
+    name: stemadeleine-frontend
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./frontend/stemadeleine/Dockerfile
+    dockerContext: ./frontend/stemadeleine
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://stemadeleine-api.onrender.com
+      - key: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+        sync: false
+
+  # Backoffice (Next.js)
+  - type: web
+    name: stemadeleine-backoffice
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./frontend/backoffice/Dockerfile
+    dockerContext: ./frontend/backoffice
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://stemadeleine-api.onrender.com
 

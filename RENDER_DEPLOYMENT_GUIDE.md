@@ -1,18 +1,26 @@
 # 🚀 Guide de Déploiement sur Render
 
+## ⚠️ Langages Disponibles sur Render
+
+Render supporte uniquement : **Docker**, Elixir, Go, Node, Python 3, Ruby et Rust.
+
+**Java n'est pas disponible directement** → Nous utilisons **Docker** pour déployer notre API Spring Boot.
+
 ## 📋 Informations pour le formulaire Render
 
-### Configuration du Web Service
+### Configuration du Web Service (API Backend)
 
-| Champ              | Valeur                                                        |
-|--------------------|---------------------------------------------------------------|
-| **Name**           | `stemadeleine-api`                                            |
-| **Language**       | `Java`                                                        |
-| **Branch**         | `main` (ou `backoffice` si c'est votre branche de production) |
-| **Region**         | `Frankfurt (EU Central)` *(ou Paris si disponible)*           |
-| **Root Directory** | `backend/api`                                                 |
-| **Build Command**  | `./render-build.sh`                                           |
-| **Start Command**  | `./render-start.sh`                                           |
+| Champ               | Valeur                                              |
+|---------------------|-----------------------------------------------------|
+| **Name**            | `stemadeleine-api`                                  |
+| **Language**        | `Docker` ⚠️                                         |
+| **Branch**          | `main`                                              |
+| **Region**          | `Frankfurt (EU Central)` *(ou Paris si disponible)* |
+| **Root Directory**  | `backend/api`                                       |
+| **Dockerfile Path** | `Dockerfile` *(relatif au Root Directory)*          |
+
+⚠️ **Important :** Avec Docker, vous n'avez PAS besoin de spécifier de Build Command ni de Start Command. Render utilise
+directement le Dockerfile.
 
 ### ⚙️ Variables d'Environnement à Configurer
 
@@ -147,19 +155,69 @@ Dans votre `PublicController.java` et autres contrôleurs, ajoutez l'URL de prod
 
 ### Configuration des Frontends
 
-Une fois l'API déployée, mettez à jour vos frontends Next.js avec l'URL de l'API :
+Une fois l'API déployée, vous avez deux options pour déployer les frontends Next.js :
 
-**Dans `frontend/stemadeleine/.env.production` :**
+#### Option 1 : Vercel (Recommandé pour Next.js) ⭐
 
-```
-NEXT_PUBLIC_API_URL=https://stemadeleine-api.onrender.com
-```
+Vercel est optimisé pour Next.js et offre le meilleur support :
 
-**Dans `frontend/backoffice/.env.production` :**
+**Pour le site public (`frontend/stemadeleine`) :**
 
-```
-NEXT_PUBLIC_API_URL=https://stemadeleine-api.onrender.com
-```
+1. Allez sur https://vercel.com
+2. Connectez votre repository GitHub
+3. Configurez :
+    - **Root Directory** : `frontend/stemadeleine`
+    - **Framework Preset** : Next.js
+    - Variables d'environnement :
+      ```
+      NEXT_PUBLIC_API_URL=https://stemadeleine-api.onrender.com
+      NEXT_PUBLIC_RECAPTCHA_SITE_KEY=votre_clé_site_recaptcha
+      ```
+
+**Pour le Backoffice (`frontend/backoffice`) :**
+
+1. Créez un nouveau projet Vercel
+2. Configurez :
+    - **Root Directory** : `frontend/backoffice`
+    - **Framework Preset** : Next.js
+    - Variables d'environnement :
+      ```
+      NEXT_PUBLIC_API_URL=https://stemadeleine-api.onrender.com
+      BACKEND_URL=https://stemadeleine-api.onrender.com
+      ```
+
+#### Option 2 : Render (Si vous préférez tout centraliser)
+
+Vous pouvez aussi déployer les frontends sur Render avec Docker :
+
+**Frontend Site Public :**
+
+- Name: `stemadeleine-frontend`
+- Language: `Docker`
+- Root Directory: `frontend/stemadeleine`
+- Dockerfile Path: `Dockerfile`
+
+**Backoffice :**
+
+- Name: `stemadeleine-backoffice`
+- Language: `Docker`
+- Root Directory: `frontend/backoffice`
+- Dockerfile Path: `Dockerfile`
+
+---
+
+## 🌐 Configuration du Reverse Proxy
+
+Si vous déployez le backoffice sur Render et souhaitez l'accès via un sous-domaine :
+
+1. Dans les paramètres DNS de votre domaine :
+   ```
+   backoffice.stemadeleine.fr CNAME stemadeleine-backoffice.onrender.com
+   ```
+
+2. Dans Render, allez dans les paramètres du service backoffice :
+    - Settings → Custom Domains
+    - Ajoutez `backoffice.stemadeleine.fr`
 
 ---
 

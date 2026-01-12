@@ -1,23 +1,32 @@
 # 📝 FORMULAIRE RENDER - VALEURS À COPIER
 
+## ⚠️ Important : Utiliser Docker
+
+**Java n'est pas disponible sur Render.** Les langages disponibles sont :
+
+- Docker ✅ (à utiliser pour notre API Java)
+- Elixir, Go, Node, Python 3, Ruby, Rust
+
 ## Configuration Rapide
 
 ### 🎯 Informations de Base
 
 ```
 Name: stemadeleine-api
-Language: Java
+Language: Docker
 Branch: main
 Region: Frankfurt (EU Central)
 Root Directory: backend/api
+Dockerfile Path: Dockerfile
+Docker Build Context Path: .
 ```
 
 ### 🔨 Commandes
 
-```
-Build Command: ./render-build.sh
-Start Command: ./render-start.sh
-```
+**Avec Docker, aucune commande à spécifier !** Render utilise directement le Dockerfile.
+
+✅ Build Command: (laisser vide - géré par Docker)
+✅ Start Command: (laisser vide - géré par Docker)
 
 ### 🔐 Variables d'Environnement (À compléter avec vos valeurs)
 
