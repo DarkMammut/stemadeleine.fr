@@ -7,11 +7,11 @@ CREATE TABLE IF NOT EXISTS newsletter_news_links (
     PRIMARY KEY (newsletter_publication_id, news_publication_id),
     CONSTRAINT fk_newsletter_publication
         FOREIGN KEY (newsletter_publication_id)
-        REFERENCES newsletter_publications(id)
+        REFERENCES public.newsletter_publications(id)
         ON DELETE CASCADE,
     CONSTRAINT fk_news_publication
         FOREIGN KEY (news_publication_id)
-        REFERENCES news_publications(id)
+        REFERENCES public.news_publications(id)
         ON DELETE CASCADE
 );
 

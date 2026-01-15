@@ -2,7 +2,7 @@
 WITH home_page AS (
     SELECT uuid_generate_v4() as new_id
 )
-INSERT INTO pages (id, page_id, name, slug, title, sub_title, description,
+INSERT INTO public.pages (id, page_id, name, slug, title, sub_title, description,
                    status, version, author_id, is_visible, sort_order, created_at, updated_at)
 SELECT new_id,                                          -- id
        new_id,                                          -- page_id (même que id pour la première version)
@@ -13,19 +13,19 @@ SELECT new_id,                                          -- id
        'Page d''accueil de l''église Sainte Madeleine', -- description
        'PUBLISHED',                                     -- status
        1,                                               -- version
-       (SELECT id FROM users LIMIT 1),                  -- author_id
+       (SELECT id FROM public.users LIMIT 1),                  -- author_id
        true,                                            -- is_visible
        0,                                               -- sort_order
        NOW(),                                           -- created_at
        NOW()                                            -- updated_at
 FROM home_page
-WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = '/');
+WHERE NOT EXISTS (SELECT 1 FROM public.pages WHERE slug = '/');
 
 -- Insert Contact page
 WITH contact_page AS (
     SELECT uuid_generate_v4() as new_id
 )
-INSERT INTO pages (id, page_id, name, slug, title, sub_title, description,
+INSERT INTO public.pages (id, page_id, name, slug, title, sub_title, description,
                    status, version, author_id, is_visible, sort_order, created_at, updated_at)
 SELECT new_id,                                          -- id
        new_id,                                          -- page_id (même que id pour la première version)
@@ -36,10 +36,10 @@ SELECT new_id,                                          -- id
        'Page de contact pour joindre l''église Sainte Madeleine', -- description
        'PUBLISHED',                                     -- status
        1,                                               -- version
-       (SELECT id FROM users LIMIT 1),                  -- author_id
+       (SELECT id FROM public.users LIMIT 1),                  -- author_id
        true,                                            -- is_visible
        1,                                               -- sort_order
        NOW(),                                           -- created_at
        NOW()                                            -- updated_at
 FROM contact_page
-WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = '/contact');
+WHERE NOT EXISTS (SELECT 1 FROM public.pages WHERE slug = '/contact');

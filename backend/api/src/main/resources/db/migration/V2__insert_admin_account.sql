@@ -2,14 +2,14 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 1) Créer l'utilisateur "Admin SuperUser" si inexistant
-INSERT INTO users (id, firstname, lastname, created_at, updated_at)
+INSERT INTO public.users (id, firstname, lastname, created_at, updated_at)
 SELECT gen_random_uuid(), 'Admin', 'SuperUser', NOW(), NOW()
 WHERE NOT EXISTS (
-    SELECT 1 FROM users WHERE firstname = 'Admin' AND lastname = 'SuperUser'
+    SELECT 1 FROM public.users WHERE firstname = 'Admin' AND lastname = 'SuperUser'
 );
 
 -- 2) Créer un compte admin rattaché si inexistant
-INSERT INTO accounts (id, user_id, email, password_hash, provider, provider_account_id, role, is_active, email_verified, created_at, updated_at)
+INSERT INTO public.accounts (id, user_id, email, password_hash, provider, provider_account_id, role, is_active, email_verified, created_at, updated_at)
 SELECT
     gen_random_uuid(),
     u.id,
@@ -22,8 +22,8 @@ SELECT
     true, -- Email vérifié pour l'admin
     NOW(),
     NOW()
-FROM users u
+FROM public.users u
 WHERE u.firstname = 'Admin' AND u.lastname = 'SuperUser'
   AND NOT EXISTS (
-    SELECT 1 FROM accounts a WHERE a.email = 'admin@example.com'
+    SELECT 1 FROM public.accounts a WHERE a.email = 'admin@example.com'
 );
