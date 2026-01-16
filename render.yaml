@@ -37,6 +37,9 @@ services:
       # reCAPTCHA
       - key: RECAPTCHA_SECRET_KEY
         sync: false
+      # CORS - Origines additionnelles (Vercel, etc.)
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
       # Spring Profile
       - key: SPRING_PROFILES_ACTIVE
         value: prod

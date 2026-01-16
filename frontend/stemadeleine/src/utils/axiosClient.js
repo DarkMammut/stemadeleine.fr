@@ -2,7 +2,7 @@ import axios from 'axios';
 import {useMemo} from 'react';
 
 export function useAxiosClient() {
-    const client = useMemo(() => {
+    return useMemo(() => {
         const instance = axios.create({
             baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080',
             timeout: 30000,
@@ -41,14 +41,12 @@ export function useAxiosClient() {
 
         return instance;
     }, []);
-
-    return client;
 }
 
 // Export d'un client axios simple pour les cas où les hooks ne sont pas utilisables
 export const axiosClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080',
-    timeout: 10000,
+    timeout: 30000,
     withCredentials: true, // Nécessaire pour la configuration CORS unifiée
     headers: {
         'Content-Type': 'application/json',
