@@ -18,13 +18,9 @@ export function middleware(request) {
     const publicRoutes = ['/auth/login', '/auth/register'];
     const isPublicRoute = publicRoutes.includes(pathname) || publicRoutes.some(route => pathname.startsWith(route + '/'));
 
-    // Root path - redirect authenticated users to dashboard, show landing page for others
+    // Root path - allow access for everyone (authenticated or not)
     if (pathname === '/') {
-        if (isAuthenticated) {
-            console.log('↗️  Redirect: / → /dashboard (authenticated)');
-            return NextResponse.redirect(new URL('/dashboard', request.url));
-        }
-        console.log('✅ Allow: / (not authenticated, show landing)');
+        console.log('✅ Allow: / (landing page accessible for all)');
         return NextResponse.next();
     }
 
