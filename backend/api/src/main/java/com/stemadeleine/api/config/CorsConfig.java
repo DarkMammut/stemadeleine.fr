@@ -25,10 +25,11 @@ public class CorsConfig {
                 List<String> allowedOrigins = new ArrayList<>(Arrays.asList(
                         "http://localhost:3000", // frontoffice local
                         "http://localhost:3001", // backoffice local
-                        "https://stemadeleine.fr", // frontoffice production
+                        "https://stemadeleine.fr", // frontoffice production (custom domain)
                         "https://www.stemadeleine.fr", // frontoffice production with www
-                        "https://backoffice.stemadeleine.fr", // backoffice production
-                        "https://stemadeleine-fr.vercel.app" // Vercel deployment
+                        "https://dashboard.stemadeleine.fr", // backoffice production (custom domain)
+                        "https://stemadeleine-fr.vercel.app", // frontoffice Vercel
+                        "https://stemadeleine-fr-backoffice.vercel.app" // backoffice Vercel
                 ));
 
                 // Ajout des origines additionnelles depuis la variable d'environnement

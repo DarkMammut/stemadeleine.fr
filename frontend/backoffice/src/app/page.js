@@ -1,144 +1,162 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import SceneLayout from "@/components/ui/SceneLayout";
-import Title from "@/components/ui/Title";
-import Card from "@/components/ui/Card";
+import {useRouter} from "next/navigation";
+import {
+    ArrowRightIcon,
+    ChartBarIcon,
+    Cog6ToothIcon,
+    CreditCardIcon,
+    EnvelopeIcon,
+    NewspaperIcon,
+    SparklesIcon,
+    UserGroupIcon
+} from "@heroicons/react/24/outline";
 import Button from "@/components/ui/Button";
-import IconButton from "@/components/ui/IconButton";
-import { ArrowRightIcon, HomeIcon } from "@heroicons/react/20/solid";
 
 export default function Home() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const goToLogin = () => router.push("/login");
-  const goToDashboard = () => router.push("/dashboard");
 
-  const actions = [
-    {
-      title: "Aller au dashboard",
-      desc: "Voir les statistiques et gérer le contenu",
-      onClick: goToDashboard,
-    },
-    {
-      title: "Se connecter",
-      desc: "Accéder à l&apos;espace sécurisé",
-      onClick: goToLogin,
-    },
-    {
-      title: "Documentation",
-      desc: "Lire la documentation du backoffice",
-      onClick: () => router.push("/docs"),
-    },
-  ];
+    const features = [
+        {
+            icon: ChartBarIcon,
+            title: "Tableau de bord",
+            description: "Vue d'ensemble des statistiques et activités",
+            href: "/dashboard",
+            color: "indigo"
+        },
+        {
+            icon: UserGroupIcon,
+            title: "Utilisateurs",
+            description: "Gestion des comptes et permissions",
+            href: "/users",
+            color: "blue"
+        },
+        {
+            icon: NewspaperIcon,
+            title: "Actualités",
+            description: "Publier et gérer les actualités de la paroisse",
+            href: "/news",
+            color: "purple"
+        },
+        {
+            icon: EnvelopeIcon,
+            title: "Contacts",
+            description: "Messages et demandes de contact",
+            href: "/contacts",
+            color: "green"
+        },
+        {
+            icon: CreditCardIcon,
+            title: "Paiements",
+            description: "Suivi des dons et transactions",
+            href: "/payments",
+            color: "amber"
+        },
+        {
+            icon: Cog6ToothIcon,
+            title: "Paramètres",
+            description: "Configuration du site et de l'association",
+            href: "/settings",
+            color: "gray"
+        }
+    ];
 
-  return (
-    <SceneLayout className="mt-12">
-      <Title label="Backoffice - Dev landing" />
+    const colorClasses = {
+        indigo: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100",
+        blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-100",
+        purple: "bg-purple-50 text-purple-600 group-hover:bg-purple-100",
+        green: "bg-green-50 text-green-600 group-hover:bg-green-100",
+        amber: "bg-amber-50 text-amber-600 group-hover:bg-amber-100",
+        gray: "bg-gray-50 text-gray-600 group-hover:bg-gray-100"
+    };
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        <section className="md:col-span-2 space-y-6">
-          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 flex items-center justify-center rounded-md bg-indigo-50">
-                <HomeIcon className="h-10 w-10 text-indigo-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold">
-                  Bienvenue en développement
-                </h3>
-                <p className="mt-2 text-sm text-gray-600">
-                  Cette page sert d&apos;atterrissage local pendant le
-                  développement. Elle ne sera pas utilisée en production à cause
-                  du reverse proxy, mais elle vous permet d&apos;accéder
-                  rapidement aux principales routes.
-                </p>
-
-                <div className="mt-4 flex gap-3 flex-wrap">
-                  <Button onClick={goToDashboard} variant="primary">
-                    Aller au dashboard
-                  </Button>
-                  <Button onClick={goToLogin} variant="secondary">
-                    Se connecter
-                  </Button>
-                  <IconButton
-                    icon={ArrowRightIcon}
-                    label="Docs"
-                    onClick={() => router.push("/docs")}
-                    variant="ghost"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm">
-            <h4 className="text-lg font-medium">Actions rapides</h4>
-            <p className="text-sm text-gray-600 mt-2">
-              Cliquer sur une carte pour naviguer.
-            </p>
-
-            <ul className="mt-4 divide-y divide-gray-100 rounded-md border border-gray-50">
-              {actions.map((a, idx) => (
-                <Card key={idx} onClick={a.onClick}>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-semibold">{a.title}</div>
-                        <div className="text-xs text-gray-500">{a.desc}</div>
-                      </div>
+    return (
+        <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50">
+            {/* Header avec effet glassmorphism */}
+            <div className="relative overflow-hidden bg-white/70 backdrop-blur-sm border-b border-gray-200/50">
+                <div className="absolute inset-0 bg-linear-to-r from-indigo-500/10 to-purple-500/10"></div>
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+                    <div className="text-center">
+                        <div className="flex justify-center mb-6">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-20 rounded-full"></div>
+                                <SparklesIcon className="relative h-16 w-16 text-indigo-600"/>
+                            </div>
+                        </div>
+                        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                            Backoffice
+                        </h1>
+                        <p className="text-xl text-gray-600 mb-2">
+                            Les Amis de Sainte-Madeleine de la Jarrie
+                        </p>
+                        <p className="text-base text-gray-500 max-w-2xl mx-auto">
+                            Espace d&apos;administration pour gérer le contenu du site, les utilisateurs et les
+                            activités de
+                            l&apos;association
+                        </p>
+                        <div className="mt-8">
+                            <Button
+                                onClick={() => router.push("/auth/login")}
+                                variant="primary"
+                                className="px-8 py-3 text-base shadow-lg hover:shadow-xl transition-shadow"
+                            >
+                                Se connecter
+                                <ArrowRightIcon className="ml-2 h-5 w-5 inline"/>
+                            </Button>
+                        </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <aside className="space-y-6">
-          <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
-            <h5 className="text-sm font-medium">Raccourcis</h5>
-            <div className="mt-3 flex flex-col gap-2">
-              <Button
-                as="a"
-                href="/login"
-                variant="outline"
-                className="w-full text-center"
-              >
-                Connexion
-              </Button>
-              <Button
-                as="a"
-                href="/dashboard"
-                variant="outline"
-                className="w-full text-center"
-              >
-                Dashboard
-              </Button>
-              <Button
-                as="a"
-                href="/api/logout"
-                variant="danger"
-                className="w-full text-center"
-              >
-                Se déconnecter
-              </Button>
+                </div>
             </div>
-          </div>
 
-          <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
-            <h5 className="text-sm font-medium">À propos</h5>
-            <p className="text-xs text-gray-500 mt-2">
-              Utilisez cette page pour naviguer rapidement lors du développement
-              local. Les boutons utilisent vos composants UI réutilisables.
-            </p>
-          </div>
-        </aside>
-      </div>
+            {/* Grid des fonctionnalités */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+                <div className="text-center mb-12">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                        Fonctionnalités
+                    </h2>
+                    <p className="text-gray-600">
+                        Accédez rapidement aux principales sections du backoffice
+                    </p>
+                </div>
 
-      <footer className="mt-8 text-center text-xs text-gray-400">
-        Dev landing — Ne pas déployer en production.
-      </footer>
-    </SceneLayout>
-  );
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {features.map((feature, index) => {
+                        const Icon = feature.icon;
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => router.push(feature.href)}
+                                className="group relative bg-white rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-gray-200 text-left"
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div
+                                        className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-colors ${colorClasses[feature.color]}`}>
+                                        <Icon className="h-6 w-6"/>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-600">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+                                    <ArrowRightIcon
+                                        className="shrink-0 h-5 w-5 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"/>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Footer */}
+            <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+                <p className="text-sm text-gray-500">
+                    © {new Date().getFullYear()} Les Amis de Sainte-Madeleine de la Jarrie
+                </p>
+            </footer>
+        </div>
+    );
 }

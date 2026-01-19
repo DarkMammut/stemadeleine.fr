@@ -29,6 +29,8 @@ services:
       # JWT
       - key: JWT_SECRET_KEY
         generateValue: true
+      - key: JWT_COOKIE_SECURE
+        value: true
       # HelloAsso
       - key: HELLOASSO_CLIENT_ID
         sync: false
@@ -68,6 +70,8 @@ services:
     dockerfilePath: ./frontend/backoffice/Dockerfile
     dockerContext: ./frontend/backoffice
     envVars:
+      - key: BACKEND_URL
+        value: https://stemadeleine-api.onrender.com
       - key: NEXT_PUBLIC_API_URL
         value: https://stemadeleine-api.onrender.com
 
