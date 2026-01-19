@@ -37,10 +37,11 @@ public class AuthController {
 
         if (jwtCookieSecure) {
             cookieHeader.append("; Secure");
-            cookieHeader.append("; SameSite=None");
-        } else {
-            cookieHeader.append("; SameSite=Lax");
         }
+
+        // Always use SameSite=Lax (even in production) because Next.js rewrites
+        // make all requests appear as same-site to the browser
+        cookieHeader.append("; SameSite=Lax");
 
         response.addHeader("Set-Cookie", cookieHeader.toString());
     }
