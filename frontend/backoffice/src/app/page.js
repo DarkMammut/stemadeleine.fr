@@ -3,6 +3,7 @@
 import {useRouter} from "next/navigation";
 import {
     ArrowRightIcon,
+    ArrowTopRightOnSquareIcon,
     ChartBarIcon,
     Cog6ToothIcon,
     CreditCardIcon,
@@ -95,7 +96,7 @@ export default function Home() {
                             activités de
                             l&apos;association
                         </p>
-                        <div className="mt-8">
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
                             <Button
                                 onClick={() => router.push("/auth/login")}
                                 variant="primary"
@@ -104,6 +105,15 @@ export default function Home() {
                                 Se connecter
                                 <ArrowRightIcon className="ml-2 h-5 w-5 inline"/>
                             </Button>
+                            <a
+                                href="https://stemadeleine.fr"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center px-8 py-3 text-base font-semibold text-indigo-600 bg-white border-2 border-indigo-600 rounded-md shadow-lg hover:bg-indigo-50 hover:shadow-xl transition-all cursor-pointer"
+                            >
+                                Voir le site principal
+                                <ArrowTopRightOnSquareIcon className="ml-2 h-5 w-5"/>
+                            </a>
                         </div>
                     </div>
                 </div>
