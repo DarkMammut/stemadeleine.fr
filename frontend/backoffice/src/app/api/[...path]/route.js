@@ -36,8 +36,6 @@ async function proxyRequest(request, method, params) {
         const url = new URL(request.url);
         const backendUrl = `${BACKEND_URL}/api/${path}${url.search}`;
 
-        console.log(`[API Proxy] ${method} ${backendUrl}`);
-
         // Get cookies from Next.js
         const cookieStore = await cookies();
         const authToken = cookieStore.get('authToken');
@@ -53,9 +51,6 @@ async function proxyRequest(request, method, params) {
         // Add cookie if present
         if (authToken) {
             fetchOptions.headers['Cookie'] = `authToken=${authToken.value}`;
-            console.log(`[API Proxy] Forwarding cookie: authToken=${authToken.value.substring(0, 20)}...`);
-        } else {
-            console.log(`[API Proxy] No authToken cookie found`);
         }
 
         // Add body for POST, PUT, PATCH
@@ -73,6 +68,14 @@ async function proxyRequest(request, method, params) {
 
         let data;
         const contentType = response.headers.get('content-type');
+
+        // Handle 204 No Content responses (no body)
+        if (response.status === 204) {
+            return new Response(null, {
+                status: 204,
+                headers: response.headers,
+            });
+        }
 
         try {
             if (contentType && contentType.includes('application/json')) {
@@ -102,7 +105,6 @@ async function proxyRequest(request, method, params) {
             nextResponse.headers.set('Set-Cookie', setCookieHeaders);
         }
 
-        console.log(`[API Proxy] Response: ${response.status}`);
         return nextResponse;
     } catch (error) {
         console.error('[API Proxy] Error:', error);
