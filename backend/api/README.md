@@ -1,103 +1,80 @@
-# API Stemadeleine.fr
+# API Backend - Stemadeleine.fr
 
-API backend Spring Boot pour le site stemadeleine.fr
-
-## 🚀 Déploiement sur Render
-
-### Configuration rapide
-
-```
-Name: stemadeleine-api
-Language: Java
-Branch: main
-Region: Frankfurt (EU Central)
-Root Directory: backend/api
-Build Command: ./render-build.sh
-Start Command: ./render-start.sh
-```
-
-### Variables d'environnement requises
-
-Voir `.env.example` pour la liste complète des variables nécessaires.
-
-Pour plus de détails, consultez :
-
-- `/DEPLOYMENT_CHECKLIST.md` - Guide complet de déploiement
-- `/RENDER_FORM_VALUES.md` - Valeurs pour le formulaire Render
-- `/RENDER_DEPLOYMENT_GUIDE.md` - Guide détaillé Render
+API REST Spring Boot 3.2 pour le site stemadeleine.fr.
 
 ---
 
-## 📊 Stats endpoints
-================
-
-New endpoints added to provide aggregated KPIs for the backoffice dashboard and donations graph.
-
-Endpoints
----------
-
-1) GET /api/stats/dashboard
-
-- Description: Returns aggregated KPIs used by the backoffice dashboard.
-- Query params: Optional `year` (integer) — currently not used for all KPIs but kept for future.
-- Response JSON shape:
-  {
-  "activeMembers": <number>,
-  "membershipAmount": <number>,
-  "donorsCount": <number>,
-  "donationsAmount": <number>
-  }
-
-2) GET /api/stats/donations?year=YYYY
-
-- Description: Returns donations aggregated per month for the requested year.
-- Query params: `year` (integer), default = current year.
-- Response JSON shape:
-  {
-  "year": 2025,
-  "monthlyTotals": [double, ..., double], // array length 12
-  "total": <number>
-  }
-
-Implementation notes
---------------------
-
-- Backend implements repository-level aggregations in `PaymentRepository` and `MembershipRepository` to avoid loading
-  entire tables into memory for common KPIs:
-    - `sumAmountByType(PaymentType)` — sum of amounts for a given payment type
-    - `countDistinctUsersByType(PaymentType)` — distinct donors count for a given type
-    - `sumMonthlyByTypeAndYear(PaymentType, year)` — monthly sums (returns rows of [month, sum])
-    - `countActiveForYear(year)` — number of active memberships for a year
-- `StatsController` uses the repository methods and falls back to in-memory computation if the repository query fails
-  for any reason.
-
-Testing
--------
-
-- Integration tests were added under `src/test/java/.../controller`:
-    - `StatsControllerIntegrationTest`
-    - `PaymentControllerIntegrationTest`
-    - `ContactControllerIntegrationTest`
-    - `NewsPublicationControllerIntegrationTest`
-
-- Tests are annotated with `@TestPropertySource(locations = "classpath:application-test.properties")` so the H2
-  in-memory database and `spring.jpa.hibernate.ddl-auto=create-drop` are used during test runs.
-
-Run tests
----------
-From the project root run (or inside backend/api):
+## 🚀 Démarrage
 
 ```bash
-# From backend/api
+./mvnw spring-boot:run
+```
+
+**URL** : http://localhost:8080  
+**Health Check** : http://localhost:8080/api/public/health
+
+---
+
+## 🧪 Tests
+
+```bash
 ./mvnw test
 ```
 
-If you are on Windows PowerShell use:
+---
 
-```powershell
-cd path\to\backend\api
-.\mvnw.cmd test
+## 📚 Documentation Complète
+
+Pour la documentation complète, consultez :
+
+**[../../API.md](../../API.md)** - Documentation complète de l'API
+
+---
+
+## 📦 Build
+
+```bash
+# Clean build
+./mvnw clean install
+
+# Build sans tests
+./mvnw clean package -DskipTests
 ```
+
+---
+
+## 🚀 Déploiement
+
+Voir **[../../DEPLOYMENT.md](../../DEPLOYMENT.md)** pour le guide de déploiement complet.
+
+Configuration Render :
+
+- **Name** : `stemadeleine-api`
+- **Language** : `Docker`
+- **Root Directory** : `backend/api`
+
+---
+
+## 📊 Endpoints Principaux
+
+### Publics
+
+- `GET /api/public/health` - Health check
+- `GET /api/public/news` - Liste des actualités
+- `POST /api/public/contact` - Formulaire de contact
+- `GET /api/stats/dashboard` - KPIs dashboard
+- `GET /api/stats/donations?year=2026` - Dons mensuels
+
+### Protégés (Authentification JWT)
+
+- `POST /api/auth/login` - Connexion
+- `GET /api/users` - Liste des utilisateurs
+- `POST /api/news` - Créer une actualité
+- `POST /api/media/upload` - Upload de média
+
+---
+
+**✅ Pour plus de détails, consultez [API.md](../../API.md)**
 
 Troubleshooting
 ---------------

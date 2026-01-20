@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Site Principal - Stemadeleine.fr
 
-## Getting Started
+Site web public de la paroisse Sainte-Madeleine de la Jarrie, développé avec Next.js 15.
 
-First, run the development server:
+---
+
+## 🚀 Démarrage
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**URL** : http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 Documentation Complète
 
-## Learn More
+Pour la documentation complète, consultez :
 
-To learn more about Next.js, take a look at the following resources:
+**[../../STEMADELEINE.md](../../STEMADELEINE.md)** - Guide complet du site principal
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 Fonctionnalités
 
-## Deploy on Vercel
+- ✅ Page d'accueil avec présentation de l'association
+- ✅ Actualités de la paroisse
+- ✅ Formulaire de contact (protégé reCAPTCHA v2)
+- ✅ Formulaire d'adhésion
+- ✅ Dons en ligne (HelloAsso)
+- ✅ Design responsive avec Tailwind CSS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔐 Configuration reCAPTCHA
+
+Variables d'environnement (`.env.local`) :
+
+```bash
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=votre_clé_publique_recaptcha
+```
+
+---
+
+## 🚀 Production
+
+**URL** : https://stemadeleine.fr
+
+Variables d'environnement sur Vercel :
+
+```
+NEXT_PUBLIC_BACKEND_URL=https://stemadeleine-api.onrender.com
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=votre_clé_publique
+```
+
+---
+
+## 📦 Build
+
+```bash
+npm run build
+npm run start
+```
+
+---
+
+**✅ Pour plus de détails, consultez [STEMADELEINE.md](../../STEMADELEINE.md)**

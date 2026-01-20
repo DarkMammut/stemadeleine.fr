@@ -1,81 +1,36 @@
-# Backoffice - Sainte-Madeleine
+# Backoffice - Stemadeleine.fr
 
-Backoffice de gestion de contenu pour le site de la paroisse Sainte-Madeleine, développé avec Next.js 15.
+Interface d'administration pour gérer le contenu du site stemadeleine.fr, développée avec Next.js 15.
 
-## 📚 Documentation
+---
 
-### Guides Essentiels
-
-- **[UTILITIES_GUIDE.md](./UTILITIES_GUIDE.md)** - Guide complet des composants et utilitaires
-    - Système de notifications
-    - Modales de confirmation
-    - Boutons intelligents (Button, IconButton, DeleteButton, PublishButton)
-    - Gestion des médias (MediaManager, MediaPicker, etc.)
-    - Composants UI de base
-    - Hooks personnalisés
-    - Exemples de code
-
-- **[../../DEVELOPMENT.md](../../DEVELOPMENT.md)** - Guide de développement général
-- **[../../AI_INSTRUCTIONS.md](../../AI_INSTRUCTIONS.md)** - Instructions pour l'IA
-
-### Documentation des Composants
-
-- **[src/components/ui/IconButton.md](./src/components/ui/IconButton.md)** - Boutons avec icônes
-- **[src/components/DeleteModal.md](src/components/ui/DeleteModal.md)** - Modale de suppression
-
-## 🚀 Démarrage Rapide
-
-### Installation
+## 🚀 Démarrage
 
 ```bash
 npm install
-```
-
-### Développement
-
-```bash
 npm run dev
 ```
 
-Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur.
+**URL** : http://localhost:3001
 
-### Build de Production
+---
 
-```bash
-npm run build
-npm run start
-```
+## 📚 Documentation Complète
 
-### Linting
+Pour la documentation complète, consultez :
 
-```bash
-npm run lint
-```
+**[../../BACKOFFICE.md](../../BACKOFFICE.md)** - Guide complet du backoffice
 
-## 🎨 Composants UI Disponibles
+---
+
+## 🎨 Composants UI Principaux
 
 ### Notifications
 
 ```javascript
-import { useNotification } from '@/hooks/useNotification';
-import Notification from '@/components/Notification';
+import {useNotification} from '@/hooks/useNotification';
 
-const { showSuccess, showError, showInfo, showWarning } = useNotification();
-```
-
-**Types** : `success`, `error`, `info`, `warning`
-
-### Modales
-
-```javascript
-import ConfirmModal from '@/components/ConfirmModal';
-import DeleteModal from '@/components/DeleteModal';
-
-// Confirmation générique
-<ConfirmModal open={show} onClose={handleClose} onConfirm={handleConfirm}/>
-
-// Suppression spécialisée
-<DeleteModal open={show} onClose={handleClose} onConfirm={handleDelete}/>
+const {showSuccess, showError} = useNotification();
 ```
 
 ### Boutons
@@ -84,26 +39,61 @@ import DeleteModal from '@/components/DeleteModal';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import DeleteButton from '@/components/ui/DeleteButton';
-import PublishButton from '@/components/ui/PublishButton';
-import { PencilIcon } from '@heroicons/react/24/outline';
+```
 
-// Bouton standard
-<Button variant="primary" size="md" loading={isLoading}>Enregistrer</Button>
+### Modales
 
-// Bouton avec icône
-<IconButton icon={PencilIcon} label="Modifier" variant="primary"/>
+```javascript
+import ConfirmModal from '@/components/ConfirmModal';
+import DeleteModal from '@/components/DeleteModal';
+```
 
-// Bouton icon-only
-<IconButton icon={PencilIcon} variant="secondary"/>
+### Gestion des Médias
 
-// Bouton hover-expand (label au survol)
-<IconButton icon={PencilIcon} label="Modifier" hoverExpand/>
+```javascript
+import MediaManager from '@/components/MediaManager';
+```
+
+---
+
+## 🔐 Authentification
+
+- Cookie HTTPOnly JWT (`authToken`)
+- Protection automatique des routes via middleware
+- Bouton "Dev Login" visible uniquement en développement
+
+---
+
+## 🚀 Production
+
+**URL** : https://dashboard.stemadeleine.fr
+
+Variables d'environnement sur Vercel :
+
+```
+NEXT_PUBLIC_BACKEND_URL=https://stemadeleine-api.onrender.com
+NEXT_PUBLIC_API_URL=https://stemadeleine-api.onrender.com
+```
+
+---
+
+## 📦 Build
+
+```bash
+npm run build
+npm run start
+```
+
+---
+
+**✅ Pour plus de détails, consultez [BACKOFFICE.md](../../BACKOFFICE.md)**
 
 // Bouton de suppression avec confirmation
 <DeleteButton onDelete={handleDelete} confirmMessage="Supprimer ?"/>
 
 // Bouton de publication
 <PublishButton onPublish={handlePublish}/>
+
 ```
 
 **Variantes de Button** :
@@ -218,85 +208,85 @@ src/
 ```javascript
 "use client";
 
-import { useState, useEffect } from 'react';
-import { PencilIcon } from '@heroicons/react/24/outline';
+import {useState, useEffect} from 'react';
+import {PencilIcon} from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import DeleteButton from '@/components/ui/DeleteButton';
 import Notification from '@/components/Notification';
-import { useNotification } from '@/hooks/useNotification';
-import { useAxiosClient } from '@/utils/axiosClient';
+import {useNotification} from '@/hooks/useNotification';
+import {useAxiosClient} from '@/utils/axiosClient';
 
 export default function ItemsPage() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { notification, showSuccess, showError, hideNotification } = useNotification();
-  const axios = useAxiosClient();
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const {notification, showSuccess, showError, hideNotification} = useNotification();
+    const axios = useAxiosClient();
 
-  const fetchItems = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('/api/items');
-      setItems(response.data);
-    } catch (error) {
-      showError("Erreur", "Impossible de charger les données");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchItems = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/api/items');
+            setItems(response.data);
+        } catch (error) {
+            showError("Erreur", "Impossible de charger les données");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const deleteItem = async (id) => {
-    await axios.delete(`/api/items/${id}`);
-    setItems(items.filter(i => i.id !== id));
-    showSuccess("Supprimé", "L'élément a été supprimé");
-  };
+    const deleteItem = async (id) => {
+        await axios.delete(`/api/items/${id}`);
+        setItems(items.filter(i => i.id !== id));
+        showSuccess("Supprimé", "L'élément a été supprimé");
+    };
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
+    useEffect(() => {
+        fetchItems();
+    }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Gestion des Éléments</h1>
+    return (
+        <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">Gestion des Éléments</h1>
 
-      {loading ? (
-        <p>Chargement...</p>
-      ) : (
-        <div className="space-y-4">
-          {items.map(item => (
-            <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
-              <div>
-                <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-gray-500">{item.description}</p>
-              </div>
-              <div className="flex gap-2">
-                <IconButton
-                  icon={PencilIcon}
-                  label="Modifier"
-                  variant="secondary"
-                  hoverExpand
-                  onClick={() => router.push(`/items/${item.id}`)}
-                />
-                <DeleteButton
-                  onDelete={() => deleteItem(item.id)}
-                  confirmMessage={`Supprimer "${item.name}" ?`}
-                  hoverExpand
-                />
-              </div>
-            </div>
-          ))}
+            {loading ? (
+                <p>Chargement...</p>
+            ) : (
+                <div className="space-y-4">
+                    {items.map(item => (
+                        <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+                            <div>
+                                <h2 className="font-semibold">{item.name}</h2>
+                                <p className="text-gray-500">{item.description}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <IconButton
+                                    icon={PencilIcon}
+                                    label="Modifier"
+                                    variant="secondary"
+                                    hoverExpand
+                                    onClick={() => router.push(`/items/${item.id}`)}
+                                />
+                                <DeleteButton
+                                    onDelete={() => deleteItem(item.id)}
+                                    confirmMessage={`Supprimer "${item.name}" ?`}
+                                    hoverExpand
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <Notification
+                show={notification.show}
+                type={notification.type}
+                title={notification.title}
+                message={notification.message}
+                onClose={hideNotification}
+            />
         </div>
-      )}
-
-      <Notification
-        show={notification.show}
-        type={notification.type}
-        title={notification.title}
-        message={notification.message}
-        onClose={hideNotification}
-      />
-    </div>
-  );
+    );
 }
 ```
 
