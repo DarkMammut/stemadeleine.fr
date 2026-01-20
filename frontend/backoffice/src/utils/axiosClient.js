@@ -11,7 +11,8 @@ export function useAxiosClient() {
 
     return useMemo(() => {
         const instance = axios.create({
-            baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://stemadeleine-api.onrender.com',
+            // ✅ Use local API routes (Next.js proxies to backend)
+            baseURL: '',
             withCredentials: true,
         });
 
@@ -26,11 +27,8 @@ export function useAxiosClient() {
             },
             async (error) => {
                 if (error.response?.status === 401) {
-                    try {
-                        await instance.post("/api/auth/logout");
-                    } catch (logoutError) {
-                        console.warn("Erreur lors du logout automatique:", logoutError);
-                    }
+                    // ✅ Don't call logout API - just clear local state and redirect
+                    // This prevents the infinite logout loop
                     logout();
                     router.push("/auth/login");
                 }
