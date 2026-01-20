@@ -11,8 +11,7 @@ export function useAxiosClient() {
 
     return useMemo(() => {
         const instance = axios.create({
-            // Use relative URLs to go through Next.js rewrites
-            // This ensures cookies work correctly (same domain)
+            baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://stemadeleine-api.onrender.com',
             withCredentials: true,
         });
 
