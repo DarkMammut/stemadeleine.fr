@@ -11,7 +11,8 @@ export function useAxiosClient() {
 
     return useMemo(() => {
         const instance = axios.create({
-            baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+            // Use relative URLs to go through Next.js rewrites
+            // This ensures cookies work correctly (same domain)
             withCredentials: true,
         });
 

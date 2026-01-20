@@ -1,34 +1,29 @@
 import {NextResponse} from 'next/server';
+import {cookies} from 'next/headers';
 
-export async function POST(request) {
+export async function POST() {
     try {
         const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
 
-        // Get the cookie from the request
-        const cookie = request.headers.get('cookie');
+        // Get the cookie to send to backend
+        const cookieStore = cookies();
+        const authToken = cookieStore.get('authToken');
 
         // Forward the request to the backend
         const response = await fetch(`${backendUrl}/api/auth/logout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                ...(cookie ? {Cookie: cookie} : {}),
+                ...(authToken ? {Cookie: `authToken=${authToken.value}`} : {}),
             },
-            credentials: 'include',
         });
 
         const data = await response.json();
 
-        // Create a Next.js response
-        const nextResponse = NextResponse.json(data, {status: response.status});
+        // Delete the cookie locally
+        cookieStore.delete('authToken');
 
-        // Forward all Set-Cookie headers from the backend (to delete the cookie)
-        const setCookieHeaders = response.headers.get('set-cookie');
-        if (setCookieHeaders) {
-            nextResponse.headers.set('Set-Cookie', setCookieHeaders);
-        }
-
-        return nextResponse;
+        return NextResponse.json(data, {status: response.status});
     } catch (error) {
         console.error('Logout proxy error:', error);
         return NextResponse.json(

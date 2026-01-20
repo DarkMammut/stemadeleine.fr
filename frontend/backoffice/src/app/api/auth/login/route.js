@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {cookies} from 'next/headers';
 
 export async function POST(request) {
     try {
@@ -12,21 +13,40 @@ export async function POST(request) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(body),
-            credentials: 'include',
         });
 
         const data = await response.json();
 
-        // Create a Next.js response
-        const nextResponse = NextResponse.json(data, {status: response.status});
+        // If login successful, extract and set the cookie
+        if (response.ok) {
+            const setCookieHeader = response.headers.get('set-cookie');
 
-        // Forward all Set-Cookie headers from the backend
-        const setCookieHeaders = response.headers.get('set-cookie');
-        if (setCookieHeaders) {
-            nextResponse.headers.set('Set-Cookie', setCookieHeaders);
+            if (setCookieHeader) {
+                // Parse the Set-Cookie header
+                const cookieParts = setCookieHeader.split(';').map(part => part.trim());
+                const [nameValue] = cookieParts;
+                const [name, value] = nameValue.split('=');
+
+                // Extract cookie attributes
+                const maxAge = cookieParts.find(p => p.startsWith('Max-Age='))?.split('=')[1];
+                const path = cookieParts.find(p => p.startsWith('Path='))?.split('=')[1] || '/';
+                const httpOnly = cookieParts.some(p => p === 'HttpOnly');
+
+                // Set the cookie using Next.js cookies API
+                const cookieStore = cookies();
+                cookieStore.set({
+                    name,
+                    value,
+                    httpOnly,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax',
+                    path,
+                    maxAge: maxAge ? parseInt(maxAge) : 86400,
+                });
+            }
         }
 
-        return nextResponse;
+        return NextResponse.json(data, {status: response.status});
     } catch (error) {
         console.error('Login proxy error:', error);
         return NextResponse.json(
