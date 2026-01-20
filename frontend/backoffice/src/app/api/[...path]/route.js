@@ -4,23 +4,28 @@ import {cookies} from 'next/headers';
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://stemadeleine-api.onrender.com';
 
 // Handle ALL HTTP methods
-export async function GET(request, {params}) {
+export async function GET(request, context) {
+    const params = await context.params;
     return proxyRequest(request, 'GET', params);
 }
 
-export async function POST(request, {params}) {
+export async function POST(request, context) {
+    const params = await context.params;
     return proxyRequest(request, 'POST', params);
 }
 
-export async function PUT(request, {params}) {
+export async function PUT(request, context) {
+    const params = await context.params;
     return proxyRequest(request, 'PUT', params);
 }
 
-export async function DELETE(request, {params}) {
+export async function DELETE(request, context) {
+    const params = await context.params;
     return proxyRequest(request, 'DELETE', params);
 }
 
-export async function PATCH(request, {params}) {
+export async function PATCH(request, context) {
+    const params = await context.params;
     return proxyRequest(request, 'PATCH', params);
 }
 
