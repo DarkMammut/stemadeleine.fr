@@ -16,8 +16,6 @@ export function useAxiosClient() {
             withCredentials: true,
         });
 
-        // Log outgoing requests when explicit debug flag is set
-        const shouldLogRequests = process.env.NEXT_PUBLIC_AXIOS_DEBUG === "true" || true; // Always log for debugging
 
         instance.interceptors.request.use((config) => {
             return config;
