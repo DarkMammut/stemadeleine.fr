@@ -251,7 +251,7 @@ export default function EditAccount() {
                             loading ||
                             saving ||
                             !account ||
-                            (account?.provider && account?.provider.toLowerCase() !== "local")
+                            account?.provider.toLowerCase() !== "local"
                         }
                         onClick={() => setShowChangePwd(true)}
                         title={
