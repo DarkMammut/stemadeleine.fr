@@ -6,7 +6,7 @@ const nextConfig = {
     async rewrites() {
         return [
             {
-                source: '/api/:path*',
+                source: '/api/:path((?!auth).*)', // Exclude /api/auth/* routes
                 destination: `${BACKEND_URL}/api/:path*`,
             },
         ];

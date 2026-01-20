@@ -25,35 +25,19 @@ public class AuthController {
     @Value("${jwt.cookie.secure:false}")
     private boolean jwtCookieSecure;
 
-    /**
-     * Helper method to create a cookie with SameSite attribute
-     */
-    private void addAuthCookie(HttpServletResponse response, String value, int maxAge) {
-        StringBuilder cookieHeader = new StringBuilder();
-        cookieHeader.append("authToken=").append(value != null ? value : "");
-        cookieHeader.append("; Path=/");
-        cookieHeader.append("; Max-Age=").append(maxAge);
-        cookieHeader.append("; HttpOnly");
-
-        if (jwtCookieSecure) {
-            cookieHeader.append("; Secure");
-        }
-
-        // Always use SameSite=Lax (even in production) because Next.js rewrites
-        // make all requests appear as same-site to the browser
-        cookieHeader.append("; SameSite=Lax");
-
-        response.addHeader("Set-Cookie", cookieHeader.toString());
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         log.info("POST /api/auth/login - Login attempt for user: {}", loginRequest.email());
         try {
             var authResponse = authService.authenticateUser(loginRequest);
 
-            // Set JWT token in a secure HTTPOnly cookie with SameSite attribute
-            addAuthCookie(response, authResponse.get("token"), 24 * 60 * 60); // 24 hours
+            // Set JWT token in a secure HTTPOnly cookie
+            Cookie jwtCookie = new Cookie("authToken", authResponse.get("token"));
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(jwtCookieSecure);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
+            response.addCookie(jwtCookie);
 
             log.info("Login successful for user: {}", loginRequest.email());
 
@@ -104,7 +88,12 @@ public class AuthController {
         log.info("POST /api/auth/logout - Déconnexion de l'utilisateur");
 
         // Supprimer le cookie authToken en définissant sa durée à 0
-        addAuthCookie(response, null, 0);
+        Cookie jwtCookie = new Cookie("authToken", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(jwtCookieSecure);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Supprime le cookie
+        response.addCookie(jwtCookie);
 
         log.info("Déconnexion réussie - Cookie supprimé");
 
