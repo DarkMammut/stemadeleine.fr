@@ -230,7 +230,7 @@ import MediaManager from '@/components/MediaManager';
 - Drag & drop de fichiers
 - Upload par clic
 - Barre de progression
-- Formats acceptés : PNG, JPG, GIF (max 10MB)
+- Formats acceptés : PNG, JPG, JPEG, GIF, WebP, SVG (max 10MB)
 - Bibliothèque de médias
 
 ---

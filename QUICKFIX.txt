@@ -49,8 +49,9 @@ git push origin main
 1. Ouvrir: https://dashboard.stemadeleine.fr
 2. Se connecter
 3. Médias > Ajouter un média
-4. Drag & drop une image
+4. Drag & drop une image (PNG, JPG, GIF, WebP, SVG)
 5. ✅ Plus d'erreur 500 !
+6. ✅ WebP et tous formats d'image acceptés !
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 RÈGLE D'OR À RETENIR

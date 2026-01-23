@@ -73,6 +73,7 @@ git push origin main
     - ✅ Upload depuis MediaSelector
     - ✅ Drag & drop
     - ✅ Sélection par clic
+    - ✅ **Tous formats acceptés : PNG, JPG, GIF, WebP, SVG**
 
 ## 🎓 Leçon apprise
 

@@ -109,8 +109,9 @@ Pour tester la correction :
 3. **Tester l'upload** :
     - Ouvrir le backoffice : https://dashboard.stemadeleine.fr
     - Aller dans la gestion des médias
-    - Drag & drop une image ou cliquer pour sélectionner
+    - Drag & drop une image (PNG, JPG, GIF, WebP, SVG)
     - Vérifier que l'upload fonctionne sans erreur 500
+    - ✅ Tous les formats d'images sont supportés, y compris WebP
 
 ## 🔍 Vérification des logs
 

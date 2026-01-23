@@ -21,33 +21,33 @@ Le système de notifications permet d'afficher des messages contextuels à l'uti
 **Emplacement** : `frontend/backoffice/src/hooks/useNotification.js`
 
 ```javascript
-import { useNotification } from '@/hooks/useNotification';
+import {useNotification} from '@/hooks/useNotification';
 
 function MyComponent() {
-  const { notification, showSuccess, showError, showInfo, showWarning, hideNotification } = useNotification();
+    const {notification, showSuccess, showError, showInfo, showWarning, hideNotification} = useNotification();
 
-  const handleSave = async () => {
-    try {
-      await saveData();
-      showSuccess("Succès", "Les données ont été enregistrées avec succès");
-    } catch (error) {
-      showError("Erreur", "Impossible d'enregistrer les données");
-    }
-  };
+    const handleSave = async () => {
+        try {
+            await saveData();
+            showSuccess("Succès", "Les données ont été enregistrées avec succès");
+        } catch (error) {
+            showError("Erreur", "Impossible d'enregistrer les données");
+        }
+    };
 
-  return (
-    <>
-      <button onClick={handleSave}>Enregistrer</button>
+    return (
+        <>
+            <button onClick={handleSave}>Enregistrer</button>
 
-      <Notification
-        show={notification.show}
-        type={notification.type}
-        title={notification.title}
-        message={notification.message}
-        onClose={hideNotification}
-      />
-    </>
-  );
+            <Notification
+                show={notification.show}
+                type={notification.type}
+                title={notification.title}
+                message={notification.message}
+                onClose={hideNotification}
+            />
+        </>
+    );
 }
 ```
 
@@ -83,42 +83,42 @@ Le composant `ConfirmModal` permet de demander une confirmation avant une action
 #### Utilisation de base
 
 ```javascript
-import { useState } from 'react';
+import {useState} from 'react';
 import ConfirmModal from '@/components/ConfirmModal';
 
 function MyComponent() {
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await deleteItem();
-      setShowConfirm(false);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await deleteItem();
+            setShowConfirm(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
-  return (
-    <>
-      <button onClick={() => setShowConfirm(true)}>Supprimer</button>
+    return (
+        <>
+            <button onClick={() => setShowConfirm(true)}>Supprimer</button>
 
-      <ConfirmModal
-        open={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        onConfirm={handleDelete}
-        title="Confirmer la suppression"
-        message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
-        confirmLabel="Supprimer"
-        cancelLabel="Annuler"
-        isLoading={isDeleting}
-        variant="danger"
-      />
-    </>
-  );
+            <ConfirmModal
+                open={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={handleDelete}
+                title="Confirmer la suppression"
+                message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                isLoading={isDeleting}
+                variant="danger"
+            />
+        </>
+    );
 }
 ```
 
@@ -152,19 +152,19 @@ Zone de drag & drop + navigation dans la bibliothèque de médias
 import MediaManager from '@/components/MediaManager';
 
 function MyComponent() {
-  const [selectedMedia, setSelectedMedia] = useState(null);
+    const [selectedMedia, setSelectedMedia] = useState(null);
 
-  return (
-    <MediaManager
-      onUploadComplete={(media) => {
-        console.log('Média uploadé:', media);
-        setSelectedMedia(media);
-      }}
-      onBrowseClick={() => {
-        // Ouvrir la bibliothèque de médias
-      }}
-    />
-  );
+    return (
+        <MediaManager
+            onUploadComplete={(media) => {
+                console.log('Média uploadé:', media);
+                setSelectedMedia(media);
+            }}
+            onBrowseClick={() => {
+                // Ouvrir la bibliothèque de médias
+            }}
+        />
+    );
 }
 ```
 
@@ -189,7 +189,7 @@ Grille d'affichage des médias
 - **Drag & Drop** : Glisser-déposer des fichiers directement
 - **Upload par clic** : Clic sur la zone pour sélectionner un fichier
 - **Barre de progression** : Affichage du pourcentage d'upload
-- **Formats acceptés** : PNG, JPG, GIF (max 10MB)
+- **Formats acceptés** : PNG, JPG, JPEG, GIF, WebP, SVG (max 10MB)
 - **Bibliothèque de médias** : Navigation dans les médias existants
 - **Modification** : Édition des médias (recadrage, métadonnées)
 
@@ -207,11 +207,11 @@ Le système de boutons offre une interface cohérente avec plusieurs variantes e
 import Button from '@/components/ui/Button';
 
 <Button variant="primary" size="md" onClick={handleClick}>
-  Enregistrer
+    Enregistrer
 </Button>
 
 <Button variant="danger" size="sm" loading={isDeleting}>
-  Supprimer
+    Supprimer
 </Button>
 ```
 
@@ -240,32 +240,32 @@ Bouton avec icône et texte optionnel, supporte le mode "hover-expand".
 
 ```javascript
 import IconButton from '@/components/ui/IconButton';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import {PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
 
 // Bouton avec icône et label
 <IconButton
-  icon={PencilIcon}
-  label="Modifier"
-  variant="primary"
-  size="md"
-  onClick={handleEdit}
+    icon={PencilIcon}
+    label="Modifier"
+    variant="primary"
+    size="md"
+    onClick={handleEdit}
 />
 
 // Icon-only (pas de label)
 <IconButton
-  icon={TrashIcon}
-  variant="danger"
-  size="sm"
-  onClick={handleDelete}
+    icon={TrashIcon}
+    variant="danger"
+    size="sm"
+    onClick={handleDelete}
 />
 
 // Hover-expand : label apparaît au survol
 <IconButton
-  icon={PencilIcon}
-  label="Modifier"
-  variant="secondary"
-  hoverExpand
-  onClick={handleEdit}
+    icon={PencilIcon}
+    label="Modifier"
+    variant="secondary"
+    hoverExpand
+    onClick={handleEdit}
 />
 ```
 
@@ -290,20 +290,20 @@ Bouton de suppression avec modale de confirmation intégrée.
 import DeleteButton from '@/components/ui/DeleteButton';
 
 <DeleteButton
-  onDelete={async () => {
-    await deleteItem(itemId);
-  }}
-  onSuccess={() => {
-    showSuccess("Suppression réussie");
-    refreshList();
-  }}
-  confirmTitle="Supprimer l'élément"
-  confirmMessage="Êtes-vous sûr ? Cette action est irréversible."
-  deleteLabel="Supprimer"
-  confirmLabel="Confirmer la suppression"
-  size="md"
-  hoverExpand
-  requireConfirmation={true}
+    onDelete={async () => {
+        await deleteItem(itemId);
+    }}
+    onSuccess={() => {
+        showSuccess("Suppression réussie");
+        refreshList();
+    }}
+    confirmTitle="Supprimer l'élément"
+    confirmMessage="Êtes-vous sûr ? Cette action est irréversible."
+    deleteLabel="Supprimer"
+    confirmLabel="Confirmer la suppression"
+    size="md"
+    hoverExpand
+    requireConfirmation={true}
 />
 ```
 
@@ -330,13 +330,13 @@ Bouton de publication avec feedback visuel.
 import PublishButton from '@/components/ui/PublishButton';
 
 <PublishButton
-  onPublish={async () => {
-    await publishContent();
-  }}
-  publishLabel="Publier"
-  publishedLabel="À jour"
-  size="md"
-  resetAfterDelay={true}
+    onPublish={async () => {
+        await publishContent();
+    }}
+    publishLabel="Publier"
+    publishedLabel="À jour"
+    size="md"
+    resetAfterDelay={true}
 />
 ```
 
@@ -391,14 +391,14 @@ Conteneur avec bordure et ombre.
 ### 1. Gestion des erreurs
 
 ```javascript
-const { showSuccess, showError } = useNotification();
+const {showSuccess, showError} = useNotification();
 
 try {
-  await saveData();
-  showSuccess("Succès", "Données enregistrées");
+    await saveData();
+    showSuccess("Succès", "Données enregistrées");
 } catch (error) {
-  console.error(error);
-  showError("Erreur", error.message || "Une erreur est survenue");
+    console.error(error);
+    showError("Erreur", error.message || "Une erreur est survenue");
 }
 ```
 
@@ -412,8 +412,8 @@ Toujours utiliser `ConfirmModal` ou `DeleteButton` pour les actions destructives
 
 // ✅ Faire
 <DeleteButton
-  onDelete={deleteItem}
-  confirmMessage="Cette action est irréversible"
+    onDelete={deleteItem}
+    confirmMessage="Cette action est irréversible"
 />
 ```
 
@@ -427,19 +427,19 @@ Toujours utiliser `ConfirmModal` ou `DeleteButton` pour les actions destructives
 const [loading, setLoading] = useState(false);
 
 const handleSave = async () => {
-  setLoading(true);
-  try {
-    await saveData();
-    showSuccess("Enregistré");
-  } catch (error) {
-    showError("Erreur");
-  } finally {
-    setLoading(false);
-  }
+    setLoading(true);
+    try {
+        await saveData();
+        showSuccess("Enregistré");
+    } catch (error) {
+        showError("Erreur");
+    } finally {
+        setLoading(false);
+    }
 };
 
 <Button loading={loading} onClick={handleSave}>
-  Enregistrer
+    Enregistrer
 </Button>
 ```
 

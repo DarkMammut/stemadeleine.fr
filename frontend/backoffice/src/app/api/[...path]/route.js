@@ -40,12 +40,14 @@ async function proxyRequest(request, method, params) {
         const cookieStore = await cookies();
         const authToken = cookieStore.get('authToken');
 
+        // Get the original Content-Type
+        const contentType = request.headers.get('content-type');
+        const isMultipart = contentType && contentType.includes('multipart/form-data');
+
         // Prepare fetch options
         const fetchOptions = {
             method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {},
         };
 
         // Add cookie if present
@@ -55,11 +57,23 @@ async function proxyRequest(request, method, params) {
 
         // Add body for POST, PUT, PATCH
         if (['POST', 'PUT', 'PATCH'].includes(method)) {
-            try {
-                const body = await request.json();
-                fetchOptions.body = JSON.stringify(body);
-            } catch (e) {
-                // No body or invalid JSON
+            if (isMultipart) {
+                // For multipart, forward the body as-is (FormData)
+                // Don't set Content-Type - let fetch/browser set it with boundary
+                fetchOptions.body = await request.arrayBuffer();
+                // Copy the Content-Type with boundary from the original request
+                if (contentType) {
+                    fetchOptions.headers['Content-Type'] = contentType;
+                }
+            } else {
+                // For JSON requests
+                fetchOptions.headers['Content-Type'] = 'application/json';
+                try {
+                    const body = await request.json();
+                    fetchOptions.body = JSON.stringify(body);
+                } catch (e) {
+                    // No body or invalid JSON
+                }
             }
         }
 
@@ -67,7 +81,7 @@ async function proxyRequest(request, method, params) {
         const response = await fetch(backendUrl, fetchOptions);
 
         let data;
-        const contentType = response.headers.get('content-type');
+        const responseContentType = response.headers.get('content-type');
 
         // Handle 204 No Content responses (no body)
         if (response.status === 204) {
@@ -78,7 +92,7 @@ async function proxyRequest(request, method, params) {
         }
 
         try {
-            if (contentType && contentType.includes('application/json')) {
+            if (responseContentType && responseContentType.includes('application/json')) {
                 data = await response.json();
             } else {
                 const text = await response.text();
