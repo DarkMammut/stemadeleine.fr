@@ -7,6 +7,7 @@ import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,7 +99,7 @@ public class MediaController {
                 });
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MediaDto> uploadMedia(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "title", required = false) String title,
