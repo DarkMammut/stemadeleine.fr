@@ -1,152 +1,176 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import SceneLayout from "@/components/ui/SceneLayout";
 import Title from "@/components/ui/Title";
 import MediaManager from "@/components/MediaManager";
 import ColorInputWithPicker from "@/components/ui/ColorInputWithPicker";
 import EditablePanel from "@/components/ui/EditablePanel";
 import Notification from "@/components/ui/Notification";
-import { useNotification } from "@/hooks/useNotification";
-import { useAxiosClient } from "@/utils/axiosClient";
-import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
+import {useNotification} from "@/hooks/useNotification";
+import {useAxiosClient} from "@/utils/axiosClient";
+import {BuildingOffice2Icon} from "@heroicons/react/24/outline";
 
 export default function Site() {
-  const axios = useAxiosClient();
-  const { notification, showError, showSuccess, hideNotification } =
-    useNotification();
-  const [organization, setOrganization] = useState(null);
-  const [originalOrganizationSettings, setOriginalOrganizationSettings] =
-    useState({});
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
+    const axios = useAxiosClient();
+    const {notification, showError, showSuccess, hideNotification} =
+        useNotification();
+    const [organization, setOrganization] = useState(null);
+    const [originalOrganizationSettings, setOriginalOrganizationSettings] =
+        useState({});
+    const [saving, setSaving] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadOrganization();
-    return () => hideNotification();
-  }, []);
+    useEffect(() => {
+        loadOrganization();
+        return () => hideNotification();
+    }, []);
 
-  const loadOrganization = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`/api/organizations`);
-      setOrganization(res.data);
-      setOriginalOrganizationSettings({
-        description: res.data.description || "",
-        primaryColor: res.data.primaryColor || "#1976d2",
-        secondaryColor: res.data.secondaryColor || "#dc004e",
-      });
-    } catch (e) {
-      showError("Erreur de chargement", "Impossible de charger l'organisation");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadOrganization = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`/api/organizations`);
+            setOrganization(res.data);
+            setOriginalOrganizationSettings({
+                description: res.data.description || "",
+                primaryColor: res.data.primaryColor || "#1976d2",
+                secondaryColor: res.data.secondaryColor || "#dc004e",
+            });
+        } catch (e) {
+            showError("Erreur de chargement", "Impossible de charger l'organisation");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleSaveSetting = (key) => async (val) => {
-    setSaving(true);
-    try {
-      await axios.patch(`/api/organizations/${organization.id}/settings`, {
-        [key]: val,
-      });
+    const handleSaveSetting = (key) => async (val) => {
+        setSaving(true);
+        try {
+            await axios.patch(`/api/organizations/${organization.id}/settings`, {
+                [key]: val,
+            });
 
-      const updated = { ...originalOrganizationSettings, [key]: val };
-      setOriginalOrganizationSettings(updated);
-      setOrganization((prev) => ({ ...prev, [key]: val }));
+            const updated = {...originalOrganizationSettings, [key]: val};
+            setOriginalOrganizationSettings(updated);
+            setOrganization((prev) => ({...prev, [key]: val}));
 
-      showSuccess("Paramètre modifié", "La modification a été enregistrée");
-    } catch (e) {
-      showError(
-        "Erreur de modification",
-        "Impossible de modifier le paramètre",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Ne pas rendre tôt : déléguer le rendu du loading aux composants (EditablePanel, MediaManager...)
-  return (
-    <SceneLayout>
-      <Title label="Paramètres du site" />
-
-      <div className="space-y-6">
-        <MediaManager
-          title="Logo de l'organisation"
-          content={{
-            id: organization ? organization.id : null,
-            medias: organization?.logo ? [organization.logo] : [],
-          }}
-          onMediaAdd={async (contentId, mediaId) => {
-            if (!organization?.id) return;
-            await axios.put(
-              `/api/organizations/${organization.id}/logo?mediaId=${mediaId}`,
+            showSuccess("Paramètre modifié", "La modification a été enregistrée");
+        } catch (e) {
+            showError(
+                "Erreur de modification",
+                "Impossible de modifier le paramètre",
             );
-            await loadOrganization();
-          }}
-          onMediaRemove={async () => {
-            if (!organization?.id) return;
-            await axios.delete(`/api/organizations/${organization.id}/media`);
-            await loadOrganization();
-          }}
-          onMediaChanged={loadOrganization}
-          maxMedias={1}
-        />
+        } finally {
+            setSaving(false);
+        }
+    };
 
-        <EditablePanel
-          title="Description"
-          icon={BuildingOffice2Icon}
-          canEdit={true}
-          initialValues={{
-            description: originalOrganizationSettings.description || "",
-          }}
-          fields={[
-            {
-              name: "description",
-              label: "Description",
-              type: "textarea",
-              defaultValue: originalOrganizationSettings.description || "",
-              required: false,
-            },
-          ]}
-          onSubmit={async (vals) => {
-            await handleSaveSetting("description")(vals.description);
-          }}
-          loading={loading || saving}
-        >
-          <div className="prose max-w-none">
-            {organization?.description || "Aucune description fournie."}
-          </div>
-        </EditablePanel>
+    // Ne pas rendre tôt : déléguer le rendu du loading aux composants (EditablePanel, MediaManager...)
+    return (
+        <SceneLayout>
+            <Title label="Paramètres du site"/>
 
-        <div>
-          <div className="space-y-4">
-            <ColorInputWithPicker
-              label="Couleur principale"
-              initialValue={originalOrganizationSettings.primaryColor}
-              onSave={handleSaveSetting("primaryColor")}
-              onChange={() => {}}
-              disabled={saving}
-            />
-            <ColorInputWithPicker
-              label="Couleur secondaire"
-              initialValue={originalOrganizationSettings.secondaryColor}
-              onSave={handleSaveSetting("secondaryColor")}
-              onChange={() => {}}
-              disabled={saving}
-            />
-          </div>
-        </div>
-      </div>
+            <div className="space-y-6">
+                <MediaManager
+                    title="Logo de l'organisation"
+                    content={{
+                        id: organization ? organization.id : null,
+                        medias: organization?.logo ? [organization.logo] : [],
+                    }}
+                    onMediaAdd={async (contentId, mediaId) => {
+                        if (!organization?.id) return;
+                        await axios.put(
+                            `/api/organizations/${organization.id}/logo?mediaId=${mediaId}`,
+                        );
+                        await loadOrganization();
+                    }}
+                    onMediaRemove={async () => {
+                        if (!organization?.id) return;
+                        await axios.delete(`/api/organizations/${organization.id}/media`);
+                        await loadOrganization();
+                    }}
+                    onMediaChanged={loadOrganization}
+                    maxMedias={1}
+                />
 
-      {notification.show && (
-        <Notification
-          type={notification.type}
-          title={notification.title}
-          message={notification.message}
-          onClose={hideNotification}
-        />
-      )}
-    </SceneLayout>
-  );
+                <MediaManager
+                    title="Favicon du site"
+                    content={{
+                        id: organization ? organization.id : null,
+                        medias: organization?.favicon ? [organization.favicon] : [],
+                    }}
+                    onMediaAdd={async (contentId, mediaId) => {
+                        if (!organization?.id) return;
+                        await axios.put(
+                            `/api/organizations/${organization.id}/favicon?mediaId=${mediaId}`,
+                        );
+                        await loadOrganization();
+                    }}
+                    onMediaRemove={async () => {
+                        if (!organization?.id) return;
+                        await axios.delete(`/api/organizations/${organization.id}/favicon`);
+                        await loadOrganization();
+                    }}
+                    onMediaChanged={loadOrganization}
+                    maxMedias={1}
+                />
+
+                <EditablePanel
+                    title="Description"
+                    icon={BuildingOffice2Icon}
+                    canEdit={true}
+                    initialValues={{
+                        description: originalOrganizationSettings.description || "",
+                    }}
+                    fields={[
+                        {
+                            name: "description",
+                            label: "Description",
+                            type: "textarea",
+                            defaultValue: originalOrganizationSettings.description || "",
+                            required: false,
+                        },
+                    ]}
+                    onSubmit={async (vals) => {
+                        await handleSaveSetting("description")(vals.description);
+                    }}
+                    loading={loading || saving}
+                >
+                    <div className="prose max-w-none">
+                        {organization?.description || "Aucune description fournie."}
+                    </div>
+                </EditablePanel>
+
+                <div>
+                    <div className="space-y-4">
+                        <ColorInputWithPicker
+                            label="Couleur principale"
+                            initialValue={originalOrganizationSettings.primaryColor}
+                            onSave={handleSaveSetting("primaryColor")}
+                            onChange={() => {
+                            }}
+                            disabled={saving}
+                        />
+                        <ColorInputWithPicker
+                            label="Couleur secondaire"
+                            initialValue={originalOrganizationSettings.secondaryColor}
+                            onSave={handleSaveSetting("secondaryColor")}
+                            onChange={() => {
+                            }}
+                            disabled={saving}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {notification.show && (
+                <Notification
+                    type={notification.type}
+                    title={notification.title}
+                    message={notification.message}
+                    onClose={hideNotification}
+                />
+            )}
+        </SceneLayout>
+    );
 }

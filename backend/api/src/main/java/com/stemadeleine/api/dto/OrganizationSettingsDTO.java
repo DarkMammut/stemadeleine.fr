@@ -11,5 +11,6 @@ public class OrganizationSettingsDTO {
     private String primaryColor;
     private String secondaryColor;
     private UUID logoMedia;
+    private UUID faviconMedia;
 }
 
