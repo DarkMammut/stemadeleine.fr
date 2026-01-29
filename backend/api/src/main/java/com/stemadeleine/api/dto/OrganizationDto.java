@@ -23,4 +23,5 @@ public class OrganizationDto {
     private Address address;
     private LegalInfo legalInfo;
     private Media logo;
+    private Media favicon;
 }

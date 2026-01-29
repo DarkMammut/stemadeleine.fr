@@ -72,6 +72,28 @@ public class OrganizationService {
         return organizationRepository.save(org);
     }
 
+    @Transactional
+    public Organization updateFavicon(UUID id, UUID mediaId) {
+        Organization org = organizationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new RuntimeException("Media not found"));
+        media.setOwnerId(id);
+        mediaRepository.save(media);
+        org.setUpdatedAt(now());
+        org.setFavicon(media);
+        return organizationRepository.save(org);
+    }
+
+    @Transactional
+    public Organization deleteFavicon(UUID id) {
+        Organization org = organizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Organization not found with id: " + id));
+        org.setFavicon(null);
+        org.setUpdatedAt(now());
+        return organizationRepository.save(org);
+    }
+
     public Organization getLastCreatedOrganization() {
         return organizationRepository.findTopByOrderByCreatedAtDesc()
                 .orElseThrow(() -> new EntityNotFoundException("Aucune organisation trouvée"));
@@ -94,6 +116,7 @@ public class OrganizationService {
                 .stream().findFirst().ifPresent(dto::setAddress);
         dto.setLegalInfo(org.getLegalInfo());
         dto.setLogo(org.getLogo());
+        dto.setFavicon(org.getFavicon());
         return dto;
     }
 
@@ -113,6 +136,9 @@ public class OrganizationService {
         dto.setSecondaryColor(org.getSecondaryColor());
         if (org.getLogo() != null) {
             dto.setLogoMedia(org.getLogo().getId());
+        }
+        if (org.getFavicon() != null) {
+            dto.setFaviconMedia(org.getFavicon().getId());
         }
         return dto;
     }

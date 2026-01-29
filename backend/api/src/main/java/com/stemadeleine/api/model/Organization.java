@@ -32,6 +32,10 @@ public class Organization {
     @JoinColumn(name = "logo_media_id", foreignKey = @ForeignKey(name = "organizations_logo_media_id_fkey"))
     private Media logo;
 
+    @ManyToOne
+    @JoinColumn(name = "favicon_media_id", foreignKey = @ForeignKey(name = "organizations_favicon_media_id_fkey"))
+    private Media favicon;
+
     @Column(name = "primary_color")
     private String primaryColor;
 

@@ -46,4 +46,16 @@ public class OrganizationController {
         Organization updated = organizationService.deleteLogo(id);
         return ResponseEntity.ok(updated);
     }
+
+    @PutMapping("/{id}/favicon")
+    public ResponseEntity<Organization> updateFavicon(@PathVariable UUID id, @RequestParam UUID mediaId) {
+        Organization updatedFavicon = organizationService.updateFavicon(id, mediaId);
+        return ResponseEntity.ok(updatedFavicon);
+    }
+
+    @DeleteMapping("/{id}/favicon")
+    public ResponseEntity<Organization> deleteFavicon(@PathVariable UUID id) {
+        Organization updated = organizationService.deleteFavicon(id);
+        return ResponseEntity.ok(updated);
+    }
 }
