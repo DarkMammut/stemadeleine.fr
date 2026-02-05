@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import {Fjord_One} from 'next/font/google';
 import './globals.css';
 import ThemeProvider from '@/components/ThemeProvider';
+import DynamicFavicon from '@/components/DynamicFavicon';
 
 const fjordOne = Fjord_One({
     variable: '--font-fjord-one',
