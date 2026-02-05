@@ -175,6 +175,7 @@ export default async function RootLayout({
         {/* Ne pas appliquer les variables de font globalement ici pour préserver la police par défaut (Fjord One)
         Charger/assigner les fonts via des classes locales ou composants si nécessaire. */}
         <body className={`${fjordOne.variable} antialiased`}>
+        <DynamicFavicon/>
         <ThemeProvider>{children}</ThemeProvider>
         </body>
         </html>
