@@ -468,3 +468,118 @@ code {
     }
 }
 
+/* ===== STYLES POUR CONTENU QUILL ===== */
+/* Styles pour afficher correctement le contenu HTML généré par React Quill */
+.quill-content,
+.ql-editor,
+[class*="dangerouslySetInnerHTML"] > *,
+.text-xl.text-gray-700 > * {
+    /* Empêcher le débordement */
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+/* Styles pour les éléments dans le contenu Quill */
+.quill-content *,
+.ql-editor *,
+[class*="dangerouslySetInnerHTML"] * {
+    max-width: 100%;
+}
+
+/* Images dans le contenu Quill */
+.quill-content img,
+.ql-editor img,
+[class*="dangerouslySetInnerHTML"] img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 1rem auto;
+}
+
+/* Tableaux dans le contenu Quill */
+.quill-content table,
+.ql-editor table,
+[class*="dangerouslySetInnerHTML"] table {
+    max-width: 100%;
+    overflow-x: auto;
+    display: block;
+    border-collapse: collapse;
+}
+
+/* Conteneurs de pré-formatage et code */
+.quill-content pre,
+.ql-editor pre,
+[class*="dangerouslySetInnerHTML"] pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* iframes et vidéos */
+.quill-content iframe,
+.quill-content video,
+.ql-editor iframe,
+.ql-editor video,
+[class*="dangerouslySetInnerHTML"] iframe,
+[class*="dangerouslySetInnerHTML"] video {
+    max-width: 100% !important;
+    height: auto;
+}
+
+/* Paragraphes et titres */
+.quill-content p,
+.quill-content h1,
+.quill-content h2,
+.quill-content h3,
+.quill-content h4,
+.quill-content h5,
+.quill-content h6,
+.ql-editor p,
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Listes */
+.quill-content ul,
+.quill-content ol,
+.ql-editor ul,
+.ql-editor ol {
+    max-width: 100%;
+    padding-left: 2rem;
+}
+
+/* Blockquotes */
+.quill-content blockquote,
+.ql-editor blockquote {
+    max-width: 100%;
+    border-left: 4px solid var(--color-secondary, #e2832b);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #4b5563;
+}
+
+/* Liens */
+.quill-content a,
+.ql-editor a {
+    color: var(--color-secondary, #e2832b);
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+.quill-content a:hover,
+.ql-editor a:hover {
+    color: var(--color-secondary-dark, #c8741a);
+}
+

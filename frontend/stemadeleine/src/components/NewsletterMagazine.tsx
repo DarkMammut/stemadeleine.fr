@@ -260,7 +260,7 @@ export default function NewsletterMagazine({
                     {/* Afficher le contenu HTML s'il est significatif */}
                     {hasSignificantHtml && (
                         <div
-                            className="prose prose-slate prose-lg max-w-none"
+                            className="quill-content prose prose-slate prose-lg max-w-none"
                             dangerouslySetInnerHTML={{__html: htmlContent}}
                         />
                     )}
@@ -278,7 +278,7 @@ export default function NewsletterMagazine({
                         </h3>
                     )}
                     <div
-                        className="prose prose-slate prose-lg max-w-none"
+                        className="quill-content prose prose-slate prose-lg max-w-none"
                         dangerouslySetInnerHTML={{__html: htmlContent}}
                     />
                 </article>
