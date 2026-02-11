@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Utilitaires pour éviter la coupure des mots */
+@layer utilities {
+    .no-word-break {
+        word-break: keep-all !important;
+        hyphens: none !important;
+        overflow-wrap: normal !important;
+    }
+
+    .break-word-safe {
+        word-break: break-word;
+        hyphens: auto;
+        overflow-wrap: anywhere;
+    }
+}
+
 /* Application globale de la police */
 @layer base {
     /* Appliquer Fjord One comme police par défaut via la variable injectée par next/font

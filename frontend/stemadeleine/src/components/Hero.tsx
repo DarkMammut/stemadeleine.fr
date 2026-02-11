@@ -35,11 +35,20 @@ export default function Hero({mediaId, title, subtitle, variant = 'default'}: Pr
 
     // Classes diffèrent selon la variante
     const sectionClassBase = 'relative overflow-hidden shadow-lg';
-    const homeClasses = 'h-[80vh] bg-fixed bg-center bg-cover rounded-b-[50%]';
+    const homeClasses = 'h-[80vh] bg-fixed bg-center bg-cover';
     const defaultClasses = 'h-60 bg-center bg-cover';
 
+    // Style pour l'arrondi du bas sur la variante home
+    const homeStyle = variant === 'home' ? {
+        borderBottomLeftRadius: '50% 20%',
+        borderBottomRightRadius: '50% 20%',
+    } : {};
+
     return (
-        <section className={`${sectionClassBase} ${variant === 'home' ? homeClasses : defaultClasses}`}>
+        <section
+            className={`${sectionClassBase} ${variant === 'home' ? homeClasses : defaultClasses}`}
+            style={homeStyle}
+        >
             {bgDiv}
 
             {/* Overlay - semi-transparent pour laisser voir l'image de fond */}

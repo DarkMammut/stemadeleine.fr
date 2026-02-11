@@ -2,6 +2,7 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/utils/auth/AuthContext";
 import {ContactsProvider} from "@/contexts/ContactsContext";
+import DynamicFavicon from "@/components/DynamicFavicon";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
