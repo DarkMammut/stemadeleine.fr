@@ -85,7 +85,7 @@ export default function Section({
                 )}
             >
                 {/* Texte */}
-                <div className="w-full flex-1 no-word-break">
+                <div className="w-full flex-1 content-container">
                     <div className="flex items-center mb-10 gap-6 ">
                         {/* Image */}
                         {mediaId && mediaUrl && (

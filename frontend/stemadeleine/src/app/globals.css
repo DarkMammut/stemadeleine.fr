@@ -20,6 +20,49 @@
         border-bottom-left-radius: 50% 20% !important;
         border-bottom-right-radius: 50% 20% !important;
     }
+
+    /* Utilitaires pour le texte responsive */
+    .text-responsive {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        word-break: normal;
+        hyphens: auto;
+        line-height: 1.6;
+    }
+
+    .content-container {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .content-container * {
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Forcer la contrainte de largeur pour le contenu dangerouslySetInnerHTML */
+    .force-responsive {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        box-sizing: border-box !important;
+    }
+
+    .force-responsive * {
+        max-width: 100% !important;
+        width: auto !important;
+        box-sizing: border-box !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+    }
 }
 
 /* Application globale de la police */
@@ -30,11 +73,12 @@
         font-family: 'Fjord One', serif;
     }
 
-    /* Éviter la coupure de mots dans les paragraphes et contenus */
+    /* Éviter la coupure de mots inappropriée SAUF pour les très longs mots */
     p, div, span, article {
-        word-break: keep-all;
-        hyphens: none;
-        overflow-wrap: normal;
+        word-break: normal;
+        hyphens: auto;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     /* Permettre la coupure seulement pour les URL et les très longs mots */
@@ -42,6 +86,15 @@
         word-break: break-word;
         hyphens: auto;
         overflow-wrap: anywhere;
+    }
+
+    /* Container responsive pour éviter le débordement */
+    .text-container {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 }
 
@@ -506,19 +559,36 @@ code {
 .ql-editor,
 [class*="dangerouslySetInnerHTML"] > *,
 .text-xl.text-gray-700 > * {
-    /* Empêcher le débordement */
+    /* Empêcher le débordement et gérer le responsive */
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
     overflow-wrap: break-word;
     word-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
     hyphens: auto;
+    line-height: 1.6;
+}
+
+/* Container principal pour le contenu */
+.quill-content,
+.ql-editor,
+[class*="dangerouslySetInnerHTML"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
 }
 
 /* Styles pour les éléments dans le contenu Quill */
 .quill-content *,
 .ql-editor *,
 [class*="dangerouslySetInnerHTML"] * {
-    max-width: 100%;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 /* Images dans le contenu Quill */
@@ -529,16 +599,30 @@ code {
     height: auto !important;
     display: block;
     margin: 1rem auto;
+    object-fit: contain;
 }
 
 /* Tableaux dans le contenu Quill */
 .quill-content table,
 .ql-editor table,
 [class*="dangerouslySetInnerHTML"] table {
+    width: 100%;
     max-width: 100%;
     overflow-x: auto;
-    display: block;
+    display: table;
     border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.quill-content td,
+.quill-content th,
+.ql-editor td,
+.ql-editor th,
+[class*="dangerouslySetInnerHTML"] td,
+[class*="dangerouslySetInnerHTML"] th {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 0;
 }
 
 /* Conteneurs de pré-formatage et code */
@@ -549,6 +633,9 @@ code {
     overflow-x: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
 }
 
 /* iframes et vidéos */
@@ -560,9 +647,10 @@ code {
 [class*="dangerouslySetInnerHTML"] video {
     max-width: 100% !important;
     height: auto;
+    aspect-ratio: 16/9;
 }
 
-/* Paragraphes et titres */
+/* Paragraphes et titres avec espacement approprié */
 .quill-content p,
 .quill-content h1,
 .quill-content h2,
@@ -577,9 +665,14 @@ code {
 .ql-editor h4,
 .ql-editor h5,
 .ql-editor h6 {
+    width: 100%;
     max-width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+    margin-bottom: 1rem;
+    line-height: 1.6;
 }
 
 /* Listes */
@@ -587,19 +680,30 @@ code {
 .quill-content ol,
 .ql-editor ul,
 .ql-editor ol {
+    width: 100%;
     max-width: 100%;
     padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.quill-content li,
+.ql-editor li {
+    word-break: normal;
+    overflow-wrap: break-word;
+    margin-bottom: 0.5rem;
 }
 
 /* Blockquotes */
 .quill-content blockquote,
 .ql-editor blockquote {
+    width: 100%;
     max-width: 100%;
     border-left: 4px solid var(--color-secondary, #e2832b);
     padding-left: 1rem;
     margin: 1rem 0;
     font-style: italic;
     color: #4b5563;
+    overflow-wrap: break-word;
 }
 
 /* Liens */
@@ -607,7 +711,8 @@ code {
 .ql-editor a {
     color: var(--color-secondary, #e2832b);
     text-decoration: underline;
-    word-break: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .quill-content a:hover,

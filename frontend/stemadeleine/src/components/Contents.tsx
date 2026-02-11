@@ -42,18 +42,19 @@ export default function Contents({
 
     const renderContentBody = (body: ContentItem['body']): React.ReactNode => {
         if (isHtmlBody(body)) {
-            return <div className="quill-content" dangerouslySetInnerHTML={{__html: body.html}}/>;
+            return <div className="quill-content force-responsive" dangerouslySetInnerHTML={{__html: body.html}}/>;
         }
 
         if (typeof body === 'object') {
             return (
-                <pre className="whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm">
+                <pre
+                    className="whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm max-w-full overflow-x-auto">
           {JSON.stringify(body, null, 2)}
         </pre>
             );
         }
 
-        return <p>{body}</p>;
+        return <p className="force-responsive">{body}</p>;
     };
 
     const renderContent = (content: ContentItem, index: number) => {
@@ -101,7 +102,7 @@ export default function Contents({
                             </h3>
                         )}
 
-                        <div className="text-xl text-gray-700 leading-relaxed text-justify">
+                        <div className="text-xl text-gray-700 leading-relaxed text-justify force-responsive">
                             {renderContentBody(content.body)}
                         </div>
                     </div>
