@@ -73,9 +73,19 @@ const RichTextEditor = ({
     // Sync external value changes with internal state
     useEffect(() => {
         if (value !== editorContent) {
-            setEditorContent(value);
+            // Nettoyer le contenu entrant pour éviter les espaces insécables
+            const cleanValue = typeof value === 'string' ?
+                value
+                    .replace(/&nbsp;/g, ' ')  // Remplacer &nbsp; par des espaces normaux
+                    .replace(/\u00A0/g, ' ')  // Remplacer les espaces insécables Unicode par des espaces normaux
+                    .replace(/\s+/g, ' ')     // Remplacer les multiples espaces par un seul
+                    .replace(/<p>\s+/g, '<p>') // Nettoyer les espaces en début de paragraphe
+                    .replace(/\s+<\/p>/g, '</p>') // Nettoyer les espaces en fin de paragraphe
+                : value;
+
+            setEditorContent(cleanValue);
         }
-    }, [value]);
+    }, [value, editorContent]);
 
     // Handle content changes
     const handleChange = (content, delta, source, editor) => {
@@ -84,7 +94,16 @@ const RichTextEditor = ({
 
         // Only trigger onChange if content actually changed and it's a user edit
         if (source === "user" && onChange) {
-            onChange(content);
+            // Normaliser le contenu en remplaçant les espaces insécables par des espaces normaux
+            const normalizedContent = content
+                .replace(/&nbsp;/g, ' ')  // Remplacer &nbsp; par des espaces normaux
+                .replace(/\s+/g, ' ')     // Remplacer les multiples espaces par un seul
+                .replace(/<p>\s+/g, '<p>') // Nettoyer les espaces en début de paragraphe
+                .replace(/\s+<\/p>/g, '</p>') // Nettoyer les espaces en fin de paragraphe
+                .replace(/<li>\s+/g, '<li>') // Nettoyer les espaces en début de liste
+                .replace(/\s+<\/li>/g, '</li>'); // Nettoyer les espaces en fin de liste
+
+            onChange(normalizedContent);
         }
     };
 
@@ -102,8 +121,9 @@ const RichTextEditor = ({
             ],
             clipboard: {
                 matchVisual: false,
-            },
-            // Removed problematic keyboard bindings that were interfering with space key
+                // Normaliser le contenu lors du copier-coller
+                matchers: []
+            }
         }),
         [],
     );
