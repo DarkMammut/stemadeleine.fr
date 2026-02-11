@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from 'react';
 import {HeartIcon} from '@heroicons/react/24/solid';
 import IconButton from './IconButton';
-import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 
 export type PageItem = {
     id: string | number;
@@ -20,6 +20,7 @@ type NavigationProps = {
 const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
     const [toggle, setToggle] = useState(false);
     const [hoveredMenu, setHoveredMenu] = useState<string | number | null>(null);
+    const router = useRouter();
 
     // Fermer le menu mobile lors de la navigation
     useEffect(() => {
@@ -50,6 +51,13 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
 
     const handleMenuLeave = () => {
         setHoveredMenu(null);
+    };
+
+    // Fonction pour gérer la navigation
+    const handleNavigation = (href: string) => {
+        setToggle(false);
+        setHoveredMenu(null);
+        router.push(href);
     };
 
     if (!tree || tree.length === 0) {
@@ -113,9 +121,9 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                             onMouseEnter={() => handleMenuEnter(page.id)}
                             onMouseLeave={handleMenuLeave}
                         >
-                            <Link
-                                href={page.slug}
-                                className={`relative inline-flex text-decoration-none z-10
+                            <button
+                                onClick={() => handleNavigation(page.slug)}
+                                className={`relative inline-flex text-decoration-none z-10 bg-transparent border-none cursor-pointer
                   after:absolute after:content-[''] after:top-full after:left-0
                   after:w-full after:h-0.5 after:bg-secondary after:scale-x-0
                   after:origin-right after:transition-transform after:duration-500
@@ -129,7 +137,7 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                     {page.name}
                   </div>
                 </span>
-                            </Link>
+                            </button>
 
                             {/* Zone invisible pour maintenir le hover */}
                             {page.children && page.children.length > 0 && (
@@ -146,10 +154,9 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                                 >
                                     {page.children.map((child) => (
                                         <li key={child.id} className="relative group/child">
-                                            <Link
-                                                href={child.slug}
-                                                onClick={() => setToggle(false)}
-                                                className="block px-4 py-3 transition-colors duration-200 relative
+                                            <button
+                                                onClick={() => handleNavigation(child.slug)}
+                                                className="block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full
                             after:absolute after:content-[''] after:bottom-0 after:left-4 after:right-4
                             after:h-0.5 after:bg-secondary after:scale-x-0
                             after:origin-right after:transition-transform after:duration-300
@@ -161,7 +168,7 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                             {child.name}
                           </div>
                         </span>
-                                            </Link>
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>

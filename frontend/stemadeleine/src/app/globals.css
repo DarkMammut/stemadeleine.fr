@@ -15,6 +15,11 @@
         hyphens: auto;
         overflow-wrap: anywhere;
     }
+
+    .hero-rounded-bottom {
+        border-bottom-left-radius: 50% 20% !important;
+        border-bottom-right-radius: 50% 20% !important;
+    }
 }
 
 /* Application globale de la police */
@@ -23,6 +28,20 @@
        La variable --font-fjord-one sera définie par le loader next/font dans `layout.tsx`. */
     html, body {
         font-family: 'Fjord One', serif;
+    }
+
+    /* Éviter la coupure de mots dans les paragraphes et contenus */
+    p, div, span, article {
+        word-break: keep-all;
+        hyphens: none;
+        overflow-wrap: normal;
+    }
+
+    /* Permettre la coupure seulement pour les URL et les très longs mots */
+    .allow-break {
+        word-break: break-word;
+        hyphens: auto;
+        overflow-wrap: anywhere;
     }
 }
 
