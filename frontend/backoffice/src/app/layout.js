@@ -2,7 +2,6 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/utils/auth/AuthContext";
 import {ContactsProvider} from "@/contexts/ContactsContext";
-import DynamicFavicon from "@/components/DynamicFavicon";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -18,7 +17,14 @@ export const metadata = {
     title: "Dashboard | LASMLJ",
     description: "Gestion du site des Amis de Sainte-Madeleine de la Jarrie",
     icons: {
-        icon: '/favicon.ico',
+        icon: [
+            {url: '/favicon.png', type: 'image/png'},
+            {url: '/favicon.svg', type: 'image/svg+xml'},
+            {url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon'},
+            {url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon'}
+        ],
+        shortcut: '/favicon.png',
+        apple: '/favicon.png',
     },
 };
 
@@ -28,7 +34,6 @@ export default function RootLayout({children}) {
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <DynamicFavicon/>
         <AuthProvider>
             <ContactsProvider>{children}</ContactsProvider>
         </AuthProvider>
