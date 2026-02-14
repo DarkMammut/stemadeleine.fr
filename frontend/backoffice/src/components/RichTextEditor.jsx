@@ -73,7 +73,7 @@ const RichTextEditor = ({
     // Sync external value changes with internal state
     useEffect(() => {
         if (value !== editorContent) {
-            // Nettoyer le contenu entrant pour éviter les espaces insécables
+            // Nettoyer le contenu entrant pour éviter les espaces insécables et les blocs de code
             const cleanValue = typeof value === 'string' ?
                 value
                     .replace(/&nbsp;/g, ' ')  // Remplacer &nbsp; par des espaces normaux
@@ -81,6 +81,9 @@ const RichTextEditor = ({
                     .replace(/\s+/g, ' ')     // Remplacer les multiples espaces par un seul
                     .replace(/<p>\s+/g, '<p>') // Nettoyer les espaces en début de paragraphe
                     .replace(/\s+<\/p>/g, '</p>') // Nettoyer les espaces en fin de paragraphe
+                    // Convertir les blocs de code en paragraphes normaux
+                    .replace(/<pre[^>]*data-language[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>')
+                    .replace(/<pre[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>')
                 : value;
 
             setEditorContent(cleanValue);
@@ -101,7 +104,10 @@ const RichTextEditor = ({
                 .replace(/<p>\s+/g, '<p>') // Nettoyer les espaces en début de paragraphe
                 .replace(/\s+<\/p>/g, '</p>') // Nettoyer les espaces en fin de paragraphe
                 .replace(/<li>\s+/g, '<li>') // Nettoyer les espaces en début de liste
-                .replace(/\s+<\/li>/g, '</li>'); // Nettoyer les espaces en fin de liste
+                .replace(/\s+<\/li>/g, '</li>') // Nettoyer les espaces en fin de liste
+                // Convertir les blocs de code en paragraphes normaux
+                .replace(/<pre[^>]*data-language[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>')
+                .replace(/<pre[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>');
 
             onChange(normalizedContent);
         }
@@ -116,7 +122,7 @@ const RichTextEditor = ({
                 [{list: "ordered"}, {list: "bullet"}],
                 [{color: []}, {background: []}],
                 ["link"],
-                ["blockquote", "code-block"],
+                ["blockquote"],
                 ["clean"],
             ],
             clipboard: {
@@ -140,7 +146,6 @@ const RichTextEditor = ({
             "background",
             "link",
             "blockquote",
-            "code-block",
         ],
         [],
     );

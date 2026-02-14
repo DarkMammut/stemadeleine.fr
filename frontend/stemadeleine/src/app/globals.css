@@ -17,8 +17,59 @@
     }
 
     .hero-rounded-bottom {
-        border-bottom-left-radius: 50% 20% !important;
-        border-bottom-right-radius: 50% 20% !important;
+        /* Pas d'effet sur mobile, effet uniquement à partir de md (768px+) */
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Appliquer l'effet arrondi seulement à partir de md (768px et plus) */
+    @media (min-width: 768px) {
+        .hero-rounded-bottom {
+            border-bottom-left-radius: 60% 30% !important;
+            border-bottom-right-radius: 60% 30% !important;
+            /* Assurer la compatibilité avec différents navigateurs */
+            -webkit-border-bottom-left-radius: 60% 30% !important;
+            -webkit-border-bottom-right-radius: 60% 30% !important;
+            -moz-border-radius-bottomleft: 60% 30% !important;
+            -moz-border-radius-bottomright: 60% 30% !important;
+        }
+    }
+
+    /* Variante plus subtile */
+    .hero-rounded-bottom-subtle {
+        /* Pas d'effet sur mobile */
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Appliquer l'effet subtil seulement à partir de md (768px et plus) */
+    @media (min-width: 768px) {
+        .hero-rounded-bottom-subtle {
+            border-bottom-left-radius: 30% 15% !important;
+            border-bottom-right-radius: 30% 15% !important;
+            -webkit-border-bottom-left-radius: 30% 15% !important;
+            -webkit-border-bottom-right-radius: 30% 15% !important;
+            -moz-border-radius-bottomleft: 30% 15% !important;
+            -moz-border-radius-bottomright: 30% 15% !important;
+        }
+    }
+
+    /* Alternative: Classe plus simple avec nom plus court */
+    .hero-curved {
+        overflow: hidden !important;
+    }
+
+    @media (min-width: 768px) {
+        .hero-curved {
+            border-bottom-left-radius: 60% 30% !important;
+            border-bottom-right-radius: 60% 30% !important;
+            -webkit-border-bottom-left-radius: 60% 30% !important;
+            -webkit-border-bottom-right-radius: 60% 30% !important;
+            -moz-border-radius-bottomleft: 60% 30% !important;
+            -moz-border-radius-bottomright: 60% 30% !important;
+        }
     }
 
     /* Utilitaires pour le texte responsive */

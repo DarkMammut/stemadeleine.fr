@@ -13,9 +13,12 @@ type HeaderProps = {
     // keep prop types for future use, not required for current static CSS solution
     headerHeight?: number;
     headerMdHeight?: number;
+    // Titre à afficher sur mobile (pour la page home)
+    mobileTitle?: string;
+    isHomePage?: boolean;
 };
 
-export default function Header({pagesTree}: HeaderProps): React.ReactElement {
+export default function Header({pagesTree, mobileTitle, isHomePage = false}: HeaderProps): React.ReactElement {
     // Minimal typing for settings to avoid `any` and satisfy ESLint
     type OrgSettings = { logoMedia?: string | number | null } | undefined | null;
     const {settings} = useGetOrganization() as { settings?: OrgSettings };
@@ -44,8 +47,17 @@ export default function Header({pagesTree}: HeaderProps): React.ReactElement {
                         </Link>
                     </div>
 
-                    {/* Navigation (center) */}
-                    <div className="flex-1 flex justify-center">
+                    {/* Titre mobile pour page home (center sur mobile, caché sur desktop) */}
+                    {isHomePage && mobileTitle && (
+                        <div className="md:hidden flex-1 flex justify-center px-4">
+                            <h1 className="text-white font-serif font-semibold text-lg text-center truncate">
+                                {mobileTitle}
+                            </h1>
+                        </div>
+                    )}
+
+                    {/* Navigation (center - caché sur mobile si titre présent, sinon normal) */}
+                    <div className={`flex-1 flex justify-center ${isHomePage && mobileTitle ? 'hidden md:flex' : ''}`}>
                         <Navigation pagesTree={pagesTree}/>
                     </div>
 

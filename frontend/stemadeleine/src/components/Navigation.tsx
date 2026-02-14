@@ -69,25 +69,25 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
         <div className="navigation">
             {/* Burger Menu Button */}
             <button
-                className={`flex justify-center items-center fixed text-center border-none right-2.5 top-0 p-0 bg-transparent z-20 md:hidden`}
+                className={`flex justify-center items-center fixed text-center border-none right-2.5 top-1/2 -translate-y-1/2 p-0 bg-transparent z-50 md:hidden`}
                 type="button"
                 onClick={() => setToggle(!toggle)}
                 aria-label="button for navigation in menu"
             >
-                <ul className="block outline-none cursor-pointer relative w-12 h-12">
+                <ul className="outline-none cursor-pointer relative w-12 h-12 flex items-center justify-center">
                     <li
-                        className={`absolute left-3 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 top-3.5 ${
-                            toggle ? 'transform translate-y-2 rotate-45' : ''
+                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 -translate-y-2 ${
+                            toggle ? 'transform translate-y-0 rotate-45' : ''
                         }`}
                     />
                     <li
-                        className={`absolute left-3 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 top-6 ${
+                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 ${
                             toggle ? 'scale-x-0' : ''
                         }`}
                     />
                     <li
-                        className={`absolute left-3 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 top-8.5 ${
-                            toggle ? 'transform -translate-y-2 -rotate-45' : ''
+                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 translate-y-2 ${
+                            toggle ? 'transform translate-y-0 -rotate-45' : ''
                         }`}
                     />
                 </ul>
