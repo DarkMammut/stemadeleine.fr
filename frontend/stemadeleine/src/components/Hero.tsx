@@ -20,7 +20,7 @@ export default function Hero({mediaId, title, subtitle, variant = 'default'}: Pr
     const bgDiv = mediaUrl ? (
         <div
             aria-hidden="true"
-            className="absolute inset-0 hero-rounded-bottom"
+            className={`absolute inset-0 ${variant === 'home' ? 'hero-rounded-bottom' : ''}`}
             style={{
                 backgroundImage: `url(${mediaUrl})`,
                 backgroundSize: 'cover',

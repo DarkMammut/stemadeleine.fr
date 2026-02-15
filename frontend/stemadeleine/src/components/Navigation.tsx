@@ -69,7 +69,7 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
         <div className="navigation">
             {/* Burger Menu Button */}
             <button
-                className={`flex justify-center items-center fixed text-center border-none right-2.5 top-1/2 -translate-y-1/2 p-0 bg-transparent z-50 md:hidden`}
+                className={`flex justify-center items-center fixed text-center border-none right-4 top-1/2 -translate-y-1/2 p-0 bg-transparent z-50 md:hidden`}
                 type="button"
                 onClick={() => setToggle(!toggle)}
                 aria-label="button for navigation in menu"

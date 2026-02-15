@@ -49,8 +49,8 @@ export default function Header({pagesTree, mobileTitle, isHomePage = false}: Hea
 
                     {/* Titre mobile pour page home (center sur mobile, caché sur desktop) */}
                     {isHomePage && mobileTitle && (
-                        <div className="md:hidden flex-1 flex justify-center px-4">
-                            <h1 className="text-white font-serif font-semibold text-lg text-center truncate">
+                        <div className="md:hidden flex-1 flex justify-center px-4 pr-16">
+                            <h1 className="text-white font-serif font-semibold text-lg text-center line-clamp-2 leading-tight">
                                 {mobileTitle}
                             </h1>
                         </div>
@@ -71,7 +71,7 @@ export default function Header({pagesTree, mobileTitle, isHomePage = false}: Hea
                             icon={HeartIcon}
                             label="Don"
                             variant="secondary"
-                            className="hidden lg:flex uppercase"
+                            className="hidden md:flex uppercase"
                         />
                     </div>
                 </div>
