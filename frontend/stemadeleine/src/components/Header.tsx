@@ -13,15 +13,13 @@ type HeaderProps = {
     // keep prop types for future use, not required for current static CSS solution
     headerHeight?: number;
     headerMdHeight?: number;
-    // Titre à afficher sur mobile (pour la page home)
-    mobileTitle?: string;
-    isHomePage?: boolean;
 };
 
-export default function Header({pagesTree, mobileTitle, isHomePage = false}: HeaderProps): React.ReactElement {
+export default function Header({pagesTree}: HeaderProps): React.ReactElement {
     // Minimal typing for settings to avoid `any` and satisfy ESLint
     type OrgSettings = { logoMedia?: string | number | null } | undefined | null;
-    const {settings} = useGetOrganization() as { settings?: OrgSettings };
+    type OrgInfo = { name?: string } | undefined | null;
+    const {settings, info} = useGetOrganization() as { settings?: OrgSettings; info?: OrgInfo };
 
     // Use static Tailwind classes to keep server and client markup identical
     // h-16 -> 4rem on mobile, md:h-20 -> 5rem on >=md
@@ -47,22 +45,25 @@ export default function Header({pagesTree, mobileTitle, isHomePage = false}: Hea
                         </Link>
                     </div>
 
-                    {/* Titre mobile pour page home (center sur mobile, caché sur desktop) */}
-                    {isHomePage && mobileTitle && (
-                        <div className="md:hidden flex-1 flex justify-center px-4 pr-16">
-                            <h1 className="text-white font-serif font-semibold text-lg text-center line-clamp-2 leading-tight">
-                                {mobileTitle}
-                            </h1>
-                        </div>
-                    )}
+                    {/* Nom de l'organisation (center sur mobile et tablette, caché sur desktop) */}
+                    <div className="md:hidden flex-1 flex justify-center px-4">
+                        <h1 className="text-white font-serif font-semibold text-lg text-center line-clamp-2 leading-tight">
+                            {info?.name || "Les Amis de Sainte Madeleine de la Jarrie"}
+                        </h1>
+                    </div>
 
-                    {/* Navigation (center - caché sur mobile si titre présent, sinon normal) */}
-                    <div className={`flex-1 flex justify-center ${isHomePage && mobileTitle ? 'hidden md:flex' : ''}`}>
+                    {/* Navigation (center sur desktop uniquement) */}
+                    <div className="hidden lg:flex flex-1 justify-center">
                         <Navigation pagesTree={pagesTree}/>
                     </div>
 
-                    {/* Donate button (right) */}
-                    <div className="flex items-center justify-end">
+                    {/* Burger menu (visible sur mobile et tablette uniquement) */}
+                    <div className="lg:hidden">
+                        <Navigation pagesTree={pagesTree}/>
+                    </div>
+
+                    {/* Donate button (right - uniquement sur desktop) */}
+                    <div className="hidden lg:flex items-center justify-end">
                         <IconButton
                             as="a"
                             href="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/2"
@@ -71,7 +72,7 @@ export default function Header({pagesTree, mobileTitle, isHomePage = false}: Hea
                             icon={HeartIcon}
                             label="Don"
                             variant="secondary"
-                            className="hidden md:flex uppercase"
+                            className="uppercase"
                         />
                     </div>
                 </div>

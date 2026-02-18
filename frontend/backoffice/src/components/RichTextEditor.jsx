@@ -88,7 +88,7 @@ const RichTextEditor = ({
 
             setEditorContent(cleanValue);
         }
-    }, [value, editorContent]);
+    }, [value]); // Retiré editorContent des dépendances pour éviter la boucle infinie
 
     // Handle content changes
     const handleChange = (content, delta, source, editor) => {
@@ -109,7 +109,10 @@ const RichTextEditor = ({
                 .replace(/<pre[^>]*data-language[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>')
                 .replace(/<pre[^>]*>(.*?)<\/pre>/gs, '<p>$1</p>');
 
-            onChange(normalizedContent);
+            // Utiliser setTimeout pour éviter d'interrompre la sélection en cours
+            setTimeout(() => {
+                onChange(normalizedContent);
+            }, 0);
         }
     };
 

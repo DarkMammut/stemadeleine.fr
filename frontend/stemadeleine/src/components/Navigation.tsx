@@ -69,24 +69,24 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
         <div className="navigation">
             {/* Burger Menu Button */}
             <button
-                className={`flex justify-center items-center fixed text-center border-none right-4 top-1/2 -translate-y-1/2 p-0 bg-transparent z-50 md:hidden`}
+                className={`flex justify-center items-center p-2 bg-transparent border-none cursor-pointer lg:hidden`}
                 type="button"
                 onClick={() => setToggle(!toggle)}
                 aria-label="button for navigation in menu"
             >
-                <ul className="outline-none cursor-pointer relative w-12 h-12 flex items-center justify-center">
+                <ul className="outline-none cursor-pointer relative w-8 h-8 flex items-center justify-center">
                     <li
-                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 -translate-y-2 ${
+                        className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full overflow-hidden transition-all duration-500 -translate-y-1.5 ${
                             toggle ? 'transform translate-y-0 rotate-45' : ''
                         }`}
                     />
                     <li
-                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 ${
+                        className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full overflow-hidden transition-all duration-500 ${
                             toggle ? 'scale-x-0' : ''
                         }`}
                     />
                     <li
-                        className={`absolute left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gray-600 bg-opacity-70 rounded-full overflow-hidden transition-all duration-500 translate-y-2 ${
+                        className={`absolute left-1/2 -translate-x-1/2 w-5 h-0.5 bg-white rounded-full overflow-hidden transition-all duration-500 translate-y-1.5 ${
                             toggle ? 'transform translate-y-0 -rotate-45' : ''
                         }`}
                     />
@@ -95,29 +95,27 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
 
             {/* Navigation Menu */}
             <nav
-                className={`fixed flex justify-center right-0 transition-all duration-300 z-10 ${
-                    !toggle ? 'opacity-0 invisible' : 'opacity-100 visible'
-                } md:opacity-100 md:visible md:top-0 md:left-0 md:right-0 md:bg-transparent md:relative ${
+                className={`fixed top-0 left-0 w-full h-full transition-all duration-300 z-30 ${
+                    !toggle ? 'opacity-0 invisible pointer-events-none' : 'opacity-100 visible'
+                } lg:opacity-100 lg:visible lg:top-0 lg:left-0 lg:right-0 lg:bg-transparent lg:relative lg:h-auto lg:w-auto lg:pointer-events-auto ${
                     toggle
-                        ? 'top-0 w-full h-screen bg-gradient-to-br from-gray-800 to-blue-900'
+                        ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800'
                         : ''
-                } md:h-auto`}
+                }`}
             >
                 <ul
-                    className={`flex m-0 p-0 text-center list-none w-full ${
-                        toggle ? 'flex-col justify-center' : 'justify-center'
-                    } md:flex-row md:justify-center`}
+                    className={`flex m-0 p-0 text-center list-none w-full h-full ${
+                        toggle ? 'flex-col justify-center items-center' : 'justify-center'
+                    } lg:flex-row lg:justify-center lg:h-auto`}
                 >
                     {visiblePages.map((page) => (
                         <li
                             key={page.id}
-                            className={
-                                `
+                            className={`
                 relative flex items-center justify-center group
-                ${toggle ? 'flex-col py-5' : 'px-10'}
-                md:px-10 md:py-0
-              `
-                            }
+                ${toggle ? 'py-6 w-full' : 'px-6 lg:px-10'}
+                lg:px-10 lg:py-0
+              `}
                             onMouseEnter={() => handleMenuEnter(page.id)}
                             onMouseLeave={handleMenuLeave}
                         >
@@ -128,12 +126,13 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                   after:w-full after:h-0.5 after:bg-secondary after:scale-x-0
                   after:origin-right after:transition-transform after:duration-500
                   hover:after:scale-x-100 hover:after:origin-left
-                  ${toggle ? 'text-white' : 'text-black'}
+                  ${toggle ? 'text-white text-xl py-2' : 'text-black'}
+                  lg:text-black lg:text-base lg:py-0
                 `}
                             >
                 <span className="overflow-hidden">
                   <div
-                      className="font-serif hover:text-white transition-colors duration-300 text-base md:text-lg uppercase no-word-break">
+                      className="font-serif hover:text-white transition-colors duration-300 text-xl lg:text-base md:text-lg uppercase no-word-break">
                     {page.name}
                   </div>
                 </span>
@@ -141,30 +140,35 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
 
                             {/* Zone invisible pour maintenir le hover */}
                             {page.children && page.children.length > 0 && (
-                                <div className="absolute top-full left-0 w-full h-8 bg-transparent hidden md:block"/>
+                                <div className="absolute top-full left-0 w-full h-8 bg-transparent hidden lg:block"/>
                             )}
 
                             {/* Sous-menu */}
                             {page.children && page.children.length > 0 && (
                                 <ul
-                                    className={`absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 md:mt-8
-                    ${hoveredMenu === page.id && !toggle ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}
-                    ${toggle ? 'relative opacity-100 visible pointer-events-auto mt-4 bg-blue-700' : ''}
+                                    className={`
+                    ${toggle ?
+                                        'relative opacity-100 visible pointer-events-auto mt-4 bg-transparent flex flex-col w-full'
+                                        :
+                                        `absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 lg:mt-8 ${hoveredMenu === page.id ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}`
+                                    }
                   `}
                                 >
                                     {page.children.map((child) => (
-                                        <li key={child.id} className="relative group/child">
+                                        <li key={child.id} className={`relative group/child ${toggle ? 'py-2' : ''}`}>
                                             <button
                                                 onClick={() => handleNavigation(child.slug)}
-                                                className="block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full
-                            after:absolute after:content-[''] after:bottom-0 after:left-4 after:right-4
-                            after:h-0.5 after:bg-secondary after:scale-x-0
-                            after:origin-right after:transition-transform after:duration-300
-                            hover:after:scale-x-100 hover:after:origin-left hover:text-white"
+                                                className={`
+                                  ${toggle ?
+                                                    'block w-full text-center py-2 bg-transparent border-none cursor-pointer text-white text-lg font-serif uppercase transition-colors duration-300 hover:text-secondary'
+                                                    :
+                                                    'block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full after:absolute after:content-[\'\'] after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-secondary after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left hover:text-white'
+                                                }
+                                `}
                                             >
                         <span className="overflow-hidden">
                           <div
-                              className="text-xs md:text-sm uppercase font-serif transition-colors duration-300 no-word-break">
+                              className={`transition-colors duration-300 no-word-break ${toggle ? 'text-base font-serif uppercase' : 'text-xs md:text-sm uppercase font-serif'}`}>
                             {child.name}
                           </div>
                         </span>
@@ -187,11 +191,11 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                     label="Don"
                     variant="secondary"
                     className={`
-            absolute bottom-7.5 left-1/2 transform -translate-x-1/2
-            text-xl flex items-center gap-2 px-4 py-2 bg-red-500
+            absolute bottom-10 left-1/2 transform -translate-x-1/2
+            text-lg flex items-center gap-3 px-6 py-3 bg-red-500
             text-white rounded-lg hover:bg-red-600 transition-colors duration-300 uppercase
             ${toggle ? 'block' : 'hidden'}
-            md:hidden
+            lg:hidden
           `}
                     onClick={() => setToggle(false)}
                 />

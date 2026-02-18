@@ -12,50 +12,58 @@ export default function DynamicFavicon() {
                 const response = await fetch(`${backend}/api/public/organization/settings`);
 
                 if (!response.ok) {
-                    console.log('Using default favicon');
+                    console.log('Using default favicon - API not available');
                     return;
                 }
 
                 const settings = await response.json();
 
                 if (settings.faviconMedia) {
-                    // Au lieu de supprimer tous les favicons, chercher uniquement notre favicon dynamique précédent
-                    const existingDynamicFavicon = document.querySelector("link[data-dynamic-favicon='true']");
-                    if (existingDynamicFavicon && existingDynamicFavicon.parentNode) {
-                        existingDynamicFavicon.parentNode.removeChild(existingDynamicFavicon);
-                    }
+                    // Supprimer TOUS les favicons existants pour éviter les conflits
+                    const existingFavicons = document.querySelectorAll("link[rel*='icon']");
+                    existingFavicons.forEach(link => {
+                        if (link.parentNode) {
+                            link.parentNode.removeChild(link);
+                        }
+                    });
 
-                    // Créer un nouveau lien vers le favicon dynamique avec un attribut identifiant
+                    // Créer un nouveau lien vers le favicon dynamique
                     const link = document.createElement('link');
                     link.rel = 'icon';
                     link.type = 'image/x-icon';
                     link.setAttribute('data-dynamic-favicon', 'true');
-                    link.href = `${backend}/api/public/media/${settings.faviconMedia}`;
+
+                    // Ajouter un timestamp pour forcer le rechargement
+                    const timestamp = new Date().getTime();
+                    link.href = `${backend}/api/public/media/${settings.faviconMedia}?t=${timestamp}`;
 
                     // Ajouter de manière sécurisée
                     if (document.head) {
                         document.head.appendChild(link);
                         addedLink = link;
 
-                        // Forcer le rafraîchissement en ajoutant un timestamp
-                        const timestamp = new Date().getTime();
-                        link.href = `${backend}/api/public/media/${settings.faviconMedia}?t=${timestamp}`;
+                        console.log('Dynamic favicon loaded:', link.href);
                     }
+                } else {
+                    console.log('No favicon configured in settings');
                 }
             } catch (error) {
                 console.error('Error loading dynamic favicon:', error);
             }
         };
 
-        updateFavicon();
+        // Attendre un peu que Next.js ait fini de charger pour éviter les conflits
+        const timeoutId = setTimeout(() => {
+            updateFavicon();
+        }, 100);
 
-        // Cleanup function - supprimer seulement notre favicon dynamique
+        // Cleanup function
         return () => {
+            clearTimeout(timeoutId);
             if (addedLink && addedLink.parentNode) {
                 try {
                     addedLink.parentNode.removeChild(addedLink);
                 } catch (e) {
-                    // Ignorer les erreurs si l'élément n'existe plus
                     console.warn('Could not remove dynamic favicon:', e);
                 }
             }

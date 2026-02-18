@@ -50,16 +50,6 @@ const ModulesList: React.FC<Props> = ({sectionId, className = ''}) => {
         );
     }
 
-    if (!modules || modules.length === 0) {
-        return (
-            <div className={`w-full py-8 ${className}`}>
-                <div className="text-center text-gray-500">
-                    <p>Aucun module disponible pour cette section.</p>
-                </div>
-            </div>
-        );
-    }
-
     // Sort modules by sortOrder
     const sortedModules = [...modules].sort(
         (a: ModuleType, b: ModuleType) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0),

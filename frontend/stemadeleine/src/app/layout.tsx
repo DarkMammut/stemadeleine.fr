@@ -14,9 +14,7 @@ const fjordOne = Fjord_One({
 export const metadata: Metadata = {
     title: 'Les Amis de Sainte-Madeleine de la Jarrie',
     description: 'Association des Amis de Sainte-Madeleine de la Jarrie',
-    icons: {
-        icon: '/favicon.ico',
-    },
+    // No static icons - favicon will be set dynamically by DynamicFavicon component
 };
 
 // Helper: convert hex to rgb object
