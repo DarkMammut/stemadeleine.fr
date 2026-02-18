@@ -71,8 +71,6 @@ export default function Layout({children, page}: LayoutProps) {
 
             <Header
                 pagesTree={tree}
-                mobileTitle={page?.slug === '/' ? page?.title : undefined}
-                isHomePage={page?.slug === '/'}
             />
 
             <div className={`pt-16 md:pt-20 ${page?.slug === '/' ? 'min-h-screen' : ''}`}>
