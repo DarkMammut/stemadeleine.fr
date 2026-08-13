@@ -8,6 +8,7 @@ type MediaImageProps = Omit<ImageProps, 'src' | 'alt'> & {
   mediaId?: string | number | null;
   src?: string; // fallback or direct URL
   alt?: string;
+  imgClassName?: string; // classes appliquées à l'image interne
   loading?: 'eager' | 'lazy'; // defaults to 'lazy'
   fallbackSrc?: string; // optional fallback if no media found
   showTitle?: boolean;
@@ -19,6 +20,7 @@ export default function MediaImage(props: MediaImageProps) {
     mediaId,
     src: srcProp,
     alt = '',
+    imgClassName,
     loading = 'lazy',
     fallbackSrc = undefined,
     showTitle = false,
@@ -87,7 +89,12 @@ export default function MediaImage(props: MediaImageProps) {
         <figure className={`${imageProps.className ?? ''} relative w-full h-full`} style={figureBgStyle}>
           {/* Keep an accessible image for screen readers */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={resolvedSrc} alt={alt || mediaTitle || ''} className="sr-only" loading={loading} />
+          <img
+            src={resolvedSrc}
+            alt={alt || mediaTitle || ''}
+            className={imgClassName ? `sr-only ${imgClassName}` : 'sr-only'}
+            loading={loading}
+          />
           {mediaTitle && (
             <figcaption
               className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/60 text-white text-sm px-2 py-1 rounded z-10">
@@ -110,6 +117,7 @@ export default function MediaImage(props: MediaImageProps) {
           alt={alt || mediaTitle || ''}
           width={width}
           height={height}
+          className={imgClassName}
           style={style}
           loading={loading}
         />
@@ -123,17 +131,18 @@ export default function MediaImage(props: MediaImageProps) {
   }
 
   // For non-blob sources, use Next/Image and pass remaining props
-  const { alt: _altFromProps, src: _srcFromProps, fill: _fillFromProps, ...imagePropsRest } = imageProps as ImageProps;
+  const { alt: _altFromProps, src: _srcFromProps, className: imageClassNameFromProps, ...imagePropsRest } = imageProps as ImageProps;
   // avoid unused variable warnings
   void _altFromProps;
   void _srcFromProps;
-  void _fillFromProps;
 
   const figureClassName = (imageProps as { className?: string }).className ?? undefined;
+  const mergedImageClassName = [imageClassNameFromProps, imgClassName].filter(Boolean).join(' ') || undefined;
 
   const nextImageProps: Omit<ImageProps, 'alt'> = {
     ...(imagePropsRest as Omit<ImageProps, 'alt'>),
     src: resolvedSrc as string,
+    className: mergedImageClassName,
   };
 
   return (

@@ -1,12 +1,17 @@
 import type {Metadata} from 'next';
-import {Fjord_One} from 'next/font/google';
+import {Inter, Playfair_Display} from 'next/font/google';
 import './globals.css';
 import ThemeProvider from '@/components/ThemeProvider';
 import DynamicFavicon from '@/components/DynamicFavicon';
 
-const fjordOne = Fjord_One({
-    variable: '--font-fjord-one',
-    weight: '400',
+const inter = Inter({
+    variable: '--font-inter',
+    subsets: ['latin'],
+    display: 'swap',
+});
+
+const playfairDisplay = Playfair_Display({
+    variable: '--font-playfair',
     subsets: ['latin'],
     display: 'swap',
 });
@@ -61,12 +66,15 @@ export default async function RootLayout({
     const primaryFromSettings =
         settings?.primaryColor || settings?.primary_color || settings?.accentColor || settings?.accent_color;
     const secondaryFromSettings = settings?.secondaryColor || settings?.secondary_color;
+    const accentFromSettings = settings?.accentColor || settings?.accent_color;
 
     const primary = primaryFromSettings || '#3b82f6';
     const secondary = secondaryFromSettings || '#64748b';
+    const accent = accentFromSettings || secondary || '#B8973A';
 
     const pRgb = hexToRgbObj(primary) || {r: 59, g: 130, b: 246};
     const sRgb = hexToRgbObj(secondary) || {r: 100, g: 116, b: 139};
+    const aRgb = hexToRgbObj(accent) || {r: 184, g: 151, b: 58};
 
     // build shades for 50..900 similar to front-end logic
     // Background / text from settings (fallbacks)
@@ -113,6 +121,20 @@ export default async function RootLayout({
     --color-secondary-light: color-mix(in srgb, ${secondary}, white 60%);
     --color-secondary-dark: color-mix(in srgb, ${secondary}, black 40%);
 
+    --color-accent: ${accent};
+    --color-accent-50: ${shadeRgb(aRgb, 0.95)};
+    --color-accent-100: ${shadeRgb(aRgb, 0.9)};
+    --color-accent-200: ${shadeRgb(aRgb, 0.8)};
+    --color-accent-300: ${shadeRgb(aRgb, 0.7)};
+    --color-accent-400: ${shadeRgb(aRgb, 0.6)};
+    --color-accent-500: ${aRgb.r}, ${aRgb.g}, ${aRgb.b};
+    --color-accent-600: ${shadeRgb(aRgb, 0.8, true)};
+    --color-accent-700: ${shadeRgb(aRgb, 0.7, true)};
+    --color-accent-800: ${shadeRgb(aRgb, 0.6, true)};
+    --color-accent-900: ${shadeRgb(aRgb, 0.5, true)};
+    --color-accent-light: color-mix(in srgb, ${accent}, white 60%);
+    --color-accent-dark: color-mix(in srgb, ${accent}, black 40%);
+
     /* Background & text: explicit defaults from backend (ensure SSR reflects organization settings) */
     --color-background: ${bgFromSettings};
     --color-text: ${textFromSettings};
@@ -143,6 +165,18 @@ export default async function RootLayout({
       --color-secondary-800: ${shadeRgb(sRgb, 0.6, true)};
       --color-secondary-900: ${shadeRgb(sRgb, 0.5, true)};
 
+      --color-accent: ${accent};
+      --color-accent-50: ${shadeRgb(aRgb, 0.95)};
+      --color-accent-100: ${shadeRgb(aRgb, 0.9)};
+      --color-accent-200: ${shadeRgb(aRgb, 0.8)};
+      --color-accent-300: ${shadeRgb(aRgb, 0.7)};
+      --color-accent-400: ${shadeRgb(aRgb, 0.6)};
+      --color-accent-500: ${aRgb.r}, ${aRgb.g}, ${aRgb.b};
+      --color-accent-600: ${shadeRgb(aRgb, 0.8, true)};
+      --color-accent-700: ${shadeRgb(aRgb, 0.7, true)};
+      --color-accent-800: ${shadeRgb(aRgb, 0.6, true)};
+      --color-accent-900: ${shadeRgb(aRgb, 0.5, true)};
+
       /* Dark-mode overrides; prefer backend dark values if available, otherwise fall back to the light settings */
       --color-background: ${bgDarkFromSettings};
       --color-surface: ${settings?.surface_dark || settings?.surface || '#1f2937'};
@@ -160,6 +194,7 @@ export default async function RootLayout({
         '--color-text': String(textFromSettings),
         '--color-primary': String(primary),
         '--color-secondary': String(secondary),
+        '--color-accent': String(accent),
     };
 
     const htmlStyle = htmlStyleMap as unknown as React.CSSProperties;
@@ -173,7 +208,7 @@ export default async function RootLayout({
         </head>
         {/* Ne pas appliquer les variables de font globalement ici pour préserver la police par défaut (Fjord One)
         Charger/assigner les fonts via des classes locales ou composants si nécessaire. */}
-        <body className={`${fjordOne.variable} antialiased`}>
+        <body className={`${inter.variable} ${playfairDisplay.variable} antialiased`}>
         <DynamicFavicon/>
         <ThemeProvider>{children}</ThemeProvider>
         </body>

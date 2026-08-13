@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
 import MediaManager from "@/components/MediaManager";
+import PdfManager from "@/components/PdfManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import ContentManager from "@/components/ContentManager";
 import NewsletterPreviewModal from "@/components/NewsletterPreviewModal";
@@ -38,6 +39,8 @@ export default function EditNewsletters({newsletterId}) {
         updateNewsletterPublicationVisibility,
         publishNewsletterPublication,
         deleteNewsletterPublication,
+        setNewsletterPublicationPdfFile,
+        removeNewsletterPublicationPdfFile,
     } = useNewsletterPublicationOperations();
 
     const {notification, showSuccess, showError, hideNotification} =
@@ -93,6 +96,30 @@ export default function EditNewsletters({newsletterId}) {
         } catch (error) {
             console.error("Erreur lors de la suppression du média:", error);
             showError("Erreur", "Impossible de supprimer le média");
+            throw error;
+        }
+    };
+
+    const handleAddPdf = async (publicationId, mediaId) => {
+        try {
+            await setNewsletterPublicationPdfFile(publicationId, mediaId);
+            await loadNewsletter();
+            showSuccess("PDF ajouté", "Le fichier PDF a été ajouté avec succès");
+        } catch (error) {
+            console.error("Erreur lors de l'ajout du PDF:", error);
+            showError("Erreur", "Impossible d'ajouter le fichier PDF");
+            throw error;
+        }
+    };
+
+    const handleRemovePdf = async (publicationId) => {
+        try {
+            await removeNewsletterPublicationPdfFile(publicationId);
+            await loadNewsletter();
+            showSuccess("PDF supprimé", "Le fichier PDF a été supprimé avec succès");
+        } catch (error) {
+            console.error("Erreur lors de la suppression du PDF:", error);
+            showError("Erreur", "Impossible de supprimer le fichier PDF");
             throw error;
         }
     };
@@ -248,6 +275,18 @@ export default function EditNewsletters({newsletterId}) {
                         displayColumns={2}
                     />
 
+                    <PdfManager
+                        title="Fichier PDF de la newsletter"
+                        content={{
+                            id: newsletterData?.id,
+                            pdfFile: newsletterData?.pdfFile || null,
+                        }}
+                        onPdfAdd={handleAddPdf}
+                        onPdfRemove={handleRemovePdf}
+                        onPdfChanged={loadNewsletter}
+                        loading={effectiveLoading}
+                    />
+
                     <ContentManager
                         parentId={newsletterId}
                         parentType="newsletter-publication"
@@ -347,6 +386,19 @@ export default function EditNewsletters({newsletterId}) {
                             onCancelExternal={handleCancelEdit}
                         />
                     )}
+
+                    {/* PDF File Manager */}
+                    <PdfManager
+                        title="Fichier PDF de la newsletter"
+                        content={{
+                            id: newsletterData.id,
+                            pdfFile: newsletterData?.pdfFile || null,
+                        }}
+                        onPdfAdd={handleAddPdf}
+                        onPdfRemove={handleRemovePdf}
+                        onPdfChanged={loadNewsletter}
+                        loading={effectiveLoading}
+                    />
 
                     {/* Rich Text Content Editor */}
                     <ContentManager

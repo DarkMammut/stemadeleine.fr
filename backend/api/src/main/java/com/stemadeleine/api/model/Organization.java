@@ -42,6 +42,12 @@ public class Organization {
     @Column(name = "secondary_color")
     private String secondaryColor;
 
+    @Column(name = "accent_color")
+    private String accentColor;
+
+    @Column(name = "text_color")
+    private String textColor;
+
     @Column(name = "creation_date")
     private LocalDate creationDate;
 

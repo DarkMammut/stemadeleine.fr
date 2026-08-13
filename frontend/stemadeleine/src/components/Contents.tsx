@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
 
 type Media = {
@@ -7,21 +8,31 @@ type Media = {
     fileUrl: string;
     title?: string;
     altText?: string;
+    caption?: string;
 };
 
-type ContentItem = {
-    id: string | number;
+export type SharedContentItem = {
+    id?: string | number;
+    contentId?: string;
     title?: string;
+    type?: string;
+    data?: string;
     body?: string | { html?: string } | Record<string, unknown>;
+    mediaId?: string | number;
     layout?: 'left' | 'right' | 'staggered';
     medias?: Media[];
+    sortOrder?: number;
 };
 
+export type ContentsTheme = 'light' | 'dark';
+
 type Props = {
-    contents?: ContentItem[];
+    contents?: SharedContentItem[];
     loading?: boolean;
     loadingMessage?: string;
     layout?: 'left' | 'right' | 'staggered';
+    variant?: 'default' | 'news';
+    theme?: ContentsTheme;
 };
 
 export default function Contents({
@@ -29,9 +40,12 @@ export default function Contents({
                                      loading = false,
                                      loadingMessage = 'Chargement des contenus...',
                                      layout = 'staggered',
+                                     variant = 'default',
+                                     theme = 'light',
                                  }: Props): React.ReactElement | null {
+    const isDarkTheme = theme === 'dark';
     // Type guard pour détecter les objets contenant du HTML
-    const isHtmlBody = (b: ContentItem['body']): b is { html: string } => {
+    const isHtmlBody = (b: SharedContentItem['body']): b is { html: string } => {
         return (
             typeof b === 'object' &&
             b !== null &&
@@ -40,7 +54,7 @@ export default function Contents({
         );
     };
 
-    const renderContentBody = (body: ContentItem['body']): React.ReactNode => {
+    const renderContentBody = (body: SharedContentItem['body']): React.ReactNode => {
         if (isHtmlBody(body)) {
             return <div className="quill-content force-responsive" dangerouslySetInnerHTML={{__html: body.html}}/>;
         }
@@ -57,7 +71,35 @@ export default function Contents({
         return <p className="force-responsive">{body}</p>;
     };
 
-    const renderContent = (content: ContentItem, index: number) => {
+    const getNewsHtmlFromBody = (content: SharedContentItem): string => {
+        if (!content.body) return content.data || '';
+        if (typeof content.body === 'string') {
+            try {
+                const parsed = JSON.parse(content.body);
+                return parsed.html || content.data || '';
+            } catch {
+                return content.body;
+            }
+        }
+        if (isHtmlBody(content.body)) {
+            return content.body.html || content.data || '';
+        }
+        return content.data || '';
+    };
+
+    const isSignificantNewsHtml = (html: string): boolean => {
+        if (!html || !html.trim()) return false;
+        const placeholders = [
+            '<p>Start writing your news content here...</p>',
+            '<p></p>',
+            '<p><br></p>',
+            '<p><br/></p>',
+            '<p>&nbsp;</p>',
+        ];
+        return !placeholders.includes(html.trim());
+    };
+
+    const renderDefaultContent = (content: SharedContentItem, index: number) => {
         if (!content.body) return null;
 
         const contentLayout = content.layout || layout;
@@ -78,31 +120,36 @@ export default function Contents({
                 break;
         }
 
+        const key = content.id != null ? String(content.id) : `content-${index}`;
+
         return (
-            <div
-                key={String(content.id)}
-                className="pb-16 pt-4 sm:pb-24 sm:pt-6 border-b border-gray-100 last:border-none"
-            >
+            <div key={key} className="">
                 <div
-                    className={`mx-auto max-w-7xl px-6 lg:px-8 flex flex-col items-start gap-8 ${
-                        content.medias && content.medias.length > 0 ? 'lg:flex-row' : ''
-                    }`}
+                    className={clsx(
+                        'mx-auto max-w-7xl flex flex-col items-start gap-16',
+                        medias.length > 0 && 'lg:flex-row',
+                    )}
                 >
                     {/* Texte */}
                     <div
-                        className={`flex-1 ${
-                            content.medias && content.medias.length > 0
-                                ? `max-w-2xl ${imageFirst ? 'lg:order-2' : 'lg:order-1'}`
-                                : 'max-w-none'
-                        }`}
+                        className={clsx(
+                            'flex-1',
+                            medias.length > 0 && 'flex-basis-full lg:flex-basis-auto',
+                            imageFirst && medias.length > 0 && 'lg:order-2',
+                        )}
                     >
                         {content.title && (
-                            <h3 className="text-xl tracking-tight text-gray-900 sm:text-3xl mb-6">
+                            <h4 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-secondary' : 'text-primary-dark')}>
                                 {content.title}
-                            </h3>
+                            </h4>
                         )}
 
-                        <div className="text-xl text-gray-700 leading-relaxed text-justify force-responsive">
+                        <div
+                            className={clsx(
+                                'tracking-tight leading-relaxed text-justify force-responsive no-word-break',
+                                isDarkTheme ? 'text-cream' : 'text-primary',
+                            )}
+                        >
                             {renderContentBody(content.body)}
                         </div>
                     </div>
@@ -110,51 +157,136 @@ export default function Contents({
                     {/* Images */}
                     {medias.length > 0 && (
                         <div
-                            className={`pt-8 lg:pt-0 flex flex-1 items-center ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+                            className={clsx(
+                                'flex-1 flex justify-center',
+                                imageFirst && medias.length > 0 && 'lg:order-1',
+                            )}
                         >
-                            <div
-                                className={`w-full flex flex-wrap gap-4 ${
-                                    medias.length === 1
-                                        ? 'justify-center'
-                                        : 'justify-center lg:justify-start'
-                                }`}
-                            >
-                                {medias.slice(0, 4).map((media, i) => (
-                                    <div
-                                        key={String(media.id)}
-                                        className={`
-                       ${
-                                            medias.length === 1
-                                                ? 'w-64 h-64 lg:w-80 lg:h-80'
-                                                : 'w-40 h-40 lg:w-48 lg:h-48'
-                                        }
-                       flex-shrink-0 overflow-hidden rounded-xl shadow-xl outline-1 -outline-offset-1 outline-black/10 flex items-center justify-center
-                      ${medias.length > 1 && i % 2 !== 0 ? '-mt-8 lg:-mt-16' : ''}
-                     `}
-                                    >
-                                        {/* MediaImage peut être un composant JS non typé ; on assume ses props */}
-                                        {/* Correction: suppression du caractère superflu `S` */}
+                            {medias.length === 1 ? (
+                                // Single image: about-grid style
+                                <div className="about-img-wrap relative w-full lg:w-80">
+                                    <div className="relative w-full aspect-[3/4] overflow-hidden">
                                         <MediaImage
-                                            mediaId={media.id}
-                                            style={{objectFit: 'contain'}}
+                                            mediaId={medias[0].id}
+                                            style={{objectFit: 'cover'}}
                                             fill={true}
-                                            sizes={
-                                                medias.length === 1
-                                                    ? 'w-64 h-64 lg:w-80 lg:h-80'
-                                                    : 'w-40 h-40 lg:w-48 lg:h-48'
-                                            }
-                                            preload={medias.length === 1 && index === 0}
-                                            showTitle
-                                            caption={media.title}
-                                            alt={media.altText}
+                                            sizes="(max-width: 1024px) 100vw, 320px"
+                                            preload={index === 0}
+                                            alt={medias[0].altText || medias[0].title || 'Image'}
                                         />
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ) : (
+                                // Multiple images: gallery grid style
+                                <div className="w-full">
+                                    <div
+                                        className={clsx(
+                                            'grid gap-3',
+                                            medias.length === 2 && 'grid-cols-2',
+                                            medias.length === 3 && 'grid-cols-3',
+                                            medias.length >= 4 &&
+                                            'grid-cols-2 lg:grid-cols-4',
+                                        )}
+                                    >
+                                        {medias.slice(0, 6).map((media, i) => (
+                                            <div
+                                                key={String(media.id)}
+                                                className={clsx(
+                                                    'relative overflow-hidden aspect-square',
+                                                    medias.length >= 4 && i === 0 &&
+                                                    'col-span-2 lg:col-span-2 row-span-2',
+                                                )}
+                                            >
+                                                <MediaImage
+                                                    mediaId={media.id}
+                                                    style={{objectFit: 'cover'}}
+                                                    fill={true}
+                                                    sizes="(max-width: 768px) 50vw, 300px"
+                                                    preload={index === 0 && i === 0}
+                                                    alt={media.altText || media.title || 'Image'}
+                                                />
+                                                {/* Gallery caption on hover */}
+                                                {media.title && (
+                                                    <div
+                                                        className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                                        <p className="text-xs text-white/85 italic">
+                                                            {media.title}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
+        );
+    };
+
+    const renderNewsContent = (content: SharedContentItem, index: number) => {
+        const key = content.id != null ? String(content.id) : content.contentId || `content-${index}`;
+        const htmlContent = getNewsHtmlFromBody(content);
+        const hasSignificantHtml = isSignificantNewsHtml(htmlContent);
+        const hasMedia = (content.medias && content.medias.length > 0) || content.mediaId;
+        const mediaId = content.medias && content.medias.length > 0 ? content.medias[0].id : content.mediaId;
+        const mediaAltText = content.medias && content.medias.length > 0
+            ? content.medias[0].altText || content.medias[0].title
+            : undefined;
+        const mediaCaption = content.medias && content.medias.length > 0
+            ? content.medias[0].caption
+            : undefined;
+
+        if (!hasSignificantHtml && !mediaId) {
+            return null;
+        }
+
+        return (
+            <article
+                key={key}
+                className={clsx(
+                    'py-8 first:pt-0 last:pb-0',
+                    isDarkTheme ? 'border-b border-white/15' : 'border-b border-cream-dark/70',
+                )}
+            >
+                {content.title && (
+                    <h3 className={clsx('mb-4 text-2xl font-normal tracking-tight', isDarkTheme ? 'text-cream' : 'text-secondary')}>
+                        {content.title}
+                    </h3>
+                )}
+
+                {hasMedia && mediaId && (
+                    <div
+                        className={clsx('mb-4 w-full overflow-hidden rounded-xl', isDarkTheme ? 'bg-white/5' : 'bg-primary/10')}>
+                        <MediaImage
+                            mediaId={mediaId}
+                            alt={mediaAltText || content.title || 'Image'}
+                            width={1400}
+                            height={900}
+                            imgClassName="block h-auto w-full rounded-xl"
+                            className="rounded-xl"
+                        />
+                    </div>
+                )}
+
+                {(mediaCaption || content.data) && (
+                    <p className={clsx('mb-4 text-sm italic', isDarkTheme ? 'text-cream/70' : 'text-secondary-light')}>
+                        {mediaCaption || content.data}
+                    </p>
+                )}
+
+                {hasSignificantHtml && (
+                    <div
+                        className={clsx(
+                            'quill-content prose prose-lg max-w-none leading-relaxed',
+                            isDarkTheme ? 'text-cream prose-headings:text-cream prose-p:text-cream prose-a:text-accent prose-strong:text-cream' : 'text-secondary-light prose-headings:text-primary-dark prose-p:text-primary prose-a:text-secondary prose-strong:text-primary-dark',
+                        )}
+                        dangerouslySetInnerHTML={{__html: htmlContent}}
+                    />
+                )}
+            </article>
         );
     };
 
@@ -171,5 +303,5 @@ export default function Contents({
         return null;
     }
 
-    return <div>{contents.map(renderContent)}</div>;
+    return <div>{contents.map(variant === 'news' ? renderNewsContent : renderDefaultContent)}</div>;
 }

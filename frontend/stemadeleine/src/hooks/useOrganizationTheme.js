@@ -3,12 +3,18 @@ import useGetOrganization from './useGetOrganization';
 
 const DEFAULT_PRIMARY = '#3b82f6';
 const DEFAULT_SECONDARY = '#64748b';
+const DEFAULT_ACCENT = '#B8973A';
 const DEFAULT_BACKGROUND = '#ffffff';
 const DEFAULT_TEXT = '#171717';
 
 const useOrganizationTheme = () => {
   const [themeLoaded, setThemeLoaded] = useState(true); // true car on applique des valeurs par défaut immédiatement
-  const [colors, setColors] = useState({ primary: DEFAULT_PRIMARY, secondary: DEFAULT_SECONDARY });
+  const [colors, setColors] = useState({
+    primary: DEFAULT_PRIMARY,
+    secondary: DEFAULT_SECONDARY,
+    accent: DEFAULT_ACCENT,
+    text: DEFAULT_TEXT,
+  });
 
   // Utiliser le hook existant pour récupérer les données de l'organisation
   const { settings, loading, error } = useGetOrganization();
@@ -78,6 +84,8 @@ const useOrganizationTheme = () => {
     const primaryColor =
       organizationData.primaryColor || organizationData.primary_color || organizationData.accentColor || organizationData.accent_color;
     const secondaryColor = organizationData.secondaryColor || organizationData.secondary_color;
+    const accentColor = organizationData.accentColor || organizationData.accent_color;
+    const textColor = organizationData.textColor || organizationData.text_color || organizationData.color_text || DEFAULT_TEXT;
 
     if (primaryColor) {
       generateColorShades(primaryColor, 'primary');
@@ -87,11 +95,15 @@ const useOrganizationTheme = () => {
       generateColorShades(secondaryColor, 'secondary');
     }
 
+    if (accentColor) {
+      generateColorShades(accentColor, 'accent');
+    }
+
     // Appliquer aussi des couleurs de fond et de texte pour éviter que la préférence système sombre ne rende toute la page noire.
     if (typeof document !== 'undefined') {
       const root = document.documentElement;
       const bg = organizationData.background || organizationData.background_color || organizationData.color_background || DEFAULT_BACKGROUND;
-      const txt = organizationData.textColor || organizationData.text_color || organizationData.color_text || DEFAULT_TEXT;
+      const txt = textColor;
       root.style.setProperty('--color-background', bg);
       root.style.setProperty('--color-text', txt);
     }
@@ -101,6 +113,8 @@ const useOrganizationTheme = () => {
       setColors({
         primary: primaryColor || DEFAULT_PRIMARY,
         secondary: secondaryColor || primaryColor || DEFAULT_SECONDARY,
+        accent: accentColor || secondaryColor || primaryColor || DEFAULT_ACCENT,
+        text: textColor,
       });
       setThemeLoaded(true);
     }, 0);
@@ -111,6 +125,7 @@ const useOrganizationTheme = () => {
     // Appliquer visuellement les couleurs par défaut dans le DOM
     generateColorShades(DEFAULT_PRIMARY, 'primary');
     generateColorShades(DEFAULT_SECONDARY, 'secondary');
+    generateColorShades(DEFAULT_ACCENT, 'accent');
     // Appliquer les couleurs de fond/texte par défaut
     if (typeof document !== 'undefined') {
       const root = document.documentElement;

@@ -5,6 +5,21 @@ import { useParams, useRouter } from 'next/navigation';
 import useGetNewsPublicationByNewsId from '@/hooks/useGetNewsPublicationByNewsId';
 import useGetOrganization from '@/hooks/useGetOrganization';
 import NewsArticle from '@/components/NewsArticle';
+import useGetPages from '@/hooks/useGetPages';
+import Layout from '@/components/Layout';
+
+const ACTUALITES_SLUG = '/actualites';
+
+type PageShape = {
+    name?: string;
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    keywords?: string;
+    heroMedia?: { id?: string | number } | null;
+    pageId?: string | number;
+    slug?: string;
+};
 
 export default function ActualitePage() {
     const params = useParams();
@@ -23,6 +38,32 @@ export default function ActualitePage() {
         loading: orgLoading,
     } = useGetOrganization();
 
+    const {
+        fetchPageBySlug,
+        loading: pageLoading,
+    } = useGetPages();
+
+    const [page, setPage] = React.useState<PageShape | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadPage = async () => {
+            const pageData = await fetchPageBySlug(ACTUALITES_SLUG);
+
+            if (!mounted) return;
+            if (pageData) {
+                setPage(pageData as PageShape);
+            }
+        };
+
+        loadPage();
+
+        return () => {
+            mounted = false;
+        };
+    }, [fetchPageBySlug]);
+
     useEffect(() => {
         if (newsId) {
             fetchNewsByNewsId(newsId);
@@ -40,7 +81,7 @@ export default function ActualitePage() {
     const settingsAny = settings as any;
     const logoUrl = settingsAny?.logoUrl || '/logo.png';
 
-    const loading = newsLoading || orgLoading;
+    const loading = newsLoading || orgLoading || pageLoading;
 
     if (loading && !newsPublication) {
         return (
@@ -66,10 +107,21 @@ export default function ActualitePage() {
     }
 
     return (
-        <NewsArticle
-            news={newsPublication}
-            organizationLogo={logoUrl}
-        />
+        <Layout
+            page={
+                page || {
+                    name: 'Actualités',
+                    title: 'Actualités',
+                    slug: ACTUALITES_SLUG,
+                }
+            }
+        >
+            <main>
+                <NewsArticle
+                    news={newsPublication}
+                    organizationLogo={logoUrl}
+                />
+            </main>
+        </Layout>
     );
 }
-

@@ -3,17 +3,15 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
     output: 'standalone', // Pour optimiser le build Docker
     images: {
-        // Autorise les images servies depuis le bucket Supabase (nom de host observé dans l'erreur)
-        // Remplacement de `domains` (déprécié) par `remotePatterns` pour limiter précisément
-        // les sources d'images et empêcher des hôtes malveillants.
+        // Compatibilité maximale: `domains` + `remotePatterns`
+        domains: ['eahwfewbtyndxbqfifuh.supabase.co'],
         remotePatterns: [
             {
                 protocol: 'https',
                 hostname: 'eahwfewbtyndxbqfifuh.supabase.co',
-                pathname: '/:path*',
+                pathname: '/storage/v1/object/public/**',
             },
         ],
-        // Si nécessaire, vous pouvez ajouter d'autres patterns ici.
     },
     /* config options here */
 };

@@ -177,7 +177,7 @@ export default function DynamicPage({initialPage = null, initialSections = []}: 
 
     return (
         <Layout page={page}>
-            <main className="mt-12">
+            <main className="">
                 {/* Afficher le contenu statique de la page (ex: ContactPageContent) */}
                 <StaticPageContentComponent pageSlug={normalizedPageSlug}/>
 
@@ -192,7 +192,7 @@ export default function DynamicPage({initialPage = null, initialSections = []}: 
                                 mediaId={section.media?.id}
                                 contents={((section.contents as unknown) as ContentItem[]) || []}
                                 variant={section.variant || 'default'}
-                                className="mb-8"
+                                className=""
                             />
                         ))}
                     </>

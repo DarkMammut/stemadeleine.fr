@@ -47,6 +47,8 @@ public class OrganizationService {
         if (dto.getDescription() != null) org.setDescription(dto.getDescription());
         if (dto.getPrimaryColor() != null) org.setPrimaryColor(dto.getPrimaryColor());
         if (dto.getSecondaryColor() != null) org.setSecondaryColor(dto.getSecondaryColor());
+        if (dto.getAccentColor() != null) org.setAccentColor(dto.getAccentColor());
+        if (dto.getTextColor() != null) org.setTextColor(dto.getTextColor());
         return organizationRepository.save(org);
     }
 
@@ -109,6 +111,8 @@ public class OrganizationService {
         dto.setSlug(org.getSlug());
         dto.setPrimaryColor(org.getPrimaryColor());
         dto.setSecondaryColor(org.getSecondaryColor());
+        dto.setAccentColor(org.getAccentColor());
+        dto.setTextColor(org.getTextColor());
         dto.setCreationDate(org.getCreationDate());
         dto.setCreatedAt(org.getCreatedAt());
         dto.setUpdatedAt(org.getUpdatedAt());
@@ -134,6 +138,8 @@ public class OrganizationService {
         dto.setDescription(org.getDescription());
         dto.setPrimaryColor(org.getPrimaryColor());
         dto.setSecondaryColor(org.getSecondaryColor());
+        dto.setAccentColor(org.getAccentColor());
+        dto.setTextColor(org.getTextColor());
         if (org.getLogo() != null) {
             dto.setLogoMedia(org.getLogo().getId());
         }
@@ -155,6 +161,10 @@ public class OrganizationService {
         dto.setName(org.getName());
         dto.setDescription(org.getDescription());
         dto.setSlug(org.getSlug());
+        dto.setPrimaryColor(org.getPrimaryColor());
+        dto.setSecondaryColor(org.getSecondaryColor());
+        dto.setAccentColor(org.getAccentColor());
+        dto.setTextColor(org.getTextColor());
         dto.setCreationDate(org.getCreationDate());
 
         // Add address if exists

@@ -17,6 +17,8 @@ public class OrganizationDto {
     private String slug;
     private String primaryColor;
     private String secondaryColor;
+    private String accentColor;
+    private String textColor;
     private LocalDate creationDate;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

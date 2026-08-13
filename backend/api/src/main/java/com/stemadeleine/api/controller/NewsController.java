@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,33 @@ public class NewsController {
                 .collect(Collectors.toList());
         log.debug("News variants: {}", variants);
         return ResponseEntity.ok(variants);
+    }
+
+    @GetMapping("/exists-with-variant-all")
+    public ResponseEntity<Boolean> existsNewsWithVariantAll() {
+        log.info("GET /api/news/exists-with-variant-all - Checking if news with variant ALL exists");
+        boolean exists = newsService.existsNewsWithVariantAll();
+        log.debug("News with variant ALL exists: {}", exists);
+        return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/setup-pages")
+    public ResponseEntity<Map<String, UUID>> createNewsPagesStructure(
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            log.error("Attempt to create news pages structure without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        log.info("POST /api/news/setup-pages - Creating complete news pages structure at /actualites");
+
+        Map<String, UUID> result = newsService.createNewsPagesStructure(
+                currentUserDetails.account().getUser()
+        );
+
+        log.info("News pages structure created successfully at /actualites");
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

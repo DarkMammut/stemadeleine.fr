@@ -1,10 +1,11 @@
 'use client';
 
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import clsx from 'clsx';
 import useGetMedia from '../hooks/useGetMedia';
 import useGetContents from '../hooks/useGetContents';
 import Contents from './Contents';
+import type {ModuleType} from './ModulesList';
 import ModulesList from './ModulesList';
 import Image from 'next/image';
 
@@ -51,6 +52,8 @@ export default function Section({
                                     className = '',
                                     showModules = true,
                                 }: SectionProps) {
+    const [hasDarkModules, setHasDarkModules] = useState(false);
+
     // Convertir mediaId en string/undefined pour useGetMedia
     const mediaIdStr = mediaId ? String(mediaId) : undefined;
     const {mediaUrl} = useGetMedia(mediaIdStr);
@@ -67,6 +70,13 @@ export default function Section({
     }, [sectionId, fetchContentsByOwnerId]);
 
     const contents = sectionId ? apiContents : staticContents;
+    const handleModulesChange = useCallback((modules: ModuleType[]) => {
+        const darkModuleTypes = new Set(['NEWS', 'NEWSLETTER', 'GALLERY']);
+        const sectionHasDarkModules = modules.some((module) =>
+            darkModuleTypes.has(String(module.type ?? '').toUpperCase()),
+        );
+        setHasDarkModules(sectionHasDarkModules);
+    }, []);
 
     // Taper proprement le composant Contents importé depuis JS
     const ContentsTyped = Contents as unknown as React.ComponentType<{
@@ -74,55 +84,72 @@ export default function Section({
         loading?: boolean;
         loadingMessage?: string;
         layout?: 'staggered' | 'left' | 'right';
+        theme?: 'light' | 'dark';
     }>;
 
     return (
-        <section className={clsx('w-full py-16 md:py-20', 'bg-transparent', className)}>
-            <div
-                className={clsx(
-                    'w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col md:flex-row items-start gap-10 md:gap-16',
-                    align === 'right' && 'md:flex-row-reverse',
-                )}
-            >
-                {/* Texte */}
-                <div className="w-full flex-1 content-container">
-                    <div className="flex items-center mb-10 gap-6 ">
-                        {/* Image */}
-                        {mediaId && mediaUrl && (
-                            <div className="flex-shrink-0 md:w-1/5 w-full">
-                                <div className="relative w-full h-48 md:h-40 rounded-xl overflow-hidden shadow-sm">
-                                    <Image
-                                        src={mediaUrl}
-                                        alt={title || 'Image de section'}
-                                        fill
-                                        style={{objectFit: 'cover'}}
-                                        sizes="(max-width: 768px) 100vw, 20vw"
-                                        priority={false}
-                                    />
-                                </div>
+        <section
+            className={clsx(
+                'w-full py-20 md:py-[5rem]',
+                hasDarkModules ? 'bg-primary' : 'bg-cream',
+                className,
+            )}
+        >
+            <div className={clsx('w-full max-w-[960px] mx-auto')}>
+                <div
+                    className={clsx(
+                        'grid gap-16 md:gap-[4rem] items-center',
+                        mediaId && mediaUrl ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1',
+                        align === 'right' && 'md:grid-flow-dense',
+                    )}
+                >
+                    {/* Text content */}
+                    <div
+                        className={clsx(
+                            'content-container',
+                            align === 'right' && mediaId && mediaUrl && 'md:col-start-2',
+                        )}
+                    >
+                        {title && (
+                            <div className="mb-3 md:mb-4">
+                                <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary leading-none">
+                                    {title}
+                                </h3>
                             </div>
                         )}
-                        {title && (
-                            <div className="flex-1 flex flex-col items-start">
-                                <h2
-                                    className="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl mb-6 justify-self-start">
-                                    {title}
-                                </h2>
-                                <div className="w-full border-b-1 border-secondary"/>
+
+                        <ContentsTyped
+                            contents={contents}
+                            loading={!!(loading && sectionId)}
+                            loadingMessage="Chargement des contenus..."
+                            theme={hasDarkModules ? 'dark' : 'light'}
+                        />
+
+                        {/* Modules Section */}
+                        {sectionId && showModules && (
+                            <div className="">
+                                <ModulesList sectionId={sectionId} onModulesChange={handleModulesChange}/>
                             </div>
                         )}
                     </div>
 
-                    <ContentsTyped
-                        contents={contents}
-                        loading={!!(loading && sectionId)}
-                        loadingMessage="Chargement des contenus..."
-                    />
-
-                    {/* Modules Section */}
-                    {sectionId && showModules && (
-                        <div className="mt-10">
-                            <ModulesList sectionId={sectionId}/>
+                    {/* Image */}
+                    {mediaId && mediaUrl && (
+                        <div className={clsx('about-img-wrap relative', align === 'right' && 'md:col-start-1')}>
+                            <div className="relative w-full aspect-[3/4] overflow-hidden shadow-lg">
+                                <Image
+                                    src={mediaUrl}
+                                    alt={title || 'Image de section'}
+                                    fill
+                                    style={{objectFit: 'cover'}}
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority={false}
+                                />
+                            </div>
+                            <div
+                                className="about-img-accent absolute bottom-[-14px] right-[-14px] w-[75%] h-[75%] border border-gold opacity-30 pointer-events-none"
+                                aria-hidden="true"
+                            />
                         </div>
                     )}
                 </div>

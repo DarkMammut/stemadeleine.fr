@@ -54,6 +54,11 @@ public class NewsletterPublication {
     @JoinColumn(name = "media_id", foreignKey = @ForeignKey(name = "newsletter_publications_media_id_fkey"))
     private Media media;
 
+    // Optional PDF file attachment for the newsletter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pdf_file_id", foreignKey = @ForeignKey(name = "newsletter_publications_pdf_file_id_fkey"))
+    private Media pdfFile;
+
     // Author who created this newsletter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "newsletter_publications_author_id_fkey"))

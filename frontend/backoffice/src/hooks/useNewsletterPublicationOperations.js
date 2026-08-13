@@ -181,6 +181,39 @@ export const useNewsletterPublicationOperations = () => {
     [axios],
   );
 
+  // Set PDF file for newsletter publication
+  const setNewsletterPublicationPdfFile = useCallback(
+    async (id, mediaId) => {
+      try {
+        const response = await axios.put(
+          `/api/newsletter-publication/${id}/pdf-file`,
+          { mediaId },
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error setting newsletter publication PDF file:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
+
+  // Remove PDF file from newsletter publication
+  const removeNewsletterPublicationPdfFile = useCallback(
+    async (id) => {
+      try {
+        const response = await axios.delete(
+          `/api/newsletter-publication/${id}/pdf-file`,
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error removing newsletter publication PDF file:", error);
+        throw error;
+      }
+    },
+    [axios],
+  );
+
   // Publish newsletter publication
   const publishNewsletterPublication = useCallback(
     async (id) => {
@@ -237,6 +270,8 @@ export const useNewsletterPublicationOperations = () => {
     updateNewsletterPublicationVisibility,
     setNewsletterPublicationMedia,
     removeNewsletterPublicationMedia,
+    setNewsletterPublicationPdfFile,
+    removeNewsletterPublicationPdfFile,
     publishNewsletterPublication,
     deleteNewsletterPublication,
     createNewsletterContent,

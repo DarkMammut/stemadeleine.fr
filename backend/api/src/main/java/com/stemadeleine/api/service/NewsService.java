@@ -7,12 +7,15 @@ import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.NewsRepository;
 import com.stemadeleine.api.repository.SectionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +27,8 @@ public class NewsService {
     private final NewsRepository newsRepository;
     private final ModuleService moduleService;
     private final SectionRepository sectionRepository;
+    private final PageService pageService;
+    private final SectionService sectionService;
 
     public List<News> getAllNews() {
         log.info("Récupération de toutes les actualités non supprimées");
@@ -46,6 +51,102 @@ public class NewsService {
                 .filter(n -> n.getStatus() != PublishingStatus.DELETED);
         log.debug("Actualité trouvée : {}", news.isPresent());
         return news;
+    }
+
+    public boolean existsNewsWithVariantAll() {
+        log.info("Vérification de l'existence d'une actualité avec la variante ALL");
+        boolean exists = newsRepository.existsByVariantAndStatusNot(NewsVariants.ALL, PublishingStatus.DELETED);
+        log.debug("Actualité avec variante ALL existe : {}", exists);
+        return exists;
+    }
+
+    @Transactional
+    public Map<String, UUID> createNewsPagesStructure(User author) {
+        log.info("Création de la structure complète pour les pages Actualités avec URL fixe /actualites");
+
+        // 1. Créer la page "Actualités" à la racine (parentPageId = null)
+        Page actualitesPage = pageService.createNewPage(null, "Actualités", author);
+
+        // Mettre à jour le slug et publier la page
+        actualitesPage = pageService.updatePage(
+                actualitesPage.getPageId(),
+                "Actualités",
+                "Actualités",
+                null,
+                "/actualites",
+                null,
+                true,
+                author
+        );
+        log.debug("Page Actualités créée et publiée avec l'ID : {}", actualitesPage.getPageId());
+
+        // 2. Créer une section dans cette page
+        Section section = sectionService.createNewSection(actualitesPage.getPageId(), "Section Actualités", author);
+        section = sectionService.updateSection(section.getSectionId(), "Section Actualités", "Section Actualités", true, author);
+        log.debug("Section créée et publiée avec l'ID : {}", section.getSectionId());
+
+        // 3. Créer la page enfant dynamique [newsId]
+        Page detailPage = pageService.createNewPage(actualitesPage.getPageId(), "[newsId]", author);
+        detailPage = pageService.updatePage(
+                detailPage.getPageId(),
+                "[newsId]",
+                "[newsId]",
+                null,
+                "/[newsId]",
+                null,
+                false, // Invisible dans la navigation (route dynamique)
+                author
+        );
+        log.debug("Page détail créée et publiée (invisible) avec l'ID : {}", detailPage.getPageId());
+
+        // 4. URL de détail toujours fixée à /actualites
+        String detailPageUrl = "/actualites";
+        log.debug("URL de base pour les détails : {}", detailPageUrl);
+
+        // 5. Créer le module News avec variante ALL
+        News news = News.builder()
+                .moduleId(UUID.randomUUID())
+                .variant(NewsVariants.ALL)
+                .contents(new ArrayList<>())
+                .section(section)
+                .name("Toutes les actualités")
+                .title("Toutes les actualités")
+                .type("NEWS")
+                .sortOrder(0)
+                .isVisible(true)
+                .status(PublishingStatus.PUBLISHED)
+                .author(author)
+                .version(1)
+                .description("Module pour afficher toutes les actualités")
+                .detailPageUrl(detailPageUrl)
+                .build();
+
+        News savedNews = newsRepository.save(news);
+        log.debug("Module News créé et publié avec l'ID : {}, URL de détail : {}", savedNews.getModuleId(), detailPageUrl);
+
+        // 6. Mettre à jour tous les modules News existants (non supprimés) avec l'URL /actualites
+        log.info("Mise à jour de tous les modules News existants avec l'URL : {}", detailPageUrl);
+        List<News> existingNewsList = newsRepository.findByStatusNot(PublishingStatus.DELETED);
+        int updatedCount = 0;
+
+        for (News existingNews : existingNewsList) {
+            if (!existingNews.getId().equals(savedNews.getId())) {
+                existingNews.setDetailPageUrl(detailPageUrl);
+                newsRepository.save(existingNews);
+                updatedCount++;
+            }
+        }
+
+        log.info("Mise à jour terminée : {} module(s) News mis à jour avec l'URL {}", updatedCount, detailPageUrl);
+        log.info("Structure Actualités créée avec succès");
+
+        Map<String, UUID> result = new HashMap<>();
+        result.put("actualitesPageId", actualitesPage.getPageId());
+        result.put("detailPageId", detailPage.getPageId());
+        result.put("sectionId", section.getSectionId());
+        result.put("newsModuleId", savedNews.getModuleId());
+
+        return result;
     }
 
     public News updateNews(UUID id, UpdateNewsPutRequest request) {

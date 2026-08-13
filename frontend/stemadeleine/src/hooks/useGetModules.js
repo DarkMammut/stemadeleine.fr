@@ -250,6 +250,67 @@ const useGetModules = () => {
     setNewsletterError(null);
   }, []);
 
+  // -----------------------------------------------------------------------
+  // New: fetch CTA by moduleId
+  // Utilise l'endpoint défini dans ModulePublicController:
+  // GET /api/public/modules/cta/by-module-id/{moduleId}
+  // -----------------------------------------------------------------------
+
+  const [cta, setCta] = useState(null);
+  const [ctaLoading, setCtaLoading] = useState(false);
+  const [ctaError, setCtaError] = useState(null);
+
+  /**
+   * Fetch latest CTA (version) by moduleId
+   * @param {string} moduleId - UUID of the module
+   * @returns {Promise<Object|null>} - CTA DTO or null if not found/error
+   */
+  const fetchCTAByModuleId = useCallback(
+    async (moduleId) => {
+      if (!moduleId) {
+        console.warn('useGetModules: moduleId is required to fetch cta');
+        return null;
+      }
+
+      setCtaLoading(true);
+      setCtaError(null);
+
+      try {
+        console.log(`Fetching cta for moduleId: ${moduleId}`);
+
+        const response = await axiosClient.get(
+          `/api/public/modules/cta/by-module-id/${moduleId}`,
+        );
+
+        const data = response.data;
+        console.log(`Fetched cta for moduleId: ${moduleId}`, data);
+
+        setCta(data);
+        return data;
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.warn(`No cta found for moduleId: ${moduleId}`);
+          setCta(null);
+          return null;
+        }
+
+        const errorMessage = `Error fetching cta for moduleId ${moduleId}: ${err.message}`;
+        console.error(errorMessage, err);
+        setCtaError(errorMessage);
+        setCta(null);
+        return null;
+      } finally {
+        setCtaLoading(false);
+      }
+    },
+    [axiosClient],
+  );
+
+  const clearCTA = useCallback(() => {
+    setCta(null);
+    setCtaError(null);
+  }, []);
+
   return {
     modules,
     loading,
@@ -274,6 +335,12 @@ const useGetModules = () => {
     newsletterError,
     fetchNewsletterByModuleId,
     clearNewsletter,
+    // CTA helpers
+    cta,
+    ctaLoading,
+    ctaError,
+    fetchCTAByModuleId,
+    clearCTA,
   };
 };
 

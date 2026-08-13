@@ -268,6 +268,54 @@ public class NewsletterPublicationService {
     }
 
     /**
+     * Set PDF file for newsletter publication
+     */
+    @Transactional
+    public NewsletterPublication setPdfFile(UUID id, UUID mediaId, User currentUser) {
+        log.info("Setting PDF file {} for newsletter publication {} by user: {}",
+                mediaId, id, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        NewsletterPublication publication = newsletterPublicationRepository.findById(id)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("Newsletter publication not found with ID: {}", id);
+                    return new RuntimeException("Newsletter publication not found");
+                });
+
+        Media pdfFile = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> {
+                    log.error("Media not found with ID: {}", mediaId);
+                    return new RuntimeException("Media not found");
+                });
+
+        publication.setPdfFile(pdfFile);
+        NewsletterPublication savedPublication = newsletterPublicationRepository.save(publication);
+        log.info("PDF file set successfully for newsletter publication");
+        return savedPublication;
+    }
+
+    /**
+     * Remove PDF file from newsletter publication
+     */
+    @Transactional
+    public NewsletterPublication removePdfFile(UUID id, User currentUser) {
+        log.info("Removing PDF file from newsletter publication {} by user: {}",
+                id, currentUser.getFirstname() + " " + currentUser.getLastname());
+
+        NewsletterPublication publication = newsletterPublicationRepository.findById(id)
+                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
+                .orElseThrow(() -> {
+                    log.error("Newsletter publication not found with ID: {}", id);
+                    return new RuntimeException("Newsletter publication not found");
+                });
+
+        publication.setPdfFile(null);
+        NewsletterPublication savedPublication = newsletterPublicationRepository.save(publication);
+        log.info("PDF file removed successfully from newsletter publication");
+        return savedPublication;
+    }
+
+    /**
      * Publish newsletter publication
      */
     @Transactional

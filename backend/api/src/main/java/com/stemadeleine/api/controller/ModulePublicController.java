@@ -2,19 +2,30 @@ package com.stemadeleine.api.controller;
 
 
 import com.stemadeleine.api.dto.ArticleDto;
+import com.stemadeleine.api.dto.CTADto;
 import com.stemadeleine.api.dto.GalleryDto;
+import com.stemadeleine.api.dto.NewsDto;
 import com.stemadeleine.api.dto.NewsletterDto;
 import com.stemadeleine.api.dto.NewsletterPublicationDto;
+import com.stemadeleine.api.dto.NewsPublicationDto;
 import com.stemadeleine.api.mapper.ArticleMapper;
+import com.stemadeleine.api.mapper.CTAMapper;
 import com.stemadeleine.api.mapper.GalleryMapper;
+import com.stemadeleine.api.mapper.NewsMapper;
 import com.stemadeleine.api.mapper.NewsletterMapper;
 import com.stemadeleine.api.mapper.NewsletterPublicationMapper;
+import com.stemadeleine.api.mapper.NewsPublicationMapper;
 import com.stemadeleine.api.service.ArticleService;
+import com.stemadeleine.api.service.CTAService;
 import com.stemadeleine.api.service.GalleryService;
+import com.stemadeleine.api.service.NewsPublicationService;
 import com.stemadeleine.api.service.NewsletterPublicationService;
 import com.stemadeleine.api.service.NewsletterService;
+import com.stemadeleine.api.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,12 +42,18 @@ public class ModulePublicController {
 
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
+    private final CTAService ctaService;
+    private final CTAMapper ctaMapper;
     private final GalleryService galleryService;
     private final GalleryMapper galleryMapper;
     private final NewsletterService newsletterService;
     private final NewsletterMapper newsletterMapper;
     private final NewsletterPublicationService newsletterPublicationService;
     private final NewsletterPublicationMapper newsletterPublicationMapper;
+    private final NewsService newsService;
+    private final NewsMapper newsMapper;
+    private final NewsPublicationService newsPublicationService;
+    private final NewsPublicationMapper newsPublicationMapper;
 
     @GetMapping("article/by-module-id/{moduleId}")
     public ResponseEntity<ArticleDto> getArticleByModuleId(@PathVariable UUID moduleId) {
@@ -48,6 +65,20 @@ public class ModulePublicController {
                 })
                 .orElseGet(() -> {
                     log.warn("Article not found with moduleId: {}", moduleId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("cta/by-module-id/{moduleId}")
+    public ResponseEntity<CTADto> getCTAByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/public/modules/cta/by-module-id/{} - Retrieving latest CTA version by moduleId", moduleId);
+        return ctaService.getCTAByModuleId(moduleId)
+                .map(cta -> {
+                    log.debug("CTA found: {} (version {})", cta.getId(), cta.getVersion());
+                    return ResponseEntity.ok(ctaMapper.toDto(cta));
+                })
+                .orElseGet(() -> {
+                    log.warn("CTA not found with moduleId: {}", moduleId);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -117,6 +148,46 @@ public class ModulePublicController {
                 })
                 .orElseGet(() -> {
                     log.warn("Newsletter publication not found with newsletterId: {}", newsletterId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    // ===== NEWS PUBLIC ENDPOINTS =====
+
+    @GetMapping("news/by-module-id/{moduleId}")
+    public ResponseEntity<NewsDto> getNewsByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/public/modules/news/by-module-id/{} - Retrieving latest news version by moduleId", moduleId);
+        return newsService.getLastVersionByModuleId(moduleId)
+                .map(news -> {
+                    log.debug("News found: {} (version {})", news.getId(), news.getVersion());
+                    return ResponseEntity.ok(newsMapper.toDto(news));
+                })
+                .orElseGet(() -> {
+                    log.warn("News not found with moduleId: {}", moduleId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("news/publications")
+    public ResponseEntity<Page<NewsPublicationDto>> getNewsPublications(Pageable pageable) {
+        log.info("GET /api/public/modules/news/publications - Retrieving published news page");
+        Page<NewsPublicationDto> publications = newsPublicationService.getPublishedNews(pageable)
+                .map(newsPublicationMapper::toDto);
+        log.debug("Found {} published news", publications.getTotalElements());
+        return ResponseEntity.ok(publications);
+    }
+
+    @GetMapping("news/publications/news/{newsId}")
+    public ResponseEntity<NewsPublicationDto> getNewsPublicationByNewsIdPublic(@PathVariable UUID newsId) {
+        log.info("GET /api/public/modules/news/publications/news/{} - Retrieving published news by newsId", newsId);
+        return newsPublicationService.getNewsPublicationByNewsId(newsId)
+                .filter(p -> p.getStatus() != com.stemadeleine.api.model.PublishingStatus.DELETED)
+                .map(publication -> {
+                    log.debug("News publication found for newsId {}: {}", newsId, publication.getName());
+                    return ResponseEntity.ok(newsPublicationMapper.toDto(publication));
+                })
+                .orElseGet(() -> {
+                    log.warn("News publication not found with newsId: {}", newsId);
                     return ResponseEntity.notFound().build();
                 });
     }

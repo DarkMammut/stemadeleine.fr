@@ -1,154 +1,154 @@
 'use client';
 
-import React, { useState } from 'react';
-import type { FooterParent, NavigationShape, NavLink, SocialItem } from './Layout';
-import Button from '@/components/Button';
-import { axiosClient } from '@/utils/axiosClient';
+import React from 'react';
+import type {FooterParent} from './Layout';
+import IconButton from '@/components/IconButton';
+import {HeartIcon} from '@heroicons/react/24/solid';
+import useGetOrganization from '@/hooks/useGetOrganization';
 
 type FooterProps = {
-  navigation?: NavigationShape | null;
-  pagesNav?: FooterParent[];
+    pagesNav?: FooterParent[];
 };
 
-const defaultNav = {
-  solutions: [] as NavLink[],
-  support: [] as NavLink[],
-  company: [] as NavLink[],
-  legal: [] as NavLink[],
-  social: [] as SocialItem[],
-};
+export default function Footer({pagesNav}: FooterProps) {
+    const parents = Array.isArray(pagesNav) ? pagesNav : [];
+    const [isDonHovered, setIsDonHovered] = React.useState(false);
 
-export default function Footer({ navigation, pagesNav }: FooterProps) {
-  const nav = navigation || defaultNav;
-  const parents = Array.isArray(pagesNav) ? pagesNav : [];
+    type OrgInfo = { name?: string } | undefined | null;
+    const {info} = useGetOrganization() as { info?: OrgInfo };
+    const orgName = info?.name || 'Les Amis de Sainte Madeleine';
 
-  // Nouvel état pour le formulaire de newsletter
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    // Two navigation columns from CMS pages (first two parent entries)
+    const col1 = parents[0] ?? null;
+    const col2 = parents[1] ?? null;
 
-  const isValidEmail = /^\S+@\S+\.\S+$/.test(email);
+    return (
+        <footer
+            className="border-t px-10 pb-8 pt-14 bg-primary-dark border-secondary"
+        >
+            <div className="mx-auto max-w-[960px]">
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isValidEmail) {
-      setStatus('error');
-      return;
-    }
-
-    try {
-      setStatus('loading');
-      const response = await axiosClient.post('/api/public/newsletter', { email });
-      if (response.status === 201 || response.status === 200) {
-        setStatus('success');
-        setEmail('');
-      } else {
-        setStatus('error');
-      }
-    } catch (err: any) {
-      console.error('Newsletter subscribe error', err);
-      setStatus('error');
-    }
-  };
-
-  return (
-    <footer className="bg-gray-800">
-      <div className="mx-auto max-w-7xl px-6 pt-20 pb-8 sm:pt-24 lg:px-8 lg:pt-32">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="grid grid-cols-2 gap-8 xl:col-span-2">
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              {parents.slice(0, 2).map((parent) => (
-                <div key={parent.name}>
-                  <h3 className="text-sm/6 font-semibold text-gray-100">
-                    <a href={parent.href} className="hover:underline">{parent.name}</a>
-                  </h3>
-                  <ul role="list" className="mt-6 space-y-4">
-                    {parent.children.map((child) => (
-                      <li key={child.name}>
-                        <a href={child.href} className="text-sm/6 text-gray-300 hover:text-gray-100">
-                          {child.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              {parents.slice(2, 4).map((parent) => (
-                <div key={parent.name} className={parent ? '' : 'hidden'}>
-                  <h3 className="text-sm/6 font-semibold text-gray-100">
-                    <a href={parent.href} className="hover:underline">{parent.name}</a>
-                  </h3>
-                  <ul role="list" className="mt-6 space-y-4">
-                    {parent.children.map((child) => (
-                      <li key={child.name}>
-                        <a href={child.href} className="text-sm/6 text-gray-600 hover:text-gray-900">
-                          {child.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-10 xl:mt-0">
-            <h3 className="text-sm/6 font-semibold text-gray-300">Souscrire à la newsletter</h3>
-            <form className="mt-6 sm:flex sm:max-w-md" onSubmit={handleSubmit} noValidate>
-              <label htmlFor="email-address" className="sr-only">
-                Adresse email
-              </label>
-              <input
-                id="email-address"
-                name="email-address"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (status !== 'idle') setStatus('idle');
-                }}
-                placeholder="Saisir votre adresse email"
-                autoComplete="email"
-                className="w-full min-w-0 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:w-64 sm:text-sm/6 xl:w-full"
-                aria-invalid={status === 'error' ? 'true' : 'false'}
-              />
-              <div className="mt-4 sm:mt-0 sm:ml-4 sm:shrink-0">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="md"
-                  className="w-full sm:w-auto"
-                  disabled={!isValidEmail || status === 'loading'}
+                {/* Top row */}
+                <div
+                    className="mb-[1.8rem] flex flex-wrap items-start justify-between gap-8 pb-10"
+                    style={{borderBottom: '1px solid rgba(184,151,58,0.1)'}}
                 >
-                  {status === 'loading' ? 'En cours...' : 'S\'abonner'}
-                </Button>
-              </div>
-            </form>
+                    {/* Brand */}
+                    <div>
+                        <p
+                            className="mb-[0.4rem] font-serif text-[1.1rem]"
+                            style={{color: 'var(--color-secondary-light)'}}
+                        >
+                            {orgName}
+                        </p>
+                        <p className="text-[11px]" style={{color: 'rgba(247,242,232,0.3)'}}>
+                            de la Jarrie · Charente-Maritime
+                        </p>
+                    </div>
 
-            {status === 'error' && (
-              <p className="mt-2 text-sm text-red-600">Veuillez saisir une adresse email valide.</p>
-            )}
-            {status === 'success' && (
-              <p className="mt-2 text-sm text-green-600">Merci ! Votre adresse a été ajoutée.</p>
-            )}
-          </div>
-        </div>
-        <div
-          className="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 md:flex md:items-center md:justify-between lg:mt-24">
-          <div className="flex gap-x-6 md:order-2">
-            {nav.social!.map((item) => (
-              <a key={item.name} href={item.href} className="text-gray-600 hover:text-gray-800">
-                <span className="sr-only">{item.name}</span>
-                {item.icon ? React.createElement(item.icon, { 'aria-hidden': true, className: 'size-6' }) : null}
-              </a>
-            ))}
-          </div>
-          <p className="mt-8 text-sm/6 text-gray-400 md:order-1 md:mt-0">
-            &copy; 2025 Les Amis de Sainte Madeleine de la Jarrie, Inc. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
+                    {/* Nav column 1 */}
+                    {col1 && (
+                        <div>
+                            <h4
+                                className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]"
+                                style={{color: 'var(--color-secondary)'}}
+                            >
+                                {col1.name}
+                            </h4>
+                            <ul className="space-y-[0.45rem]">
+                                {col1.children.map((child) => (
+                                    <li key={child.name}>
+                                        <a
+                                            href={child.href}
+                                            className="text-[12px] transition-colors duration-200"
+                                            style={{color: 'rgba(247,242,232,0.38)'}}
+                                            onMouseEnter={(e) =>
+                                                ((e.currentTarget as HTMLAnchorElement).style.color =
+                                                    'var(--color-secondary-light)')
+                                            }
+                                            onMouseLeave={(e) =>
+                                                ((e.currentTarget as HTMLAnchorElement).style.color =
+                                                    'rgba(247,242,232,0.38)')
+                                            }
+                                        >
+                                            {child.name}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Nav column 2 */}
+                    {col2 && (
+                        <div>
+                            <h4
+                                className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]"
+                                style={{color: 'var(--color-secondary)'}}
+                            >
+                                {col2.name}
+                            </h4>
+                            <ul className="space-y-[0.45rem]">
+                                {col2.children.map((child) => (
+                                    <li key={child.name}>
+                                        <a
+                                            href={child.href}
+                                            className="text-[12px] transition-colors duration-200"
+                                            style={{color: 'rgba(247,242,232,0.38)'}}
+                                            onMouseEnter={(e) =>
+                                                ((e.currentTarget as HTMLAnchorElement).style.color =
+                                                    'var(--color-secondary-light)')
+                                            }
+                                            onMouseLeave={(e) =>
+                                                ((e.currentTarget as HTMLAnchorElement).style.color =
+                                                    'rgba(247,242,232,0.38)')
+                                            }
+                                        >
+                                            {child.name}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Donation button */}
+                    <div className="flex items-start">
+                        <IconButton
+                            as="a"
+                            href="https://www.helloasso.com/associations/les-amis-de-sainte-madeleine-de-la-jarrie/formulaires/2"
+                            icon={HeartIcon}
+                            label="Faire un don"
+                            variant="outline"
+                            unstyled={true}
+                            forceWhiteOnHover={false}
+                            onMouseEnter={() => setIsDonHovered(true)}
+                            onMouseLeave={() => setIsDonHovered(false)}
+                            style={{
+                                backgroundColor: 'transparent',
+                                color: isDonHovered
+                                    ? 'var(--color-secondary-light)'
+                                    : 'var(--color-secondary)',
+                                borderColor: isDonHovered
+                                    ? 'var(--color-secondary)'
+                                    : 'rgba(184,151,58,0.3)',
+                            }}
+                            className="rounded-none border px-[1.1rem] py-[0.6rem] text-[11px] font-semibold uppercase tracking-[0.1em]"
+                        />
+                    </div>
+                </div>
+
+                {/* Bottom row */}
+                <div className="flex flex-wrap justify-between gap-2">
+          <span className="text-[11px]" style={{color: 'rgba(247,242,232,0.22)'}}>
+            © 2025 Les Amis de Sainte Madeleine de la Jarrie · Tous droits réservés
+          </span>
+                    <span className="text-[11px]" style={{color: 'rgba(247,242,232,0.22)'}}>
+            Mentions légales · Politique de confidentialité
+          </span>
+                </div>
+
+            </div>
+        </footer>
+    );
 }

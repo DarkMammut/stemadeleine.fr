@@ -3,6 +3,7 @@ import ArticleModule from '@/components/modules/ArticleModule';
 import NewsModule from '@/components/modules/NewsModule';
 import GalleryModule from '@/components/modules/GalleryModule';
 import NewslettersModule, {NewslettersModuleType} from '@/components/modules/NewslettersModule';
+import CTAModule, {CTAModuleType} from '@/components/modules/CTAModule';
 
 type ModuleType = {
     id: string;
@@ -38,8 +39,7 @@ const ModuleRenderer: React.FC<Props> = ({module}) => {
             // return <FormModule module={module} />;
             return <div>Form module not implemented yet</div>;
         case 'CTA':
-            // return <CTAModule module={module} />;
-            return <div>CTA module not implemented yet</div>;
+            return <CTAModule module={module as CTAModuleType}/>;
         case 'TIMELINE':
             // return <TimelineModule module={module} />;
             return <div>Timeline module not implemented yet</div>;

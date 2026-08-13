@@ -36,6 +36,20 @@ public class CTAController {
                 .toList();
     }
 
+    @GetMapping("/by-module-id/{moduleId}")
+    public ResponseEntity<CTADto> getCTAByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/cta/by-module-id/{} - Retrieving CTA by moduleId", moduleId);
+        return ctaService.getCTAByModuleId(moduleId)
+                .map(cta -> {
+                    log.debug("CTA found for moduleId {}: {}", moduleId, cta.getId());
+                    return ResponseEntity.ok(ctaMapper.toDto(cta));
+                })
+                .orElseGet(() -> {
+                    log.warn("CTA not found for moduleId: {}", moduleId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CTADto> getCTAById(@PathVariable UUID id) {
         log.info("GET /api/cta/{} - Retrieving CTA by ID", id);

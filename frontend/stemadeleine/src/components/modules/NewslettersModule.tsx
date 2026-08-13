@@ -1,16 +1,19 @@
 'use client';
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import clsx from 'clsx';
+import Pagination from '@/components/Pagination';
 import useGetNewsletterPublications from '@/hooks/useGetNewsletterPublications';
 import useGetModules from '@/hooks/useGetModules';
 import NewsletterCard from './NewsletterCard';
 
-// Local types for the newsletter DTO returned by the backend
+type NewsletterVariant = 'LAST' | 'LAST3' | 'LAST5' | 'ALL';
+
+const ALL_NEWSLETTERS_PAGE_SIZE = 6;
+
 interface NewsletterDto {
     variant?: string;
     detailPageUrl?: string;
-    // other fields omitted on purpose
 }
 
 export interface NewslettersModuleType {
@@ -21,9 +24,9 @@ export interface NewslettersModuleType {
     type: string;
     isVisible?: boolean;
     sortOrder?: number;
-    mediaId?: string;
     description?: string;
-    createdAt?: string;
+    variant?: string;
+    detailPageUrl?: string;
 
     [key: string]: unknown;
 }
@@ -34,15 +37,15 @@ interface Props {
 }
 
 const NewslettersModule: React.FC<Props> = ({module, className = ''}) => {
+    const [currentPage, setCurrentPage] = useState(1);
     const {
         publications,
         loading: publicationsLoading,
         error: publicationsError,
-        fetchPublications
+        fetchPublications,
     } = useGetNewsletterPublications();
 
-    // Cast proprement le hook JS vers une interface connue localement
-    const modulesHook = useGetModules() as unknown as {
+    const modulesHook = useGetModules() as {
         newsletter?: NewsletterDto | null;
         newsletterLoading?: boolean;
         fetchNewsletterByModuleId?: (moduleId: string) => Promise<NewsletterDto | null>;
@@ -51,107 +54,140 @@ const NewslettersModule: React.FC<Props> = ({module, className = ''}) => {
     const {newsletter, newsletterLoading, fetchNewsletterByModuleId} = modulesHook;
 
     useEffect(() => {
-        // On récupère toujours les publications
         fetchPublications().catch(console.error);
 
-        // On récupère les infos du module newsletter (variant, etc.)
         if (module.moduleId) {
             fetchNewsletterByModuleId?.(module.moduleId).catch(console.error);
         }
     }, [module.moduleId, fetchPublications, fetchNewsletterByModuleId]);
 
-    // Utiliser l'URL du backend, sans fallback si non définie
-    const basePath = newsletter?.detailPageUrl ?? null;
+    const variant = ((newsletter?.variant || module.variant || 'LAST3').toUpperCase() as NewsletterVariant);
+    const basePath = newsletter?.detailPageUrl ?? module.detailPageUrl ?? '/newsletters';
 
-    // Filtrer les publications selon le variant
-    const filteredPublications = useMemo(() => {
-        if (!publications || publications.length === 0) {
-            return [];
-        }
+    const sortedPublications = useMemo(() => (
+        [...publications]
+            .filter((item) => item.isVisible !== false)
+            .sort((a, b) => {
+                const dateA = a.publishedDate ? new Date(a.publishedDate).getTime() : 0;
+                const dateB = b.publishedDate ? new Date(b.publishedDate).getTime() : 0;
+                return dateB - dateA;
+            })
+    ), [publications]);
 
-        const variant = newsletter?.variant?.toUpperCase();
+    const totalPages = Math.ceil(sortedPublications.length / ALL_NEWSLETTERS_PAGE_SIZE);
+    const effectiveCurrentPage = variant === 'ALL'
+        ? Math.min(currentPage, Math.max(totalPages, 1))
+        : 1;
 
-        // Trier par date de publication décroissante
-        const sorted = [...publications].sort((a, b) => {
-            const dateA = a.publishedDate ? new Date(a.publishedDate).getTime() : 0;
-            const dateB = b.publishedDate ? new Date(b.publishedDate).getTime() : 0;
-            return dateB - dateA;
-        });
+    const paginatedAllPublications = useMemo(() => {
+        const startIndex = (effectiveCurrentPage - 1) * ALL_NEWSLETTERS_PAGE_SIZE;
+        return sortedPublications.slice(startIndex, startIndex + ALL_NEWSLETTERS_PAGE_SIZE);
+    }, [effectiveCurrentPage, sortedPublications]);
 
-        // Filtrer selon le variant
+    const displayedPublications = useMemo(() => {
         switch (variant) {
             case 'LAST':
-                return sorted.slice(0, 1);
-            case 'LAST3':
-                return sorted.slice(0, 3);
+                return sortedPublications.slice(0, 1);
             case 'LAST5':
-                return sorted.slice(0, 5);
+                return sortedPublications.slice(0, 5);
             case 'ALL':
+                return paginatedAllPublications;
+            case 'LAST3':
             default:
-                return sorted;
+                return sortedPublications.slice(0, 3);
         }
-    }, [publications, newsletter?.variant]);
+    }, [paginatedAllPublications, sortedPublications, variant]);
 
     if (!module.isVisible) {
         return null;
     }
 
-    const isLoading = publicationsLoading || Boolean(newsletterLoading);
-
-    if (isLoading) {
+    if ((publicationsLoading || newsletterLoading) && sortedPublications.length === 0) {
         return (
-            <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex items-center justify-center py-12">
+                <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gold"></div>
             </div>
         );
     }
 
     if (publicationsError) {
         return (
-            <div className="text-center py-12 text-red-500">
+            <div className="py-12 text-center text-red-500">
                 <p>Erreur lors du chargement des newsletters: {publicationsError}</p>
             </div>
         );
     }
 
-    if (filteredPublications.length === 0) {
+    if (sortedPublications.length === 0) {
         return (
-            <div className="text-center py-12 text-gray-500">
+            <div className="py-12 text-center text-cream/70">
                 <p>Aucune newsletter disponible pour le moment.</p>
             </div>
         );
     }
 
+    const moduleTitle = module.title || module.name || 'Newsletters';
+
     return (
-        <section
-            className={clsx(
-                'w-full my-6 md:my-12 py-6 md:py-12 px-4 md:px-8',
-                className,
-            )}
-        >
-            {/* Module Header */}
-            <div className="mb-6 pb-6">
-                {module.title && (
-                    <h3 className="text-4xl text-gray-900 mb-4">{module.title}</h3>
-                )}
+        <div className={clsx('w-full', className)}>
+            <div className="mb-8">
+                <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-cream">
+                    {moduleTitle}
+                </h2>
+
                 {module.description && (
-                    <p className="mt-2 text-gray-600">{module.description}</p>
+                    <p className="mt-3 max-w-3xl text-sm leading-[1.8] text-[rgba(247,242,232,0.6)]">
+                        {module.description}
+                    </p>
                 )}
             </div>
 
-            {/* Newsletters List */}
-            <div className="space-y-8">
-                {filteredPublications.map((newsletter) => (
-                    <NewsletterCard
-                        key={newsletter.id}
-                        newsletter={newsletter}
-                        basePath={basePath}
+            {(variant === 'LAST3' || variant === 'LAST5') && (
+                <div className="grid grid-cols-1 gap-[1.5px] md:grid-cols-3">
+                    {displayedPublications.map((newsletterItem) => (
+                        <NewsletterCard
+                            key={newsletterItem.id}
+                            newsletter={newsletterItem}
+                            basePath={basePath}
+                            variant="grid"
+                        />
+                    ))}
+                </div>
+            )}
+
+            {variant === 'ALL' && (
+                <div className="space-y-8">
+                    <div className="space-y-[1.5px] bg-[rgba(184,151,58,0.12)]">
+                        {displayedPublications.map((newsletterItem) => (
+                            <NewsletterCard
+                                key={newsletterItem.id}
+                                newsletter={newsletterItem}
+                                basePath={basePath}
+                                variant="list"
+                            />
+                        ))}
+                    </div>
+
+                    <Pagination
+                        currentPage={effectiveCurrentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        variant="dark"
+                        disabled={publicationsLoading}
+                        ariaLabel="Pagination des newsletters"
                     />
-                ))}
-            </div>
-        </section>
+                </div>
+            )}
+
+            {variant === 'LAST' && displayedPublications[0] && (
+                <NewsletterCard
+                    newsletter={displayedPublications[0]}
+                    basePath={basePath}
+                    variant="feature"
+                />
+            )}
+        </div>
     );
 };
 
 export default NewslettersModule;
-

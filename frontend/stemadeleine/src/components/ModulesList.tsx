@@ -16,9 +16,10 @@ export interface ModuleType {
 interface Props {
     sectionId: string;
     className?: string;
+    onModulesChange?: (modules: ModuleType[]) => void;
 }
 
-const ModulesList: React.FC<Props> = ({sectionId, className = ''}) => {
+const ModulesList: React.FC<Props> = ({sectionId, className = '', onModulesChange}) => {
     const {modules, loading, error, fetchModulesBySectionId} = useGetModules();
 
     useEffect(() => {
@@ -26,6 +27,10 @@ const ModulesList: React.FC<Props> = ({sectionId, className = ''}) => {
             fetchModulesBySectionId(sectionId).catch(console.error);
         }
     }, [sectionId, fetchModulesBySectionId]);
+
+    useEffect(() => {
+        onModulesChange?.(modules as ModuleType[]);
+    }, [modules, onModulesChange]);
 
     if (loading) {
         return (
@@ -65,4 +70,3 @@ const ModulesList: React.FC<Props> = ({sectionId, className = ''}) => {
 };
 
 export default ModulesList;
-

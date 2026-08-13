@@ -4,8 +4,22 @@ import React, {useEffect} from 'react';
 import {useParams, useRouter} from 'next/navigation';
 import useGetNewsletterPublicationByNewsletterId from '@/hooks/useGetNewsletterPublicationByNewsletterId';
 import useGetOrganization from '@/hooks/useGetOrganization';
-import useGetMedia from '@/hooks/useGetMedia';
+import useGetPages from '@/hooks/useGetPages';
 import NewsletterMagazine from '@/components/NewsletterMagazine';
+import Layout from '@/components/Layout';
+
+const NEWSLETTERS_SLUG = '/newsletters';
+
+type PageShape = {
+    name?: string;
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    keywords?: string;
+    heroMedia?: { id?: string | number } | null;
+    pageId?: string | number;
+    slug?: string;
+};
 
 export default function NewsletterPage() {
     const params = useParams();
@@ -20,18 +34,33 @@ export default function NewsletterPage() {
     } = useGetNewsletterPublicationByNewsletterId();
 
     const {
-        settings,
         loading: orgLoading,
     } = useGetOrganization();
 
-    // Récupérer l'URL du logo via useGetMedia
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const settingsAny = settings as any;
-    const logoMediaId = settingsAny?.logo_media_id ? String(settingsAny.logo_media_id) : undefined;
-    const {mediaUrl: logoUrl, loading: logoLoading} = useGetMedia(logoMediaId) as {
-        mediaUrl: string | null;
-        loading: boolean;
-    };
+    const {
+        fetchPageBySlug,
+        loading: pageLoading,
+    } = useGetPages();
+
+    const [page, setPage] = React.useState<PageShape | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadPage = async () => {
+            const pageData = await fetchPageBySlug(NEWSLETTERS_SLUG);
+            if (!mounted) return;
+            if (pageData) {
+                setPage(pageData as PageShape);
+            }
+        };
+
+        loadPage();
+
+        return () => {
+            mounted = false;
+        };
+    }, [fetchPageBySlug]);
 
     useEffect(() => {
         if (newsletterId) {
@@ -46,7 +75,7 @@ export default function NewsletterPage() {
         }
     }, [newsletterLoading, newsletterError, router]);
 
-    const loading = newsletterLoading || orgLoading || logoLoading;
+    const loading = newsletterLoading || orgLoading || pageLoading;
 
     if (loading && !newsletter) {
         return (
@@ -72,9 +101,20 @@ export default function NewsletterPage() {
     }
 
     return (
-        <NewsletterMagazine
-            newsletter={newsletter}
-            organizationLogo={logoUrl || '/logo.png'}
-        />
+        <Layout
+            page={
+                page || {
+                    name: 'Newsletters',
+                    title: 'Newsletters',
+                    slug: NEWSLETTERS_SLUG,
+                }
+            }
+        >
+            <main className="bg-cream">
+                <NewsletterMagazine
+                    newsletter={newsletter}
+                />
+            </main>
+        </Layout>
     );
 }

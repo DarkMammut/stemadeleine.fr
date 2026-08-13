@@ -40,6 +40,7 @@ export interface NewsletterPublication {
     status: PublishingStatus;
     publishedDate?: string;
     media?: Media;
+    pdfFile?: Media;
     author?: User;
     contents?: Content[];
     createdAt: string;

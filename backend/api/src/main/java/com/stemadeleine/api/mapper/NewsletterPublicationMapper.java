@@ -40,6 +40,7 @@ public class NewsletterPublicationMapper {
                 .status(publication.getStatus())
                 .publishedDate(publication.getPublishedDate())
                 .media(publication.getMedia() != null ? mediaMapper.toDto(publication.getMedia()) : null)
+                .pdfFile(publication.getPdfFile() != null ? mediaMapper.toDto(publication.getPdfFile()) : null)
                 .author(publication.getAuthor() != null ? userMapper.toDto(publication.getAuthor()) : null)
                 .contents(contents.stream()
                         .map(contentMapper::toDto)

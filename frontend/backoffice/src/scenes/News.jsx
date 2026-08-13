@@ -24,6 +24,7 @@ import NewsCard from "@/components/NewsCard";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import Pagination from "@/components/ui/Pagination";
+import NewsAllVariantAlert from "@/components/NewsAllVariantAlert";
 
 export default function News() {
   const router = useRouter();
@@ -283,6 +284,8 @@ export default function News() {
   return (
     <SceneLayout>
       <Title label="Actualités" />
+
+      <NewsAllVariantAlert />
 
       <Utilities
         actions={[

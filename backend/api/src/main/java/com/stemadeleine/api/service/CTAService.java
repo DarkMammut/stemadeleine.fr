@@ -66,6 +66,12 @@ public class CTAService {
         return savedCta;
     }
 
+    public Optional<CTA> getCTAByModuleId(UUID moduleId) {
+        log.info("Recherche du CTA avec le moduleId : {}", moduleId);
+        return ctaRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(c -> c.getStatus() != PublishingStatus.DELETED);
+    }
+
     public CTA updateCTA(UUID id, UpdateCTARequest request, User user) {
         log.info("Mise à jour du CTA avec l'ID : {}", id);
         return ctaRepository.findById(id)
@@ -74,6 +80,7 @@ public class CTAService {
                     cta.setUrl(request.url());
                     cta.setVariant(request.variant());
                     cta.setName(request.name());
+                    cta.setTitle(request.title());
                     cta.setAuthor(user);
                     cta.setVersion(cta.getVersion() + 1);
                     log.debug("CTA mis à jour : {}", cta);
@@ -109,6 +116,7 @@ public class CTAService {
 
         CTA cta = CTA.builder()
                 .moduleId(module.getModuleId())
+                .section(module.getSection())
                 .name(name)
                 .title(title)
                 .label(label)

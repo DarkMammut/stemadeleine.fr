@@ -73,13 +73,22 @@ export default function Layout({children, page}: LayoutProps) {
                 pagesTree={tree}
             />
 
-            <div className={`pt-16 md:pt-20 ${page?.slug === '/' ? 'min-h-screen' : ''}`}>
+            <div className={page?.slug === '/' ? '' : 'pt-[60px]'}>
                 <Hero
                     title={page?.title}
                     mediaId={page?.heroMedia?.id}
                     subtitle={page?.subtitle}
+                    description={page?.description}
                     variant={page?.slug === '/' ? 'home' : 'default'}
+                    className={page?.slug === '/' ? 'mt-[60px] mb-0' : ''}
                 />
+            </div>
+
+            <div
+                aria-hidden="true"
+                className="bg-cream py-6 text-center text-base tracking-[0.6em] text-secondary"
+            >
+                ✦&nbsp;✦&nbsp;✦
             </div>
 
             {children}

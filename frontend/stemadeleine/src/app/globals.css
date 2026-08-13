@@ -116,10 +116,22 @@
 
 /* Application globale de la police */
 @layer base {
-    /* Appliquer Fjord One comme police par défaut via la variable injectée par next/font
-       La variable --font-fjord-one sera définie par le loader next/font dans `layout.tsx`. */
     html, body {
-        font-family: 'Fjord One', serif;
+        font-family: var(--font-inter), Inter, sans-serif;
+    }
+
+    h1, h2, h4, h5, h6 {
+        font-family: var(--font-playfair), 'Playfair Display', serif;
+        font-weight: 400;
+    }
+
+    h3 {
+        font-family: var(--font-inter), Inter, sans-serif;
+        font-weight: 400;
+    }
+
+    .font-serif {
+        font-family: var(--font-playfair), 'Playfair Display', serif !important;
     }
 
     /* Éviter la coupure de mots inappropriée SAUF pour les très longs mots */
@@ -163,12 +175,16 @@ code {
 /* Variables CSS - seront définies dynamiquement par le backend */
 :root {
     /* Couleurs par défaut - seront remplacées par les couleurs du backend */
-    --color-primary: #90cab4;
-    --color-secondary: #e2832b;
-    --color-primary-light: color-mix(in srgb, var(--color-primary), white 60%);
+    --color-primary: #2C2416;
+    --color-secondary: #B8973A;
+    --color-accent: #F7F2E8;
+    --color-text: #5C4F35;
+    --color-primary-light: color-mix(in srgb, var(--color-primary), white 40%);
     --color-primary-dark: color-mix(in srgb, var(--color-primary), black 40%);
-    --color-secondary-light: color-mix(in srgb, var(--color-secondary), white 60%);
+    --color-secondary-light: color-mix(in srgb, var(--color-secondary), white 40%);
     --color-secondary-dark: color-mix(in srgb, var(--color-secondary), black 40%);
+    --color-accent-light: color-mix(in srgb, var(--color-accent), white 40%);
+    --color-accent-dark: color-mix(in srgb, var(--color-accent), black 40%);
     --color-primary-rgb: 144, 202, 180;
     --color-secondary-rgb: 226, 131, 43;
 
@@ -194,6 +210,27 @@ code {
     --color-secondary-700: 168, 87, 28;
     --color-secondary-800: 135, 71, 28;
     --color-secondary-900: 110, 59, 26;
+
+    --color-accent-50: 248, 241, 224;
+    --color-accent-100: 242, 227, 195;
+    --color-accent-200: 230, 205, 146;
+    --color-accent-300: 216, 181, 101;
+    --color-accent-400: 201, 163, 68;
+    --color-accent-500: 184, 151, 58;
+    --color-accent-600: 162, 128, 45;
+    --color-accent-700: 137, 104, 37;
+    --color-accent-800: 112, 86, 33;
+    --color-accent-900: 92, 71, 30;
+
+    /* Palette Sainte-Madeleine */
+    --color-stone: #2C2416;
+    --color-gold: #B8973A;
+    --color-gold-light: #E8C96A;
+    --color-cream: #F7F2E8;
+    --color-cream-dark: #EDE6D3;
+    --color-text-dark: #1A1208;
+    --color-text-mid: #5C4F35;
+    --color-text-light: #8C7B5A;
 }
 
 /* Custom Tailwind utilities using organization colors */
@@ -306,6 +343,39 @@ code {
         background-color: var(--color-secondary-dark);
     }
 
+    .bg-accent {
+        background-color: var(--color-accent);
+    }
+
+    .bg-accent-light {
+        background-color: var(--color-accent-light);
+    }
+
+    .bg-accent-dark {
+        background-color: var(--color-accent-dark);
+    }
+
+    /* Sainte-Madeleine palette utilities */
+    .bg-stone {
+        background-color: var(--color-stone);
+    }
+
+    .bg-gold {
+        background-color: var(--color-gold);
+    }
+
+    .bg-gold-light {
+        background-color: var(--color-gold-light);
+    }
+
+    .bg-cream {
+        background-color: var(--color-cream);
+    }
+
+    .bg-cream-dark {
+        background-color: var(--color-cream-dark);
+    }
+
     /* Text color utilities - shorter syntax */
     .text-primary {
         color: var(--color-primary);
@@ -355,6 +425,10 @@ code {
         color: var(--color-secondary);
     }
 
+    .text-secondary-light {
+        color: var(--color-secondary-light);
+    }
+
     .text-secondary-50 {
         color: rgb(var(--color-secondary-50));
     }
@@ -393,6 +467,50 @@ code {
 
     .text-secondary-900 {
         color: rgb(var(--color-secondary-900));
+    }
+
+    .text-accent {
+        color: var(--color-accent);
+    }
+
+    .text-accent-light {
+        color: var(--color-accent-light);
+    }
+
+    .text-accent-dark {
+        color: var(--color-accent-dark);
+    }
+
+    .text-stone {
+        color: var(--color-stone);
+    }
+
+    .text-gold {
+        color: var(--color-gold);
+    }
+
+    .text-gold-light {
+        color: var(--color-gold-light);
+    }
+
+    .text-cream {
+        color: var(--color-cream);
+    }
+
+    .text-cream-dark {
+        color: var(--color-cream-dark);
+    }
+
+    .text-text-dark {
+        color: var(--color-text-dark);
+    }
+
+    .text-text-mid {
+        color: var(--color-text-mid);
+    }
+
+    .text-text-light {
+        color: var(--color-text-light);
     }
 
     /* Border color utilities - shorter syntax */
@@ -434,6 +552,38 @@ code {
 
     .border-secondary-600 {
         border-color: rgb(var(--color-secondary-600));
+    }
+
+    .border-accent {
+        border-color: var(--color-accent);
+    }
+
+    .border-accent-light {
+        border-color: var(--color-accent-light);
+    }
+
+    .border-accent-dark {
+        border-color: var(--color-accent-dark);
+    }
+
+    .border-stone {
+        border-color: var(--color-stone);
+    }
+
+    .border-gold {
+        border-color: var(--color-gold);
+    }
+
+    .border-gold-light {
+        border-color: var(--color-gold-light);
+    }
+
+    .border-cream {
+        border-color: var(--color-cream);
+    }
+
+    .border-cream-dark {
+        border-color: var(--color-cream-dark);
     }
 
     /* Ring color utilities for focus states - shorter syntax */
@@ -517,6 +667,14 @@ code {
 
     .hover\:text-secondary:hover {
         color: var(--color-secondary);
+    }
+
+    .hover\:text-gold:hover {
+        color: var(--color-gold);
+    }
+
+    .hover\:text-gold-light:hover {
+        color: var(--color-gold-light);
     }
 
     .bg-gradient-primary {
@@ -768,4 +926,3 @@ code {
 .ql-editor a:hover {
     color: var(--color-secondary-dark, #c8741a);
 }
-

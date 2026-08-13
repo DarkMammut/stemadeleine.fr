@@ -35,6 +35,8 @@ export default function Site() {
                 description: res.data.description || "",
                 primaryColor: res.data.primaryColor || "#1976d2",
                 secondaryColor: res.data.secondaryColor || "#dc004e",
+                accentColor: res.data.accentColor || "#B8973A",
+                textColor: res.data.textColor || "#1A1208",
             });
         } catch (e) {
             showError("Erreur de chargement", "Impossible de charger l'organisation");
@@ -50,9 +52,7 @@ export default function Site() {
                 [key]: val,
             });
 
-            const updated = {...originalOrganizationSettings, [key]: val};
-            setOriginalOrganizationSettings(updated);
-            setOrganization((prev) => ({...prev, [key]: val}));
+            await loadOrganization();
 
             showSuccess("Paramètre modifié", "La modification a été enregistrée");
         } catch (e) {
@@ -155,6 +155,22 @@ export default function Site() {
                             label="Couleur secondaire"
                             initialValue={originalOrganizationSettings.secondaryColor}
                             onSave={handleSaveSetting("secondaryColor")}
+                            onChange={() => {
+                            }}
+                            disabled={saving}
+                        />
+                        <ColorInputWithPicker
+                            label="Couleur d'accent"
+                            initialValue={originalOrganizationSettings.accentColor}
+                            onSave={handleSaveSetting("accentColor")}
+                            onChange={() => {
+                            }}
+                            disabled={saving}
+                        />
+                        <ColorInputWithPicker
+                            label="Couleur de texte"
+                            initialValue={originalOrganizationSettings.textColor}
+                            onSave={handleSaveSetting("textColor")}
                             onChange={() => {
                             }}
                             disabled={saving}

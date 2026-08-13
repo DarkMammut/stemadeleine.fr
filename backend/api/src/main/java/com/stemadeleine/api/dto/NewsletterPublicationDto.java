@@ -18,6 +18,7 @@ public record NewsletterPublicationDto(
         PublishingStatus status,
         OffsetDateTime publishedDate,
         MediaDto media,
+        MediaDto pdfFile,
         UserDto author,
         List<ContentDto> contents,
         OffsetDateTime createdAt,

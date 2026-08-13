@@ -10,7 +10,8 @@ public class OrganizationSettingsDTO {
     private String description;
     private String primaryColor;
     private String secondaryColor;
+    private String accentColor;
+    private String textColor;
     private UUID logoMedia;
     private UUID faviconMedia;
 }
-

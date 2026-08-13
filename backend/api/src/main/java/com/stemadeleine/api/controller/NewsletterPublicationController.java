@@ -308,6 +308,70 @@ public class NewsletterPublicationController {
     }
 
     /**
+     * Set PDF file for newsletter publication
+     */
+    @PutMapping("/{id}/pdf-file")
+    public ResponseEntity<NewsletterPublicationDto> setPdfFile(
+            @PathVariable UUID id,
+            @RequestBody Map<String, UUID> body,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            log.error("Attempt to set PDF file for newsletter publication without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        UUID mediaId = body.get("mediaId");
+        User currentUser = customUserDetails.account().getUser();
+        log.info("PUT /api/newsletter-publication/{}/pdf-file - Setting PDF file {} by user: {}",
+                id, mediaId, currentUser.getFirstname() + " " + currentUser.getLastname());
+        try {
+            NewsletterPublication updatedPublication = newsletterPublicationService
+                    .setPdfFile(id, mediaId, currentUser);
+            NewsletterPublicationDto dto = newsletterPublicationMapper.toDto(updatedPublication);
+
+            log.info("PDF file set successfully for newsletter publication");
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            log.error("Error setting PDF file for newsletter publication {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error setting PDF file for newsletter publication {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Remove PDF file from newsletter publication
+     */
+    @DeleteMapping("/{id}/pdf-file")
+    public ResponseEntity<NewsletterPublicationDto> removePdfFile(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            log.error("Attempt to remove PDF file from newsletter publication without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = customUserDetails.account().getUser();
+        log.info("DELETE /api/newsletter-publication/{}/pdf-file - Removing PDF file by user: {}",
+                id, currentUser.getFirstname() + " " + currentUser.getLastname());
+        try {
+            NewsletterPublication updatedPublication = newsletterPublicationService
+                    .removePdfFile(id, currentUser);
+            NewsletterPublicationDto dto = newsletterPublicationMapper.toDto(updatedPublication);
+
+            log.info("PDF file removed successfully from newsletter publication");
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            log.error("Error removing PDF file from newsletter publication {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error removing PDF file from newsletter publication {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
      * Publish newsletter publication
      */
     @PutMapping("/{id}/publish")

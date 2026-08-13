@@ -20,6 +20,8 @@ public record CreateNewsletterPublicationRequest(
 
         OffsetDateTime publishedDate,
 
-        UUID mediaId
+        UUID mediaId,
+
+        UUID pdfFileId
 ) {
 }

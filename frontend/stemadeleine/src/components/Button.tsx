@@ -14,6 +14,7 @@ interface OwnProps {
   className?: string;
   variant?: Variant;
   size?: Size;
+  unstyled?: boolean;
   disabled?: boolean;
   loading?: boolean;
   type?: 'button' | 'submit' | 'reset';
@@ -31,6 +32,7 @@ const ButtonInner = <C extends React.ElementType = 'button'>(
     className = '',
     variant = 'primary',
     size = 'md',
+    unstyled = false,
     disabled = false,
     loading = false,
     type = 'button',
@@ -63,7 +65,7 @@ const ButtonInner = <C extends React.ElementType = 'button'>(
   };
 
   // Classes finales
-  const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
+  const buttonClasses = `${baseClasses} ${unstyled ? '' : variants[variant]} ${sizes[size]} ${className}`;
 
   // Sanitize "as" prop: accept strings or components; fallback to 'button' for invalid values
   let Component: React.ElementType = (asProp as React.ElementType) ?? 'button';
@@ -160,4 +162,3 @@ const Button = React.forwardRef(ButtonInner as unknown as React.ForwardRefRender
 Object.defineProperty(Button, 'displayName', { value: 'Button', writable: false });
 
 export default Button;
-
