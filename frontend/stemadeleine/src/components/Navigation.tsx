@@ -18,6 +18,7 @@ type NavigationProps = {
 const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
     const [toggle, setToggle] = useState(false);
     const [hoveredMenu, setHoveredMenu] = useState<string | number | null>(null);
+    const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
     const router = useRouter();
 
     // Fermer le menu mobile lors de la navigation
@@ -28,6 +29,8 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
             const target = event.target as Element;
             if (toggle && !target.closest('.navigation')) {
                 setToggle(false);
+                setHoveredMenu(null);
+                setExpandedMenus({});
             }
         };
 
@@ -56,10 +59,30 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
         setHoveredMenu(null);
     };
 
+    const handleToggleMenu = () => {
+        setToggle((previous) => {
+            const next = !previous;
+            if (!next) {
+                setHoveredMenu(null);
+                setExpandedMenus({});
+            }
+            return next;
+        });
+    };
+
+    const toggleSubMenu = (pageId: string | number) => {
+        const key = String(pageId);
+        setExpandedMenus((current) => ({
+            ...current,
+            [key]: !current[key],
+        }));
+    };
+
     // Fonction pour gérer la navigation
     const handleNavigation = (href: string) => {
         setToggle(false);
         setHoveredMenu(null);
+        setExpandedMenus({});
         router.push(href);
     };
 
@@ -74,7 +97,7 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
             <button
                 className={`relative z-40 flex items-center justify-center p-2 bg-transparent border-none cursor-pointer lg:hidden`}
                 type="button"
-                onClick={() => setToggle(!toggle)}
+                onClick={handleToggleMenu}
                 aria-label="button for navigation in menu"
             >
                 <ul className="outline-none cursor-pointer relative w-8 h-8 flex items-center justify-center">
@@ -102,86 +125,120 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                     !toggle ? 'opacity-0 invisible pointer-events-none' : 'opacity-100 visible'
                 } lg:opacity-100 lg:visible lg:top-0 lg:left-0 lg:right-0 lg:bg-transparent lg:relative lg:h-auto lg:w-auto lg:pointer-events-auto ${
                     toggle
-                        ? 'bg-primary'
+                        ? 'bg-primary/95 backdrop-blur-sm'
                         : ''
                 }`}
             >
                 <ul
                     className={`flex m-0 p-0 text-center list-none w-full h-full ${
-                        toggle ? 'flex-col justify-center items-center' : 'justify-center'
+                        toggle ? 'flex-col items-stretch justify-start px-5 py-6 gap-3 overflow-y-auto' : 'justify-center'
                     } lg:flex-row lg:justify-end lg:h-auto`}
                 >
-                    {visiblePages.map((page) => (
-                        <li
-                            key={page.id}
-                            className={`
-                relative flex items-center justify-center group
-                ${toggle ? 'py-6 w-full' : 'px-6 lg:px-4'}
-                lg:px-4 lg:py-0
-              `}
-                            onMouseEnter={() => handleMenuEnter(page.id)}
-                            onMouseLeave={handleMenuLeave}
-                        >
-                            <button
-                                onClick={() => handleNavigation(page.slug)}
-                                className={`relative inline-flex text-decoration-none z-10 bg-transparent border-none cursor-pointer
-                  after:absolute after:content-[''] after:top-full after:left-0
-                  after:w-full after:h-0.5 after:bg-secondary after:scale-x-0
-                  after:origin-right after:transition-transform after:duration-500
-                  hover:after:scale-x-100 hover:after:origin-left
-                  ${toggle ? 'text-secondary-light text-xl py-2' : 'text-secondary-light'}
-                  lg:text-secondary-light lg:py-0
+                    {visiblePages.map((page) => {
+                        const visibleChildren = Array.isArray(page.children)
+                            ? page.children.filter((child) => child?.isVisible)
+                            : [];
+                        const hasChildren = visibleChildren.length > 0;
+                        const isExpanded = Boolean(expandedMenus[String(page.id)]);
+
+                        return (
+                            <li
+                                key={page.id}
+                                className={`
+                  relative flex items-center justify-center group
+                  ${toggle ? 'w-full' : 'px-6 lg:px-4'}
+                  lg:px-4 lg:py-0
                 `}
+                                onMouseEnter={() => handleMenuEnter(page.id)}
+                                onMouseLeave={handleMenuLeave}
                             >
-                <span className="overflow-hidden">
-                  <div
-                      className="hover:text-secondary transition-colors duration-300 text-xl md:text-lg lg:text-[11px] lg:tracking-[0.12em] lg:font-medium uppercase no-word-break">
-                    {page.name}
-                  </div>
-                </span>
-                            </button>
+                                <div
+                                    className={`${toggle ? 'w-full rounded-xl border border-secondary bg-primary-dark px-4 py-3' : ''}`}>
+                                    <div className={`${toggle ? 'flex items-center justify-between gap-3' : ''}`}>
+                                        <button
+                                            onClick={() => handleNavigation(page.slug)}
+                                            className={`relative inline-flex text-decoration-none z-10 bg-transparent border-none cursor-pointer
+                        after:absolute after:content-[''] after:top-full after:left-0
+                        after:w-full after:h-0.5 after:bg-secondary after:scale-x-0
+                        after:origin-right after:transition-transform after:duration-500
+                        hover:after:scale-x-100 hover:after:origin-left
+                        ${toggle ? 'text-secondary-light py-1 text-left' : 'text-secondary-light'}
+                        lg:text-secondary-light lg:py-0
+                      `}
+                                        >
+                      <span className="overflow-hidden">
+                        <div
+                            className={`hover:text-secondary transition-colors duration-300 uppercase no-word-break ${toggle ? 'text-[0.92rem] tracking-[0.12em] font-medium' : 'text-xl md:text-lg lg:text-[11px] lg:tracking-[0.12em] lg:font-medium'}`}>
+                          {page.name}
+                        </div>
+                      </span>
+                                        </button>
 
-                            {/* Zone invisible pour maintenir le hover */}
-                            {page.children && page.children.length > 0 && (
-                                <div className="absolute top-full left-0 w-full h-6 bg-transparent hidden lg:block"/>
-                            )}
-
-                            {/* Sous-menu */}
-                            {page.children && page.children.length > 0 && (
-                                <ul
-                                    className={`
-                    ${toggle ?
-                                        'relative opacity-100 visible pointer-events-auto mt-4 bg-transparent flex flex-col w-full'
-                                        :
-                                        `absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 lg:mt-6 ${hoveredMenu === page.id ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}`
-                                    }
-                  `}
-                                >
-                                    {page.children.map((child) => (
-                                        <li key={child.id} className={`relative group/child ${toggle ? 'py-2' : ''}`}>
+                                        {toggle && hasChildren && (
                                             <button
-                                                onClick={() => handleNavigation(child.slug)}
-                                                className={`
-                                  ${toggle ?
-                                                    'block w-full text-center py-2 bg-transparent border-none cursor-pointer text-secondary-light text-lg font-serif uppercase transition-colors duration-300 hover:text-secondary'
-                                                    :
-                                                    'block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full text-secondary-light after:absolute after:content-[\'\'] after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-secondary after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left hover:text-secondary'
-                                                }
-                                `}
+                                                type="button"
+                                                onClick={() => toggleSubMenu(page.id)}
+                                                aria-expanded={isExpanded}
+                                                aria-label={`Afficher le sous-menu ${page.name}`}
+                                                className="inline-flex h-9 w-9 items-center justify-center text-secondary-light transition-colors duration-300 hover:border-secondary hover:text-secondary"
                                             >
-                        <span className="overflow-hidden">
-                          <div
-                              className={`transition-colors duration-300 no-word-break ${toggle ? 'text-base font-serif uppercase' : 'text-xs md:text-sm uppercase font-serif'}`}>
-                            {child.name}
-                          </div>
-                        </span>
+                                                <svg
+                                                    className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor"
+                                                          strokeWidth="1.8" strokeLinecap="round"
+                                                          strokeLinejoin="round"/>
+                                                </svg>
                                             </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </li>
-                    ))}
+                                        )}
+                                    </div>
+
+                                    {/* Zone invisible pour maintenir le hover */}
+                                    {hasChildren && (
+                                        <div
+                                            className="absolute top-full left-0 w-full h-6 bg-transparent hidden lg:block"/>
+                                    )}
+
+                                    {/* Sous-menu */}
+                                    {hasChildren && (
+                                        <ul
+                                            className={`
+                      ${toggle
+                                                ? `overflow-hidden rounded-lg bg-primary/80 transition-all duration-300 ${isExpanded ? 'mt-2 max-h-[500px] opacity-100' : 'mt-0 max-h-0 opacity-0'}`
+                                                : `absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 lg:mt-6 ${hoveredMenu === page.id ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}`
+                                            }
+                    `}
+                                        >
+                                            {visibleChildren.map((child) => (
+                                                <li key={child.id}
+                                                    className={`relative group/child ${toggle ? 'border-b border-secondary-500/20 last:border-b-0' : ''}`}>
+                                                    <button
+                                                        onClick={() => handleNavigation(child.slug)}
+                                                        className={`
+                                    ${toggle
+                                                            ? 'block w-full px-4 py-3 bg-transparent border-none cursor-pointer text-left text-secondary-light transition-colors duration-300 hover:text-secondary'
+                                                            : 'block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full text-secondary-light after:absolute after:content-[\'\'] after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-secondary after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left hover:text-secondary'
+                                                        }
+                                  `}
+                                                    >
+                          <span className="overflow-hidden">
+                            <div
+                                className={`transition-colors duration-300 no-word-break ${toggle ? 'text-sm tracking-[0.08em] uppercase' : 'text-xs md:text-sm uppercase font-serif'}`}>
+                              {child.name}
+                            </div>
+                          </span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </li>
+                        );
+                    })}
                 </ul>
             </nav>
         </div>

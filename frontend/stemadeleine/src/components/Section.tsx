@@ -90,7 +90,7 @@ export default function Section({
     return (
         <section
             className={clsx(
-                'w-full py-20 md:py-[5rem]',
+                'w-full py-20 md:py-5 px-5 md:px-0',
                 hasDarkModules ? 'bg-primary' : 'bg-cream',
                 className,
             )}
@@ -98,7 +98,7 @@ export default function Section({
             <div className={clsx('w-full max-w-[960px] mx-auto')}>
                 <div
                     className={clsx(
-                        'grid gap-16 md:gap-[4rem] items-center',
+                        'grid gap-16 md:gap-4 items-center',
                         mediaId && mediaUrl ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1',
                         align === 'right' && 'md:grid-flow-dense',
                     )}
@@ -136,7 +136,7 @@ export default function Section({
                     {/* Image */}
                     {mediaId && mediaUrl && (
                         <div className={clsx('about-img-wrap relative', align === 'right' && 'md:col-start-1')}>
-                            <div className="relative w-full aspect-[3/4] overflow-hidden shadow-lg">
+                            <div className="relative w-full aspect-3/4 overflow-hidden shadow-lg">
                                 <Image
                                     src={mediaUrl}
                                     alt={title || 'Image de section'}
