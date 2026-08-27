@@ -68,12 +68,6 @@ const CTAModule: React.FC<Props> = ({module, className = ''}) => {
 
     return (
         <div className={clsx('w-full p-2', className)}>
-            {title && (
-                <h2 className="mb-4 font-serif text-[clamp(1.5rem,2.5vw,2.1rem)] font-normal leading-[1.3] text-cream">
-                    {title}
-                </h2>
-            )}
-
             {Boolean(ctaLoading) && !hasValidAction && (
                 <div className="flex items-center py-2">
                     <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-gold"/>
