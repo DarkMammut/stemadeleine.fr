@@ -199,7 +199,7 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                                     {/* Zone invisible pour maintenir le hover */}
                                     {hasChildren && (
                                         <div
-                                            className="absolute top-full left-0 w-full h-6 bg-transparent hidden lg:block"/>
+                                            className="absolute top-full left-0 w-full h-[18px] bg-transparent hidden lg:block"/>
                                     )}
 
                                     {/* Sous-menu */}
@@ -207,8 +207,8 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                                         <ul
                                             className={`
                       ${toggle
-                                                ? `overflow-hidden rounded-lg bg-primary/80 transition-all duration-300 ${isExpanded ? 'mt-2 max-h-[500px] opacity-100' : 'mt-0 max-h-0 opacity-0'}`
-                                                : `absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-light rounded-b-lg shadow-lg flex flex-col transition-all duration-300 lg:mt-6 ${hoveredMenu === page.id ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}`
+                                                ? `overflow-hidden rounded-lg bg-primary transition-all duration-300 ${isExpanded ? 'mt-2 max-h-[500px] opacity-100' : 'mt-0 max-h-0 opacity-0'}`
+                                                : `absolute left-1/2 top-full transform -translate-x-1/2 min-w-[200px] z-50 bg-primary-dark rounded-b-lg shadow-lg flex flex-col transition-all duration-300 lg:mt-[18px] ${hoveredMenu === page.id ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'}`
                                             }
                     `}
                                         >
