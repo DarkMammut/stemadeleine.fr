@@ -10,9 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,12 +58,21 @@ public class ModuleService {
         List<Module> allModules = moduleRepository.findBySectionIdAndStatusNotWithInheritedData(section.getId(), PublishingStatus.DELETED);
         log.debug("Found {} total modules with inherited data for section: {}", allModules.size(), sectionId);
 
+        // Keep only the latest version per moduleId among published+visible modules
         List<Module> publishedVisibleModules = allModules.stream()
                 .filter(module -> module.getStatus() == PublishingStatus.PUBLISHED)
                 .filter(Module::getIsVisible)
+                .collect(Collectors.toMap(
+                        Module::getModuleId,
+                        m -> m,
+                        (a, b) -> a.getVersion() >= b.getVersion() ? a : b
+                ))
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(m -> m.getSortOrder() != null ? m.getSortOrder() : 0))
                 .toList();
 
-        log.debug("Found {} published and visible modules for section: {}", publishedVisibleModules.size(), sectionId);
+        log.debug("Found {} published and visible modules (deduplicated) for section: {}", publishedVisibleModules.size(), sectionId);
         return publishedVisibleModules;
     }
 

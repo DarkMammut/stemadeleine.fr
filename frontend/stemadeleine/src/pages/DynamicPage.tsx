@@ -11,7 +11,7 @@ import Layout from '@/components/Layout';
 type PageShape = {
     name?: string;
     title?: string;
-    subtitle?: string;
+    subTitle?: string;
     description?: string;
     keywords?: string;
     heroMedia?: { id?: string | number; fileUrl?: string } | null;

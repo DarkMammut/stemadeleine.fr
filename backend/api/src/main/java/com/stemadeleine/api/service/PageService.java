@@ -450,6 +450,29 @@ public class PageService {
     }
 
     /**
+     * Finds any published page by its slug, regardless of visibility.
+     * Non-visible pages can be accessed directly via their URL but won't appear in navigation.
+     */
+    public Optional<Page> findPublishedBySlug(String slug) {
+        log.info("Finding published page by slug (any visibility): {}", slug);
+
+        Optional<Page> latestPage = pageRepository.findAll().stream()
+                .filter(page -> slug.equals(page.getSlug()))
+                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED)
+                .max(Comparator.comparingInt(Page::getVersion));
+
+        if (latestPage.isPresent()) {
+            Page page = latestPage.get();
+            log.debug("Found published page: {} (version {}, visible={}) for slug: {}",
+                    page.getTitle(), page.getVersion(), page.getIsVisible(), slug);
+        } else {
+            log.warn("No published page found for slug: {}", slug);
+        }
+
+        return latestPage;
+    }
+
+    /**
      * Finds a published and visible page by its ID
      */
     public Optional<Page> findByIdAndVisible(UUID id, boolean visible) {

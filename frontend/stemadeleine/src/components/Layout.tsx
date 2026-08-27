@@ -10,7 +10,7 @@ import type {PageItem} from './Navigation';
 type PageShape = {
     name?: string;
     title?: string;
-    subtitle?: string;
+    subTitle?: string;
     description?: string;
     keywords?: string;
     heroMedia?: { id?: string | number } | null;
@@ -77,7 +77,7 @@ export default function Layout({children, page}: LayoutProps) {
                 <Hero
                     title={page?.title}
                     mediaId={page?.heroMedia?.id}
-                    subtitle={page?.subtitle}
+                    subtitle={page?.subTitle}
                     description={page?.description}
                     variant={page?.slug === '/' ? 'home' : 'default'}
                     className={page?.slug === '/' ? 'mt-[60px] mb-0' : ''}

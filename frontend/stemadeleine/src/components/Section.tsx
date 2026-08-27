@@ -124,13 +124,6 @@ export default function Section({
                             loadingMessage="Chargement des contenus..."
                             theme={hasDarkModules ? 'dark' : 'light'}
                         />
-
-                        {/* Modules Section */}
-                        {sectionId && showModules && (
-                            <div className="">
-                                <ModulesList sectionId={sectionId} onModulesChange={handleModulesChange}/>
-                            </div>
-                        )}
                     </div>
 
                     {/* Image */}
@@ -146,13 +139,16 @@ export default function Section({
                                     priority={false}
                                 />
                             </div>
-                            <div
-                                className="about-img-accent absolute bottom-[-14px] right-[-14px] w-[75%] h-[75%] border border-gold opacity-30 pointer-events-none"
-                                aria-hidden="true"
-                            />
                         </div>
                     )}
                 </div>
+
+                {/* Modules Section */}
+                {sectionId && showModules && (
+                    <div className="">
+                        <ModulesList sectionId={sectionId} onModulesChange={handleModulesChange}/>
+                    </div>
+                )}
             </div>
         </section>
     );

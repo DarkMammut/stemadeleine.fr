@@ -59,11 +59,12 @@ public class PublicController {
     }
 
     /**
-     * Retrieves a public page by its slug
+     * Retrieves a public page by its slug.
+     * Returns any published page (visible or not); non-visible pages won't appear in navigation.
      */
     @GetMapping("/pages/slug")
     public ResponseEntity<Page> getPageBySlug(@RequestParam String slug) {
-        Optional<Page> page = pageService.findBySlugAndVisible(slug, true);
+        Optional<Page> page = pageService.findPublishedBySlug(slug);
         return page.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
