@@ -8,7 +8,7 @@ export function middleware(request) {
     const isAuthenticated = !!authToken;
 
     // Public routes that don't require authentication
-    const publicRoutes = ['/auth/login', '/auth/register'];
+    const publicRoutes = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
     const isPublicRoute = publicRoutes.includes(pathname) || publicRoutes.some(route => pathname.startsWith(route + '/'));
 
     // Root path - allow access for everyone (authenticated or not)

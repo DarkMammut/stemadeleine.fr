@@ -28,8 +28,7 @@ export default function LoginForm() {
     };
 
     const handleForgotPassword = () => {
-        // TODO: Implémenter la logique de récupération de mot de passe
-        // Placeholder pour future fonctionnalité (pas de console.log ici)
+        router.push("/auth/forgot-password");
     };
 
     return (
