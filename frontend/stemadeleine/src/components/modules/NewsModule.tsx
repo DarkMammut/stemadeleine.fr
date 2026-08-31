@@ -82,11 +82,11 @@ function NewsGridCard({news}: { news: NewsPublication }) {
                     {dateLabel}
                 </div>
             )}
-            <h3 className="font-serif text-cream text-base font-normal leading-[1.4] mb-2">
+            <h3 className="font-serif text-cream-dark text-base font-normal leading-[1.4] mb-2">
                 {title}
             </h3>
             {description && (
-                <p className="text-[13px] leading-[1.6] text-cream-light">
+                <p className="text-[13px] leading-[1.6] text-cream">
                     {description}
                 </p>
             )}
@@ -291,7 +291,8 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
                                 )}
                                 <div className="flex flex-col justify-center">
                                     {latestNewsDate && (
-                                        <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                                        <div
+                                            className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
                                             {latestNewsDate}
                                         </div>
                                     )}
@@ -326,7 +327,8 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
                             )}
                             <div className="flex flex-col justify-center">
                                 {latestNewsDate && (
-                                    <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                                    <div
+                                        className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
                                         {latestNewsDate}
                                     </div>
                                 )}

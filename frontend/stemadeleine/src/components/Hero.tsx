@@ -99,7 +99,8 @@ export default function Hero({mediaId, title, subtitle, description, variant = '
                                 className="mb-7 inline-flex items-center gap-4 uppercase tracking-[0.22em] text-[11px] font-medium text-secondary"
                             >
                                 <span className="h-px w-7 bg-current opacity-80"/>
-                                <span style={{textShadow: '0 1px 10px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.85), 0 0px 2px rgba(0,0,0,1)'}}>La Jarrie · Charente-Maritime</span>
+                                <span
+                                    style={{textShadow: '0 1px 10px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.85), 0 0px 2px rgba(0,0,0,1)'}}>La Jarrie · Charente-Maritime</span>
                                 <span className="h-px w-7 bg-current opacity-80"/>
                             </div>
 
@@ -144,7 +145,7 @@ export default function Hero({mediaId, title, subtitle, description, variant = '
                                 />
                                 <Button
                                     as="a"
-                                    href="/about"
+                                    href="/association"
                                     variant="outline"
                                     size="lg"
                                     unstyled={true}
