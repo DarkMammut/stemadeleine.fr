@@ -17,9 +17,10 @@ type ModuleType = {
 
 interface Props {
     module: ModuleType | null | undefined;
+    isDark?: boolean;
 }
 
-const ModuleRenderer: React.FC<Props> = ({module}) => {
+const ModuleRenderer: React.FC<Props> = ({module, isDark}) => {
     if (!module) {
         return null;
     }
@@ -39,7 +40,7 @@ const ModuleRenderer: React.FC<Props> = ({module}) => {
             // return <FormModule module={module} />;
             return <div>Form module not implemented yet</div>;
         case 'CTA':
-            return <CTAModule module={module as CTAModuleType}/>;
+            return <CTAModule module={module as CTAModuleType} isDark={isDark}/>;
         case 'TIMELINE':
             // return <TimelineModule module={module} />;
             return <div>Timeline module not implemented yet</div>;

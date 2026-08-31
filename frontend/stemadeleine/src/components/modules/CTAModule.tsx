@@ -31,13 +31,15 @@ export interface CTAModuleType {
 interface Props {
     module: CTAModuleType;
     className?: string;
+    /** true = section sombre → bouton/lien clairs ; false = section claire → bouton/lien foncés */
+    isDark?: boolean;
 }
 
 function isExternalUrl(url: string): boolean {
     return /^https?:\/\//i.test(url);
 }
 
-const CTAModule: React.FC<Props> = ({module, className = ''}) => {
+const CTAModule: React.FC<Props> = ({module, className = '', isDark = true}) => {
     const modulesHook = useGetModules() as unknown as {
         cta?: CTADto | null;
         ctaLoading?: boolean;
@@ -58,13 +60,26 @@ const CTAModule: React.FC<Props> = ({module, className = ''}) => {
     const label = cta?.label ?? module.label ?? module.title ?? module.name ?? '';
     const url = cta?.url ?? module.url ?? '';
     const hasValidAction = Boolean(label && url);
-    const title = module.title ?? module.name;
     const externalUrl = hasValidAction ? isExternalUrl(url) : false;
-    const [isDiscoverHovered, setIsDiscoverHovered] = React.useState(false);
+    const [isHovered, setIsHovered] = React.useState(false);
 
     if (!module?.isVisible) {
         return null;
     }
+
+    const buttonStyle = isDark
+        ? {
+            // dark section : border secondary, texte cream → hover inversé
+            backgroundColor: isHovered ? 'var(--color-secondary)' : 'transparent',
+            borderColor: 'var(--color-secondary)',
+            color: isHovered ? 'var(--color-primary-dark)' : 'var(--color-cream)',
+        }
+        : {
+            // light section : border primary, texte primary → hover bg primary, texte secondary, border secondary
+            backgroundColor: isHovered ? 'var(--color-primary)' : 'transparent',
+            borderColor: isHovered ? 'var(--color-secondary)' : 'var(--color-primary)',
+            color: isHovered ? 'var(--color-secondary)' : 'var(--color-primary)',
+        };
 
     return (
         <div className={clsx('w-full p-2', className)}>
@@ -89,18 +104,10 @@ const CTAModule: React.FC<Props> = ({module, className = ''}) => {
                             variant="outline"
                             size="lg"
                             unstyled={true}
-                            onMouseEnter={() => setIsDiscoverHovered(true)}
-                            onMouseLeave={() => setIsDiscoverHovered(false)}
-                            style={{
-                                backgroundColor: 'transparent',
-                                borderColor: isDiscoverHovered
-                                    ? 'var(--color-secondary-light)'
-                                    : 'rgba(var(--color-secondary-500),0.5)',
-                                color: isDiscoverHovered
-                                    ? 'rgb(var(--color-secondary-50))'
-                                    : 'var(--color-secondary-light)',
-                            }}
-                            className="rounded-none border px-9 py-3 text-[11px] font-medium uppercase tracking-[0.14em]"
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                            style={buttonStyle}
+                            className="rounded-none border px-9 py-3 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors duration-200"
                         >
                             {label}
                         </Button>
@@ -109,7 +116,15 @@ const CTAModule: React.FC<Props> = ({module, className = ''}) => {
                             href={url}
                             target={externalUrl ? '_blank' : undefined}
                             rel={externalUrl ? 'noopener noreferrer' : undefined}
-                            className="text-[11px] uppercase tracking-[0.16em] text-secondary transition-colors duration-200 hover:text-secondary-light"
+                            className={clsx(
+                                'relative inline-block text-[11px] uppercase tracking-[0.16em] transition-colors duration-200',
+                                "after:absolute after:content-[''] after:bottom-0 after:left-0 after:h-px after:w-full",
+                                'after:scale-x-0 after:origin-right after:transition-transform after:duration-300',
+                                'hover:after:scale-x-100 hover:after:origin-left',
+                                isDark
+                                    ? 'text-cream hover:text-secondary after:bg-secondary'
+                                    : 'text-primary hover:text-secondary after:bg-primary',
+                            )}
                         >
                             {label}
                         </a>

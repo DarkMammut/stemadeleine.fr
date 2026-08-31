@@ -146,7 +146,7 @@ export default function Section({
                 {/* Modules Section */}
                 {sectionId && showModules && (
                     <div className="">
-                        <ModulesList sectionId={sectionId} onModulesChange={handleModulesChange}/>
+                        <ModulesList sectionId={sectionId} isDark={hasDarkModules} onModulesChange={handleModulesChange}/>
                     </div>
                 )}
             </div>

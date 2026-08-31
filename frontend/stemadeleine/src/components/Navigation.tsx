@@ -219,8 +219,8 @@ const Navigation: React.FC<NavigationProps> = ({pagesTree = []}) => {
                                                         onClick={() => handleNavigation(child.slug)}
                                                         className={`
                                     ${toggle
-                                                            ? 'block w-full px-4 py-3 bg-transparent border-none cursor-pointer text-left text-secondary-light transition-colors duration-300 hover:text-secondary'
-                                                            : 'block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-left w-full text-secondary-light after:absolute after:content-[\'\'] after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-secondary after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left hover:text-secondary'
+                                                           ? 'block w-full px-4 py-3 bg-transparent border-none cursor-pointer text-center text-secondary-light transition-colors duration-300 hover:text-secondary'
+                                                           : 'block px-4 py-3 transition-colors duration-200 relative bg-transparent border-none cursor-pointer text-center w-full text-secondary-light after:absolute after:content-[\'\'] after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-secondary after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left hover:text-secondary'
                                                         }
                                   `}
                                                     >

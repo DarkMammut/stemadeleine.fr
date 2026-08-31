@@ -7,6 +7,9 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import {ArrowDownTrayIcon, ArrowLeftIcon, ArrowRightIcon, DocumentIcon,} from '@heroicons/react/24/outline';
 import {NewsletterPublication} from '@/types/newsletter';
 import Pagination from '@/components/Pagination';
+import Contents from '@/components/Contents';
+import useGetContents from '@/hooks/useGetContents';
+import clsx from "clsx";
 
 const PDFViewer = dynamic(
     async () => {
@@ -14,13 +17,13 @@ const PDFViewer = dynamic(
         pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
         return function PDFViewerComponent({
-            pdfUrl,
-            currentPage,
-            containerWidth,
-            pdfError,
-            onDocumentLoadSuccess,
-            onDocumentLoadError,
-        }: {
+                                               pdfUrl,
+                                               currentPage,
+                                               containerWidth,
+                                               pdfError,
+                                               onDocumentLoadSuccess,
+                                               onDocumentLoadError,
+                                           }: {
             pdfUrl: string;
             currentPage: number;
             containerWidth: number;
@@ -67,6 +70,18 @@ export default function NewsletterMagazine({
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pdfLoading, setPdfLoading] = useState<boolean>(true);
     const [pdfError, setPdfError] = useState<boolean>(false);
+
+    const {contents, loading: contentsLoading, fetchContentsByOwnerId} = useGetContents() as unknown as {
+        contents: import('@/components/Contents').SharedContentItem[];
+        loading: boolean;
+        fetchContentsByOwnerId: (ownerId: string) => Promise<unknown[]>;
+    };
+
+    useEffect(() => {
+        if (newsletter.newsletterId) {
+            fetchContentsByOwnerId(newsletter.newsletterId).catch(console.error);
+        }
+    }, [newsletter.newsletterId, fetchContentsByOwnerId]);
 
     const title = newsletter.title || newsletter.name;
     const description = newsletter.description || '';
@@ -131,21 +146,16 @@ export default function NewsletterMagazine({
             {/* En-tête de présentation */}
             <header className="bg-primary px-8 py-10 print:px-6 print:py-8">
                 <div className="mx-auto max-w-5xl">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="w-14 shrink-0" aria-hidden="true"/>
-                        <div className="flex-1 text-center">
-                            <h2 className="font-serif text-[clamp(1.8rem,4vw,3rem)] font-normal leading-none tracking-wide text-secondary">
-                                {title}
-                            </h2>
-                        </div>
-                        <div className="text-right w-14">
-                            {publishedMonthYear && (
-                                <p className="text-xs font-medium uppercase tracking-[0.12em] text-secondary-light">
-                                    {publishedMonthYear}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                    {/* Date en haut à gauche */}
+                    {publishedMonthYear && (
+                        <p className="mb-4 text-xs font-medium uppercase tracking-[0.12em] text-secondary-light">
+                            {publishedMonthYear}
+                        </p>
+                    )}
+                    {/* Titre pleine largeur */}
+                    <h2 className="font-serif text-[clamp(1.6rem,4vw,3rem)] font-normal leading-tight tracking-wide text-secondary">
+                        {title}
+                    </h2>
 
                     {/* Titre et description */}
                     <div className="mt-8 border-t border-secondary pt-6">
@@ -179,6 +189,18 @@ export default function NewsletterMagazine({
                     </div>
                 </div>
             </header>
+
+            {/* Contenus éditoriaux */}
+            {(contentsLoading || contents.length > 0) && (
+                <section className={clsx('w-full max-w-[960px] mx-auto')}>
+                    <Contents
+                        contents={contents}
+                        loading={contentsLoading}
+                        loadingMessage="Chargement du contenu..."
+                        theme="light"
+                    />
+                </section>
+            )}
 
             {/* Visionneuse PDF */}
             {hasPdf && (

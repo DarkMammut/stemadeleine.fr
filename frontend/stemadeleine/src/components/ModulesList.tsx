@@ -16,10 +16,11 @@ export interface ModuleType {
 interface Props {
     sectionId: string;
     className?: string;
+    isDark?: boolean;
     onModulesChange?: (modules: ModuleType[]) => void;
 }
 
-const ModulesList: React.FC<Props> = ({sectionId, className = '', onModulesChange}) => {
+const ModulesList: React.FC<Props> = ({sectionId, className = '', isDark, onModulesChange}) => {
     const {modules, loading, error, fetchModulesBySectionId} = useGetModules();
 
     useEffect(() => {
@@ -63,7 +64,7 @@ const ModulesList: React.FC<Props> = ({sectionId, className = '', onModulesChang
     return (
         <div className={`w-full ${className}`}>
             {sortedModules.map((module: ModuleType) => (
-                <ModuleRenderer key={module.id} module={module}/>
+                <ModuleRenderer key={module.id} module={module} isDark={isDark}/>
             ))}
         </div>
     );
