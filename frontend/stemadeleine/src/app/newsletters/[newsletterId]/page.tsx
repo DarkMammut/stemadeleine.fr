@@ -1,120 +1,47 @@
-'use client';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import NewsletterDetailClient from '@/components/newsletters/NewsletterDetailClient';
+import { buildMetadataFromPage } from '@/lib/metadata';
+import { getPageBySlug } from '@/lib/serverApi';
+import { getNewsletterPublicationByNewsletterId } from '@/lib/publicApi';
 
-import React, {useEffect} from 'react';
-import {useParams, useRouter} from 'next/navigation';
-import useGetNewsletterPublicationByNewsletterId from '@/hooks/useGetNewsletterPublicationByNewsletterId';
-import useGetOrganization from '@/hooks/useGetOrganization';
-import useGetPages from '@/hooks/useGetPages';
-import NewsletterMagazine from '@/components/NewsletterMagazine';
-import Layout from '@/components/Layout';
+type Params = { params: Promise<{ newsletterId: string }> };
 
 const NEWSLETTERS_SLUG = '/newsletters';
 
-type PageShape = {
-    name?: string;
-    title?: string;
-    subtitle?: string;
-    description?: string;
-    keywords?: string;
-    heroMedia?: { id?: string | number } | null;
-    pageId?: string | number;
-    slug?: string;
-};
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { newsletterId } = await params;
+  const [page, newsletter] = await Promise.all([
+    getPageBySlug(NEWSLETTERS_SLUG),
+    getNewsletterPublicationByNewsletterId(newsletterId),
+  ]);
 
-export default function NewsletterPage() {
-    const params = useParams();
-    const router = useRouter();
-    const newsletterId = params?.newsletterId as string | undefined;
+  if (!newsletter) {
+    return buildMetadataFromPage(page);
+  }
 
-    const {
-        newsletter,
-        loading: newsletterLoading,
-        error: newsletterError,
-        fetchNewsletterByNewsletterId,
-    } = useGetNewsletterPublicationByNewsletterId();
+  const canonicalPath = `/newsletters/${newsletterId}`;
+  const pageForSeo = {
+    name: newsletter.title || newsletter.name || page?.name || 'Newsletters',
+    description: newsletter.description || page?.description,
+    heroMedia: newsletter.media?.fileUrl ? { fileUrl: newsletter.media.fileUrl } : page?.heroMedia,
+    url: canonicalPath,
+    keywords: page?.keywords || null,
+  };
 
-    const {
-        loading: orgLoading,
-    } = useGetOrganization();
+  return buildMetadataFromPage(pageForSeo);
+}
 
-    const {
-        fetchPageBySlug,
-        loading: pageLoading,
-    } = useGetPages();
+export default async function NewsletterPage({ params }: Params) {
+  const { newsletterId } = await params;
+  const [newsletter, page] = await Promise.all([
+    getNewsletterPublicationByNewsletterId(newsletterId),
+    getPageBySlug(NEWSLETTERS_SLUG),
+  ]);
 
-    const [page, setPage] = React.useState<PageShape | null>(null);
+  if (!newsletter) {
+    notFound();
+  }
 
-    useEffect(() => {
-        let mounted = true;
-
-        const loadPage = async () => {
-            const pageData = await fetchPageBySlug(NEWSLETTERS_SLUG);
-            if (!mounted) return;
-            if (pageData) {
-                setPage(pageData as PageShape);
-            }
-        };
-
-        loadPage();
-
-        return () => {
-            mounted = false;
-        };
-    }, [fetchPageBySlug]);
-
-    useEffect(() => {
-        if (newsletterId) {
-            fetchNewsletterByNewsletterId(newsletterId);
-        }
-    }, [newsletterId, fetchNewsletterByNewsletterId]);
-
-    // Rediriger vers la page 404 si la newsletter n'est pas trouvée
-    useEffect(() => {
-        if (!newsletterLoading && newsletterError) {
-            router.replace('/404');
-        }
-    }, [newsletterLoading, newsletterError, router]);
-
-    const loading = newsletterLoading || orgLoading || pageLoading;
-
-    if (loading && !newsletter) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
-
-    if (newsletterError && !newsletter) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-red-500 text-center">
-                    <h2 className="text-2xl font-bold mb-4">Erreur</h2>
-                    <p>{newsletterError}</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!newsletter) {
-        return null;
-    }
-
-    return (
-        <Layout
-            page={
-                page || {
-                    name: 'Newsletters',
-                    title: 'Newsletters',
-                    slug: NEWSLETTERS_SLUG,
-                }
-            }
-        >
-            <main className="bg-cream">
-                <NewsletterMagazine
-                    newsletter={newsletter}
-                />
-            </main>
-        </Layout>
-    );
+  return <NewsletterDetailClient newsletter={newsletter} page={page} />;
 }

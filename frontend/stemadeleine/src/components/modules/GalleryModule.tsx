@@ -64,31 +64,36 @@ const GalleryModule: React.FC<Props> = ({module}) => {
     switch (variant) {
         case 'GRID':
             return (
-                <GridGallery
-                    images={galleryImages}
-                    title={moduleTitle}
-                    loading={Boolean(galleryLoading)}
-                />
+                <div className="w-full">
+                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                        {moduleTitle}
+                    </h3>
+                    <GridGallery
+                        images={galleryImages}
+                        title={moduleTitle}
+                        loading={Boolean(galleryLoading)}
+                    />
+                </div>
             );
         case 'CAROUSEL':
             return (
-                <section className="w-full">
-                    <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                <div className="w-full">
+                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
                         {moduleTitle}
-                    </h2>
+                    </h3>
                     <CarouselGallery
                         module={carouselModule}
                         gallery={gallery}
                         loading={Boolean(galleryLoading)}
                     />
-                </section>
+                </div>
             );
         case 'SLIDER':
             return (
-                <section className="w-full">
-                    <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                <div className="w-full">
+                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
                         {moduleTitle}
-                    </h2>
+                    </h3>
                     <CarouselGallery
                         module={carouselModule}
                         gallery={gallery}
@@ -99,16 +104,21 @@ const GalleryModule: React.FC<Props> = ({module}) => {
                         showThumbnails={false}
                         showCounter={false}
                     />
-                </section>
+                </div>
             );
         default:
             // fallback to grid
             return (
-                <GridGallery
-                    images={galleryImages}
-                    title={moduleTitle}
-                    loading={Boolean(galleryLoading)}
-                />
+                <div className="w-full">
+                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                        {moduleTitle}
+                    </h3>
+                    <GridGallery
+                        images={galleryImages}
+                        title={moduleTitle}
+                        loading={Boolean(galleryLoading)}
+                    />
+                </div>
             );
     }
 };

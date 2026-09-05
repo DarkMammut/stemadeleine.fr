@@ -44,3 +44,20 @@ export async function getSectionsByPageId(pageId: string | number) {
     return [];
   }
 }
+
+export async function getPublicPages() {
+  try {
+    const res = await axiosClient.get('/api/public/pages', {
+      headers: SERVER_API_TOKEN ? { Authorization: `Bearer ${SERVER_API_TOKEN}` } : undefined,
+    });
+    return Array.isArray(res.data) ? res.data : [];
+  } catch (unknownErr) {
+    if (axios.isAxiosError(unknownErr)) {
+      const status = unknownErr.response?.status ?? 'unknown';
+      console.error('getPublicPages axios error:', status, unknownErr.message);
+    } else {
+      console.error('getPublicPages unknown error:', unknownErr);
+    }
+    return [];
+  }
+}

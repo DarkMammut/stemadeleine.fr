@@ -3,27 +3,69 @@ import { getPageBySlug } from '@/lib/serverApi';
 
 type PageShape = {
   name?: string;
+  title?: string;
   description?: string;
   heroMedia?: { fileUrl?: string } | null;
   url?: string;
   keywords?: string | null;
+  noIndex?: boolean | null;
+  noFollow?: boolean | null;
 };
 
 const DEFAULT_SITE_NAME = 'Les Amis de Sainte-Madeleine';
 const DEFAULT_DESCRIPTION = 'Site officiel des Amis de Sainte-Madeleine de la Jarrie';
 const DEFAULT_LOCALE = 'fr_FR';
+const DEFAULT_AUTHOR = 'Les Amis de Sainte-Madeleine';
+const DEFAULT_PUBLISHER = 'Les Amis de Sainte-Madeleine';
+const DEFAULT_KEYWORDS = ['Sainte-Madeleine', 'La Jarrie', 'association', 'patrimoine'];
+
+function getSiteBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL || 'https://stemadeleine.fr';
+}
+
+function buildAbsoluteUrl(pathOrUrl?: string): string | undefined {
+  if (!pathOrUrl) return undefined;
+  try {
+    return new URL(pathOrUrl, getSiteBaseUrl()).toString();
+  } catch {
+    return undefined;
+  }
+}
+
+function buildTitle(page: PageShape | null, siteName: string): string {
+  const pageTitle = page?.title?.trim() || page?.name?.trim();
+  return pageTitle ? `${pageTitle} | ${siteName}` : siteName;
+}
+
+function buildRobots(page: PageShape | null) {
+  const noIndex = Boolean(page?.noIndex);
+  const noFollow = Boolean(page?.noFollow);
+  return {
+    index: !noIndex,
+    follow: !noFollow,
+  };
+}
 
 export function buildMetadataFromPage(page: PageShape | null, opts?: { siteName?: string; locale?: string }): Metadata {
   const siteName = opts?.siteName ?? DEFAULT_SITE_NAME;
   const locale = opts?.locale ?? DEFAULT_LOCALE;
+  const metadataBase = new URL(getSiteBaseUrl());
+  const robots = buildRobots(page);
 
   if (!page) {
     return {
       title: siteName,
       description: DEFAULT_DESCRIPTION,
+      metadataBase,
+      applicationName: siteName,
+      authors: [{ name: DEFAULT_AUTHOR }],
+      publisher: DEFAULT_PUBLISHER,
+      robots,
+      keywords: DEFAULT_KEYWORDS,
       openGraph: {
         title: siteName,
         description: DEFAULT_DESCRIPTION,
+        url: metadataBase.toString(),
         siteName,
         locale,
       },
@@ -33,22 +75,29 @@ export function buildMetadataFromPage(page: PageShape | null, opts?: { siteName?
     } as Metadata;
   }
 
-  const title = page.name ? `${page.name} - ${siteName}` : siteName;
+  const title = buildTitle(page, siteName);
   const description = page.description || DEFAULT_DESCRIPTION;
   const image = page.heroMedia?.fileUrl || undefined;
-  const url = page.url || undefined;
+  const canonical = buildAbsoluteUrl(page.url || undefined);
 
-  const keywordsArray = page.keywords ? page.keywords.split(',').map((k) => k.trim()).filter(Boolean) : [];
+  const pageKeywords = page.keywords ? page.keywords.split(',').map((k) => k.trim()).filter(Boolean) : [];
+  const keywordsArray = pageKeywords.length > 0 ? pageKeywords : DEFAULT_KEYWORDS;
 
-  const metadata: Metadata = {
+  return {
+    metadataBase,
+    applicationName: siteName,
     title,
     description,
-    // You can add other top-level fields as needed
+    keywords: keywordsArray,
+    authors: [{ name: DEFAULT_AUTHOR }],
+    publisher: DEFAULT_PUBLISHER,
+    robots,
+    alternates: canonical ? { canonical } : undefined,
     openGraph: {
       title,
       description,
-      url,
-      images: image ? [{ url: image }] : undefined,
+      url: canonical || metadataBase.toString(),
+      images: image ? [{ url: buildAbsoluteUrl(image) || image }] : undefined,
       siteName,
       locale,
     },
@@ -56,16 +105,9 @@ export function buildMetadataFromPage(page: PageShape | null, opts?: { siteName?
       card: 'summary_large_image',
       title,
       description,
-      images: image ? [image] : undefined,
+      images: image ? [buildAbsoluteUrl(image) || image] : undefined,
     },
   } as Metadata;
-
-  if (keywordsArray.length > 0) {
-    // Attach keywords in a safe way; Metadata type may vary between Next versions
-    (metadata as unknown as Record<string, unknown>)['keywords'] = keywordsArray;
-  }
-
-  return metadata;
 }
 
 export async function getMetadataForSlug(slug = '/'): Promise<Metadata> {

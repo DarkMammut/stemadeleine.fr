@@ -112,9 +112,9 @@ export default function Section({
                     >
                         {title && (
                             <div className="mb-3 md:mb-4">
-                                <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary leading-none">
+                                <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary leading-none">
                                     {title}
-                                </h3>
+                                </h2>
                             </div>
                         )}
 
@@ -146,7 +146,8 @@ export default function Section({
                 {/* Modules Section */}
                 {sectionId && showModules && (
                     <div className="">
-                        <ModulesList sectionId={sectionId} isDark={hasDarkModules} onModulesChange={handleModulesChange}/>
+                        <ModulesList sectionId={sectionId} isDark={hasDarkModules}
+                                     onModulesChange={handleModulesChange}/>
                     </div>
                 )}
             </div>

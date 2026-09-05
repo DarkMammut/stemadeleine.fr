@@ -19,6 +19,12 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
     title: 'Les Amis de Sainte-Madeleine de la Jarrie',
     description: 'Association des Amis de Sainte-Madeleine de la Jarrie',
+    authors: [{name: 'Les Amis de Sainte-Madeleine'}],
+    publisher: 'Les Amis de Sainte-Madeleine',
+    robots: {
+        index: true,
+        follow: true,
+    },
     // No static icons - favicon will be set dynamically by DynamicFavicon component
 };
 

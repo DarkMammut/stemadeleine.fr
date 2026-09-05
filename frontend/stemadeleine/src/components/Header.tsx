@@ -39,9 +39,10 @@ export default function Header({pagesTree}: HeaderProps): React.ReactElement {
                                 preload={true}
                             />
                         </div>
-                        <h1 className="line-clamp-2 font-serif text-lg font-normal leading-tight tracking-[0.06em] md:text-sm">
+                        <span
+                            className="line-clamp-2 font-serif text-lg font-normal leading-tight tracking-[0.06em] md:text-sm">
                             {info?.name || "Les Amis de Sainte Madeleine de la Jarrie"}
-                        </h1>
+                        </span>
                     </Link>
 
                     {/* Navigation desktop (right) */}

@@ -238,9 +238,9 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
             )}
         >
             <div className="mb-8">
-                <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25]">
+                <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25]">
                     {moduleTitle}
-                </h2>
+                </h3>
             </div>
 
             {(variant === 'LAST3' || variant === 'LAST5') && (

@@ -1,127 +1,53 @@
-'use client';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import NewsDetailClient from '@/components/news/NewsDetailClient';
+import { buildMetadataFromPage } from '@/lib/metadata';
+import { getPageBySlug } from '@/lib/serverApi';
+import { getNewsPublicationByNewsId } from '@/lib/publicApi';
 
-import React, { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import useGetNewsPublicationByNewsId from '@/hooks/useGetNewsPublicationByNewsId';
-import useGetOrganization from '@/hooks/useGetOrganization';
-import NewsArticle from '@/components/NewsArticle';
-import useGetPages from '@/hooks/useGetPages';
-import Layout from '@/components/Layout';
+type Params = { params: Promise<{ newsId: string }> };
 
 const ACTUALITES_SLUG = '/actualites';
 
-type PageShape = {
-    name?: string;
-    title?: string;
-    subtitle?: string;
-    description?: string;
-    keywords?: string;
-    heroMedia?: { id?: string | number } | null;
-    pageId?: string | number;
-    slug?: string;
-};
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { newsId } = await params;
+  const [page, newsPublication] = await Promise.all([
+    getPageBySlug(ACTUALITES_SLUG),
+    getNewsPublicationByNewsId(newsId),
+  ]);
 
-export default function ActualitePage() {
-    const params = useParams();
-    const router = useRouter();
-    const newsId = params?.newsId as string | undefined;
+  if (!newsPublication) {
+    return buildMetadataFromPage(page);
+  }
 
-    const {
-        newsPublication,
-        loading: newsLoading,
-        error: newsError,
-        fetchNewsByNewsId,
-    } = useGetNewsPublicationByNewsId();
+  const canonicalPath = `/actualites/${newsId}`;
+  const pageForSeo = {
+    title: newsPublication.title || newsPublication.name || page?.title || page?.name || 'Actualites',
+    description: newsPublication.description || page?.description,
+    heroMedia: newsPublication.media?.fileUrl ? { fileUrl: newsPublication.media.fileUrl } : page?.heroMedia,
+    url: canonicalPath,
+    keywords: page?.keywords || null,
+  };
 
-    const {
-        settings,
-        loading: orgLoading,
-    } = useGetOrganization();
+  return buildMetadataFromPage(pageForSeo);
+}
 
-    const {
-        fetchPageBySlug,
-        loading: pageLoading,
-    } = useGetPages();
+export default async function ActualitePage({ params }: Params) {
+  const { newsId } = await params;
+  const [newsPublication, page] = await Promise.all([
+    getNewsPublicationByNewsId(newsId),
+    getPageBySlug(ACTUALITES_SLUG),
+  ]);
 
-    const [page, setPage] = React.useState<PageShape | null>(null);
+  if (!newsPublication) {
+    notFound();
+  }
 
-    useEffect(() => {
-        let mounted = true;
-
-        const loadPage = async () => {
-            const pageData = await fetchPageBySlug(ACTUALITES_SLUG);
-
-            if (!mounted) return;
-            if (pageData) {
-                setPage(pageData as PageShape);
-            }
-        };
-
-        loadPage();
-
-        return () => {
-            mounted = false;
-        };
-    }, [fetchPageBySlug]);
-
-    useEffect(() => {
-        if (newsId) {
-            fetchNewsByNewsId(newsId);
-        }
-    }, [newsId, fetchNewsByNewsId]);
-
-    // Rediriger vers 404 si l'actualité n'est pas trouvée
-    useEffect(() => {
-        if (!newsLoading && newsError) {
-            router.replace('/404');
-        }
-    }, [newsLoading, newsError, router]);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const settingsAny = settings as any;
-    const logoUrl = settingsAny?.logoUrl || '/logo.png';
-
-    const loading = newsLoading || orgLoading || pageLoading;
-
-    if (loading && !newsPublication) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
-
-    if (newsError && !newsPublication) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-red-500 text-center">
-                    <h2 className="text-2xl font-bold mb-4">Erreur</h2>
-                    <p>{newsError}</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!newsPublication) {
-        return null;
-    }
-
-    return (
-        <Layout
-            page={
-                page || {
-                    name: 'Actualités',
-                    title: 'Actualités',
-                    slug: ACTUALITES_SLUG,
-                }
-            }
-        >
-            <main>
-                <NewsArticle
-                    news={newsPublication}
-                    organizationLogo={logoUrl}
-                />
-            </main>
-        </Layout>
-    );
+  return (
+    <NewsDetailClient
+      newsPublication={newsPublication}
+      page={page}
+      organizationLogo="/logo.png"
+    />
+  );
 }

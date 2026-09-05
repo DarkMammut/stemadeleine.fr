@@ -1,5 +1,4 @@
 import React, {ReactNode} from 'react';
-import Meta from '@/components/Meta';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
@@ -16,17 +15,6 @@ type PageShape = {
     heroMedia?: { id?: string | number } | null;
     pageId?: string | number;
     slug?: string;
-};
-
-// Minimal navigation types passed to Footer (optional)
-export type NavLink = { name: string; href: string };
-export type SocialItem = { name: string; href: string; icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> };
-export type NavigationShape = {
-    solutions?: NavLink[];
-    support?: NavLink[];
-    company?: NavLink[];
-    legal?: NavLink[];
-    social?: SocialItem[];
 };
 
 export type FooterParent = { name: string; href: string; children: { name: string; href: string }[] };
@@ -56,31 +44,18 @@ export default function Layout({children, page}: LayoutProps) {
 
     return (
         <>
-            <Meta
-                title={page?.name || 'Accueil'}
-                description={
-                    page?.description ||
-                    'Bienvenue sur le site des amis de Sainte-Madeleine de la Jarrie. Découvrez nos actualités et nos activités.'
-                }
-                keywords={
-                    page?.keywords ? page.keywords.split(',') : ['accueil', 'paroisse', 'actualités', 'newsletters']
-                }
-                type="website"
-                url={typeof window !== 'undefined' ? window.location.href : undefined}
-            />
-
             <Header
                 pagesTree={tree}
             />
 
-            <div className={page?.slug === '/' ? '' : 'pt-[60px]'}>
+            <div className={page?.slug === '/' ? '' : 'pt-15'}>
                 <Hero
                     title={page?.title}
                     mediaId={page?.heroMedia?.id}
                     subtitle={page?.subTitle}
                     description={page?.description}
                     variant={page?.slug === '/' ? 'home' : 'default'}
-                    className={page?.slug === '/' ? 'mt-[60px] mb-0' : ''}
+                    className={page?.slug === '/' ? 'mt-15 mb-0' : ''}
                 />
             </div>
 

@@ -72,13 +72,7 @@ const GridGallery: React.FC<Props> = ({images, title, loading = false}) => {
     }
 
     return (
-        <div className="w-full">
-            {title && (
-                <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
-                    {title}
-                </h2>
-            )}
-
+        <>
             <div
                 className="pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:auto-rows-[240px] gap-[3px] mt-4">
                 {normalizedImages.map((image, index) => {
@@ -127,7 +121,7 @@ const GridGallery: React.FC<Props> = ({images, title, loading = false}) => {
                 onNext={goToNextImage}
                 onPrevious={goToPreviousImage}
             />
-        </div>
+        </>
     );
 };
 

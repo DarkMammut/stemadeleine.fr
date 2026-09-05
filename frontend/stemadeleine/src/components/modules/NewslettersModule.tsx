@@ -131,9 +131,9 @@ const NewslettersModule: React.FC<Props> = ({module, className = ''}) => {
     return (
         <div className={clsx('w-full', className)}>
             <div className="mb-8">
-                <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-cream">
+                <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-cream">
                     {moduleTitle}
-                </h2>
+                </h3>
 
                 {module.description && (
                     <p className="mt-3 max-w-3xl text-sm leading-[1.8] text-[rgba(247,242,232,0.6)]">
