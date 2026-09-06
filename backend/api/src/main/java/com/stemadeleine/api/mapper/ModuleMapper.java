@@ -15,6 +15,7 @@ import java.util.function.Function;
 public class ModuleMapper {
     private final GalleryService galleryService;
     private final MediaMapper mediaMapper;
+private final ListContentMapper listContentMapper;
 
     public ModuleDto toDto(Module module) {
         java.util.List<MediaDto> medias = Collections.emptyList();
@@ -85,7 +86,7 @@ public class ModuleMapper {
                 list.getStatus() != null ? list.getStatus().name() : null,
                 list.getIsVisible(),
                 list.getVersion(),
-                list.getContents() != null ? list.getContents().stream().map(contentMapper).toList() : null
+                list.getContents() != null ? list.getContents().stream().map(listContentMapper::toDto).toList() : null
         );
     }
 

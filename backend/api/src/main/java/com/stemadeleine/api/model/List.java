@@ -20,7 +20,6 @@ public class List extends Module {
     @Column(nullable = false)
     private ListVariants variant = ListVariants.CARD;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "list_id", referencedColumnName = "id")
-    private java.util.List<Content> contents;
+    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<ListContent> contents;
 }

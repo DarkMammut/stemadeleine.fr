@@ -190,6 +190,67 @@ const useGetModules = () => {
   }, []);
 
   // -----------------------------------------------------------------------
+  // New: fetch list by moduleId
+  // Utilise l'endpoint défini dans ModulePublicController:
+  // GET /api/public/modules/list/by-module-id/{moduleId}
+  // -----------------------------------------------------------------------
+
+  const [list, setList] = useState(null);
+  const [listLoading, setListLoading] = useState(false);
+  const [listError, setListError] = useState(null);
+
+  /**
+   * Fetch latest list (version) by moduleId
+   * @param {string} moduleId - UUID of the module
+   * @returns {Promise<Object|null>} - list DTO or null if not found/error
+   */
+  const fetchListByModuleId = useCallback(
+    async (moduleId) => {
+      if (!moduleId) {
+        console.warn('useGetModules: moduleId is required to fetch list');
+        return null;
+      }
+
+      setListLoading(true);
+      setListError(null);
+
+      try {
+        console.log(`Fetching list for moduleId: ${moduleId}`);
+
+        const response = await axiosClient.get(
+          `/api/public/modules/list/by-module-id/${moduleId}`,
+        );
+
+        const data = response.data;
+        console.log(`Fetched list for moduleId: ${moduleId}`, data);
+
+        setList(data);
+        return data;
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.warn(`No list found for moduleId: ${moduleId}`);
+          setList(null);
+          return null;
+        }
+
+        const errorMessage = `Error fetching list for moduleId ${moduleId}: ${err.message}`;
+        console.error(errorMessage, err);
+        setListError(errorMessage);
+        setList(null);
+        return null;
+      } finally {
+        setListLoading(false);
+      }
+    },
+    [axiosClient],
+  );
+
+  const clearList = useCallback(() => {
+    setList(null);
+    setListError(null);
+  }, []);
+
+  // -----------------------------------------------------------------------
   // New: fetch newsletter by moduleId
   // Utilise l'endpoint défini dans ModulePublicController:
   // GET /api/public/modules/newsletter/by-module-id/{moduleId}
@@ -329,6 +390,12 @@ const useGetModules = () => {
     galleryError,
     fetchGalleryByModuleId,
     clearGallery,
+    // list helpers
+    list,
+    listLoading,
+    listError,
+    fetchListByModuleId,
+    clearList,
     // newsletter helpers
     newsletter,
     newsletterLoading,

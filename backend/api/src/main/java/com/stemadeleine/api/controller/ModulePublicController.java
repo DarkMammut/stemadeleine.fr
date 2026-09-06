@@ -4,6 +4,8 @@ package com.stemadeleine.api.controller;
 import com.stemadeleine.api.dto.ArticleDto;
 import com.stemadeleine.api.dto.CTADto;
 import com.stemadeleine.api.dto.GalleryDto;
+import com.stemadeleine.api.dto.ListContentDto;
+import com.stemadeleine.api.dto.ListDto;
 import com.stemadeleine.api.dto.NewsDto;
 import com.stemadeleine.api.dto.NewsletterDto;
 import com.stemadeleine.api.dto.NewsletterPublicationDto;
@@ -11,6 +13,7 @@ import com.stemadeleine.api.dto.NewsPublicationDto;
 import com.stemadeleine.api.mapper.ArticleMapper;
 import com.stemadeleine.api.mapper.CTAMapper;
 import com.stemadeleine.api.mapper.GalleryMapper;
+import com.stemadeleine.api.mapper.ListMapper;
 import com.stemadeleine.api.mapper.NewsMapper;
 import com.stemadeleine.api.mapper.NewsletterMapper;
 import com.stemadeleine.api.mapper.NewsletterPublicationMapper;
@@ -18,6 +21,7 @@ import com.stemadeleine.api.mapper.NewsPublicationMapper;
 import com.stemadeleine.api.service.ArticleService;
 import com.stemadeleine.api.service.CTAService;
 import com.stemadeleine.api.service.GalleryService;
+import com.stemadeleine.api.service.ListService;
 import com.stemadeleine.api.service.NewsPublicationService;
 import com.stemadeleine.api.service.NewsletterPublicationService;
 import com.stemadeleine.api.service.NewsletterService;
@@ -29,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -54,6 +59,8 @@ public class ModulePublicController {
     private final NewsMapper newsMapper;
     private final NewsPublicationService newsPublicationService;
     private final NewsPublicationMapper newsPublicationMapper;
+    private final ListService listService;
+    private final ListMapper listMapper;
 
     @GetMapping("article/by-module-id/{moduleId}")
     public ResponseEntity<ArticleDto> getArticleByModuleId(@PathVariable UUID moduleId) {
@@ -93,6 +100,41 @@ public class ModulePublicController {
                 })
                 .orElseGet(() -> {
                     log.warn("Gallery not found with moduleId: {}", moduleId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    @GetMapping("list/by-module-id/{moduleId}")
+    public ResponseEntity<ListDto> getListByModuleId(@PathVariable UUID moduleId) {
+        log.info("GET /api/public/modules/list/by-module-id/{} - Retrieving latest list version by moduleId", moduleId);
+        return listService.getLastVersionByModuleId(moduleId)
+                .map(list -> {
+                    ListDto dto = listMapper.toDto(list);
+                    // Ne renvoyer que les contenus visibles, triés par sortOrder, pour l'affichage public
+                    List<ListContentDto> visibleContents = dto.contents() != null
+                            ? dto.contents().stream()
+                            .filter(content -> Boolean.TRUE.equals(content.isVisible()))
+                            .sorted(Comparator.comparing(c -> c.sortOrder() != null ? c.sortOrder() : 0))
+                            .toList()
+                            : List.of();
+                    ListDto publicDto = new ListDto(
+                            dto.id(),
+                            dto.moduleId(),
+                            dto.sectionId(),
+                            dto.name(),
+                            dto.type(),
+                            dto.variant(),
+                            dto.sortOrder(),
+                            dto.status(),
+                            dto.isVisible(),
+                            dto.version(),
+                            visibleContents
+                    );
+                    log.debug("List found: {} (version {})", list.getId(), list.getVersion());
+                    return ResponseEntity.ok(publicDto);
+                })
+                .orElseGet(() -> {
+                    log.warn("List not found with moduleId: {}", moduleId);
                     return ResponseEntity.notFound().build();
                 });
     }

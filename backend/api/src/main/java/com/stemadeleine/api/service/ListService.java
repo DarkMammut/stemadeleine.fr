@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateModuleRequest;
+import com.stemadeleine.api.dto.UpdateListDetailsRequest;
 import com.stemadeleine.api.dto.UpdateListRequest;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
@@ -64,16 +65,22 @@ public class ListService {
         return savedList;
     }
 
-    public List updateList(UUID id, List listDetails) {
+    public List updateList(UUID id, UpdateListDetailsRequest request) {
         log.info("Mise à jour des détails de la liste avec l'ID : {}", id);
         return listRepository.findById(id)
                 .map(list -> {
-                    list.setName(listDetails.getName());
-                    list.setTitle(listDetails.getTitle());
-                    list.setVariant(listDetails.getVariant());
-                    list.setContents(listDetails.getContents());
-                    list.setSortOrder(listDetails.getSortOrder());
-                    list.setIsVisible(listDetails.getIsVisible());
+                    if (request.getName() != null) {
+                        list.setName(request.getName());
+                    }
+                    if (request.getTitle() != null) {
+                        list.setTitle(request.getTitle());
+                    }
+                    if (request.getVariant() != null) {
+                        list.setVariant(request.getVariant());
+                    }
+                    if (request.getSortOrder() != null) {
+                        list.setSortOrder(request.getSortOrder());
+                    }
                     log.debug("Détails de la liste mis à jour : {}", list);
                     return listRepository.save(list);
                 })
@@ -98,7 +105,7 @@ public class ListService {
         String name = request.name() != null ? request.name() : (previousList != null ? previousList.getName() : module.getName());
         String title = request.title() != null ? request.title() : (previousList != null ? previousList.getTitle() : module.getTitle());
         ListVariants variant = request.variant() != null ? request.variant() : (previousList != null ? previousList.getVariant() : ListVariants.CARD);
-        java.util.List<Content> contents = previousList != null ? new java.util.ArrayList<>(previousList.getContents()) : new java.util.ArrayList<>();
+        java.util.List<ListContent> contents = previousList != null ? new java.util.ArrayList<>(previousList.getContents()) : new java.util.ArrayList<>();
         String type = module.getType();
         Integer sortOrder = module.getSortOrder();
         Boolean isVisible = module.getIsVisible();
@@ -107,7 +114,6 @@ public class ListService {
 
         List list = List.builder()
                 .variant(variant)
-                .contents(contents)
                 .moduleId(module.getModuleId())
                 .section(module.getSection())
                 .name(name)
@@ -120,9 +126,20 @@ public class ListService {
                 .version(newVersion)
                 .build();
 
+        contents.forEach(c -> c.setList(list));
+        list.setContents(contents);
+
         List savedList = listRepository.save(list);
         log.info("Nouvelle version de liste créée avec succès, ID : {}", savedList.getId());
         return savedList;
+    }
+
+    public Optional<List> getLastVersionByModuleId(UUID moduleId) {
+        log.info("Recherche de la dernière version de la liste pour le moduleId : {}", moduleId);
+        Optional<List> list = listRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
+                .filter(l -> l.getStatus() != PublishingStatus.DELETED);
+        log.debug("Liste trouvée : {}", list.isPresent());
+        return list;
     }
 
     public boolean softDeleteList(UUID id) {

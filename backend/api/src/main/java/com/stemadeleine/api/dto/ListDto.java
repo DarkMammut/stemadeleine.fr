@@ -1,6 +1,5 @@
 package com.stemadeleine.api.dto;
 
-import java.util.List;
 import java.util.UUID;
 
 public record ListDto(
@@ -14,6 +13,6 @@ public record ListDto(
         String status,
         Boolean isVisible,
         Integer version,
-        List<ContentDto> contents
+        java.util.List<ListContentDto> contents
 ) implements ModuleDtoMarker {
 }

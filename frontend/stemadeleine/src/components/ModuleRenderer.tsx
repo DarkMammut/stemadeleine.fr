@@ -2,6 +2,7 @@ import React from 'react';
 import ArticleModule from '@/components/modules/ArticleModule';
 import NewsModule from '@/components/modules/NewsModule';
 import GalleryModule from '@/components/modules/GalleryModule';
+import ListModule from '@/components/modules/ListModule';
 import NewslettersModule, {NewslettersModuleType} from '@/components/modules/NewslettersModule';
 import CTAModule, {CTAModuleType} from '@/components/modules/CTAModule';
 
@@ -45,8 +46,7 @@ const ModuleRenderer: React.FC<Props> = ({module, isDark}) => {
             // return <TimelineModule module={module} />;
             return <div>Timeline module not implemented yet</div>;
         case 'LIST':
-            // return <ListModule module={module} />;
-            return <div>List module not implemented yet</div>;
+            return <ListModule module={module} isDark={isDark}/>;
         default:
             console.warn(`Unknown module type: ${type}`);
             return (
