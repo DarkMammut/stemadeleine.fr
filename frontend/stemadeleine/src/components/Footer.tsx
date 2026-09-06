@@ -49,12 +49,23 @@ export default function Footer({pagesNav}: FooterProps) {
                     {/* Nav column 1 */}
                     {col1 && (
                         <div>
-                            <h4
-                                className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]"
-                                style={{color: 'var(--color-secondary)'}}
-                            >
-                                {col1.name}
-                            </h4>
+                            <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]">
+                                <a
+                                    href={col1.href}
+                                    className="transition-colors duration-200"
+                                    style={{color: 'var(--color-secondary)'}}
+                                    onMouseEnter={(e) =>
+                                        ((e.currentTarget as HTMLAnchorElement).style.color =
+                                            'var(--color-secondary-light)')
+                                    }
+                                    onMouseLeave={(e) =>
+                                        ((e.currentTarget as HTMLAnchorElement).style.color =
+                                            'var(--color-secondary)')
+                                    }
+                                >
+                                    {col1.name}
+                                </a>
+                            </h3>
                             <ul className="space-y-[0.45rem]">
                                 {col1.children.map((child) => (
                                     <li key={child.name}>
@@ -82,12 +93,23 @@ export default function Footer({pagesNav}: FooterProps) {
                     {/* Nav column 2 */}
                     {col2 && (
                         <div>
-                            <h4
-                                className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]"
-                                style={{color: 'var(--color-secondary)'}}
-                            >
-                                {col2.name}
-                            </h4>
+                            <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em]">
+                                <a
+                                    href={col2.href}
+                                    className="transition-colors duration-200"
+                                    style={{color: 'var(--color-secondary)'}}
+                                    onMouseEnter={(e) =>
+                                        ((e.currentTarget as HTMLAnchorElement).style.color =
+                                            'var(--color-secondary-light)')
+                                    }
+                                    onMouseLeave={(e) =>
+                                        ((e.currentTarget as HTMLAnchorElement).style.color =
+                                            'var(--color-secondary)')
+                                    }
+                                >
+                                    {col2.name}
+                                </a>
+                            </h3>
                             <ul className="space-y-[0.45rem]">
                                 {col2.children.map((child) => (
                                     <li key={child.name}>

@@ -6,7 +6,7 @@ type PublicPage = {
   updatedAt?: string | null;
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stemadeleine.fr';
 
 function toAbsoluteUrl(slug: string): string {
   const normalized = slug.startsWith('/') ? slug : `/${slug}`;
@@ -25,8 +25,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   const uniqueEntries = Array.from(new Map(entries.map((entry) => [entry.slug, entry])).values());
+  const homeEntry = { slug: '/', url: toAbsoluteUrl('/'), updatedAt: null };
+  const allEntries = uniqueEntries.some((entry) => entry.slug === '/') ? uniqueEntries : [homeEntry, ...uniqueEntries];
 
-  return uniqueEntries.map((entry) => ({
+  return allEntries.map((entry) => ({
     url: entry.url,
     lastModified: entry.updatedAt ? new Date(entry.updatedAt) : new Date(),
     changeFrequency: 'weekly',

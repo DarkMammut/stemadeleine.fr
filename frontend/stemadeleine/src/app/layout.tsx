@@ -206,7 +206,7 @@ export default async function RootLayout({
     const htmlStyle = htmlStyleMap as unknown as React.CSSProperties;
 
     return (
-        <html lang="en" style={htmlStyle}>
+        <html lang="fr" style={htmlStyle}>
         <head>
             <title>{String(metadata.title ?? 'Create Next App')}</title>
             {/* Injecter les variables CSS du backend au plus tôt */}
