@@ -143,6 +143,10 @@ export default function MediaImage(props: MediaImageProps) {
     ...(imagePropsRest as Omit<ImageProps, 'alt'>),
     src: resolvedSrc as string,
     className: mergedImageClassName,
+    quality: imageProps.quality ?? 75,
+    sizes:
+      imageProps.sizes ??
+      (imageProps.fill ? '100vw' : '(max-width: 768px) 100vw, 50vw'),
   };
 
   return (
