@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title: newsPublication.title || newsPublication.name || page?.title || page?.name || 'Actualites',
     description: newsPublication.description || page?.description,
     heroMedia: newsPublication.media?.fileUrl ? { fileUrl: newsPublication.media.fileUrl } : page?.heroMedia,
-    url: canonicalPath,
+    slug: canonicalPath,
     keywords: page?.keywords || null,
   };
 

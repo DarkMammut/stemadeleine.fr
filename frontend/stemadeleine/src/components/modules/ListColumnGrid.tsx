@@ -31,8 +31,8 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
 
     return (
         <div
-            className="grid justify-center gap-10 pt-6"
-            style={{gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 300px))'}}
+            className="grid w-full justify-center gap-10 pt-6"
+            style={{gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 260px))'}}
         >
             {contents.map((content, index) => {
                 const html = getBodyHtml(content.body);

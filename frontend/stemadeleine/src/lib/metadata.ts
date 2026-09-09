@@ -6,7 +6,7 @@ type PageShape = {
     title?: string;
     description?: string;
     heroMedia?: { fileUrl?: string } | null;
-    url?: string;
+    slug?: string;
     keywords?: string | null;
     noIndex?: boolean | null;
     noFollow?: boolean | null;
@@ -33,10 +33,10 @@ function buildAbsoluteUrl(pathOrUrl?: string): string | undefined {
 }
 
 function buildTitle(page: PageShape | null, siteName: string): string {
-    const pageTitle = page?.title?.trim() || page?.name?.trim();
+    const pageTitle = page?.name?.trim() || page?.title?.trim();
     if (!pageTitle) return siteName;
-    const pageUrl = page?.url?.trim();
-    const isHomePage = !pageUrl || pageUrl === '/';
+    const slug = page?.slug?.trim();
+    const isHomePage = !slug || slug === '/';
     return isHomePage ? pageTitle : `${pageTitle} | ${siteName}`;
 }
 
@@ -50,7 +50,7 @@ function buildRobots(page: PageShape | null) {
 }
 
 export function buildMetadataFromPage(page: PageShape | null, opts?: { siteName?: string; locale?: string }): Metadata {
-    const siteName = opts?.siteName ?? DEFAULT_SITE_NAME;
+    const siteName = opts?.siteName?.trim() || DEFAULT_SITE_NAME;
     const locale = opts?.locale ?? DEFAULT_LOCALE;
     const metadataBase = new URL(getSiteBaseUrl());
     const robots = buildRobots(page);
@@ -81,7 +81,7 @@ export function buildMetadataFromPage(page: PageShape | null, opts?: { siteName?
     const title = buildTitle(page, siteName);
     const description = page.description || DEFAULT_DESCRIPTION;
     const image = page.heroMedia?.fileUrl || undefined;
-    const canonical = buildAbsoluteUrl(page.url || '/');
+    const canonical = buildAbsoluteUrl(page.slug || '/');
 
     const pageKeywords = page.keywords ? page.keywords.split(',').map((k) => k.trim()).filter(Boolean) : [];
     const keywordsArray = pageKeywords.length > 0 ? pageKeywords : DEFAULT_KEYWORDS;

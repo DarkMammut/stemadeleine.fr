@@ -192,7 +192,7 @@ export default function NewsletterMagazine({
 
             {/* Contenus éditoriaux */}
             {(contentsLoading || contents.length > 0) && (
-                <section className={clsx('w-full max-w-[960px] mx-auto')}>
+                <section className={clsx('w-full max-w-[960px] mx-auto px-4 md:px-0')}>
                     <Contents
                         contents={contents}
                         loading={contentsLoading}

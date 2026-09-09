@@ -47,7 +47,7 @@ export async function getSectionsByPageId(pageId: string | number) {
 
 export async function getPublicPages() {
   try {
-    const res = await axiosClient.get('/api/public/pages', {
+    const res = await axiosClient.get('/api/public/pages/tree', {
       headers: SERVER_API_TOKEN ? { Authorization: `Bearer ${SERVER_API_TOKEN}` } : undefined,
     });
     return Array.isArray(res.data) ? res.data : [];

@@ -90,7 +90,7 @@ export default function Section({
     return (
         <section
             className={clsx(
-                'w-full py-20 md:py-5 px-5 md:px-0',
+                'w-full py-15 md:py-10 px-5 md:px-0',
                 hasDarkModules ? 'bg-primary' : 'bg-cream',
                 className,
             )}
@@ -111,7 +111,7 @@ export default function Section({
                         )}
                     >
                         {title && (
-                            <div className="mb-3 md:mb-4">
+                            <div className="mb-3 md:mb-5">
                                 <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary leading-none">
                                     {title}
                                 </h2>
