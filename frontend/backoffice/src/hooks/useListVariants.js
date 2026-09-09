@@ -31,6 +31,8 @@ export default function useListVariants() {
       setVariants([
         { value: "CARD", label: "Cartes" },
         { value: "BULLET", label: "Liste à puces" },
+        { value: "COLUMN", label: "Colonnes" },
+        { value: "NAV_CARD", label: "Cartes de navigation" },
       ]);
     } finally {
       setLoading(false);
@@ -53,11 +55,15 @@ export default function useListVariants() {
  * Formate le nom de la variante pour l'affichage
  * CARD -> Cartes
  * BULLET -> Liste à puces
+ * COLUMN -> Colonnes
+ * NAV_CARD -> Cartes de navigation
  */
 function formatVariantLabel(variant) {
   const labels = {
     CARD: "Cartes",
     BULLET: "Liste à puces",
+    COLUMN: "Colonnes",
+    NAV_CARD: "Cartes de navigation",
   };
 
   return labels[variant] || variant;

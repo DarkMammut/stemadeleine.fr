@@ -25,7 +25,7 @@ export default function Hero({mediaId, title, subtitle, description, variant = '
 
     const homeTitle = title?.trim() || 'Les Amis de Sainte Madeleine';
     const homeSubline =
-        subtitle?.trim() || 'Association de sauvegarde du patrimoine · fondée en 2015';
+        subtitle?.trim() || 'Association de sauvegarde du patrimoine · fondée en 2022';
     const homeBody =
         description?.trim() ||
         "Protéger, restaurer et faire vivre l'église Sainte-Madeleine de La Jarrie, joyau roman du Saintonge, pour les générations futures.";
@@ -167,11 +167,20 @@ export default function Hero({mediaId, title, subtitle, description, variant = '
                             </div>
                         </>
                     ) : (
-                        title && (
-                            <h1 className="text-3xl font-serif text-center text-white uppercase drop-shadow-lg md:text-4xl lg:text-5xl">
-                                {title}
-                            </h1>
-                        )
+                        title || subtitle ? (
+                            <div className="flex flex-col items-center gap-3 text-center">
+                                {title && (
+                                    <h1 className="text-3xl font-serif text-white uppercase drop-shadow-lg md:text-4xl lg:text-5xl">
+                                        {title}
+                                    </h1>
+                                )}
+                                {subtitle && (
+                                    <p className="max-w-2xl text-[11px] font-medium uppercase tracking-[0.16em] text-secondary-light drop-shadow-md">
+                                        {subtitle}
+                                    </p>
+                                )}
+                            </div>
+                        ) : null
                     )}
                 </div>
             </div>

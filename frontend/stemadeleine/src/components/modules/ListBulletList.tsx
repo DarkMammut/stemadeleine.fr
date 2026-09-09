@@ -3,23 +3,12 @@
 import React from 'react';
 import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
-import type {ListContentItem} from './ListCardGrid';
+import {type ListContentItem, isExternalUrl, getBodyHtml} from './listContent.types';
 
 interface Props {
     contents: ListContentItem[];
     loading?: boolean;
     isDark?: boolean;
-}
-
-function isExternalUrl(url: string): boolean {
-    return /^https?:\/\//i.test(url);
-}
-
-function getBodyHtml(body: ListContentItem['body']): string {
-    if (body && typeof body === 'object' && 'html' in body && typeof (body as { html?: unknown }).html === 'string') {
-        return (body as { html: string }).html;
-    }
-    return '';
 }
 
 const ListBulletList: React.FC<Props> = ({contents, loading = false, isDark = true}) => {

@@ -2,8 +2,11 @@
 
 import React, {useEffect} from 'react';
 import useGetModules from '@/hooks/useGetModules';
-import ListCardGrid, {type ListContentItem} from './ListCardGrid';
+import ListNavCard from './ListNavCard';
 import ListBulletList from './ListBulletList';
+import ListColumnGrid from './ListColumnGrid';
+import ListCardGrid from './ListCardGrid';
+import type {ListContentItem} from './listContent.types';
 
 type ModuleType = {
     id: string;
@@ -65,6 +68,10 @@ const ListModule: React.FC<Props> = ({module, isDark = true}) => {
 
             {variant === 'BULLET' ? (
                 <ListBulletList contents={contents} loading={Boolean(listLoading)} isDark={isDark}/>
+            ) : variant === 'COLUMN' ? (
+                <ListColumnGrid contents={contents} loading={Boolean(listLoading)} isDark={isDark}/>
+            ) : variant === 'NAV_CARD' ? (
+                <ListNavCard contents={contents} loading={Boolean(listLoading)} isDark={isDark}/>
             ) : (
                 <ListCardGrid contents={contents} loading={Boolean(listLoading)} isDark={isDark}/>
             )}
