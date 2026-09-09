@@ -1,6 +1,7 @@
 'use client';
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
 import Lightbox from '@/components/Lightbox';
 
@@ -38,6 +39,7 @@ interface Props {
     showThumbnails?: boolean;
     showArrows?: boolean;
     showCounter?: boolean;
+    isDark?: boolean;
 }
 
 const CarouselGallery: React.FC<Props> = ({
@@ -48,7 +50,8 @@ const CarouselGallery: React.FC<Props> = ({
                                               autoPlayInterval = 5000,
                                               showThumbnails = true,
                                               showArrows = true,
-                                              showCounter = true
+                                              showCounter = true,
+                                              isDark = true
                                           }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -165,9 +168,14 @@ const CarouselGallery: React.FC<Props> = ({
         <>
             <div className="w-full">
                 {module.title && (
-                    <h2 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                    <h3
+                        className={clsx(
+                            'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+                            isDark ? 'text-secondary' : 'text-primary',
+                        )}
+                    >
                         {module.title}
-                    </h2>
+                    </h3>
                 )}
 
                 <div
@@ -336,8 +344,8 @@ const CarouselGallery: React.FC<Props> = ({
                                     onClick={() => goToSlide(index)}
                                     className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer ${
                                         index === currentIndex
-                                            ? 'w-8 h-2 bg-gold'
-                                            : 'w-2 h-2 bg-cream/40 hover:bg-cream/60'
+                                            ? 'w-8 h-2 bg-secondary'
+                                            : 'w-2 h-2 bg-transparent border-secondary hover:bg-cream'
                                     }`}
                                     aria-label={`Aller à l'image ${index + 1}`}
                                 />

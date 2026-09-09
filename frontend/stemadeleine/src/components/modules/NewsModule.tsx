@@ -27,6 +27,7 @@ export interface NewsModuleType {
 interface Props {
     module: NewsModuleType;
     className?: string;
+    isDark?: boolean;
 }
 
 function formatNewsDate(publishedDate?: string): string | null {
@@ -82,9 +83,9 @@ function NewsGridCard({news}: { news: NewsPublication }) {
                     {dateLabel}
                 </div>
             )}
-            <h3 className="font-serif text-cream-dark text-base font-normal leading-[1.4] mb-2">
+            <h4 className="font-serif text-cream-dark text-base font-normal leading-[1.4] mb-2">
                 {title}
-            </h3>
+            </h4>
             {description && (
                 <p className="text-[13px] leading-[1.6] text-cream">
                     {description}
@@ -133,9 +134,9 @@ function NewsListCard({news}: { news: NewsPublication }) {
                         {dateLabel}
                     </div>
                 )}
-                <h3 className="font-serif text-cream text-lg font-normal leading-[1.35] mb-2">
+                <h4 className="font-serif text-cream text-lg font-normal leading-[1.35] mb-2">
                     {title}
-                </h3>
+                </h4>
                 {news.description && (
                     <p className="text-[13px] leading-[1.65] text-[rgba(247,242,232,0.45)]">
                         {news.description}
@@ -156,7 +157,7 @@ function NewsListCard({news}: { news: NewsPublication }) {
     );
 }
 
-const NewsModule: React.FC<Props> = ({module, className = ''}) => {
+const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) => {
     const {
         publications,
         loading,
@@ -238,7 +239,12 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
             )}
         >
             <div className="mb-8">
-                <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25]">
+                <h3
+                    className={clsx(
+                        'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+                        isDark ? 'text-secondary' : 'text-primary',
+                    )}
+                >
                     {moduleTitle}
                 </h3>
             </div>
@@ -296,9 +302,9 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
                                             {latestNewsDate}
                                         </div>
                                     )}
-                                    <h3 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
+                                    <h4 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
                                         {latestNews.title || latestNews.name}
-                                    </h3>
+                                    </h4>
                                     {latestNews.description && (
                                         <p className="text-sm leading-[1.7] text-[rgba(247,242,232,0.55)]">
                                             {latestNews.description}
@@ -332,9 +338,9 @@ const NewsModule: React.FC<Props> = ({module, className = ''}) => {
                                         {latestNewsDate}
                                     </div>
                                 )}
-                                <h3 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
+                                <h4 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
                                     {latestNews.title || latestNews.name}
-                                </h3>
+                                </h4>
                                 {latestNews.description && (
                                     <p className="text-sm leading-[1.7] text-[rgba(247,242,232,0.55)]">
                                         {latestNews.description}

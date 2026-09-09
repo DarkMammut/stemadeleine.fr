@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import clsx from 'clsx';
 import useGetModules from '@/hooks/useGetModules';
 import GridGallery from './GridGallery';
 import CarouselGallery from './CarouselGallery';
@@ -33,9 +34,10 @@ type GalleryDto = {
 
 interface Props {
     module: ModuleType;
+    isDark?: boolean;
 }
 
-const GalleryModule: React.FC<Props> = ({module}) => {
+const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
     // on réutilise le hook existant qui expose fetchGalleryByModuleId + gallery
     const modulesHook = useGetModules() as unknown as {
         gallery?: GalleryDto | null;
@@ -59,13 +61,17 @@ const GalleryModule: React.FC<Props> = ({module}) => {
     const moduleTitle = module.title ?? module.name ?? 'Galerie';
     const galleryImages = gallery?.medias ?? [];
     const carouselModule = {...module, title: undefined};
+    const titleClassName = clsx(
+        'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+        isDark ? 'text-secondary' : 'text-primary',
+    );
 
     // Choisir le composant en fonction de la variante
     switch (variant) {
         case 'GRID':
             return (
                 <div className="w-full">
-                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                    <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
                     <GridGallery
@@ -78,20 +84,21 @@ const GalleryModule: React.FC<Props> = ({module}) => {
         case 'CAROUSEL':
             return (
                 <div className="w-full">
-                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                    <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
                     <CarouselGallery
                         module={carouselModule}
                         gallery={gallery}
                         loading={Boolean(galleryLoading)}
+                        isDark={isDark}
                     />
                 </div>
             );
         case 'SLIDER':
             return (
                 <div className="w-full">
-                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                    <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
                     <CarouselGallery
@@ -103,6 +110,7 @@ const GalleryModule: React.FC<Props> = ({module}) => {
                         showArrows={false}
                         showThumbnails={false}
                         showCounter={false}
+                        isDark={isDark}
                     />
                 </div>
             );
@@ -110,7 +118,7 @@ const GalleryModule: React.FC<Props> = ({module}) => {
             // fallback to grid
             return (
                 <div className="w-full">
-                    <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] text-cream font-normal leading-[1.25] mb-6">
+                    <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
                     <GridGallery

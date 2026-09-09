@@ -44,9 +44,10 @@ export interface ArticleModuleType {
 interface Props {
     module: ArticleModuleType;
     className?: string;
+    isDark?: boolean;
 }
 
-const ArticleModule: React.FC<Props> = ({module, className = ''}) => {
+const ArticleModule: React.FC<Props> = ({module, className = '', isDark = true}) => {
     const {
         contents,
         loading: contentsLoading,
@@ -124,7 +125,14 @@ const ArticleModule: React.FC<Props> = ({module, className = ''}) => {
         >
             {/* Article Header */}
             {module.title && (
-                <h3 className="text-2xl tracking-tight text-secondary mb-4">{module.title}</h3>
+                <h3
+                    className={clsx(
+                        'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+                        isDark ? 'text-secondary' : 'text-primary',
+                    )}
+                >
+                    {module.title}
+                </h3>
             )}
 
             {/* Article Contents */}

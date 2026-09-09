@@ -133,9 +133,9 @@ export default function NewsletterCard({
                     </div>
                 )}
 
-                <h3 className="mb-2 font-serif text-base font-normal leading-[1.4] text-cream">
+                <h4 className="mb-2 font-serif text-base font-normal leading-[1.4] text-cream">
                     {title}
-                </h3>
+                </h4>
 
                 {description && (
                     <p className="text-[13px] leading-[1.6] text-cream-light">
@@ -172,9 +172,9 @@ export default function NewsletterCard({
                             </div>
                         )}
 
-                        <h3 className="mb-3 font-serif text-2xl font-normal leading-[1.3] text-cream">
+                        <h4 className="mb-3 font-serif text-2xl font-normal leading-[1.3] text-cream">
                             {title}
-                        </h3>
+                        </h4>
 
                         {description && (
                             <p className="text-sm leading-[1.7] text-[rgba(247,242,232,0.55)]">
@@ -215,9 +215,9 @@ export default function NewsletterCard({
                     </div>
                 )}
 
-                <h3 className="mb-2 font-serif text-lg font-normal leading-[1.35] text-cream">
+                <h4 className="mb-2 font-serif text-lg font-normal leading-[1.35] text-cream">
                     {title}
-                </h3>
+                </h4>
 
                 {description && (
                     <p className="text-[13px] leading-[1.65] text-[rgba(247,242,232,0.45)]">

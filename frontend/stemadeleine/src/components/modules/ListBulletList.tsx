@@ -42,11 +42,11 @@ const ListBulletList: React.FC<Props> = ({contents, loading = false, isDark = tr
                     : {};
 
                 return (
-                    <li key={content.id} className="group flex items-start gap-4 py-6 first:pt-0 last:pb-0">
+                    <li key={content.id} className="group flex items-center gap-4 py-6 first:pt-0 last:pb-0">
                         {/* Puce */}
                         <span
                             className={clsx(
-                                'mt-2.5 h-2 w-2 flex-shrink-0 rounded-full transition-colors',
+                                'h-2 w-2 flex-shrink-0 rounded-full transition-colors',
                                 isDark ? 'bg-accent group-hover:bg-secondary' : 'bg-secondary group-hover:bg-primary',
                             )}
                             aria-hidden="true"
@@ -54,13 +54,13 @@ const ListBulletList: React.FC<Props> = ({contents, loading = false, isDark = tr
 
                         {/* Miniature optionnelle */}
                         {media && (
-                            <div className="relative hidden h-20 w-28 flex-shrink-0 overflow-hidden bg-[#3A3020] sm:block">
+                            <div className="relative hidden h-20 w-28 flex-shrink-0 overflow-hidden bg-[#3A3020] sm:flex sm:items-center sm:justify-center">
                                 <MediaImage
                                     mediaId={media.id}
                                     fill
                                     sizes="112px"
                                     alt={media.altText ?? media.title ?? content.title ?? 'Image'}
-                                    style={{objectFit: 'cover'}}
+                                    style={{objectFit: 'cover', objectPosition: 'center'}}
                                 />
                             </div>
                         )}
@@ -71,7 +71,7 @@ const ListBulletList: React.FC<Props> = ({contents, loading = false, isDark = tr
                                     {...titleProps}
                                     className={clsx(
                                         'mb-1 block font-serif text-lg font-normal leading-snug transition-colors',
-                                        isDark ? 'text-cream group-hover:text-accent' : 'text-primary-dark group-hover:text-secondary',
+                                        isDark ? 'text-secondary group-hover:text-accent' : 'text-secondary group-hover:text-primary',
                                     )}
                                 >
                                     {content.title}

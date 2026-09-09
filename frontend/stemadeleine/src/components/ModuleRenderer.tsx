@@ -30,13 +30,13 @@ const ModuleRenderer: React.FC<Props> = ({module, isDark}) => {
 
     switch (type) {
         case 'ARTICLE':
-            return <ArticleModule module={module}/>;
+            return <ArticleModule module={module} isDark={isDark}/>;
         case 'NEWS':
-            return <NewsModule module={module}/>;
+            return <NewsModule module={module} isDark={isDark}/>;
         case 'GALLERY':
-            return <GalleryModule module={module}/>;
+            return <GalleryModule module={module} isDark={isDark}/>;
         case 'NEWSLETTER':
-            return <NewslettersModule module={module as NewslettersModuleType}/>;
+            return <NewslettersModule module={module as NewslettersModuleType} isDark={isDark}/>;
         case 'FORM':
             // return <FormModule module={module} />;
             return <div>Form module not implemented yet</div>;

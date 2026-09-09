@@ -11,6 +11,26 @@ interface Props {
     isDark?: boolean;
 }
 
+const ROMAN_NUMERALS: [number, string][] = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+];
+
+function toRomanNumeral(value: number): string {
+    let remaining = value;
+    let result = '';
+
+    for (const [numberValue, numeral] of ROMAN_NUMERALS) {
+        while (remaining >= numberValue) {
+            result += numeral;
+            remaining -= numberValue;
+        }
+    }
+
+    return result;
+}
+
 /**
  * Affichage en colonnes centrées, inspiré de la section "Mission" (pillars) :
  * un repère (visuel ou numéro) au-dessus d'un titre et d'un court texte.
@@ -30,10 +50,7 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
     }
 
     return (
-        <div
-            className="grid w-full justify-center gap-10 pt-6"
-            style={{gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 260px))'}}
-        >
+        <div className="grid w-full grid-cols-1 gap-10 pt-6 sm:grid-cols-2 lg:grid-cols-3">
             {contents.map((content, index) => {
                 const html = getBodyHtml(content.body);
                 const media = content.medias?.[0];
@@ -61,7 +78,7 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
                                     className="rounded-full"
                                 />
                             ) : (
-                                <span className="font-serif text-base">{index + 1}</span>
+                                <span className="font-serif text-base">{toRomanNumeral(index + 1)}</span>
                             )}
                         </div>
 

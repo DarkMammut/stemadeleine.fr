@@ -1,6 +1,7 @@
 'use client';
 
 import React, {useEffect} from 'react';
+import clsx from 'clsx';
 import useGetModules from '@/hooks/useGetModules';
 import ListNavCard from './ListNavCard';
 import ListBulletList from './ListBulletList';
@@ -55,13 +56,12 @@ const ListModule: React.FC<Props> = ({module, isDark = true}) => {
     const contents = list?.contents ?? [];
 
     return (
-        <div className="w-full">
+        <div className="w-full py-0 md:py-5">
             <h3
-                className={
-                    isDark
-                        ? 'mb-6 font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-cream'
-                        : 'mb-6 font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-primary-dark'
-                }
+                className={clsx(
+                    'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+                    isDark ? 'text-secondary' : 'text-primary',
+                )}
             >
                 {moduleTitle}
             </h3>

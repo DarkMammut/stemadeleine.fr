@@ -34,9 +34,10 @@ export interface NewslettersModuleType {
 interface Props {
     module: NewslettersModuleType;
     className?: string;
+    isDark?: boolean;
 }
 
-const NewslettersModule: React.FC<Props> = ({module, className = ''}) => {
+const NewslettersModule: React.FC<Props> = ({module, className = '', isDark = true}) => {
     const [currentPage, setCurrentPage] = useState(1);
     const {
         publications,
@@ -131,15 +132,14 @@ const NewslettersModule: React.FC<Props> = ({module, className = ''}) => {
     return (
         <div className={clsx('w-full', className)}>
             <div className="mb-8">
-                <h3 className="font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] text-cream">
+                <h3
+                    className={clsx(
+                        'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
+                        isDark ? 'text-secondary' : 'text-primary',
+                    )}
+                >
                     {moduleTitle}
                 </h3>
-
-                {module.description && (
-                    <p className="mt-3 max-w-3xl text-sm leading-[1.8] text-[rgba(247,242,232,0.6)]">
-                        {module.description}
-                    </p>
-                )}
             </div>
 
             {(variant === 'LAST3' || variant === 'LAST5') && (
