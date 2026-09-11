@@ -63,14 +63,14 @@ const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
     const carouselModule = {...module, title: undefined};
     const titleClassName = clsx(
         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-        isDark ? 'text-secondary' : 'text-primary',
+        isDark ? 'text-accent' : 'text-text-mid',
     );
 
     // Choisir le composant en fonction de la variante
     switch (variant) {
         case 'GRID':
             return (
-                <div className="w-full">
+                <div className="w-full mb-6 md:mb-12">
                     <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
@@ -83,7 +83,7 @@ const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
             );
         case 'CAROUSEL':
             return (
-                <div className="w-full">
+                <div className="w-full mb-6 md:mb-12">
                     <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
@@ -97,7 +97,7 @@ const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
             );
         case 'SLIDER':
             return (
-                <div className="w-full">
+                <div className="w-full mb-6 md:mb-12">
                     <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>
@@ -117,7 +117,7 @@ const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
         default:
             // fallback to grid
             return (
-                <div className="w-full">
+                <div className="w-full mb-6 md:mb-12">
                     <h3 className={titleClassName}>
                         {moduleTitle}
                     </h3>

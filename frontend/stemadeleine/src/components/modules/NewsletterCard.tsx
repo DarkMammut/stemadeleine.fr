@@ -64,9 +64,9 @@ function getNewsletterHref(newsletter: NewsletterPublication, basePath?: string 
 }
 
 function NewsletterActions({
-    detailHref,
-    downloadUrl,
-}: {
+                               detailHref,
+                               downloadUrl,
+                           }: {
     detailHref: string | null;
     downloadUrl: string | null;
 }) {
@@ -79,7 +79,7 @@ function NewsletterActions({
             {detailHref && (
                 <Link
                     href={detailHref}
-                    className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold transition-colors duration-200 hover:text-gold-light"
+                    className="text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary transition-colors duration-200 hover:text-secondary-light"
                 >
                     Lire la newsletter
                 </Link>
@@ -90,7 +90,7 @@ function NewsletterActions({
                     href={downloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cream/80 transition-colors duration-200 hover:text-cream"
+                    className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent/80 transition-colors duration-200 hover:text-accent"
                 >
                     Télécharger le PDF
                 </a>
@@ -100,10 +100,10 @@ function NewsletterActions({
 }
 
 export default function NewsletterCard({
-    newsletter,
-    basePath = '/newsletters',
-    variant = 'list',
-}: NewsletterCardProps) {
+                                           newsletter,
+                                           basePath = '/newsletters',
+                                           variant = 'list',
+                                       }: NewsletterCardProps) {
     const imageUrl = getNewsletterImageUrl(newsletter);
     const dateLabel = formatNewsletterDate(newsletter.publishedDate);
     const title = newsletter.title || newsletter.name;
@@ -133,12 +133,12 @@ export default function NewsletterCard({
                     </div>
                 )}
 
-                <h4 className="mb-2 font-serif text-base font-normal leading-[1.4] text-cream">
+                <h4 className="mb-2 font-serif text-base font-normal leading-[1.4] text-accent">
                     {title}
                 </h4>
 
                 {description && (
-                    <p className="text-[13px] leading-[1.6] text-cream-light">
+                    <p className="text-[13px] leading-[1.6] text-accent-light">
                         {description}
                     </p>
                 )}
@@ -150,7 +150,8 @@ export default function NewsletterCard({
 
     if (variant === 'feature') {
         return (
-            <article className="border border-[rgba(184,151,58,0.12)] bg-stone p-6 transition-colors duration-200 hover:bg-[#3A3020] md:p-8">
+            <article
+                className="border border-[rgba(184,151,58,0.12)] bg-primary p-6 transition-colors duration-200 hover:bg-[#3A3020] md:p-8">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-[320px_minmax(0,1fr)]">
                     {imageUrl ? (
                         <img
@@ -160,24 +161,25 @@ export default function NewsletterCard({
                             style={{filter: 'brightness(0.82)'}}
                         />
                     ) : (
-                        <div className="flex h-52 w-full items-center justify-center bg-[#3A3020] text-gold md:h-full">
+                        <div
+                            className="flex h-52 w-full items-center justify-center bg-[#3A3020] text-secondary md:h-full">
                             ✦
                         </div>
                     )}
 
                     <div className="flex flex-col justify-center">
                         {dateLabel && (
-                            <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                            <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
                                 {dateLabel}
                             </div>
                         )}
 
-                        <h4 className="mb-3 font-serif text-2xl font-normal leading-[1.3] text-cream">
+                        <h4 className="mb-3 font-serif text-2xl font-normal leading-[1.3] text-accent">
                             {title}
                         </h4>
 
                         {description && (
-                            <p className="text-sm leading-[1.7] text-[rgba(247,242,232,0.55)]">
+                            <p className="text-sm leading-[1.7] text-accent-light">
                                 {description}
                             </p>
                         )}
@@ -192,7 +194,7 @@ export default function NewsletterCard({
     return (
         <article
             className={clsx(
-                'flex flex-col gap-5 bg-stone p-6 transition-colors duration-200 hover:bg-[#3A3020] md:flex-row md:gap-6 md:p-7',
+                'flex flex-col gap-5 bg-primary p-6 transition-colors duration-200 hover:bg-[#3A3020] md:flex-row md:gap-6 md:p-7',
             )}
         >
             {imageUrl ? (
@@ -203,19 +205,20 @@ export default function NewsletterCard({
                     style={{filter: 'brightness(0.82)'}}
                 />
             ) : (
-                <div className="flex h-40 w-full shrink-0 items-center justify-center bg-[#3A3020] text-gold md:h-28 md:w-48">
+                <div
+                    className="flex h-40 w-full shrink-0 items-center justify-center bg-[#3A3020] text-secondary md:h-28 md:w-48">
                     ✦
                 </div>
             )}
 
             <div className="flex-1">
                 {dateLabel && (
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
                         {dateLabel}
                     </div>
                 )}
 
-                <h4 className="mb-2 font-serif text-lg font-normal leading-[1.35] text-cream">
+                <h4 className="mb-2 font-serif text-lg font-normal leading-[1.35] text-accent">
                     {title}
                 </h4>
 

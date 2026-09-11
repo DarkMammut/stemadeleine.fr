@@ -82,7 +82,7 @@ const CTAModule: React.FC<Props> = ({module, className = '', isDark = true}) => 
         };
 
     return (
-        <div className={clsx('w-full p-2', className)}>
+        <div className={clsx('w-full mb-6 md:mb-12', className)}>
             {Boolean(ctaLoading) && !hasValidAction && (
                 <div className="flex items-center py-2">
                     <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-gold"/>
@@ -90,7 +90,7 @@ const CTAModule: React.FC<Props> = ({module, className = '', isDark = true}) => 
             )}
 
             {!ctaLoading && !hasValidAction && (
-                <p className="text-sm text-cream/70">Aucun appel a l&apos;action disponible.</p>
+                <p className="text-sm text-accent-dark">Aucun appel a l&apos;action disponible.</p>
             )}
 
             {hasValidAction && (
@@ -122,8 +122,8 @@ const CTAModule: React.FC<Props> = ({module, className = '', isDark = true}) => 
                                 'after:scale-x-0 after:origin-right after:transition-transform after:duration-300',
                                 'hover:after:scale-x-100 hover:after:origin-left',
                                 isDark
-                                    ? 'text-cream hover:text-secondary after:bg-secondary'
-                                    : 'text-primary hover:text-secondary after:bg-primary',
+                                    ? 'text-accent hover:text-secondary after:bg-secondary'
+                                    : 'text-text-mid hover:text-secondary after:bg-primary',
                             )}
                         >
                             {label}

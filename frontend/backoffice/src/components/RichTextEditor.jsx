@@ -120,7 +120,7 @@ const RichTextEditor = ({
     const modules = useMemo(
         () => ({
             toolbar: [
-                [{header: [1, 2, 3, false]}],
+                [{header: [3, 4, 5, false]}],
                 ["bold", "italic", "underline", "strike"],
                 [{list: "ordered"}, {list: "bullet"}],
                 [{color: []}, {background: []}],

@@ -17,12 +17,12 @@ interface Props {
  */
 const ListNavCard: React.FC<Props> = ({contents, loading = false, isDark = true}) => {
     if (loading) {
-        return <div className="text-center text-cream/80">Chargement de la liste...</div>;
+        return <div className="text-center text-accent/80">Chargement de la liste...</div>;
     }
 
     if (!contents || contents.length === 0) {
         return (
-            <div className="w-full text-center text-cream/70">
+            <div className="w-full text-center text-accent/70">
                 <p>Aucun contenu à afficher</p>
             </div>
         );
@@ -64,7 +64,7 @@ const ListNavCard: React.FC<Props> = ({contents, loading = false, isDark = true}
                                 <h4
                                     className={clsx(
                                         'mb-3 font-serif text-xl font-normal leading-snug',
-                                        isDark ? 'text-cream' : 'text-gray-900',
+                                        isDark ? 'text-accent' : 'text-text-dark',
                                     )}
                                 >
                                     {content.title}
@@ -75,7 +75,7 @@ const ListNavCard: React.FC<Props> = ({contents, loading = false, isDark = true}
                                 <div
                                     className={clsx(
                                         'quill-content force-responsive line-clamp-3 text-sm leading-relaxed',
-                                        isDark ? 'text-cream-dark' : 'text-gray-600',
+                                        isDark ? 'text-accent-dark' : 'text-text-mid',
                                     )}
                                     dangerouslySetInnerHTML={{__html: html}}
                                 />
@@ -85,7 +85,7 @@ const ListNavCard: React.FC<Props> = ({contents, loading = false, isDark = true}
                                 <span
                                     className={clsx(
                                         'mt-4 inline-flex items-center gap-1 text-sm font-medium transition-colors',
-                                        isDark ? 'text-accent group-hover:text-secondary' : 'text-primary group-hover:text-secondary',
+                                        isDark ? 'text-accent group-hover:text-secondary' : 'text-text-mid group-hover:text-secondary',
                                     )}
                                 >
                                     En savoir plus

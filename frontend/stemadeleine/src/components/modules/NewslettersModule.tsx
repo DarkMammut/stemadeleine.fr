@@ -106,7 +106,7 @@ const NewslettersModule: React.FC<Props> = ({module, className = '', isDark = tr
     if ((publicationsLoading || newsletterLoading) && sortedPublications.length === 0) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-gold"></div>
+                <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-secondary"></div>
             </div>
         );
     }
@@ -121,7 +121,7 @@ const NewslettersModule: React.FC<Props> = ({module, className = '', isDark = tr
 
     if (sortedPublications.length === 0) {
         return (
-            <div className="py-12 text-center text-cream/70">
+            <div className="py-12 text-center text-accent/70">
                 <p>Aucune newsletter disponible pour le moment.</p>
             </div>
         );
@@ -130,12 +130,12 @@ const NewslettersModule: React.FC<Props> = ({module, className = '', isDark = tr
     const moduleTitle = module.title || module.name || 'Newsletters';
 
     return (
-        <div className={clsx('w-full', className)}>
+        <div className={clsx('w-full mb-6 md:mb-12', className)}>
             <div className="mb-8">
                 <h3
                     className={clsx(
                         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                        isDark ? 'text-secondary' : 'text-primary',
+                        isDark ? 'text-accent' : 'text-text-mid',
                     )}
                 >
                     {moduleTitle}

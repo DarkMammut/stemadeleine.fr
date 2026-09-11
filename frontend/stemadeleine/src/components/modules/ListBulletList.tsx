@@ -3,7 +3,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
-import {type ListContentItem, isExternalUrl, getBodyHtml} from './listContent.types';
+import {getBodyHtml, isExternalUrl, type ListContentItem} from './listContent.types';
 
 interface Props {
     contents: ListContentItem[];
@@ -54,7 +54,8 @@ const ListBulletList: React.FC<Props> = ({contents, loading = false, isDark = tr
 
                         {/* Miniature optionnelle */}
                         {media && (
-                            <div className="relative hidden h-20 w-28 flex-shrink-0 overflow-hidden bg-[#3A3020] sm:flex sm:items-center sm:justify-center">
+                            <div
+                                className="relative hidden h-20 w-28 flex-shrink-0 overflow-hidden bg-[#3A3020] shadow-sm sm:flex sm:items-center sm:justify-center">
                                 <MediaImage
                                     mediaId={media.id}
                                     fill

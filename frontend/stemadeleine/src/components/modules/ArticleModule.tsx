@@ -119,7 +119,7 @@ const ArticleModule: React.FC<Props> = ({module, className = '', isDark = true})
     return (
         <article
             className={clsx(
-                'w-full my-6 md:my-12 py-6 md:py-12 px-4 md:px-8 shadow-lg bg-primary',
+                'w-full mb-6 md:mb-12 py-6 md:py-12 px-4 md:px-8 shadow-lg bg-primary',
                 className,
             )}
         >
@@ -128,7 +128,7 @@ const ArticleModule: React.FC<Props> = ({module, className = '', isDark = true})
                 <h3
                     className={clsx(
                         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                        isDark ? 'text-secondary' : 'text-primary',
+                        isDark ? 'text-text-mid' : 'text-accent',
                     )}
                 >
                     {module.title}
@@ -148,8 +148,8 @@ const ArticleModule: React.FC<Props> = ({module, className = '', isDark = true})
 
             {/* Article Metadata */}
             {(writerName || writingDate) && (
-                <div className="mt-8 pt-4 border-t border-gray-100">
-                    <div className="flex items-center text-sm text-gray-500 space-x-4">
+                <div className="mt-8 pt-4 border-t border-accent">
+                    <div className="flex items-center text-sm text-accent-dark space-x-4">
                         {writerName && (
                             <span>
                 Par {writerName}

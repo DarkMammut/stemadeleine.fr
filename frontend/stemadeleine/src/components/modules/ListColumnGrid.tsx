@@ -3,7 +3,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
-import {type ListContentItem, isExternalUrl, getBodyHtml} from './listContent.types';
+import {getBodyHtml, isExternalUrl, type ListContentItem} from './listContent.types';
 
 interface Props {
     contents: ListContentItem[];
@@ -38,12 +38,12 @@ function toRomanNumeral(value: number): string {
  */
 const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = true}) => {
     if (loading) {
-        return <div className="text-center text-cream/80">Chargement de la liste...</div>;
+        return <div className="text-center text-accent/80">Chargement de la liste...</div>;
     }
 
     if (!contents || contents.length === 0) {
         return (
-            <div className="w-full text-center text-cream/70">
+            <div className="w-full text-center text-accent/70">
                 <p>Aucun contenu à afficher</p>
             </div>
         );
@@ -86,7 +86,7 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
                             <h4
                                 className={clsx(
                                     'mb-2 font-serif text-lg font-normal leading-snug transition-colors',
-                                    isDark ? 'text-cream group-hover:text-accent' : 'text-primary-dark group-hover:text-secondary',
+                                    isDark ? 'text-accent group-hover:text-accent' : 'text-text-dark group-hover:text-secondary',
                                 )}
                             >
                                 {content.title}
@@ -97,7 +97,7 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
                             <div
                                 className={clsx(
                                     'quill-content force-responsive text-sm leading-relaxed',
-                                    isDark ? 'text-cream-dark' : 'text-primary/80',
+                                    isDark ? 'text-accent-dark' : 'text-text-dark',
                                 )}
                                 dangerouslySetInnerHTML={{__html: html}}
                             />
@@ -110,7 +110,7 @@ const ListColumnGrid: React.FC<Props> = ({contents, loading = false, isDark = tr
                                 rel={external ? 'noopener noreferrer' : undefined}
                                 className={clsx(
                                     'mt-4 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.14em] transition-colors',
-                                    isDark ? 'text-accent group-hover:text-secondary' : 'text-secondary group-hover:text-primary',
+                                    isDark ? 'text-accent group-hover:text-secondary' : 'text-secondary group-hover:text-text-mid',
                                 )}
                             >
                                 En savoir plus

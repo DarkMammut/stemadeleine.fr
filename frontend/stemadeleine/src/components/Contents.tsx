@@ -139,7 +139,7 @@ export default function Contents({
                         )}
                     >
                         {content.title && (
-                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-secondary' : 'text-primary-dark')}>
+                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-accent' : 'text-text-dark')}>
                                 {content.title}
                             </h3>
                         )}
@@ -147,7 +147,7 @@ export default function Contents({
                         <div
                             className={clsx(
                                 'tracking-tight leading-relaxed text-justify force-responsive no-word-break',
-                                isDarkTheme ? 'text-cream' : 'text-primary',
+                                isDarkTheme ? 'text-accent' : 'text-text-mid',
                             )}
                         >
                             {renderContentBody(content.body)}
@@ -209,7 +209,7 @@ export default function Contents({
                                                 {media.title && (
                                                     <div
                                                         className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                                        <p className="text-xs text-white/85 italic">
+                                                        <p className="text-xs text-accent italic">
                                                             {media.title}
                                                         </p>
                                                     </div>
@@ -248,11 +248,11 @@ export default function Contents({
                 key={key}
                 className={clsx(
                     'py-8 first:pt-0 last:pb-0',
-                    isDarkTheme ? 'border-b border-white/15' : 'border-b border-cream-dark/70',
+                    isDarkTheme ? 'border-b border-accent-light' : 'border-b border-accent-dark',
                 )}
             >
                 {content.title && (
-                    <h3 className={clsx('mb-4 text-2xl font-normal tracking-tight', isDarkTheme ? 'text-cream' : 'text-secondary')}>
+                    <h3 className={clsx('mb-4 text-2xl font-normal tracking-tight', isDarkTheme ? 'text-accent' : 'text-text-mid')}>
                         {content.title}
                     </h3>
                 )}
@@ -272,7 +272,7 @@ export default function Contents({
                 )}
 
                 {(mediaCaption || content.data) && (
-                    <p className={clsx('mb-4 text-sm italic', isDarkTheme ? 'text-cream/70' : 'text-secondary-light')}>
+                    <p className={clsx('mb-4 text-sm italic', isDarkTheme ? 'text-accent-dark' : 'text-secondary-light')}>
                         {mediaCaption || content.data}
                     </p>
                 )}
@@ -281,7 +281,7 @@ export default function Contents({
                     <div
                         className={clsx(
                             'quill-content prose prose-lg max-w-none leading-relaxed',
-                            isDarkTheme ? 'text-cream prose-headings:text-cream prose-p:text-cream prose-a:text-accent prose-strong:text-cream' : 'text-secondary-light prose-headings:text-primary-dark prose-p:text-primary prose-a:text-secondary prose-strong:text-primary-dark',
+                            isDarkTheme ? 'text-accent prose-headings:text-accent prose-p:text-accent prose-a:text-accent prose-strong:text-accent' : 'text-secondary-light prose-headings:text-text-dark prose-p:text-text-mid prose-a:text-secondary prose-strong:text-text-dark',
                         )}
                         dangerouslySetInnerHTML={{__html: htmlContent}}
                     />

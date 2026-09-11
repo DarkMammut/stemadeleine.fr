@@ -1,7 +1,6 @@
 'use client';
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import clsx from 'clsx';
 import MediaImage from '@/components/MediaImage';
 import Lightbox from '@/components/Lightbox';
 
@@ -153,12 +152,12 @@ const CarouselGallery: React.FC<Props> = ({
     }, [totalImages]);
 
     if (loading) {
-        return <div className="text-center text-cream/80">Chargement de la galerie...</div>;
+        return <div className="text-center text-text-mid">Chargement de la galerie...</div>;
     }
 
     if (!gallery || !images || images.length === 0) {
         return (
-            <div className="w-full text-center text-cream/70">
+            <div className="w-full text-center text-text-mid">
                 <p>Aucune image à afficher</p>
             </div>
         );
@@ -167,17 +166,6 @@ const CarouselGallery: React.FC<Props> = ({
     return (
         <>
             <div className="w-full">
-                {module.title && (
-                    <h3
-                        className={clsx(
-                            'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                            isDark ? 'text-secondary' : 'text-primary',
-                        )}
-                    >
-                        {module.title}
-                    </h3>
-                )}
-
                 <div
                     className="relative w-full pt-6"
                     onMouseEnter={() => setIsPaused(true)}
@@ -189,7 +177,7 @@ const CarouselGallery: React.FC<Props> = ({
                         {hasNavigation && (
                             <button
                                 onClick={goToPrevious}
-                                className="hidden md:flex bg-stone/85 hover:bg-stone text-gold-light rounded-full p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer"
+                                className="hidden md:flex bg-stone/85 hover:bg-stone text-secondary-light rounded-full p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary-light cursor-pointer"
                                 aria-label="Image précédente"
                             >
                                 <svg
@@ -229,7 +217,7 @@ const CarouselGallery: React.FC<Props> = ({
                                                 className="min-w-full h-full flex items-center justify-center bg-stone"
                                             >
                                                 <div
-                                                    className="w-full h-full flex items-center justify-center text-cream/60">
+                                                    className="w-full h-full flex items-center justify-center text-text-mid">
                                                     Aucune image disponible
                                                 </div>
                                             </div>
@@ -259,7 +247,7 @@ const CarouselGallery: React.FC<Props> = ({
                                             {(media.caption || media.title) && (
                                                 <div
                                                     className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[rgba(44,36,22,0.8)] to-transparent p-4 pointer-events-none">
-                                                    <p className="text-[11px] tracking-[0.06em] italic text-[rgba(247,242,232,0.85)]">
+                                                    <p className="text-[11px] tracking-[0.06em] italic text-accent">
                                                         {caption}
                                                     </p>
                                                 </div>
@@ -272,7 +260,7 @@ const CarouselGallery: React.FC<Props> = ({
                             {/* Compteur */}
                             {showCounter && (
                                 <div
-                                    className="absolute top-4 right-4 bg-stone/80 text-cream px-3 py-1 rounded-full text-sm z-10 pointer-events-none border border-gold/30">
+                                    className="absolute top-4 right-4 text-accent px-3 py-1 rounded-full text-sm z-10 pointer-events-none border border-secondary-light">
                                     {currentIndex + 1} / {totalImages}
                                 </div>
                             )}
@@ -282,7 +270,7 @@ const CarouselGallery: React.FC<Props> = ({
                         {hasNavigation && (
                             <button
                                 onClick={goToNext}
-                                className="hidden md:flex bg-stone/85 hover:bg-stone text-gold-light rounded-full p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer"
+                                className="hidden md:flex bg-stone/85 hover:bg-stone text-secondary-light rounded-full p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary-light cursor-pointer"
                                 aria-label="Image suivante"
                             >
                                 <svg
@@ -303,7 +291,7 @@ const CarouselGallery: React.FC<Props> = ({
                         <div className="md:hidden mt-3 flex items-center justify-center gap-3">
                             <button
                                 onClick={goToPrevious}
-                                className="bg-stone/85 hover:bg-stone text-gold-light rounded-full p-2.5 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer"
+                                className="bg-stone/85 hover:bg-stone text-secondary-light rounded-full p-2.5 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary-light cursor-pointer"
                                 aria-label="Image précédente"
                             >
                                 <svg
@@ -319,7 +307,7 @@ const CarouselGallery: React.FC<Props> = ({
 
                             <button
                                 onClick={goToNext}
-                                className="bg-stone/85 hover:bg-stone text-gold-light rounded-full p-2.5 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer"
+                                className="bg-stone/85 hover:bg-stone text-secondary-light rounded-full p-2.5 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary-light cursor-pointer"
                                 aria-label="Image suivante"
                             >
                                 <svg
@@ -342,10 +330,10 @@ const CarouselGallery: React.FC<Props> = ({
                                 <button
                                     key={index}
                                     onClick={() => goToSlide(index)}
-                                    className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gold-light cursor-pointer ${
+                                    className={`appearance-none rounded-full border border-secondary transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer ${
                                         index === currentIndex
                                             ? 'w-8 h-2 bg-secondary'
-                                            : 'w-2 h-2 bg-transparent border-secondary hover:bg-cream'
+                                            : 'w-2 h-2 bg-transparent hover:bg-secondary'
                                     }`}
                                     aria-label={`Aller à l'image ${index + 1}`}
                                 />
@@ -364,8 +352,8 @@ const CarouselGallery: React.FC<Props> = ({
                                         onClick={() => goToSlide(index)}
                                         className={`flex-shrink-0 w-20 h-14 overflow-hidden border transition-all cursor-pointer ${
                                             index === currentIndex
-                                                ? 'border-gold ring-2 ring-gold-light/60'
-                                                : 'border-gold/30 hover:border-gold/60'
+                                                ? 'border-secondary ring-2 ring-secondary-light'
+                                                : 'border-secondary-light hover:border-secondary'
                                         }`}
                                     >
                                         <div

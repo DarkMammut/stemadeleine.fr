@@ -60,12 +60,12 @@ const GridGallery: React.FC<Props> = ({images, title, loading = false}) => {
         setCurrentLightboxIndex((prev) => Math.max(prev - 1, 0));
 
     if (loading) {
-        return <div className="text-center text-cream/80">Chargement de la galerie...</div>;
+        return <div className="text-center text-text-dark">Chargement de la galerie...</div>;
     }
 
     if (normalizedImages.length === 0) {
         return (
-            <div className="w-full text-center text-cream/70">
+            <div className="w-full text-center text-text-dark">
                 Aucune image dans cette galerie.
             </div>
         );
@@ -86,8 +86,8 @@ const GridGallery: React.FC<Props> = ({images, title, loading = false}) => {
                             type="button"
                             onClick={() => openLightbox(index)}
                             className={clsx(
-                                'group relative overflow-hidden bg-[#3A3020] text-left cursor-pointer',
-                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-light',
+                                'group relative overflow-hidden bg-primary text-left cursor-pointer',
+                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary-light',
                                 isFeatured && 'sm:col-span-2 lg:col-span-1 lg:row-span-2',
                             )}
                         >
@@ -105,7 +105,7 @@ const GridGallery: React.FC<Props> = ({images, title, loading = false}) => {
                             </div>
 
                             <figcaption
-                                className="absolute inset-x-0 bottom-0 px-4 py-3 bg-gradient-to-t from-[rgba(44,36,22,0.8)] to-transparent text-[11px] tracking-[0.06em] italic text-[rgba(247,242,232,0.85)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                className="absolute inset-x-0 bottom-0 px-4 py-3 bg-gradient-to-t from-[rgba(44,36,22,0.8)] to-transparent text-[11px] tracking-[0.06em] italic text-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                 {caption}
                             </figcaption>
                         </button>

@@ -56,11 +56,11 @@ const ListModule: React.FC<Props> = ({module, isDark = true}) => {
     const contents = list?.contents ?? [];
 
     return (
-        <div className="w-full py-0 md:py-5">
+        <div className="w-full mb-6 md:mb-12">
             <h3
                 className={clsx(
                     'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                    isDark ? 'text-secondary' : 'text-primary',
+                    isDark ? 'text-accent' : 'text-text-mid',
                 )}
             >
                 {moduleTitle}

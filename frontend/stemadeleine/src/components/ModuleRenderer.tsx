@@ -50,8 +50,8 @@ const ModuleRenderer: React.FC<Props> = ({module, isDark}) => {
         default:
             console.warn(`Unknown module type: ${type}`);
             return (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-yellow-800">
+                <div className="p-4 bg-accent-dark border-secondary rounded-lg">
+                    <p className="text-text-mid">
                         Module de type « {type} » non pris en charge
                     </p>
                 </div>

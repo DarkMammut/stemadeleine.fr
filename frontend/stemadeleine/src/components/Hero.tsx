@@ -170,7 +170,7 @@ export default function Hero({mediaId, title, subtitle, description, variant = '
                         title || subtitle ? (
                             <div className="flex flex-col items-center gap-3 text-center">
                                 {title && (
-                                    <h1 className="text-3xl font-serif text-white uppercase drop-shadow-lg md:text-4xl lg:text-5xl">
+                                    <h1 className="text-3xl font-serif text-accent uppercase drop-shadow-lg md:text-4xl lg:text-5xl">
                                         {title}
                                     </h1>
                                 )}

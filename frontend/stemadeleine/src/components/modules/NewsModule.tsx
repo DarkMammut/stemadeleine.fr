@@ -83,11 +83,11 @@ function NewsGridCard({news}: { news: NewsPublication }) {
                     {dateLabel}
                 </div>
             )}
-            <h4 className="font-serif text-cream-dark text-base font-normal leading-[1.4] mb-2">
+            <h4 className="font-serif text-accent-dark text-base font-normal leading-[1.4] mb-2">
                 {title}
             </h4>
             {description && (
-                <p className="text-[13px] leading-[1.6] text-cream">
+                <p className="text-[13px] leading-[1.6] text-accent">
                     {description}
                 </p>
             )}
@@ -123,18 +123,18 @@ function NewsListCard({news}: { news: NewsPublication }) {
                 />
             ) : (
                 <div
-                    className="h-40 md:h-28 md:w-48 w-full bg-[#3A3020] shrink-0 flex items-center justify-center text-gold">
+                    className="h-40 md:h-28 md:w-48 w-full bg-[#3A3020] shrink-0 flex items-center justify-center text-secondary">
                     ✦
                 </div>
             )}
             <div>
                 {dateLabel && (
                     <div
-                        className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                        className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
                         {dateLabel}
                     </div>
                 )}
-                <h4 className="font-serif text-cream text-lg font-normal leading-[1.35] mb-2">
+                <h4 className="font-serif text-accent text-lg font-normal leading-[1.35] mb-2">
                     {title}
                 </h4>
                 {news.description && (
@@ -204,7 +204,7 @@ const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) =>
     if (loading && displayedPublications.length === 0) {
         return (
             <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
             </div>
         );
     }
@@ -234,7 +234,7 @@ const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) =>
     return (
         <div
             className={clsx(
-                'w-full',
+                'w-full mb-6 md:mb-12',
                 className,
             )}
         >
@@ -242,7 +242,7 @@ const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) =>
                 <h3
                     className={clsx(
                         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                        isDark ? 'text-secondary' : 'text-primary',
+                        isDark ? 'text-accent' : 'text-text-mid',
                     )}
                 >
                     {moduleTitle}
@@ -291,18 +291,18 @@ const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) =>
                                     />
                                 ) : (
                                     <div
-                                        className="h-52 md:h-full w-full bg-[#3A3020] flex items-center justify-center text-gold">
+                                        className="h-52 md:h-full w-full bg-[#3A3020] flex items-center justify-center text-secondary">
                                         ✦
                                     </div>
                                 )}
                                 <div className="flex flex-col justify-center">
                                     {latestNewsDate && (
                                         <div
-                                            className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                                            className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
                                             {latestNewsDate}
                                         </div>
                                     )}
-                                    <h4 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
+                                    <h4 className="font-serif text-accent text-2xl font-normal leading-[1.3] mb-3">
                                         {latestNews.title || latestNews.name}
                                     </h4>
                                     {latestNews.description && (
@@ -327,18 +327,18 @@ const NewsModule: React.FC<Props> = ({module, className = '', isDark = true}) =>
                                 />
                             ) : (
                                 <div
-                                    className="h-52 md:h-full w-full bg-[#3A3020] flex items-center justify-center text-gold">
+                                    className="h-52 md:h-full w-full bg-[#3A3020] flex items-center justify-center text-secondary">
                                     ✦
                                 </div>
                             )}
                             <div className="flex flex-col justify-center">
                                 {latestNewsDate && (
                                     <div
-                                        className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
+                                        className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
                                         {latestNewsDate}
                                     </div>
                                 )}
-                                <h4 className="font-serif text-cream text-2xl font-normal leading-[1.3] mb-3">
+                                <h4 className="font-serif text-accent text-2xl font-normal leading-[1.3] mb-3">
                                     {latestNews.title || latestNews.name}
                                 </h4>
                                 {latestNews.description && (

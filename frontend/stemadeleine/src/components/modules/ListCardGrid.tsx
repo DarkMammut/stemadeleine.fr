@@ -17,12 +17,12 @@ interface Props {
  */
 const ListCardGrid: React.FC<Props> = ({contents, loading = false, isDark = true}) => {
     if (loading) {
-        return <div className="text-center text-cream/80">Chargement de la liste...</div>;
+        return <div className="text-center text-accent-dark">Chargement de la liste...</div>;
     }
 
     if (!contents || contents.length === 0) {
         return (
-            <div className="w-full text-center text-cream/70">
+            <div className="w-full text-center text-accent-dark">
                 <p>Aucun contenu à afficher</p>
             </div>
         );
@@ -55,7 +55,7 @@ const ListCardGrid: React.FC<Props> = ({contents, loading = false, isDark = true
                                 aria-hidden="true"
                                 className={clsx(
                                     'absolute inset-0 flex items-center justify-center text-3xl',
-                                    isDark ? 'text-cream/20' : 'text-primary/20',
+                                    isDark ? 'text-accent-light' : 'text-text-light',
                                 )}
                             >
                                 ✦
@@ -69,7 +69,7 @@ const ListCardGrid: React.FC<Props> = ({contents, loading = false, isDark = true
                         />
 
                         {content.title && (
-                            <h4 className="relative z-10 px-4 pb-4 font-serif text-base font-normal leading-snug text-cream">
+                            <h4 className="relative z-10 px-4 pb-4 font-serif text-base font-normal leading-snug text-accent">
                                 {content.title}
                             </h4>
                         )}
@@ -77,7 +77,7 @@ const ListCardGrid: React.FC<Props> = ({contents, loading = false, isDark = true
                         {hasLink && (
                             <span
                                 aria-hidden="true"
-                                className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-cream/40 text-cream transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:border-accent group-hover:text-accent"
+                                className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-accent-light text-accent transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:border-accent group-hover:text-accent"
                             >
                                 →
                             </span>
