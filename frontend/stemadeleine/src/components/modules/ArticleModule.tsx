@@ -128,7 +128,7 @@ const ArticleModule: React.FC<Props> = ({module, className = '', isDark = true})
                 <h3
                     className={clsx(
                         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                        isDark ? 'text-text-mid' : 'text-accent',
+                        isDark ? 'text-text-dark' : 'text-accent',
                     )}
                 >
                     {module.title}

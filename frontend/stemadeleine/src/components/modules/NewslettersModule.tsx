@@ -135,7 +135,7 @@ const NewslettersModule: React.FC<Props> = ({module, className = '', isDark = tr
                 <h3
                     className={clsx(
                         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-                        isDark ? 'text-accent' : 'text-text-mid',
+                        isDark ? 'text-accent' : 'text-text-dark',
                     )}
                 >
                     {moduleTitle}

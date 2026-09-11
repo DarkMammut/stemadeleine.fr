@@ -140,7 +140,7 @@ export default function Contents({
                         )}
                     >
                         {content.title && (
-                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-accent' : 'text-text-mid')}>
+                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-accent' : 'text-text-dark')}>
                                 {content.title}
                             </h3>
                         )}

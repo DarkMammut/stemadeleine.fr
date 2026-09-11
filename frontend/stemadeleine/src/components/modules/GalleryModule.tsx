@@ -63,7 +63,7 @@ const GalleryModule: React.FC<Props> = ({module, isDark = true}) => {
     const carouselModule = {...module, title: undefined};
     const titleClassName = clsx(
         'font-serif text-[clamp(1.7rem,3vw,2.4rem)] font-normal leading-[1.25] mb-6',
-        isDark ? 'text-accent' : 'text-text-mid',
+        isDark ? 'text-accent' : 'text-text-dark',
     );
 
     // Choisir le composant en fonction de la variante
