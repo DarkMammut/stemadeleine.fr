@@ -127,7 +127,7 @@ export default function Contents({
             <div key={key} className="">
                 <div
                     className={clsx(
-                        'mx-auto max-w-7xl flex flex-col items-start gap-16',
+                        'mx-auto max-w-7xl mb-4 md:mb-8 flex flex-col items-start md:gap-4 gap-10',
                         medias.length > 0 && 'lg:flex-row',
                     )}
                 >

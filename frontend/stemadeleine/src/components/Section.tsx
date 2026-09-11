@@ -98,7 +98,7 @@ export default function Section({
             <div className={clsx('w-full max-w-[960px] mx-auto')}>
                 <div
                     className={clsx(
-                        'grid gap-16 md:gap-4 items-center',
+                        'grid gap-10 md:gap-4 items-start',
                         mediaId && mediaUrl ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1',
                         align === 'right' && 'md:grid-flow-dense',
                     )}
@@ -117,13 +117,16 @@ export default function Section({
                                 </h2>
                             </div>
                         )}
+                        <div className="mb-6 md:mb-12">
+                            <ContentsTyped
+                                contents={contents}
+                                loading={!!(loading && sectionId)}
+                                loadingMessage="Chargement des contenus..."
+                                theme={hasDarkModules ? 'dark' : 'light'}
+                            />
+                        </div>
 
-                        <ContentsTyped
-                            contents={contents}
-                            loading={!!(loading && sectionId)}
-                            loadingMessage="Chargement des contenus..."
-                            theme={hasDarkModules ? 'dark' : 'light'}
-                        />
+
                     </div>
 
                     {/* Image */}
