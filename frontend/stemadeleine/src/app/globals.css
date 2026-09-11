@@ -883,11 +883,11 @@ code {
 }
 
 .quill-content h4 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 2.5rem;
     letter-spacing: -0.025em;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
     color: var(--color-text-dark);
 }
 
