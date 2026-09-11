@@ -770,8 +770,8 @@ code {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+    overflow-wrap: normal;
+    word-wrap: normal;
     word-break: normal;
     hyphens: auto;
     line-height: 1.6;
