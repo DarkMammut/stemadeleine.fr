@@ -874,12 +874,21 @@ code {
 .ql-editor h6 {
     width: 100%;
     max-width: 100%;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+    overflow-wrap: normal;
+    word-wrap: normal;
     word-break: normal;
     hyphens: auto;
     margin-bottom: 1rem;
     line-height: 1.6;
+}
+
+.quill-content h4 {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.025em;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-text-dark);
 }
 
 /* Listes */
