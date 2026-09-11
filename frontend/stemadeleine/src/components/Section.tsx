@@ -117,16 +117,12 @@ export default function Section({
                                 </h2>
                             </div>
                         )}
-                        <div className="mb-6 md:mb-12">
-                            <ContentsTyped
-                                contents={contents}
-                                loading={!!(loading && sectionId)}
-                                loadingMessage="Chargement des contenus..."
-                                theme={hasDarkModules ? 'dark' : 'light'}
-                            />
-                        </div>
-
-
+                        <ContentsTyped
+                            contents={contents}
+                            loading={!!(loading && sectionId)}
+                            loadingMessage="Chargement des contenus..."
+                            theme={hasDarkModules ? 'dark' : 'light'}
+                        />
                     </div>
 
                     {/* Image */}
