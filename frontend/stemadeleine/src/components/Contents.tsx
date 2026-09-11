@@ -56,7 +56,8 @@ export default function Contents({
 
     const renderContentBody = (body: SharedContentItem['body']): React.ReactNode => {
         if (isHtmlBody(body)) {
-            return <div className="quill-content force-responsive" dangerouslySetInnerHTML={{__html: body.html}}/>;
+            return <div className="quill-content force-responsive no-word-break"
+                        dangerouslySetInnerHTML={{__html: body.html}}/>;
         }
 
         if (typeof body === 'object') {
@@ -139,7 +140,7 @@ export default function Contents({
                         )}
                     >
                         {content.title && (
-                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-accent' : 'text-text-dark')}>
+                            <h3 className={clsx('mb-6 text-4xl tracking-tight no-word-break', isDarkTheme ? 'text-accent' : 'text-text-mid')}>
                                 {content.title}
                             </h3>
                         )}
