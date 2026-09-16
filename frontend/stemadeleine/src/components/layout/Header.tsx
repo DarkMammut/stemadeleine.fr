@@ -28,7 +28,7 @@ export default function Header({pagesTree}: HeaderProps): React.ReactElement {
                 {/* inner container centered with max width to align left brand and right navigation */}
                 <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-4 md:px-10">
                     {/* Logo + titre (left, cliquable) */}
-                    <Link href="/frontend/stemadeleine/public"
+                    <Link href="/"
                           className="flex min-w-0 h-full items-center gap-3 text-secondary">
                         <div className="flex h-full max-w-[2.8rem] shrink-0 items-center md:max-w-[3.2rem]">
                             <MediaImage
