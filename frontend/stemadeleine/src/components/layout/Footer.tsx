@@ -5,6 +5,7 @@ import type {FooterParent} from './Layout';
 import IconButton from '@/components/IconButton';
 import {HeartIcon} from '@heroicons/react/24/solid';
 import useGetOrganization from '@/hooks/useGetOrganization';
+import Link from "next/link";
 
 type FooterProps = {
     pagesNav?: FooterParent[];
@@ -52,6 +53,25 @@ function FooterNavColumn({parent}: { parent: FooterParent }) {
                 ))}
             </ul>
         </div>
+    );
+}
+
+function LegalLink({href, children}: { href: string; children: React.ReactNode }) {
+    return (
+        <Link
+            href={href}
+            className="transition-colors duration-200 text-secondary-light"
+            onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLAnchorElement).style.color =
+                    'var(--color-secondary)')
+            }
+            onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLAnchorElement).style.color =
+                    'var(--color-secondary-light)')
+            }
+        >
+            {children}
+        </Link>
     );
 }
 
@@ -112,7 +132,7 @@ export default function Footer({pagesNav}: FooterProps) {
                         />
                     </div>
 
-                    {/* Nav columns: toutes les pages principales, 3 par ligne */}
+                    {/* Nav columns : toutes les pages principales, 3 par ligne */}
                     {parents.length > 0 && (
                         <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-3">
                             {parents.map((parent) => (
@@ -124,12 +144,14 @@ export default function Footer({pagesNav}: FooterProps) {
 
                 {/* Bottom row */}
                 <div className="flex flex-wrap justify-between gap-2">
-          <span className="text-[11px]" style={{color: 'rgba(247,242,232,0.22)'}}>
-            © 2025 Les Amis de Sainte Madeleine de la Jarrie · Tous droits réservés
-          </span>
-                    <span className="text-[11px]" style={{color: 'rgba(247,242,232,0.22)'}}>
-            Mentions légales · Politique de confidentialité
-          </span>
+                  <span className="text-[11px]" style={{color: 'rgba(247,242,232,0.22)'}}>
+                    © 2025 Les Amis de Sainte Madeleine de la Jarrie · Tous droits réservés
+                  </span>
+                    <span className="flex items-center gap-2 text-[11px] text-secondary-light">
+                        <LegalLink href="/mentions-legales">Mentions légales</LegalLink>
+                        <span className="text-secondary-light">·</span>
+                        <LegalLink href="/politique-de-confidentialite">Politique de confidentialité</LegalLink>
+                      </span>
                 </div>
 
             </div>

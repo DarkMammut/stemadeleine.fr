@@ -4,9 +4,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import {usePathname, useRouter} from 'next/navigation';
 import useGetPages from '@/hooks/useGetPages';
 import useGetSections from '@/hooks/useGetSections';
-import Section, {ContentItem} from '@/components/Section';
+import Section, {ContentItem} from '@/components/layout/Section';
 import StaticPageContent from '@/pages/StaticPageContent';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
 
 type PageShape = {
     name?: string;

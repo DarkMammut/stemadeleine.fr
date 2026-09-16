@@ -2,9 +2,9 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import useGetPages from '@/hooks/useGetPages';
-import Section, {ContentItem} from '@/components/Section';
+import Section, {ContentItem} from '@/components/layout/Section';
 import useGetSections from '@/hooks/useGetSections';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
 import NewsletterSection from '@/components/NewsletterSection';
 
 type PageShape = {

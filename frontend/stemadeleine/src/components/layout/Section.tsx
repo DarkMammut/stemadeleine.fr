@@ -2,9 +2,9 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 import clsx from 'clsx';
-import useGetMedia from '../hooks/useGetMedia';
-import useGetContents from '../hooks/useGetContents';
-import Contents from './Contents';
+import useGetMedia from '../../hooks/useGetMedia';
+import useGetContents from '../../hooks/useGetContents';
+import Contents from '../Contents';
 import type {ModuleType} from './ModulesList';
 import ModulesList from './ModulesList';
 import Image from 'next/image';

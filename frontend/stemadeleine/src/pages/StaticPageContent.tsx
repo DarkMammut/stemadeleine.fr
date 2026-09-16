@@ -1,26 +1,36 @@
 import React from 'react';
 import ContactPageContent from '@/pages/ContactPageContent';
 import AboutPageContent from '@/pages/AboutPageContent';
+import MentionsLegalesContent from '@/pages/MentionsLegalesContent';
+import PolitiqueConfidentialiteContent from '@/pages/PolitiqueConfidentialiteContent';
 
 interface Props {
-  pageSlug?: string;
+    pageSlug?: string;
 }
 
 /**
  * Composant qui gère le contenu fixe spécifique à certaines pages
  */
-const StaticPageContent: React.FC<Props> = ({ pageSlug }) => {
+const StaticPageContent: React.FC<Props> = ({pageSlug}) => {
 
-  // Retourner le composant correspondant au slug
-  if (pageSlug === '/contact') {
-    return <ContactPageContent />;
-  }
+    // Retourner le composant correspondant au slug
+    if (pageSlug === '/contact') {
+        return <ContactPageContent/>;
+    }
 
-  if (pageSlug === '/about') {
-    return <AboutPageContent />;
-  }
+    if (pageSlug === '/about') {
+        return <AboutPageContent/>;
+    }
 
-  return null;
+    if (pageSlug === '/mentions-legales') {
+        return <MentionsLegalesContent/>;
+    }
+
+    if (pageSlug === '/politique-de-confidentialite') {
+        return <PolitiqueConfidentialiteContent/>;
+    }
+
+    return null;
 };
 
 export default StaticPageContent;

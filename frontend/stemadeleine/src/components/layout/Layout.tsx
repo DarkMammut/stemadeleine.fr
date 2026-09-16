@@ -1,9 +1,9 @@
 import React, {ReactNode} from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Hero from '@/components/Hero';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import Hero from '@/components/layout/Hero';
 import useGetPages from '@/hooks/useGetPages';
-import type {PageItem} from './Navigation';
+import type {PageItem} from '../Navigation';
 
 // Types for the page shape used by Meta/Hero
 type PageShape = {

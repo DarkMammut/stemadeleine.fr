@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import useGetModules from '../hooks/useGetModules';
+import useGetModules from '../../hooks/useGetModules';
 import ModuleRenderer from './ModuleRenderer';
 
 export interface ModuleType {
