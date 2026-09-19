@@ -15,19 +15,36 @@ import java.util.UUID;
 public interface ContentRepository extends JpaRepository<Content, UUID> {
 
     /**
-     * Find a content by its logical ID and status.
+     * Find a content by its logical ID and status,
+     * including its medias.
      */
+    @Query("""
+            SELECT DISTINCT c
+            FROM Content c
+            LEFT JOIN FETCH c.medias
+            WHERE c.contentId = :contentId
+              AND c.status = :status
+            """)
     Optional<Content> findByContentIdAndStatus(
-            UUID contentId,
-            PublishingStatus status
+            @Param("contentId") UUID contentId,
+            @Param("status") PublishingStatus status
     );
 
     /**
-     * Find contents by owner and status.
+     * Find contents by owner and status,
+     * including their medias.
      */
+    @Query("""
+            SELECT DISTINCT c
+            FROM Content c
+            LEFT JOIN FETCH c.medias
+            WHERE c.ownerId = :ownerId
+              AND c.status = :status
+            ORDER BY c.sortOrder ASC
+            """)
     List<Content> findByOwnerIdAndStatusOrderBySortOrderAsc(
-            UUID ownerId,
-            PublishingStatus status
+            @Param("ownerId") UUID ownerId,
+            @Param("status") PublishingStatus status
     );
 
     /**
@@ -53,7 +70,7 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
      * Find a content by database ID with its medias.
      */
     @Query("""
-            SELECT c
+            SELECT DISTINCT c
             FROM Content c
             LEFT JOIN FETCH c.medias
             WHERE c.id = :id
