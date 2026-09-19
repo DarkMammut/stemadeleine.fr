@@ -5,7 +5,8 @@ import {NewsPublication} from '@/types/news';
 import useGetContents from '@/hooks/useGetContents';
 import MediaImage from '@/components/MediaImage';
 import Button from '@/components/Button';
-import Contents, {type SharedContentItem} from '@/components/Contents';
+import Contents from '@/components/Contents';
+import clsx from "clsx";
 
 interface NewsArticleProps {
     news: NewsPublication;
@@ -15,16 +16,12 @@ interface NewsArticleProps {
 export default function NewsArticle({
                                         news,
                                     }: NewsArticleProps) {
-    const {
-        contents: fetchedContents,
-        loading: contentsLoading,
-        fetchContentsByOwnerId,
-    } = useGetContents() as unknown as {
-        contents: SharedContentItem[];
+
+    const {contents, loading: contentsLoading, fetchContentsByOwnerId} = useGetContents() as unknown as {
+        contents: import('@/components/Contents').SharedContentItem[];
         loading: boolean;
-        fetchContentsByOwnerId: (ownerId: string) => Promise<SharedContentItem[]>;
+        fetchContentsByOwnerId: (ownerId: string) => Promise<unknown[]>;
     };
-    const [isAllNewsHovered, setIsAllNewsHovered] = React.useState(false);
 
     useEffect(() => {
         if (news.newsId) {
@@ -32,9 +29,7 @@ export default function NewsArticle({
         }
     }, [news.newsId, fetchContentsByOwnerId]);
 
-    const contents = fetchedContents && fetchedContents.length > 0
-        ? [...fetchedContents].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-        : [];
+    const [isAllNewsHovered, setIsAllNewsHovered] = React.useState(false);
 
     const title = news.title || news.name;
     const formattedDate = news.publishedDate
@@ -95,24 +90,17 @@ export default function NewsArticle({
                     )}
                 </div>
 
-                <div
-                    className="mx-auto max-w-4xl">
-                    {contentsLoading && (
-                        <div className="flex justify-center py-12">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"/>
-                        </div>
-                    )}
-
-                    {!contentsLoading && contents.length === 0 && (
-                        <p className="py-12 text-center italic text-secondary-light">
-                            Aucun contenu disponible pour cette actualité.
-                        </p>
-                    )}
-
-                    {!contentsLoading && (
-                        <Contents contents={contents} theme="light"/>
-                    )}
-                </div>
+                {/* Contenus éditoriaux */}
+                {(contentsLoading || contents.length > 0) && (
+                    <section className={clsx('w-full max-w-[960px] mx-auto px-4 md:px-0')}>
+                        <Contents
+                            contents={contents}
+                            loading={contentsLoading}
+                            loadingMessage="Chargement du contenu..."
+                            theme="light"
+                        />
+                    </section>
+                )}
                 <div className="max-w-2xl mx-auto">
                     <div className="mt-10 mb-10 border-b border-secondary"></div>
                     <div className="flex justify-center">
