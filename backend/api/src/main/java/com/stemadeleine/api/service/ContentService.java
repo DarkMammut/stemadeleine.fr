@@ -2,6 +2,7 @@ package com.stemadeleine.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stemadeleine.api.dto.MediaDto;
 import com.stemadeleine.api.model.Content;
 import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.PublishingStatus;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,72 +29,121 @@ public class ContentService {
     private final ObjectMapper objectMapper;
 
     /**
-     * Get all contents ordered by sort order
+     * Get all contents.
      */
     public List<Content> getAllContents() {
-        log.debug("Retrieving all contents");
         return contentRepository.findAll();
     }
 
     /**
-     * Get content by its database ID
+     * Get content by database ID.
      */
     public Optional<Content> getContentById(UUID id) {
-        log.debug("Retrieving content by ID: {}", id);
         return contentRepository.findByIdWithMedias(id);
     }
 
     /**
-     * Get the latest version of a content by its logical contentId
+     * Get the current working version of a content.
+     * <p>
+     * Priority:
+     * 1. DRAFT
+     * 2. PUBLISHED
+     * <p>
+     * There should never be another status returned here.
      */
     public Optional<Content> getLatestContentVersion(UUID contentId) {
-        log.debug("Retrieving latest version of content: {}", contentId);
-        return contentRepository.findTopByContentIdOrderByVersionDesc(contentId);
+        return contentRepository.findByContentIdAndStatus(
+                contentId,
+                PublishingStatus.DRAFT
+        ).or(() -> contentRepository.findByContentIdAndStatus(
+                contentId,
+                PublishingStatus.PUBLISHED
+        ));
     }
 
     /**
-     * Get contents by owner (section or other entity)
+     * Get the draft of a content.
+     */
+    public Optional<Content> getDraft(UUID contentId) {
+        return contentRepository.findByContentIdAndStatus(
+                contentId,
+                PublishingStatus.DRAFT
+        );
+    }
+
+    /**
+     * Get the published version of a content.
+     */
+    public Optional<Content> getPublished(UUID contentId) {
+        return contentRepository.findByContentIdAndStatus(
+                contentId,
+                PublishingStatus.PUBLISHED
+        );
+    }
+
+    /**
+     * Get contents for an owner.
+     * <p>
+     * Backoffice = DRAFT contents.
      */
     public List<Content> getContentsByOwner(UUID ownerId) {
-        log.debug("Retrieving contents by owner: {}", ownerId);
-        return contentRepository.findByOwnerIdOrderBySortOrderAsc(ownerId);
+        return contentRepository.findByOwnerIdAndStatusOrderBySortOrderAsc(
+                ownerId,
+                PublishingStatus.DRAFT
+        );
     }
 
     /**
-     * Get latest versions of all contents for a specific owner
+     * Get published contents for an owner.
+     * <p>
+     * Public side = PUBLISHED contents only.
+     */
+    public List<Content> getPublishedContentsByOwner(UUID ownerId) {
+        return contentRepository.findByOwnerIdAndStatusOrderBySortOrderAsc(
+                ownerId,
+                PublishingStatus.PUBLISHED
+        );
+    }
+
+    /**
+     * Compatibility method for the existing controller.
+     * <p>
+     * The old implementation returned the latest version regardless
+     * of its status. We now return the working DRAFT, or PUBLISHED
+     * when no draft exists.
      */
     public List<Content> getLatestContentsByOwner(UUID ownerId) {
-        log.info("Retrieving latest contents by owner: {}", ownerId);
-
-        // Vérifier d'abord tous les contenus pour cet owner (debug)
-        List<Content> allContents = contentRepository.findByOwnerIdOrderBySortOrderAsc(ownerId);
-        log.info("Found {} total contents (all versions) for owner {}", allContents.size(), ownerId);
-        for (Content c : allContents) {
-            log.info("  - Content id={}, contentId={}, version={}, status={}, title={}",
-                    c.getId(), c.getContentId(), c.getVersion(), c.getStatus(), c.getTitle());
-        }
-
-        List<Content> latestContents = contentRepository.findLatestContentsByOwner(ownerId);
-        log.info("Found {} latest contents (after filtering) for owner: {}", latestContents.size(), ownerId);
-        for (Content c : latestContents) {
-            log.info("  - Latest: id={}, contentId={}, version={}, status={}, medias: {}",
-                    c.getId(), c.getContentId(), c.getVersion(), c.getStatus(),
-                    c.getMedias().stream().map(m -> m.getId()).toList());
-        }
-        return latestContents;
+        return getContentsByOwner(ownerId);
     }
 
     /**
-     * Create a new content (first version)
+     * Create a new content.
+     * <p>
+     * A new content starts with a DRAFT only.
      */
     @Transactional
-    public Content createContent(String title, JsonNode body, UUID ownerId, User author) {
-        log.info("Creating new content '{}' for owner: {}", title, ownerId);
+    public Content createContent(
+            String title,
+            JsonNode body,
+            UUID ownerId,
+            User author
+    ) {
+        log.info(
+                "Creating new content '{}' for owner {}",
+                title,
+                ownerId
+        );
 
         UUID contentId = UUID.randomUUID();
-        Integer maxSortOrder = contentRepository.findMaxSortOrderByOwner(ownerId);
+
+        Integer maxSortOrder =
+                contentRepository.findMaxSortOrderByOwnerAndStatus(
+                        ownerId,
+                        PublishingStatus.DRAFT
+                );
 
         Content content = new Content();
+
         content.setContentId(contentId);
         content.setOwnerId(ownerId);
         content.setVersion(1);
@@ -102,286 +151,502 @@ public class ContentService {
         content.setBody(body);
         content.setStatus(PublishingStatus.DRAFT);
         content.setIsVisible(true);
-        content.setSortOrder(maxSortOrder != null ? maxSortOrder + 1 : 1);
+        content.setSortOrder(
+                maxSortOrder != null
+                        ? maxSortOrder + 1
+                        : 1
+        );
         content.setAuthor(author);
 
-        Content savedContent = contentRepository.save(content);
-        log.debug("Content created with ID: {} and contentId: {}", savedContent.getId(), savedContent.getContentId());
-        return savedContent;
+        return contentRepository.save(content);
     }
 
     /**
-     * Create a new version of existing content
+     * Update the existing DRAFT.
+     * <p>
+     * If no DRAFT exists, create one from the PUBLISHED version.
+     * <p>
+     * Every actual update increments the version.
      */
     @Transactional
-    public Content createNewVersion(UUID contentId, String title, JsonNode body, User author) {
-        log.info("Creating new version of content: {} by user: {}", contentId, author.getUsername());
+    public Content createNewVersion(
+            UUID contentId,
+            String title,
+            JsonNode body,
+            User author
+    ) {
+        Content draft = getOrCreateDraft(contentId, author);
 
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+        draft.setVersion(draft.getVersion() + 1);
+        draft.setTitle(title);
+        draft.setBody(body);
+        draft.setStatus(PublishingStatus.DRAFT);
+        draft.setAuthor(author);
 
-        Content newVersion = Content.builder()
-                .contentId(contentId)
-                .ownerId(latestVersion.getOwnerId())
-                .version(latestVersion.getVersion() + 1)
-                .title(title)
-                .body(body)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(latestVersion.getIsVisible())
-                .sortOrder(latestVersion.getSortOrder())
-                .author(author)
-                .medias(new ArrayList<>(latestVersion.getMedias())) // Correction : nouvelle instance de la liste
-                .build();
-
-        Content savedContent = contentRepository.save(newVersion);
-        log.debug("New content version created: version {} for contentId: {}",
-                savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
+        return contentRepository.save(draft);
     }
 
     /**
-     * Crée une nouvelle version de contenu avec une liste de médias personnalisée
+     * Update the existing DRAFT including its media.
      */
     @Transactional
-    public Content createNewVersionWithMedias(UUID contentId, String title, JsonNode body, List<com.stemadeleine.api.dto.MediaDto> mediasDto, User author) {
-        log.info("Creating new version of content (with medias): {} by user: {}", contentId, author.getUsername());
-
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+    public Content createNewVersionWithMedias(
+            UUID contentId,
+            String title,
+            JsonNode body,
+            List<MediaDto> mediasDto,
+            User author
+    ) {
+        Content draft = getOrCreateDraft(contentId, author);
 
         List<Media> medias = new ArrayList<>();
+
         if (mediasDto != null && !mediasDto.isEmpty()) {
             List<UUID> mediaIds = mediasDto.stream()
-                    .map(com.stemadeleine.api.dto.MediaDto::id)
-                    .collect(Collectors.toList());
-            medias = mediaRepository.findAllById(mediaIds);
+                    .map(MediaDto::id)
+                    .toList();
+
+            medias.addAll(mediaRepository.findAllById(mediaIds));
         }
 
-        Content newVersion = Content.builder()
-                .contentId(contentId)
-                .ownerId(latestVersion.getOwnerId())
-                .version(latestVersion.getVersion() + 1)
-                .title(title)
-                .body(body)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(latestVersion.getIsVisible())
-                .sortOrder(latestVersion.getSortOrder())
-                .author(author)
-                .medias(new ArrayList<>(medias)) // Correction : nouvelle instance de la liste
-                .build();
+        draft.setVersion(draft.getVersion() + 1);
+        draft.setTitle(title);
+        draft.setBody(body);
+        draft.setStatus(PublishingStatus.DRAFT);
+        draft.setAuthor(author);
 
-        Content savedContent = contentRepository.save(newVersion);
-        log.debug("New content version created (with medias): version {} for contentId: {}", savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
+        draft.getMedias().clear();
+        draft.getMedias().addAll(medias);
+
+        return contentRepository.save(draft);
     }
 
     /**
-     * Update content visibility
+     * Update content visibility on the DRAFT.
      */
     @Transactional
-    public Content updateContentVisibility(UUID contentId, Boolean isVisible, User author) {
-        log.info("Updating content visibility for: {} to: {} by user: {}",
-                contentId, isVisible, author.getUsername());
+    public Content updateContentVisibility(
+            UUID contentId,
+            Boolean isVisible,
+            User author
+    ) {
+        Content draft = getOrCreateDraft(contentId, author);
 
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+        draft.setVersion(draft.getVersion() + 1);
+        draft.setIsVisible(isVisible);
+        draft.setAuthor(author);
+        draft.setStatus(PublishingStatus.DRAFT);
 
-        // Create new version with updated visibility
-        Content newVersion = new Content();
-        newVersion.setContentId(contentId);
-        newVersion.setOwnerId(latestVersion.getOwnerId());
-        newVersion.setVersion(latestVersion.getVersion() + 1);
-        newVersion.setTitle(latestVersion.getTitle());
-        newVersion.setBody(latestVersion.getBody());
-        newVersion.setStatus(latestVersion.getStatus());
-        newVersion.setIsVisible(isVisible);
-        newVersion.setSortOrder(latestVersion.getSortOrder());
-        newVersion.setAuthor(author);
-
-        Content savedContent = contentRepository.save(newVersion);
-        log.debug("Content visibility updated: version {} for contentId: {}",
-                savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
+        return contentRepository.save(draft);
     }
 
     /**
-     * Delete content (mark as deleted)
+     * Update content sort order.
+     * <p>
+     * Only the DRAFT is modified.
      */
     @Transactional
-    public Content deleteContent(UUID contentId, User author) {
-        log.info("Deleting content: {} by user: {}", contentId, author.getUsername());
-
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
-
-        // Create new version marked as deleted
-        Content deletedVersion = new Content();
-        deletedVersion.setContentId(contentId);
-        deletedVersion.setOwnerId(latestVersion.getOwnerId());
-        deletedVersion.setVersion(latestVersion.getVersion() + 1);
-        deletedVersion.setTitle(latestVersion.getTitle());
-        deletedVersion.setBody(latestVersion.getBody());
-        deletedVersion.setStatus(PublishingStatus.DELETED);
-        deletedVersion.setIsVisible(false);
-        deletedVersion.setSortOrder(latestVersion.getSortOrder());
-        deletedVersion.setAuthor(author);
-
-        Content savedContent = contentRepository.save(deletedVersion);
-        log.debug("Content marked as deleted: version {} for contentId: {}",
-                savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
-    }
-
-    /**
-     * Update content sort order
-     */
-    @Transactional
-    public void updateContentSortOrder(UUID ownerId, List<UUID> contentIds, User author) {
-        log.info("Updating content sort order for owner: {} by user: {}", ownerId, author.getUsername());
+    public void updateContentSortOrder(
+            UUID ownerId,
+            List<UUID> contentIds,
+            User author
+    ) {
+        log.info(
+                "Updating content sort order for owner {}",
+                ownerId
+        );
 
         for (int i = 0; i < contentIds.size(); i++) {
             UUID contentId = contentIds.get(i);
-            Content latestVersion = getLatestContentVersion(contentId)
-                    .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+            int newSortOrder = i + 1;
 
-            if (!latestVersion.getSortOrder().equals(i + 1)) {
-                // Create new version with updated sort order
-                Content newVersion = new Content();
-                newVersion.setContentId(contentId);
-                newVersion.setOwnerId(latestVersion.getOwnerId());
-                newVersion.setVersion(latestVersion.getVersion() + 1);
-                newVersion.setTitle(latestVersion.getTitle());
-                newVersion.setBody(latestVersion.getBody());
-                newVersion.setStatus(latestVersion.getStatus());
-                newVersion.setIsVisible(latestVersion.getIsVisible());
-                newVersion.setSortOrder(i + 1);
-                newVersion.setAuthor(author);
+            Content draft = getOrCreateDraft(contentId, author);
 
-                contentRepository.save(newVersion);
-                log.debug("Content sort order updated: contentId {} to position {}", contentId, i + 1);
+            if (!Integer.valueOf(newSortOrder).equals(draft.getSortOrder())) {
+                draft.setVersion(draft.getVersion() + 1);
+                draft.setSortOrder(newSortOrder);
+                draft.setAuthor(author);
+
+                contentRepository.save(draft);
             }
         }
     }
 
+    @Transactional
+    public Content resetDraftToPublished(UUID contentId, User author) {
+
+        Content published = getPublished(contentId)
+                .orElseThrow(() ->
+                        new RuntimeException("Published content not found: " + contentId)
+                );
+
+        Content draft = getDraft(contentId)
+                .orElseThrow(() ->
+                        new RuntimeException("Draft not found: " + contentId)
+                );
+
+        draft.setVersion(draft.getVersion() + 1);
+
+        draft.setOwnerId(published.getOwnerId());
+        draft.setTitle(published.getTitle());
+        draft.setBody(published.getBody());
+        draft.setSortOrder(published.getSortOrder());
+        draft.setIsVisible(published.getIsVisible());
+        draft.setAuthor(author);
+
+        synchronizeMedias(draft, published);
+
+        return contentRepository.save(draft);
+    }
+
     /**
-     * Add media to content
+     * Add a media to the DRAFT.
      */
     @Transactional
-    public Content addMediaToContent(UUID contentId, UUID mediaId, User author) {
-        log.info("Adding media {} to content {} by user: {}", mediaId, contentId, author.getUsername());
-
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+    public Content addMediaToContent(
+            UUID contentId,
+            UUID mediaId,
+            User author
+    ) {
+        Content draft = getOrCreateDraft(contentId, author);
 
         Media media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new RuntimeException("Media not found: " + mediaId));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Media not found: " + mediaId
+                        )
+                );
 
-        // Create new version with updated medias list
-        List<Media> updatedMedias = new ArrayList<>();
-        if (latestVersion.getMedias() != null) {
-            updatedMedias.addAll(latestVersion.getMedias());
+        if (!draft.getMedias().contains(media)) {
+            draft.getMedias().add(media);
+
+            draft.setVersion(draft.getVersion() + 1);
+            draft.setAuthor(author);
         }
 
-        // Add media only if not already present
-        if (!updatedMedias.contains(media)) {
-            updatedMedias.add(media);
-        }
-
-        // Création d'une nouvelle version sans builder
-        Content newVersion = new Content();
-        newVersion.setContentId(contentId);
-        newVersion.setOwnerId(latestVersion.getOwnerId());
-        newVersion.setVersion(latestVersion.getVersion() + 1);
-        newVersion.setTitle(latestVersion.getTitle());
-        newVersion.setBody(latestVersion.getBody());
-        newVersion.setStatus(PublishingStatus.DRAFT);
-        newVersion.setIsVisible(latestVersion.getIsVisible());
-        newVersion.setSortOrder(latestVersion.getSortOrder());
-        newVersion.setAuthor(author);
-        newVersion.setMedias(updatedMedias);
-
-        Content savedContent = contentRepository.save(newVersion);
-        log.debug("Media added to content: version {} for contentId: {}",
-                savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
+        return contentRepository.save(draft);
     }
 
     /**
-     * Remove media from content
+     * Remove a media from the DRAFT.
      */
     @Transactional
-    public Content removeMediaFromContent(UUID contentId, UUID mediaId, User author) {
-        log.info("Removing media {} from content {} by user: {}", mediaId, contentId, author.getUsername());
+    public Content removeMediaFromContent(
+            UUID contentId,
+            UUID mediaId,
+            User author
+    ) {
+        Content draft = getOrCreateDraft(contentId, author);
 
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+        boolean removed = draft.getMedias()
+                .removeIf(media -> media.getId().equals(mediaId));
 
-        // Create new version with updated medias list (without the specified media)
-        List<Media> updatedMedias = new ArrayList<>();
-        if (latestVersion.getMedias() != null) {
-            updatedMedias = latestVersion.getMedias().stream()
-                    .filter(media -> !media.getId().equals(mediaId))
-                    .collect(Collectors.toList());
+        if (removed) {
+            draft.setVersion(draft.getVersion() + 1);
+            draft.setAuthor(author);
         }
 
-        Content newVersion = new Content();
-        newVersion.setContentId(contentId);
-        newVersion.setOwnerId(latestVersion.getOwnerId());
-        newVersion.setVersion(latestVersion.getVersion() + 1);
-        newVersion.setTitle(latestVersion.getTitle());
-        newVersion.setBody(latestVersion.getBody());
-        newVersion.setStatus(latestVersion.getStatus());
-        newVersion.setIsVisible(latestVersion.getIsVisible());
-        newVersion.setSortOrder(latestVersion.getSortOrder());
-        newVersion.setAuthor(author);
-        newVersion.setMedias(updatedMedias);
-
-        Content savedContent = contentRepository.save(newVersion);
-        log.debug("Media removed from content: version {} for contentId: {}",
-                savedContent.getVersion(), savedContent.getContentId());
-        return savedContent;
+        return contentRepository.save(draft);
     }
 
     /**
-     * Update content status (publish, draft, etc.)
+     * Publish the DRAFT.
+     * <p>
+     * First publication:
+     * DRAFT exists
+     * PUBLISHED does not exist
+     * -> create PUBLISHED
+     * <p>
+     * Subsequent publication:
+     * DRAFT exists
+     * PUBLISHED exists
+     * -> update existing PUBLISHED
+     * <p>
+     * No third row is ever created.
      */
     @Transactional
-    public Content updateContentStatus(UUID contentId, PublishingStatus status, User author) {
-        log.info("Updating content status: contentId={} to status={} by user: {}", contentId, status, author.getUsername());
+    public Content publishContent(
+            UUID contentId,
+            User author
+    ) {
+        Content draft = getDraft(contentId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Draft not found: " + contentId
+                        )
+                );
 
-        Content latestVersion = getLatestContentVersion(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found: " + contentId));
+        Optional<Content> publishedOptional =
+                getPublished(contentId);
 
-        log.info("Latest version found: id={}, version={}, current status={}",
-                latestVersion.getId(), latestVersion.getVersion(), latestVersion.getStatus());
+        Content published;
 
-        // Si le statut est déjà le même, on retourne le contenu existant
-        if (latestVersion.getStatus().equals(status)) {
-            log.info("Content {} already has status {}, no update needed", contentId, status);
-            return latestVersion;
+        if (publishedOptional.isPresent()) {
+            published = publishedOptional.get();
+
+            published.setVersion(draft.getVersion());
+            published.setOwnerId(draft.getOwnerId());
+            published.setTitle(draft.getTitle());
+            published.setBody(draft.getBody());
+            published.setSortOrder(draft.getSortOrder());
+            published.setIsVisible(draft.getIsVisible());
+            published.setAuthor(author);
+
+            synchronizeMedias(published, draft);
+
+        } else {
+            published = Content.builder()
+                    .contentId(draft.getContentId())
+                    .ownerId(draft.getOwnerId())
+                    .version(draft.getVersion())
+                    .title(draft.getTitle())
+                    .body(draft.getBody())
+                    .status(PublishingStatus.PUBLISHED)
+                    .isVisible(draft.getIsVisible())
+                    .sortOrder(draft.getSortOrder())
+                    .author(author)
+                    .medias(new ArrayList<>(draft.getMedias()))
+                    .build();
         }
 
-        // Mettre à jour directement le statut de la version courante
-        log.info("Changing status from {} to {} for content id={}",
-                latestVersion.getStatus(), status, latestVersion.getId());
+        published.setStatus(PublishingStatus.PUBLISHED);
 
-        latestVersion.setStatus(status);
-        Content savedContent = contentRepository.save(latestVersion);
-
-        log.info("Content status successfully updated: contentId={}, id={}, version={}, new status={}",
-                savedContent.getContentId(), savedContent.getId(), savedContent.getVersion(), savedContent.getStatus());
-        return savedContent;
+        return contentRepository.save(published);
     }
 
     /**
-     * Create default content body
+     * Publish all drafts for an owner.
+     */
+    @Transactional
+    public int publishAllContentsByOwner(
+            UUID ownerId,
+            User author
+    ) {
+        log.info(
+                "Starting publication of all contents for owner {}",
+                ownerId
+        );
+
+        List<Content> drafts =
+                contentRepository.findByOwnerIdAndStatusOrderBySortOrderAsc(
+                        ownerId,
+                        PublishingStatus.DRAFT
+                );
+
+        log.info(
+                "Found {} DRAFT contents for owner {}",
+                drafts.size(),
+                ownerId
+        );
+
+        int publishedCount = 0;
+
+        for (Content draft : drafts) {
+
+            log.info(
+                    "Publishing content: id={}, contentId={}, version={}, status={}",
+                    draft.getId(),
+                    draft.getContentId(),
+                    draft.getVersion(),
+                    draft.getStatus()
+            );
+
+            Content published =
+                    publishContent(
+                            draft.getContentId(),
+                            author
+                    );
+
+            log.info(
+                    "Content published: id={}, contentId={}, version={}, status={}",
+                    published.getId(),
+                    published.getContentId(),
+                    published.getVersion(),
+                    published.getStatus()
+            );
+
+            publishedCount++;
+        }
+
+        log.info(
+                "Finished publication for owner {}: {} contents published",
+                ownerId,
+                publishedCount
+        );
+
+        return publishedCount;
+    }
+
+    /**
+     * Check whether the DRAFT contains changes compared to PUBLISHED.
+     */
+    @Transactional(readOnly = true)
+    public boolean hasDraftChanges(UUID contentId) {
+        Optional<Content> draft = getDraft(contentId);
+
+        if (draft.isEmpty()) {
+            return false;
+        }
+
+        Optional<Content> published = getPublished(contentId);
+
+        return published.isEmpty()
+                || !draft.get().getVersion()
+                .equals(published.get().getVersion());
+    }
+
+    /**
+     * Delete a content.
+     * <p>
+     * DRAFT -> DELETED
+     * PUBLISHED -> ARCHIVED
+     * <p>
+     * No new version is created.
+     */
+    @Transactional
+    public Content deleteContent(
+            UUID contentId,
+            User author
+    ) {
+        Content draft = getDraft(contentId)
+                .orElse(null);
+
+        Content published = getPublished(contentId)
+                .orElse(null);
+
+        if (draft == null && published == null) {
+            throw new RuntimeException(
+                    "Content not found: " + contentId
+            );
+        }
+
+        if (draft != null) {
+            draft.setStatus(PublishingStatus.DELETED);
+            draft.setIsVisible(false);
+            draft.setAuthor(author);
+
+            contentRepository.save(draft);
+        }
+
+        if (published != null) {
+            published.setStatus(PublishingStatus.ARCHIVED);
+            published.setIsVisible(false);
+            published.setAuthor(author);
+
+            contentRepository.save(published);
+        }
+
+        return draft != null ? draft : published;
+    }
+
+    /**
+     * Compatibility method for the existing controller.
+     * <p>
+     * PUBLISHED = publish.
+     * DRAFT = no-op because the working state is already DRAFT.
+     */
+    @Transactional
+    public Content updateContentStatus(
+            UUID contentId,
+            PublishingStatus status,
+            User author
+    ) {
+        return switch (status) {
+            case PUBLISHED -> publishContent(contentId, author);
+
+            case DRAFT -> getOrCreateDraft(contentId, author);
+
+            case DELETED -> deleteContent(contentId, author);
+
+            case ARCHIVED -> {
+                Content published = getPublished(contentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Published content not found: "
+                                                + contentId
+                                )
+                        );
+
+                published.setStatus(PublishingStatus.ARCHIVED);
+                published.setIsVisible(false);
+                published.setAuthor(author);
+
+                yield contentRepository.save(published);
+            }
+        };
+    }
+
+    /**
+     * Create a DRAFT from the current PUBLISHED version
+     * when no DRAFT exists.
+     */
+    private Content getOrCreateDraft(
+            UUID contentId,
+            User author
+    ) {
+        Optional<Content> existingDraft =
+                getDraft(contentId);
+
+        if (existingDraft.isPresent()) {
+            return existingDraft.get();
+        }
+
+        Content published = getPublished(contentId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Content not found: " + contentId
+                        )
+                );
+
+        Content draft = Content.builder()
+                .contentId(published.getContentId())
+                .ownerId(published.getOwnerId())
+                .version(published.getVersion() + 1)
+                .title(published.getTitle())
+                .body(published.getBody())
+                .status(PublishingStatus.DRAFT)
+                .isVisible(published.getIsVisible())
+                .sortOrder(published.getSortOrder())
+                .author(author)
+                .medias(new ArrayList<>(published.getMedias()))
+                .build();
+
+        return contentRepository.save(draft);
+    }
+
+    /**
+     * Synchronize media associations between DRAFT and PUBLISHED.
+     */
+    private void synchronizeMedias(
+            Content published,
+            Content draft
+    ) {
+        published.getMedias().clear();
+        published.getMedias().addAll(
+                new ArrayList<>(draft.getMedias())
+        );
+    }
+
+    /**
+     * Create default content body.
      */
     public JsonNode createDefaultBody() {
         try {
-            return objectMapper.readTree("{\"html\": \"<p>Start writing your content here...</p>\"}");
+            return objectMapper.readTree(
+                    "{\"html\": \"<p>Start writing your content here...</p>\"}"
+            );
         } catch (Exception e) {
-            log.error("Error creating default content body", e);
-            return objectMapper.createObjectNode().put("html", "<p>Start writing your content here...</p>");
+            log.error(
+                    "Error creating default content body",
+                    e
+            );
+
+            return objectMapper
+                    .createObjectNode()
+                    .put(
+                            "html",
+                            "<p>Start writing your content here...</p>"
+                    );
         }
     }
 }

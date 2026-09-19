@@ -215,68 +215,111 @@ public class ContentController {
         }
 
         User currentUser = currentUserDetails.account().getUser();
-        log.info("POST /api/content/owner/{}/publish - Publishing all contents by user: {}",
-                ownerId, currentUser.getUsername());
+
+        log.info(
+                "POST /api/content/owner/{}/publish - Publishing contents by user: {}",
+                ownerId,
+                currentUser.getUsername()
+        );
 
         try {
-            log.info("Publishing contents for owner: {}", ownerId);
-
-            // Récupérer toutes les dernières versions des contenus pour l'ownerId
-            var latestContents = contentService.getLatestContentsByOwner(ownerId);
-
-            log.info("Found {} latest contents for owner {}", latestContents.size(), ownerId);
-
-            int publishedCount = 0;
-            int skippedCount = 0;
-
-            for (Content content : latestContents) {
-                log.info("Processing content: id={}, contentId={}, status={}, title={}",
-                        content.getId(), content.getContentId(), content.getStatus(), content.getTitle());
-
-                try {
-                    // Publier seulement si le contenu n'est pas déjà publié et n'est pas supprimé
-                    if (!content.getStatus().equals(com.stemadeleine.api.model.PublishingStatus.PUBLISHED)) {
-                        log.info("Publishing content: {} (contentId: {}) from status {} to PUBLISHED",
-                                content.getId(), content.getContentId(), content.getStatus());
-
-                        contentService.updateContentStatus(
-                                content.getContentId(),
-                                com.stemadeleine.api.model.PublishingStatus.PUBLISHED,
-                                currentUser
-                        );
-                        publishedCount++;
-                        log.info("Content successfully published: {} (contentId: {})", content.getId(), content.getContentId());
-                    } else {
-                        skippedCount++;
-                        log.info("Content already published, skipped: {} (contentId: {})", content.getId(), content.getContentId());
-                    }
-                } catch (Exception e) {
-                    log.error("Failed to publish content {} (contentId: {}): {}",
-                            content.getId(), content.getContentId(), e.getMessage(), e);
-                    skippedCount++;
-                }
-            }
+            int publishedCount =
+                    contentService.publishAllContentsByOwner(
+                            ownerId,
+                            currentUser
+                    );
 
             Map<String, Object> response = Map.of(
                     "ownerId", ownerId,
-                    "totalContents", latestContents.size(),
                     "publishedCount", publishedCount,
-                    "skippedCount", skippedCount,
-                    "message", String.format("Published %d out of %d contents for owner %s",
-                            publishedCount, latestContents.size(), ownerId)
+                    "message", String.format(
+                            "Published %d contents for owner %s",
+                            publishedCount,
+                            ownerId
+                    )
             );
 
-            log.info("Bulk publish completed for owner {}: {} published, {} skipped",
-                    ownerId, publishedCount, skippedCount);
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
-            log.error("Error publishing contents for owner {}: {}", ownerId, e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Failed to publish contents",
-                    "message", e.getMessage(),
-                    "ownerId", ownerId
-            ));
+            log.error(
+                    "Error publishing contents for owner {}: {}",
+                    ownerId,
+                    e.getMessage(),
+                    e
+            );
+
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "error", "Failed to publish contents",
+                            "message", e.getMessage(),
+                            "ownerId", ownerId
+                    )
+            );
+        }
+    }
+
+    @PostMapping("/{contentId}/publish")
+    public ResponseEntity<ContentDto> publishContent(
+            @PathVariable UUID contentId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+
+        try {
+            Content published = contentService.publishContent(
+                    contentId,
+                    currentUser
+            );
+
+            return ResponseEntity.ok(
+                    contentMapper.toDto(published)
+            );
+
+        } catch (RuntimeException e) {
+            log.error(
+                    "Error publishing content {}: {}",
+                    contentId,
+                    e.getMessage(),
+                    e
+            );
+
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{contentId}/reset-draft")
+    public ResponseEntity<ContentDto> resetDraftToPublished(
+            @PathVariable UUID contentId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        User currentUser = currentUserDetails.account().getUser();
+
+        try {
+            Content draft = contentService.resetDraftToPublished(
+                    contentId,
+                    currentUser
+            );
+
+            return ResponseEntity.ok(contentMapper.toDto(draft));
+
+        } catch (RuntimeException e) {
+            log.error(
+                    "Error resetting draft {} to published: {}",
+                    contentId,
+                    e.getMessage(),
+                    e
+            );
+
+            return ResponseEntity.badRequest().build();
         }
     }
 }

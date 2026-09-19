@@ -158,7 +158,10 @@ public class ModuleService {
 
     public List<Content> getContentsByModuleId(UUID moduleId) {
         log.debug("Retrieving contents for module: {}", moduleId);
-        List<Content> contents = contentRepository.findByOwnerIdOrderBySortOrderAsc(moduleId);
+        List<Content> contents = contentRepository.findByOwnerIdAndStatusOrderBySortOrderAsc(
+                moduleId,
+                PublishingStatus.DRAFT
+        );
         log.debug("Found {} contents for module: {}", contents.size(), moduleId);
         return contents;
     }

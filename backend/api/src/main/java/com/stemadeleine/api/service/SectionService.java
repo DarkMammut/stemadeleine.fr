@@ -153,7 +153,12 @@ public class SectionService {
      */
     public List<Content> getContentsBySection(UUID sectionId) {
         log.debug("Retrieving contents for section: {}", sectionId);
-        return contentService.getLatestContentsByOwner(sectionId);
+
+        List<Content> contents = contentService.getContentsByOwner(sectionId);
+
+        log.debug("Found {} contents for section: {}", contents.size(), sectionId);
+
+        return contents;
     }
 
     /**

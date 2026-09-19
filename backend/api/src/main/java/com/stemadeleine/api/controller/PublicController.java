@@ -130,22 +130,37 @@ public class PublicController {
      * Retrieves published and visible contents by ownerId (sectionId, moduleId, etc.)
      */
     @GetMapping("/contents/{ownerId}")
-    public ResponseEntity<List<Content>> getContentsByOwnerId(@PathVariable UUID ownerId) {
-        log.info("GET /api/public/contents/{} - Retrieving published and visible contents", ownerId);
+    public ResponseEntity<List<Content>> getContentsByOwnerId(
+            @PathVariable UUID ownerId
+    ) {
+        log.info(
+                "GET /api/public/contents/{} - Retrieving published and visible contents",
+                ownerId
+        );
 
         try {
-            List<Content> contents = contentService.getLatestContentsByOwner(ownerId);
+            List<Content> contents =
+                    contentService.getPublishedContentsByOwner(ownerId);
 
-            // Filter only published and visible contents for public access
             List<Content> publicContents = contents.stream()
-                    .filter(content -> content.getStatus() == PublishingStatus.PUBLISHED)
                     .filter(Content::getIsVisible)
                     .toList();
 
-            log.debug("Found {} published contents for ownerId: {}", publicContents.size(), ownerId);
+            log.debug(
+                    "Found {} published contents for ownerId: {}",
+                    publicContents.size(),
+                    ownerId
+            );
+
             return ResponseEntity.ok(publicContents);
+
         } catch (Exception e) {
-            log.error("Error retrieving contents for ownerId {}: {}", ownerId, e.getMessage());
+            log.error(
+                    "Error retrieving contents for ownerId {}: {}",
+                    ownerId,
+                    e.getMessage()
+            );
+
             return ResponseEntity.notFound().build();
         }
     }

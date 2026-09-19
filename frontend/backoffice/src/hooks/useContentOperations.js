@@ -186,6 +186,17 @@ export const useContentOperations = ({parentType = "section"} = {}) => {
         [axios],
     );
 
+    const resetDraftToPublished = useCallback(
+        async (contentId) => {
+            const response = await axios.post(
+                `/api/content/${contentId}/reset-draft`
+            );
+
+            return response.data;
+        },
+        [axios],
+    );
+
     return {
         getContents,
         createContent,
@@ -195,5 +206,6 @@ export const useContentOperations = ({parentType = "section"} = {}) => {
         addMediaToContent,
         removeMediaFromContent,
         publishAllContents,
+        resetDraftToPublished,
     };
 };

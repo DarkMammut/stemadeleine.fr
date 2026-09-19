@@ -16,7 +16,20 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "contents",
-        indexes = {@Index(name = "idx_contents_content_id_version", columnList = "content_id, version DESC")}
+        indexes = {
+                @Index(
+                        name = "idx_contents_content_id_version",
+                        columnList = "content_id, version DESC"
+                ),
+                @Index(
+                        name = "idx_contents_content_id_status",
+                        columnList = "content_id, status"
+                ),
+                @Index(
+                        name = "idx_contents_owner_id_status",
+                        columnList = "owner_id, status"
+                )
+        }
 )
 @Getter
 @Setter
