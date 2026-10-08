@@ -3,116 +3,90 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.UpdateNewsletterPutRequest;
 import com.stemadeleine.api.dto.UpdateNewsletterRequest;
-import com.stemadeleine.api.model.*;
-import com.stemadeleine.api.model.Module;
+import com.stemadeleine.api.model.NewsVariants;
+import com.stemadeleine.api.model.Newsletter;
+import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.PublishingStatus;
+import com.stemadeleine.api.model.Section;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.NewsletterRepository;
-import com.stemadeleine.api.repository.SectionRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NewsletterService {
+
+    private static final String DETAIL_PAGE_URL = "/newsletters";
+
     private final NewsletterRepository newsletterRepository;
     private final ModuleService moduleService;
-    private final SectionRepository sectionRepository;
     private final PageService pageService;
     private final SectionService sectionService;
 
-    /**
-     * Retourne l'URL de base pour les détails des newsletters.
-     * Toujours fixée à /newsletters pour simplifier la gestion.
-     *
-     * @return L'URL de base pour les détails des newsletters : /newsletters
-     */
-    private String getNewsletterDetailPageUrl() {
-        log.debug("URL de détail des newsletters : /newsletters");
-        return "/newsletters";
-    }
-
     public List<Newsletter> getAllNewsletters() {
-        log.info("Récupération de toutes les newsletters non supprimées");
-        List<Newsletter> newsletters = newsletterRepository.findByStatusNot(PublishingStatus.DELETED);
-        log.debug("Nombre de newsletters trouvées : {}", newsletters.size());
-        return newsletters;
+        return newsletterRepository.findByStatus(PublishingStatus.DRAFT);
     }
 
     public Optional<Newsletter> getNewsletterById(UUID id) {
-        log.info("Recherche de la newsletter avec l'ID : {}", id);
-        Optional<Newsletter> newsletter = newsletterRepository.findById(id)
-                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
-        log.debug("Newsletter trouvée : {}", newsletter.isPresent());
-        return newsletter;
+        return newsletterRepository.findById(id)
+                .filter(n -> n.getStatus() == PublishingStatus.DRAFT || n.getStatus() == PublishingStatus.PUBLISHED);
     }
 
+    /**
+     * DRAFT of a newsletter module (backoffice).
+     */
     public Optional<Newsletter> getLastVersionByModuleId(UUID moduleId) {
-        log.info("Recherche de la dernière version de la newsletter avec le moduleId : {}", moduleId);
-        Optional<Newsletter> newsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
-                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
-        log.debug("Newsletter trouvée : {}", newsletter.isPresent());
-        return newsletter;
+        return newsletterRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.DRAFT);
+    }
+
+    /**
+     * PUBLISHED version of a newsletter module (public site).
+     */
+    public Optional<Newsletter> getPublishedByModuleId(UUID moduleId) {
+        return newsletterRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.PUBLISHED);
     }
 
     public boolean existsNewsletterWithVariantAll() {
-        log.info("Vérification de l'existence d'une newsletter avec la variante ALL");
-        boolean exists = newsletterRepository.existsByVariantAndStatusNot(NewsVariants.ALL, PublishingStatus.DELETED);
-        log.debug("Newsletter avec variante ALL existe : {}", exists);
-        return exists;
+        return newsletterRepository.existsByVariantAndStatus(NewsVariants.ALL, PublishingStatus.DRAFT);
     }
 
     @Transactional
     public Newsletter updateNewsletter(UUID id, UpdateNewsletterPutRequest request) {
-        log.info("Mise à jour de la newsletter avec l'ID : {}", id);
-        return newsletterRepository.findById(id)
-                .map(newsletter -> {
-                    if (request.getTitle() != null) {
-                        newsletter.setTitle(request.getTitle());
-                    }
-                    if (request.getName() != null) {
-                        newsletter.setName(request.getName());
-                    }
-                    if (request.getSortOrder() != null) {
-                        newsletter.setSortOrder(request.getSortOrder());
-                    }
-                    if (request.getVariant() != null) {
-                        newsletter.setVariant(request.getVariant());
-                    }
-                    log.debug("Newsletter mise à jour : {}", newsletter);
-                    return newsletterRepository.save(newsletter);
-                })
-                .orElseThrow(() -> {
-                    log.error("Newsletter non trouvée avec l'ID : {}", id);
-                    return new RuntimeException("Newsletter not found");
-                });
+        Newsletter newsletter = moduleService.findDraftByRowId(newsletterRepository, id)
+                .orElseThrow(() -> new RuntimeException("Newsletter not found"));
+
+        if (request.getTitle() != null) newsletter.setTitle(request.getTitle());
+        if (request.getName() != null) newsletter.setName(request.getName());
+        if (request.getSortOrder() != null) newsletter.setSortOrder(request.getSortOrder());
+        if (request.getVariant() != null) newsletter.setVariant(request.getVariant());
+
+        return moduleService.saveDraft(newsletter);
     }
 
+    @Transactional
     public void softDeleteNewsletter(UUID id) {
-        log.info("Suppression logique de la newsletter avec l'ID : {}", id);
-        newsletterRepository.findById(id).ifPresent(newsletter -> {
-            newsletter.setStatus(PublishingStatus.DELETED);
-            newsletterRepository.save(newsletter);
-            log.debug("Newsletter marquée comme supprimée : {}", id);
-        });
+        moduleService.softDeleteModuleByRowId(id);
     }
 
+    @Transactional
     public Newsletter createNewsletterWithModule(CreateModuleRequest request, User author) {
-        log.info("Création d'une nouvelle newsletter pour la section : {}", request.sectionId());
+        Section section = moduleService.getDraftSection(request.sectionId());
 
-        // Récupérer la section à partir de l'UUID
-        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
-                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
-
-        // Créer directement la newsletter (hérite de Module)
         Newsletter newsletter = Newsletter.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
-                .contents(new java.util.ArrayList<>())
+                .contents(new ArrayList<>())
                 .section(section)
                 .name(request.name())
                 .title(request.name())
@@ -125,107 +99,46 @@ public class NewsletterService {
                 .description("Newsletter description")
                 .build();
 
-        Newsletter savedNewsletter = newsletterRepository.save(newsletter);
-        log.info("Newsletter créée avec succès, ID : {}", savedNewsletter.getId());
-        return savedNewsletter;
+        return newsletterRepository.save(newsletter);
     }
 
+    /**
+     * Updates the DRAFT of the newsletter module in place (no new row).
+     */
+    @Transactional
     public Newsletter createNewsletterVersion(UpdateNewsletterRequest request, User author) {
-        log.info("Création d'une nouvelle version de newsletter pour le moduleId : {}", request.moduleId());
+        Newsletter newsletter = newsletterRepository.findByModuleIdAndStatus(request.moduleId(), PublishingStatus.DRAFT)
+                .orElseThrow(() -> new RuntimeException("Draft newsletter not found for moduleId: " + request.moduleId()));
 
-        // 1. Récupérer le module
-        Module module = moduleService.getModuleByModuleId(request.moduleId())
-                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+        if (request.name() != null) newsletter.setName(request.name());
+        if (request.title() != null) newsletter.setTitle(request.title());
+        if (request.variant() != null) newsletter.setVariant(request.variant());
+        newsletter.setAuthor(author);
 
-        // 2. Récupérer la dernière version de la newsletter pour ce module
-        Newsletter previousNewsletter = newsletterRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
-                .orElse(null);
-
-        // 3. Fusionner les infos du request et de la version précédente
-        String name = request.name() != null ? request.name() : (previousNewsletter != null ? previousNewsletter.getName() : module.getName());
-        String title = request.title() != null ? request.title() : (previousNewsletter != null ? previousNewsletter.getTitle() : module.getTitle());
-        NewsVariants variant = request.variant() != null ? request.variant() : (previousNewsletter != null ? previousNewsletter.getVariant() : NewsVariants.LAST3);
-        List<Content> contents = previousNewsletter != null ? new ArrayList<>(previousNewsletter.getContents()) : new ArrayList<>();
-        String type = module.getType();
-        Integer sortOrder = module.getSortOrder();
-        Boolean isVisible = module.getIsVisible();
-        PublishingStatus status = PublishingStatus.DRAFT;
-        int newVersion = previousNewsletter != null ? previousNewsletter.getVersion() + 1 : 1;
-
-        Newsletter newsletter = Newsletter.builder()
-                .variant(variant)
-                .contents(contents)
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(name)
-                .title(title)
-                .type(type)
-                .sortOrder(sortOrder)
-                .isVisible(isVisible)
-                .status(status)
-                .author(author)
-                .version(newVersion)
-                .build();
-
-        Newsletter savedNewsletter = newsletterRepository.save(newsletter);
-        log.info("Nouvelle version de newsletter créée avec succès, ID : {}", savedNewsletter.getId());
-        return savedNewsletter;
+        return moduleService.saveDraft(newsletter);
     }
 
+    /**
+     * Creates and publishes the pages structure of the newsletters: /newsletters, its section,
+     * the dynamic detail page and the "all newsletters" module.
+     */
     @Transactional
     public Map<String, UUID> createNewsletterPagesStructure(User author) {
         log.info("Création de la structure complète pour les pages Newsletter avec URL fixe /newsletters");
 
-        // 1. Créer la page "Newsletters" à la racine (parentPageId = null)
         Page newslettersPage = pageService.createNewPage(null, "Newsletters", author);
-
-        // Mettre à jour le slug et publier la page
-        newslettersPage.setSlug("/newsletters");
-        newslettersPage.setIsVisible(false);
-        newslettersPage.setStatus(PublishingStatus.PUBLISHED);
         newslettersPage = pageService.updatePage(
-                newslettersPage.getPageId(),
-                "Newsletters",
-                "Newsletters",
-                null,
-                "/newsletters",
-                null,
-                true,
-                author
-        );
-        log.debug("Page Newsletters créée et publiée avec l'ID : {}", newslettersPage.getPageId());
+                newslettersPage.getPageId(), "Newsletters", "Newsletters", null, "/newsletters", null, true, author);
 
-        // 2. Créer une section dans cette page
         Section section = sectionService.createNewSection(newslettersPage.getPageId(), "Section Newsletters", author);
-        section.setIsVisible(true);
-        section.setStatus(PublishingStatus.PUBLISHED);
-        section = sectionService.updateSection(section.getSectionId(), "Section Newsletters", "Section Newsletters", true, author);
-        log.debug("Section créée et publiée avec l'ID : {}", section.getSectionId());
+        section = sectionService.updateSection(
+                section.getSectionId(), "Section Newsletters", "Section Newsletters", true, author);
 
-        // 3. Créer la page enfant dynamique [newsletterId]
+        // Dynamic detail page [newsletterId], not visible in the navigation
         Page detailPage = pageService.createNewPage(newslettersPage.getPageId(), "[newsletterId]", author);
-
-        // Mettre à jour le slug et publier la page (INVISIBLE pour ne pas apparaître dans la navigation)
-        detailPage.setSlug("/[newsletterId]");
-        detailPage.setIsVisible(false); // Invisible car c'est une route dynamique
-        detailPage.setStatus(PublishingStatus.PUBLISHED);
         detailPage = pageService.updatePage(
-                detailPage.getPageId(),
-                "[newsletterId]",
-                "[newsletterId]",
-                null,
-                "/[newsletterId]",
-                null,
-                false, // Invisible dans la navigation
-                author
-        );
-        log.debug("Page détail créée et publiée (invisible) avec l'ID : {}", detailPage.getPageId());
+                detailPage.getPageId(), "[newsletterId]", "[newsletterId]", null, "/[newsletterId]", null, false, author);
 
-        // 4. URL de détail toujours fixée à /newsletters
-        String detailPageUrl = getNewsletterDetailPageUrl();
-        log.debug("URL de base pour les détails : {}", detailPageUrl);
-
-        // 5. Créer le module Newsletter avec variante ALL et l'URL de détail
         Newsletter newsletter = Newsletter.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.ALL)
@@ -236,43 +149,33 @@ public class NewsletterService {
                 .type("NEWSLETTER")
                 .sortOrder(0)
                 .isVisible(true)
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
                 .description("Module pour afficher toutes les newsletters")
-                .detailPageUrl(detailPageUrl)
+                .detailPageUrl(DETAIL_PAGE_URL)
                 .build();
-
         Newsletter savedNewsletter = newsletterRepository.save(newsletter);
-        log.debug("Module Newsletter créé et publié avec l'ID : {}, URL de détail : {}", savedNewsletter.getModuleId(), detailPageUrl);
 
-        // 6. Mettre à jour tous les modules Newsletter existants (non supprimés) avec l'URL /newsletters
-        log.info("Mise à jour de tous les modules Newsletter existants avec l'URL : {}", detailPageUrl);
-        List<Newsletter> existingNewsletters = newsletterRepository.findByStatusNot(PublishingStatus.DELETED);
-        int updatedCount = 0;
+        // The module is published together with its section (the page must be published first)
+        pageService.publishPage(newslettersPage.getPageId(), author);
+        sectionService.publishSection(section.getSectionId(), author);
 
-        for (Newsletter existingNewsletter : existingNewsletters) {
-            // Ne pas mettre à jour le module qu'on vient de créer
-            if (!existingNewsletter.getId().equals(savedNewsletter.getId())) {
-                String previousUrl = existingNewsletter.getDetailPageUrl();
-                existingNewsletter.setDetailPageUrl(detailPageUrl);
-                newsletterRepository.save(existingNewsletter);
-                updatedCount++;
-                log.debug("Module Newsletter mis à jour : ID={}, ancienne URL={}, nouvelle URL={}",
-                        existingNewsletter.getModuleId(), previousUrl, detailPageUrl);
+        // All the other newsletter modules (DRAFT and PUBLISHED rows) share the same detail page
+        for (PublishingStatus status : List.of(PublishingStatus.DRAFT, PublishingStatus.PUBLISHED)) {
+            for (Newsletter existing : newsletterRepository.findByStatus(status)) {
+                if (!existing.getModuleId().equals(savedNewsletter.getModuleId())) {
+                    existing.setDetailPageUrl(DETAIL_PAGE_URL);
+                    newsletterRepository.save(existing);
+                }
             }
         }
 
-        log.info("Mise à jour terminée : {} module(s) Newsletter mis à jour avec l'URL {}", updatedCount, detailPageUrl);
-        log.info("Structure Newsletter créée avec succès");
-
-        // Retourner les IDs créés
         Map<String, UUID> result = new HashMap<>();
         result.put("newslettersPageId", newslettersPage.getPageId());
         result.put("detailPageId", detailPage.getPageId());
         result.put("sectionId", section.getSectionId());
         result.put("newsletterModuleId", savedNewsletter.getModuleId());
-
         return result;
     }
 }

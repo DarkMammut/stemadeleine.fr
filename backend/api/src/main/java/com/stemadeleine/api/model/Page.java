@@ -3,6 +3,7 @@ package com.stemadeleine.api.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
@@ -13,7 +14,11 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "pages",
-        indexes = {@Index(name = "idx_pages_page_id_version", columnList = "page_id, version DESC")}
+        indexes = {
+                @Index(name = "idx_pages_page_id_version", columnList = "page_id, version DESC"),
+                @Index(name = "idx_pages_page_id_status", columnList = "page_id, status"),
+                @Index(name = "idx_pages_slug_status", columnList = "slug, status")
+        }
 )
 @Getter
 @Setter
@@ -66,10 +71,14 @@ public class Page {
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "pages_author_id_fkey"))
     private User author;
 
-    @OneToMany(mappedBy = "parentPage", cascade = CascadeType.ALL, orphanRemoval = true)
+    // A DRAFT page only has DRAFT children and a PUBLISHED page only has PUBLISHED children.
+    // DELETED / ARCHIVED rows are excluded from the collections.
+    @OneToMany(mappedBy = "parentPage")
+    @SQLRestriction("status in ('DRAFT', 'PUBLISHED')")
     private List<Page> children;
 
-    @OneToMany(mappedBy = "page", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "page", fetch = FetchType.LAZY)
+    @SQLRestriction("status in ('DRAFT', 'PUBLISHED')")
     private List<Section> sections = new ArrayList<>();
 
     @Column(name = "is_visible", nullable = false)

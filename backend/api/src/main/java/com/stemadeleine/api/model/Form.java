@@ -20,7 +20,8 @@ public class Form extends Module {
     @Column(length = 1000)
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    // ManyToOne: the DRAFT and PUBLISHED rows of a module may reference the same media
+    @ManyToOne
     @JoinColumn(name = "media_id", referencedColumnName = "id")
     private Media media;
 

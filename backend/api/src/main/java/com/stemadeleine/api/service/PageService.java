@@ -1,7 +1,10 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.PageDto;
-import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.model.Media;
+import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.PublishingStatus;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.repository.PageRepository;
 import jakarta.transaction.Transactional;
@@ -9,14 +12,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-@Slf4j
+/**
+ * Pages are stored as two rows per logical page (pageId): one DRAFT (backoffice working copy,
+ * version incremented on every edit) and one PUBLISHED (public site, receives the draft's version on publish).
+ * Deleting a page marks the DRAFT as DELETED and the PUBLISHED as ARCHIVED.
+ */
 @Service
+@Slf4j
 public class PageService {
 
     private final MediaRepository mediaRepository;
@@ -29,123 +39,84 @@ public class PageService {
         this.sectionService = sectionService;
     }
 
+    // ==== READ ====
+
+    /**
+     * PUBLISHED row of a page (public site).
+     */
     public Optional<Page> getPublishedPage(UUID pageId) {
-        return pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(pageId, PublishingStatus.PUBLISHED);
+        return pageRepository.findByPageIdAndStatus(pageId, PublishingStatus.PUBLISHED);
+    }
+
+    /**
+     * DRAFT row of a page (backoffice).
+     */
+    public Optional<Page> getLastVersion(UUID pageId) {
+        return pageRepository.findByPageIdAndStatus(pageId, PublishingStatus.DRAFT);
+    }
+
+    public Optional<Page> getDraftBySlug(String slug) {
+        return pageRepository.findBySlugAndStatus(slug, PublishingStatus.DRAFT).stream().findFirst();
     }
 
     public Optional<Page> getPublishedPageBySlug(String slug) {
-        return pageRepository.findBySlug(slug)
-                .filter(Page::getIsVisible);
+        return pageRepository.findBySlugAndStatus(slug, PublishingStatus.PUBLISHED).stream()
+                .filter(Page::getIsVisible)
+                .findFirst();
     }
 
-    public Optional<Page> getLastVersion(UUID pageId) {
-        return pageRepository.findTopByPageIdOrderByVersionDesc(pageId);
-    }
-
-    private void filterDeletedChildren(Page page) {
-        if (page.getChildren() != null) {
-            // Regrouper les enfants par pageId et ne garder que la version la plus élevée
-            Map<UUID, Page> latestChildren = page.getChildren().stream()
-                    .filter(child -> child.getStatus() != PublishingStatus.DELETED)
-                    .collect(Collectors.toMap(
-                            Page::getPageId,
-                            Function.identity(),
-                            BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))
-                    ));
-            // Appliquer récursivement le filtrage sur les enfants
-            latestChildren.values().forEach(this::filterDeletedChildren);
-            // Remettre la liste des enfants (complets)
-            List<Page> filteredChildren = latestChildren.values().stream()
-                    .sorted(Comparator.comparing(c -> c.getSortOrder() != null ? c.getSortOrder() : 0))
-                    .toList();
-            page.setChildren(filteredChildren);
-        }
-    }
-
-    public List<Page> getLatestPagesForTree() {
-        Map<UUID, Page> latestPages = pageRepository.findAll().stream()
-                .filter(p -> p.getStatus() != PublishingStatus.DELETED)
-                .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
-
-        // Nettoyer les enfants existants (clear au lieu de setChildren pour éviter l'erreur orphan deletion)
-        latestPages.values().forEach(page -> {
-            if (page.getChildren() != null) {
-                page.getChildren().clear();
-            } else {
-                page.setChildren(new ArrayList<>());
-            }
-        });
-
-        // Recréer la hiérarchie
-        for (Page page : latestPages.values()) {
-            Page parent = page.getParentPage();
-            if (parent != null && latestPages.containsKey(parent.getPageId())) {
-                latestPages.get(parent.getPageId()).getChildren().add(page);
-            }
-        }
-
-        // Ne retourner que les vraies racines
-        List<Page> roots = latestPages.values().stream()
-                .filter(page -> page.getParentPage() == null)
-                .sorted(Comparator.comparing(page -> page.getSortOrder() != null ? page.getSortOrder() : 0))
-                .toList();
-        // Filtrer récursivement les enfants supprimés
-        roots.forEach(this::filterDeletedChildren);
-        return roots;
-    }
-
-    public Page getPageById(UUID pageId) {
-        return pageRepository.findById(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
-    }
-
-    @Transactional
-    public Page publishPage(UUID pageId, User author) {
-        Page page = getLastVersion(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found: " + pageId));
-        publishPageRecursive(page, author);
-        return pageRepository.save(page);
-    }
-
-    private void publishPageRecursive(Page page, User author) {
-        page.setStatus(PublishingStatus.PUBLISHED);
-        page.setAuthor(author);
-        page.setUpdatedAt(java.time.OffsetDateTime.now());
-        if (page.getChildren() != null) {
-            for (Page child : page.getChildren()) {
-                publishPageRecursive(child, author);
-                pageRepository.save(child);
-            }
-        }
+    public Page getPageById(UUID id) {
+        return pageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Page not found with id: " + id));
     }
 
     public List<Page> getAllPages() {
-        return pageRepository.findAll();
+        return pageRepository.findByStatus(PublishingStatus.DRAFT);
     }
 
-    @Transactional
-    public void updatePageTree(List<PageDto> tree, Page parent) {
-        int sortOrder = 0;
+    /**
+     * Backoffice page tree (DRAFT rows only).
+     */
+    public List<PageDto> getDraftTree() {
+        return buildTree(pageRepository.findByStatus(PublishingStatus.DRAFT));
+    }
 
-        for (PageDto dto : tree) {
-            Page page = pageRepository.findById(dto.id())
-                    .orElseThrow(() -> new RuntimeException("Page not found: " + dto.id()));
+    /**
+     * Public navigation tree (PUBLISHED and visible rows only).
+     */
+    public List<PageDto> findVisiblePagesHierarchyDto() {
+        return buildTree(pageRepository.findByStatus(PublishingStatus.PUBLISHED).stream()
+                .filter(p -> Boolean.TRUE.equals(p.getIsVisible()))
+                .toList());
+    }
 
-            page.setParentPage(parent);
-            page.setSortOrder(sortOrder++);
-            page.setIsVisible(dto.isVisible());
-
-            if (dto.status() != null) {
-                page.setStatus(dto.status());
-            }
-
-            pageRepository.save(page);
-
-            if (dto.children() != null && !dto.children().isEmpty()) {
-                updatePageTree(dto.children(), page);
+    private List<PageDto> buildTree(List<Page> pages) {
+        Map<UUID, List<Page>> childrenByParent = new HashMap<>();
+        Map<UUID, Page> byId = new HashMap<>();
+        pages.forEach(p -> byId.put(p.getId(), p));
+        List<Page> roots = new ArrayList<>();
+        for (Page page : pages) {
+            Page parent = page.getParentPage();
+            if (parent == null || !byId.containsKey(parent.getId())) {
+                roots.add(page);
+            } else {
+                childrenByParent.computeIfAbsent(parent.getId(), k -> new ArrayList<>()).add(page);
             }
         }
+        return toDtos(roots, childrenByParent);
     }
+
+    private List<PageDto> toDtos(List<Page> pages, Map<UUID, List<Page>> childrenByParent) {
+        return pages.stream()
+                .sorted(Comparator.comparing(p -> p.getSortOrder() != null ? p.getSortOrder() : 0))
+                .map(p -> new PageDto(
+                        p.getId(), p.getPageId(), p.getName(), p.getTitle(), p.getSubTitle(), p.getSlug(),
+                        p.getDescription(), p.getStatus(), p.getSortOrder(), p.getIsVisible(),
+                        toDtos(childrenByParent.getOrDefault(p.getId(), List.of()), childrenByParent)))
+                .toList();
+    }
+
+    // ==== WRITE (DRAFT) ====
 
     public Page createNewPage(UUID parentPageId, String name, User author) {
         Page parentPage = null;
@@ -154,12 +125,11 @@ public class PageService {
                     .orElseThrow(() -> new RuntimeException("Parent page not found with id: " + parentPageId));
         }
 
-        Integer maxSortOrder = pageRepository.findMaxSortOrderByParentPage(parentPageId);
+        Integer maxSortOrder = pageRepository.findMaxSortOrderByParentPageAndStatus(parentPageId, PublishingStatus.DRAFT);
         if (maxSortOrder == null) {
             maxSortOrder = 0;
         }
 
-        // Generate slug based on name and parent
         String slug = generateSlug(parentPage != null ? parentPage.getSlug() : null, name);
 
         Page page = Page.builder()
@@ -178,15 +148,13 @@ public class PageService {
         return pageRepository.save(page);
     }
 
+    @Transactional
     public Page updatePage(UUID pageId, String name, String title, String subTitle, String slug, String description, Boolean isVisible, User author) {
-        Page page = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+        Page page = getDraftOrThrow(pageId);
 
         if (name != null) {
             page.setName(name);
-            // If name changes, regenerate slug automatically excluding other versions of this page
-            String newSlug = generateSlugForPage(page.getParentPage() != null ? page.getParentPage().getSlug() : null, name, page.getPageId());
-            page.setSlug(newSlug);
+            page.setSlug(generateSlugForPage(page.getParentPage() != null ? page.getParentPage().getSlug() : null, name, page.getPageId()));
         }
         if (title != null) page.setTitle(title);
         if (subTitle != null) page.setSubTitle(subTitle);
@@ -198,104 +166,241 @@ public class PageService {
         if (isVisible != null) page.setIsVisible(isVisible);
         page.setAuthor(author);
 
-        return pageRepository.save(page);
+        return saveDraft(page);
     }
 
+    /**
+     * Updates the DRAFT of the page in place (version incremented, no new row).
+     */
     @Transactional
     public Page createPageVersion(UUID pageId, String name, String title, String subTitle, String slug, String description, Boolean isVisible, User author) {
-        Page currentPage = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+        Page page = getDraftOrThrow(pageId);
 
-        String newName = name != null ? name : currentPage.getName();
+        String newName = name != null ? name : page.getName();
         String newSlug;
         String normalizedName = newName.trim().toLowerCase();
         if (normalizedName.equals("accueil") || normalizedName.equals("home")) {
             newSlug = "/";
-        } else if (!newName.equals(currentPage.getName())) {
-            // Name changé, slug à régénérer systématiquement
-            String parentSlug = currentPage.getParentPage() != null ? currentPage.getParentPage().getSlug() : null;
+        } else if (!newName.equals(page.getName())) {
+            String parentSlug = page.getParentPage() != null ? page.getParentPage().getSlug() : null;
             newSlug = generateSlugForPage(parentSlug, newName, pageId);
         } else if (slug != null && !slug.isEmpty()) {
             newSlug = ensureUniqueSlug(slug, pageId);
         } else {
-            newSlug = currentPage.getSlug();
+            newSlug = page.getSlug();
         }
 
-        // Create new page version
-        Page newPage = Page.builder()
-                .pageId(pageId)
-                .version(currentPage.getVersion() + 1)
-                .name(newName)
-                .title(title != null ? title : currentPage.getTitle())
-                .subTitle(subTitle != null ? subTitle : currentPage.getSubTitle())
-                .slug(newSlug)
-                .description(description != null ? description : currentPage.getDescription())
-                .status(PublishingStatus.DRAFT)
-                .sortOrder(currentPage.getSortOrder())
-                .parentPage(currentPage.getParentPage())
-                .heroMedia(currentPage.getHeroMedia())
-                .author(author)
-                .isVisible(isVisible != null ? isVisible : currentPage.getIsVisible())
-                .build();
+        page.setName(newName);
+        page.setSlug(newSlug);
+        if (title != null) page.setTitle(title);
+        if (subTitle != null) page.setSubTitle(subTitle);
+        if (description != null) page.setDescription(description);
+        if (isVisible != null) page.setIsVisible(isVisible);
+        page.setAuthor(author);
 
-        // Attach existing sections to new page version (without duplication)
-        List<Section> sectionsToAttach = currentPage.getSections() != null ? new ArrayList<>(currentPage.getSections()) : new ArrayList<>();
-        for (Section section : sectionsToAttach) {
-            section.setPage(newPage);
-        }
-        newPage.setSections(sectionsToAttach);
+        return saveDraft(page);
+    }
 
-        Page savedPage = pageRepository.save(newPage);
-        if (!sectionsToAttach.isEmpty()) {
-            sectionService.saveAll(sectionsToAttach);
+    @Transactional
+    public void updatePageTree(List<PageDto> tree, Page parent) {
+        int sortOrder = 0;
+
+        for (PageDto dto : tree) {
+            Page page = pageRepository.findById(dto.id())
+                    .filter(p -> p.getStatus() == PublishingStatus.DRAFT)
+                    .orElseThrow(() -> new RuntimeException("Draft page not found: " + dto.id()));
+
+            page.setParentPage(parent);
+            page.setSortOrder(sortOrder++);
+            if (dto.isVisible() != null) {
+                page.setIsVisible(dto.isVisible());
+            }
+            saveDraft(page);
+
+            if (dto.children() != null && !dto.children().isEmpty()) {
+                updatePageTree(dto.children(), page);
+            }
+        }
+    }
+
+    @Transactional
+    public Page updatePageVisibility(UUID pageId, Boolean isVisible, User author) {
+        Page page = getLastVersion(pageId)
+                .or(() -> pageRepository.findById(pageId).filter(p -> p.getStatus() == PublishingStatus.DRAFT))
+                .orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
+
+        page.setIsVisible(isVisible);
+        page.setAuthor(author);
+        return saveDraft(page);
+    }
+
+    @Transactional
+    public Page setHeroMediaLastVersion(UUID pageId, UUID heroMediaId) {
+        Page page = getDraftOrThrow(pageId);
+
+        Media media = mediaRepository.findById(heroMediaId)
+                .orElseThrow(() -> new RuntimeException("Media not found"));
+
+        media.setOwnerId(pageId);
+        mediaRepository.save(media);
+
+        page.setHeroMedia(media);
+        return saveDraft(page);
+    }
+
+    @Transactional
+    public Page removeHeroMediaLastVersion(UUID pageId) {
+        Page page = getDraftOrThrow(pageId);
+
+        Media media = page.getHeroMedia();
+        if (media != null) {
+            media.setOwnerId(null);
+            mediaRepository.save(media);
         }
 
-        // Dynamically reattach all children to the new version
-        List<Page> children = pageRepository.findByParentPage(currentPage);
-        for (Page child : children) {
-            child.setParentPage(savedPage);
-        }
-        if (!children.isEmpty()) {
-            pageRepository.saveAll(children);
-        }
-        savedPage.setChildren(children);
+        page.setHeroMedia(null);
+        return saveDraft(page);
+    }
 
-        log.debug("Page version created, sections and children re-attached: version {} for pageId: {}", savedPage.getVersion(), savedPage.getPageId());
-        return savedPage;
+    // ==== PUBLISH / DELETE ====
+
+    /**
+     * Publishes the draft of the page (and, recursively, of its child pages): the PUBLISHED row
+     * is created or updated with the draft's content and version. The draft is left untouched.
+     */
+    @Transactional
+    public Page publishPage(UUID pageId, User author) {
+        Page draft = getDraftOrThrow(pageId);
+        return publishPageRecursive(draft, author);
+    }
+
+    /**
+     * Publishes every root page and, recursively, all their descendants.
+     */
+    @Transactional
+    public void publishTree(User author) {
+        pageRepository.findByStatus(PublishingStatus.DRAFT).stream()
+                .filter(p -> p.getParentPage() == null)
+                .forEach(p -> publishPageRecursive(p, author));
+    }
+
+    private Page publishPageRecursive(Page draft, User author) {
+        Page parentPublished = null;
+        if (draft.getParentPage() != null) {
+            parentPublished = getPublishedPage(draft.getParentPage().getPageId())
+                    .orElseThrow(() -> new IllegalStateException(
+                            "The parent page must be published before page " + draft.getPageId()));
+        }
+
+        Page published = getPublishedPage(draft.getPageId()).orElseGet(() -> Page.builder()
+                .pageId(draft.getPageId())
+                .status(PublishingStatus.PUBLISHED)
+                .build());
+        published.setVersion(draft.getVersion());
+        published.setName(draft.getName());
+        published.setTitle(draft.getTitle());
+        published.setSubTitle(draft.getSubTitle());
+        published.setSlug(draft.getSlug());
+        published.setDescription(draft.getDescription());
+        published.setSortOrder(draft.getSortOrder());
+        published.setIsVisible(draft.getIsVisible());
+        published.setHeroMedia(draft.getHeroMedia());
+        published.setParentPage(parentPublished);
+        published.setAuthor(author != null ? author : draft.getAuthor());
+        published = pageRepository.save(published);
+
+        for (Page child : pageRepository.findByParentPageAndStatus(draft, PublishingStatus.DRAFT)) {
+            publishPageRecursive(child, author);
+        }
+        return published;
+    }
+
+    /**
+     * Logical deletion: DRAFT becomes DELETED, PUBLISHED becomes ARCHIVED, for the page,
+     * its child pages, and their sections and modules.
+     */
+    @Transactional
+    public void delete(UUID pageId) {
+        getDraftOrThrow(pageId);
+        deleteRecursive(pageId);
+    }
+
+    private void deleteRecursive(UUID pageId) {
+        for (Page row : pageRepository.findByPageId(pageId)) {
+            if (row.getStatus() != PublishingStatus.DRAFT && row.getStatus() != PublishingStatus.PUBLISHED) {
+                continue;
+            }
+            List<UUID> childIds = pageRepository.findByParentPageAndStatus(row, row.getStatus()).stream()
+                    .map(Page::getPageId)
+                    .toList();
+            sectionService.softDeleteSectionsOfPage(row);
+            row.setStatus(row.getStatus() == PublishingStatus.DRAFT ? PublishingStatus.DELETED : PublishingStatus.ARCHIVED);
+            row.setIsVisible(false);
+            pageRepository.save(row);
+            childIds.forEach(this::deleteRecursive);
+        }
+    }
+
+    // ==== PUBLIC ====
+
+    public Optional<Page> findBySlugAndVisible(String slug, boolean visible) {
+        return pageRepository.findBySlugAndStatus(slug, PublishingStatus.PUBLISHED).stream()
+                .filter(page -> page.getIsVisible() == visible)
+                .findFirst();
+    }
+
+    /**
+     * Finds any published page by its slug, regardless of visibility.
+     * Non-visible pages can be accessed directly via their URL but won't appear in navigation.
+     */
+    public Optional<Page> findPublishedBySlug(String slug) {
+        return pageRepository.findBySlugAndStatus(slug, PublishingStatus.PUBLISHED).stream().findFirst();
+    }
+
+    /**
+     * Finds a published page by its logical pageId (or technical id), filtered on visibility.
+     */
+    public Optional<Page> findByIdAndVisible(UUID id, boolean visible) {
+        return getPublishedPage(id)
+                .or(() -> pageRepository.findById(id).filter(p -> p.getStatus() == PublishingStatus.PUBLISHED))
+                .filter(page -> page.getIsVisible() == visible);
+    }
+
+    public List<Page> searchInVisiblePages(String query) {
+        String q = query.toLowerCase();
+        return pageRepository.findByStatus(PublishingStatus.PUBLISHED).stream()
+                .filter(page -> Boolean.TRUE.equals(page.getIsVisible()))
+                .filter(page ->
+                        (page.getTitle() != null && page.getTitle().toLowerCase().contains(q)) ||
+                                (page.getName() != null && page.getName().toLowerCase().contains(q)) ||
+                                (page.getSubTitle() != null && page.getSubTitle().toLowerCase().contains(q)) ||
+                                (page.getDescription() != null && page.getDescription().toLowerCase().contains(q)))
+                .sorted(Comparator.comparing(Page::getTitle))
+                .toList();
+    }
+
+    /**
+     * Full URL of a page (the slug already contains the parents' path).
+     */
+    public String buildFullPageUrl(UUID pageId) {
+        return getLastVersion(pageId).map(Page::getSlug).orElse(null);
+    }
+
+    // ==== HELPERS ====
+
+    private Page getDraftOrThrow(UUID pageId) {
+        return getLastVersion(pageId)
+                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
+    }
+
+    private Page saveDraft(Page page) {
+        page.setStatus(PublishingStatus.DRAFT);
+        page.setVersion(page.getVersion() + 1);
+        return pageRepository.save(page);
     }
 
     private String generateSlug(String parentSlug, String name) {
-        String baseSlug = name.toLowerCase()
-                .replaceAll("[^a-z0-9\\s-]", "")
-                .replaceAll("\\s+", "-")
-                .trim();
-
-        String fullSlug;
-        if (parentSlug != null && !parentSlug.equals("/")) {
-            fullSlug = parentSlug + "/" + baseSlug;
-        } else {
-            fullSlug = "/" + baseSlug;
-        }
-
-        // Check uniqueness and add suffix if necessary
-        return ensureUniqueSlug(fullSlug);
-    }
-
-    private String ensureUniqueSlug(String baseSlug) {
-        return ensureUniqueSlug(baseSlug, null);
-    }
-
-    private String ensureUniqueSlug(String baseSlug, UUID excludePageId) {
-        String slug = baseSlug;
-        int counter = 1;
-
-        // While a slug already exists (excluding other versions of the same page), add a numeric suffix
-        while (slugExistsForDifferentPage(slug, excludePageId)) {
-            slug = baseSlug + "-" + counter;
-            counter++;
-        }
-
-        return slug;
+        return generateSlugForPage(parentSlug, name, null);
     }
 
     private String generateSlugForPage(String parentSlug, String name, UUID pageId) {
@@ -304,246 +409,25 @@ public class PageService {
                 .replaceAll("\\s+", "-")
                 .trim();
 
-        String fullSlug;
-        if (parentSlug != null && !parentSlug.equals("/")) {
-            fullSlug = parentSlug + "/" + baseSlug;
-        } else {
-            fullSlug = "/" + baseSlug;
-        }
+        String fullSlug = (parentSlug != null && !parentSlug.equals("/"))
+                ? parentSlug + "/" + baseSlug
+                : "/" + baseSlug;
 
-        // Check uniqueness excluding other versions of this same page
         return ensureUniqueSlug(fullSlug, pageId);
     }
 
+    private String ensureUniqueSlug(String baseSlug, UUID excludePageId) {
+        String slug = baseSlug;
+        int counter = 1;
+        while (slugExistsForDifferentPage(slug, excludePageId)) {
+            slug = baseSlug + "-" + counter;
+            counter++;
+        }
+        return slug;
+    }
+
     private boolean slugExistsForDifferentPage(String slug, UUID excludePageId) {
-        Optional<Page> existingPage = pageRepository.findBySlug(slug);
-        if (existingPage.isEmpty()) {
-            return false;
-        }
-
-        // If excludePageId is provided, check that the slug doesn't belong to another version of the same page
-        if (excludePageId != null) {
-            return !existingPage.get().getPageId().equals(excludePageId);
-        }
-
-        return true;
-    }
-
-    public Page setHeroMediaLastVersion(UUID pageId, UUID heroMediaId) {
-        Page lastVersion = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found"));
-
-        Media media = mediaRepository.findById(heroMediaId)
-                .orElseThrow(() -> new RuntimeException("Media not found"));
-
-        // Update media ownerId
-        media.setOwnerId(pageId);
-        mediaRepository.save(media);
-
-        lastVersion.setHeroMedia(media);
-        return pageRepository.save(lastVersion);
-    }
-
-    public Page removeHeroMediaLastVersion(UUID pageId) {
-        Page lastVersion = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found"));
-
-        Media media = lastVersion.getHeroMedia();
-        if (media != null) {
-            media.setOwnerId(null);
-            mediaRepository.save(media);
-        }
-
-        lastVersion.setHeroMedia(null);
-        return pageRepository.save(lastVersion);
-    }
-
-    @Transactional
-    public void delete(UUID pageId) {
-        // Find page by pageId (logical identifier) not by id (technical identifier)
-        Page page = pageRepository.findTopByPageIdOrderByVersionDesc(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found with pageId: " + pageId));
-
-        // Delete using entity technical id
-        pageRepository.softDeleteById(page.getId());
-    }
-
-    public Page updatePageVisibility(UUID pageId, Boolean isVisible, User author) {
-        // First try to find by pageId (version identifier)
-        Optional<Page> pageOpt = pageRepository.findTopByPageIdOrderByVersionDesc(pageId);
-
-        // If not found, try to find by direct id
-        if (pageOpt.isEmpty()) {
-            pageOpt = pageRepository.findById(pageId);
-        }
-
-        Page page = pageOpt.orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
-
-        page.setIsVisible(isVisible);
-        page.setAuthor(author);
-
-        return pageRepository.save(page);
-    }
-
-    // ==== METHODS FOR PUBLIC ENDPOINTS ====
-
-    /**
-     * Nouvelle méthode : récupère la hiérarchie des pages visibles et publiées (dernière version)
-     */
-    public List<Page> findVisiblePagesHierarchy() {
-        // Récupérer toutes les pages visibles et publiées, dernière version uniquement
-        Map<UUID, Page> latestPages = pageRepository.findAll().stream()
-                .filter(p -> p.getStatus() == PublishingStatus.PUBLISHED && p.getIsVisible())
-                .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))));
-
-        // Nettoyer les enfants existants (clear au lieu de setChildren pour éviter l'erreur orphan deletion)
-        latestPages.values().forEach(page -> {
-            if (page.getChildren() != null) {
-                page.getChildren().clear();
-            } else {
-                page.setChildren(new ArrayList<>());
-            }
-        });
-
-        // Construire la hiérarchie
-        List<Page> roots = new ArrayList<>();
-        for (Page page : latestPages.values()) {
-            Page parent = page.getParentPage();
-            if (parent == null || parent.getPageId() == null || !latestPages.containsKey(parent.getPageId())) {
-                roots.add(page);
-            } else {
-                latestPages.get(parent.getPageId()).getChildren().add(page);
-            }
-        }
-
-        // Trier les racines
-        roots.sort(Comparator.comparing(p -> p.getSortOrder() != null ? p.getSortOrder() : 0));
-        return roots;
-    }
-
-    /**
-     * Finds a published and visible page by its slug (without sections)
-     */
-    public Optional<Page> findBySlugAndVisible(String slug, boolean visible) {
-        log.info("Finding published and visible page by slug: {}", slug);
-
-        // Get all pages with this slug
-        List<Page> pagesWithSlug = pageRepository.findAll().stream()
-                .filter(page -> slug.equals(page.getSlug()))
-                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED)
-                .filter(page -> page.getIsVisible() == visible)
-                .toList();
-
-        // If multiple versions exist, get the most recent one
-        Optional<Page> latestPage = pagesWithSlug.stream()
-                .max(Comparator.comparingInt(Page::getVersion));
-
-        if (latestPage.isPresent()) {
-            Page page = latestPage.get();
-            log.debug("Found published page: {} (version {}) for slug: {}",
-                    page.getTitle(), page.getVersion(), slug);
-            return latestPage;
-        }
-
-        log.warn("No published and visible page found for slug: {}", slug);
-        return Optional.empty();
-    }
-
-    /**
-     * Finds any published page by its slug, regardless of visibility.
-     * Non-visible pages can be accessed directly via their URL but won't appear in navigation.
-     */
-    public Optional<Page> findPublishedBySlug(String slug) {
-        log.info("Finding published page by slug (any visibility): {}", slug);
-
-        Optional<Page> latestPage = pageRepository.findAll().stream()
-                .filter(page -> slug.equals(page.getSlug()))
-                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED)
-                .max(Comparator.comparingInt(Page::getVersion));
-
-        if (latestPage.isPresent()) {
-            Page page = latestPage.get();
-            log.debug("Found published page: {} (version {}, visible={}) for slug: {}",
-                    page.getTitle(), page.getVersion(), page.getIsVisible(), slug);
-        } else {
-            log.warn("No published page found for slug: {}", slug);
-        }
-
-        return latestPage;
-    }
-
-    /**
-     * Finds a published and visible page by its ID
-     */
-    public Optional<Page> findByIdAndVisible(UUID id, boolean visible) {
-        return getPublishedPage(id)
-                .filter(page -> page.getIsVisible() == visible);
-    }
-
-    /**
-     * Search in visible pages by title, name, subtitle or description
-     */
-    public List<Page> searchInVisiblePages(String query) {
-        return pageRepository.findAll().stream()
-                .filter(page -> page.getStatus() == PublishingStatus.PUBLISHED && page.getIsVisible())
-                .collect(Collectors.toMap(Page::getPageId, Function.identity(), BinaryOperator.maxBy(Comparator.comparingInt(Page::getVersion))))
-                .values().stream()
-                .filter(page ->
-                        (page.getTitle() != null && page.getTitle().toLowerCase().contains(query.toLowerCase())) ||
-                                (page.getName() != null && page.getName().toLowerCase().contains(query.toLowerCase())) ||
-                                (page.getSubTitle() != null && page.getSubTitle().toLowerCase().contains(query.toLowerCase())) ||
-                                (page.getDescription() != null && page.getDescription().toLowerCase().contains(query.toLowerCase()))
-                )
-                .sorted(Comparator.comparing(Page::getTitle))
-                .toList();
-    }
-
-    /**
-     * Convertit une entité Page en PageDto, récursivement pour les enfants, sans inclure le parent
-     */
-    public PageDto toPageDto(Page page) {
-        List<PageDto> childrenDto = page.getChildren() != null ?
-                page.getChildren().stream().map(this::toPageDto).toList() : List.of();
-        return new PageDto(
-                page.getId(),
-                page.getPageId(),
-                page.getName(),
-                page.getTitle(),
-                page.getSubTitle(),
-                page.getSlug(),
-                page.getDescription(),
-                page.getStatus(),
-                page.getSortOrder(),
-                page.getIsVisible(),
-                childrenDto
-        );
-    }
-
-    /**
-     * Expose la hiérarchie des pages visibles et publiées sous forme de PageDto
-     */
-    public List<PageDto> findVisiblePagesHierarchyDto() {
-        List<Page> roots = findVisiblePagesHierarchy();
-        return roots.stream().map(this::toPageDto).toList();
-    }
-
-    /**
-     * Construit l'URL complète d'une page en remontant la hiérarchie des parents
-     *
-     * @param pageId L'ID de la page
-     * @return L'URL complète (ex: "/paroisse/newsletters")
-     */
-    public String buildFullPageUrl(UUID pageId) {
-        log.debug("Construction de l'URL complète pour la page avec pageId: {}", pageId);
-
-        Optional<Page> pageOpt = getLastVersion(pageId);
-        if (pageOpt.isEmpty()) {
-            log.warn("Page introuvable avec pageId: {}", pageId);
-            return null;
-        }
-
-        Page page = pageOpt.get();
-        return page.getSlug();
+        return pageRepository.findBySlugAndStatus(slug, PublishingStatus.DRAFT).stream()
+                .anyMatch(p -> excludePageId == null || !p.getPageId().equals(excludePageId));
     }
 }
-

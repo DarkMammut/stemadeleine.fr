@@ -3,6 +3,7 @@ package com.stemadeleine.api.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
@@ -10,7 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sections")
+@Table(
+        name = "sections",
+        indexes = {
+                @Index(name = "idx_sections_section_id_version", columnList = "section_id, version DESC"),
+                @Index(name = "idx_sections_section_id_status", columnList = "section_id, status"),
+                @Index(name = "idx_sections_page_id_status", columnList = "page_id, status")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +30,7 @@ public class Section {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "section_id", nullable = false)
+    @Column(name = "section_id", nullable = false, updatable = false)
     private UUID sectionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -73,6 +81,9 @@ public class Section {
     private List<Content> contents;
 
     // One-to-many relationship with modules
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // A DRAFT section only has DRAFT modules and a PUBLISHED section only has PUBLISHED modules.
+    // DELETED / ARCHIVED rows are excluded from the collection.
+    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
+    @SQLRestriction("status in ('DRAFT', 'PUBLISHED')")
     private List<Module> modules;
 }

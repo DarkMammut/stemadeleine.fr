@@ -3,13 +3,16 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.UpdateArticlePutRequest;
 import com.stemadeleine.api.dto.UpdateArticleRequest;
-import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.model.Article;
+import com.stemadeleine.api.model.ArticleVariants;
+import com.stemadeleine.api.model.PublishingStatus;
+import com.stemadeleine.api.model.Section;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.ArticleRepository;
-import com.stemadeleine.api.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,129 +26,87 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final ModuleService moduleService;
-    private final SectionRepository sectionRepository;
 
+    /**
+     * Working (DRAFT) articles.
+     */
     public List<Article> getAllArticles() {
-        log.info("Récupération de tous les articles non supprimés");
-        List<Article> articles = articleRepository.findByStatusNot(PublishingStatus.DELETED);
-        log.debug("Nombre d'articles trouvés : {}", articles.size());
-        return articles;
+        return articleRepository.findByStatus(PublishingStatus.DRAFT);
     }
 
     public Optional<Article> getArticleById(UUID id) {
-        log.info("Recherche de l'article avec l'ID : {}", id);
-        Optional<Article> article = articleRepository.findById(id)
-                .filter(a -> a.getStatus() != PublishingStatus.DELETED);
-        log.debug("Article trouvé : {}", article.isPresent());
-        return article;
-    }
-
-    public Optional<Article> getLastVersionByModuleId(UUID moduleId) {
-        log.info("Recherche de la dernière version de l'article avec le moduleId : {}", moduleId);
-        Optional<Article> article = articleRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
-                .filter(a -> a.getStatus() != PublishingStatus.DELETED);
-        log.debug("Article trouvé : {}", article.isPresent());
-        return article;
-    }
-
-    public Article updateArticle(UUID id, UpdateArticlePutRequest request) {
-        log.info("Mise à jour de l'article avec l'ID : {}", id);
         return articleRepository.findById(id)
-                .map(article -> {
-                    if (request.getTitle() != null) {
-                        article.setTitle(request.getTitle());
-                    }
-                    if (request.getName() != null) {
-                        article.setName(request.getName());
-                    }
-                    if (request.getSortOrder() != null) {
-                        article.setSortOrder(request.getSortOrder());
-                    }
-                    if (request.getVariant() != null) {
-                        article.setVariant(request.getVariant());
-                    }
-                    if (request.getWriter() != null) {
-                        article.setWriter(request.getWriter());
-                    }
-                    if (request.getWritingDate() != null) {
-                        article.setWritingDate(request.getWritingDate());
-                    }
-                    log.debug("Article mis à jour : {}", article);
-                    return articleRepository.save(article);
-                })
-                .orElseThrow(() -> {
-                    log.error("Article non trouvé avec l'ID : {}", id);
-                    return new RuntimeException("Article not found");
-                });
+                .filter(a -> a.getStatus() == PublishingStatus.DRAFT || a.getStatus() == PublishingStatus.PUBLISHED);
     }
 
+    /**
+     * DRAFT of an article (backoffice).
+     */
+    public Optional<Article> getLastVersionByModuleId(UUID moduleId) {
+        return articleRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.DRAFT);
+    }
+
+    /**
+     * PUBLISHED version of an article (public site).
+     */
+    public Optional<Article> getPublishedByModuleId(UUID moduleId) {
+        return articleRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.PUBLISHED);
+    }
+
+    @Transactional
+    public Article updateArticle(UUID id, UpdateArticlePutRequest request) {
+        Article article = moduleService.findDraftByRowId(articleRepository, id)
+                .orElseThrow(() -> new RuntimeException("Draft article not found"));
+
+        if (request.getTitle() != null) article.setTitle(request.getTitle());
+        if (request.getName() != null) article.setName(request.getName());
+        if (request.getSortOrder() != null) article.setSortOrder(request.getSortOrder());
+        if (request.getVariant() != null) article.setVariant(request.getVariant());
+        if (request.getWriter() != null) article.setWriter(request.getWriter());
+        if (request.getWritingDate() != null) article.setWritingDate(request.getWritingDate());
+
+        return moduleService.saveDraft(article);
+    }
+
+    /**
+     * Updates the DRAFT of the article in place (no new row).
+     */
+    @Transactional
     public Article createArticleVersion(UpdateArticleRequest request, User author) {
-        log.info("Création d'une nouvelle version d'article pour le moduleId : {}", request.moduleId());
+        Article article = articleRepository.findByModuleIdAndStatus(request.moduleId(), PublishingStatus.DRAFT)
+                .orElseThrow(() -> new RuntimeException("Draft article not found for moduleId: " + request.moduleId()));
 
-        // 1. Récupérer le module
-        Module module = moduleService.getModuleByModuleId(request.moduleId())
-                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+        if (request.name() != null) article.setName(request.name());
+        if (request.title() != null) article.setTitle(request.title());
+        if (request.variant() != null) article.setVariant(request.variant());
+        if (request.writer() != null) article.setWriter(request.writer());
+        if (request.writingDate() != null) article.setWritingDate(request.writingDate());
+        article.setAuthor(author);
 
-        // 2. Récupérer la dernière version de l'article pour ce module
-        Article previousArticle = articleRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
-                .orElse(null);
-
-        // 3. Fusionner les infos du request et de la version précédente
-        String name = request.name() != null ? request.name() : (previousArticle != null ? previousArticle.getName() : module.getName());
-        String title = request.title() != null ? request.title() : (previousArticle != null ? previousArticle.getTitle() : module.getTitle());
-        ArticleVariants variant = request.variant() != null ? request.variant() : (previousArticle != null ? previousArticle.getVariant() : ArticleVariants.STAGGERED);
-        List<Content> contents = previousArticle != null ? new ArrayList<>(previousArticle.getContents()) : new ArrayList<>();
-        String type = module.getType();
-        Integer sortOrder = module.getSortOrder();
-        Boolean isVisible = module.getIsVisible();
-        PublishingStatus status = PublishingStatus.DRAFT;
-        int newVersion = previousArticle != null ? previousArticle.getVersion() + 1 : 1;
-        String writer = request.writer() != null ? request.writer() : (previousArticle != null ? previousArticle.getWriter() : null);
-        java.time.LocalDate writingDate = request.writingDate() != null ? request.writingDate() : (previousArticle != null ? previousArticle.getWritingDate() : null);
-
-        Article article = Article.builder()
-                .variant(variant)
-                .contents(contents)
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(name)
-                .title(title)
-                .type(type)
-                .sortOrder(sortOrder)
-                .isVisible(isVisible)
-                .status(status)
-                .author(author)
-                .version(newVersion)
-                .writer(writer)
-                .writingDate(writingDate)
-                .build();
-
-        Article savedArticle = articleRepository.save(article);
-        log.info("Nouvelle version d'article créée avec succès, ID : {}", savedArticle.getId());
-        return savedArticle;
+        return moduleService.saveDraft(article);
     }
 
+    /**
+     * Deletes the article: DRAFT -> DELETED, PUBLISHED -> ARCHIVED.
+     */
+    @Transactional
     public void softDeleteArticle(UUID id) {
-        log.info("Suppression logique de l'article avec l'ID : {}", id);
-        articleRepository.findById(id).ifPresent(article -> {
-            article.setStatus(PublishingStatus.DELETED);
-            articleRepository.save(article);
-            log.debug("Article marqué comme supprimé : {}", id);
-        });
+        moduleService.softDeleteModuleByRowId(id);
     }
 
+    @Transactional
+    public Article publishArticle(UUID moduleId, User author) {
+        return (Article) moduleService.publishModule(moduleId, author);
+    }
+
+    @Transactional
     public Article createArticleWithModule(CreateModuleRequest request, User author) {
-        log.info("Création d'un nouvel article pour la section : {}", request.sectionId());
+        Section section = moduleService.getDraftSection(request.sectionId());
 
-        // Récupérer la section à partir de l'UUID
-        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
-                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
-
-        // Créer l'article et le lier au module
         Article article = Article.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(ArticleVariants.STAGGERED)
-                .contents(new java.util.ArrayList<>())
+                .contents(new ArrayList<>())
                 .section(section)
                 .name(request.name())
                 .title(request.name())
@@ -155,12 +116,8 @@ public class ArticleService {
                 .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
-                .writer(null)
-                .writingDate(null)
                 .build();
 
-        Article savedArticle = articleRepository.save(article);
-        log.info("Article créé avec succès, ID : {}", savedArticle.getId());
-        return savedArticle;
+        return articleRepository.save(article);
     }
 }

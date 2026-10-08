@@ -65,7 +65,7 @@ public class ModulePublicController {
     @GetMapping("article/by-module-id/{moduleId}")
     public ResponseEntity<ArticleDto> getArticleByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/public/modules/article/by-module-id/{} - Retrieving latest article version by moduleId", moduleId);
-        return articleService.getLastVersionByModuleId(moduleId)
+        return articleService.getPublishedByModuleId(moduleId)
                 .map(article -> {
                     log.debug("Article found: {} (version {})", article.getId(), article.getVersion());
                     return ResponseEntity.ok(articleMapper.toDto(article));
@@ -79,7 +79,7 @@ public class ModulePublicController {
     @GetMapping("cta/by-module-id/{moduleId}")
     public ResponseEntity<CTADto> getCTAByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/public/modules/cta/by-module-id/{} - Retrieving latest CTA version by moduleId", moduleId);
-        return ctaService.getCTAByModuleId(moduleId)
+        return ctaService.getPublishedByModuleId(moduleId)
                 .map(cta -> {
                     log.debug("CTA found: {} (version {})", cta.getId(), cta.getVersion());
                     return ResponseEntity.ok(ctaMapper.toDto(cta));
@@ -93,7 +93,7 @@ public class ModulePublicController {
     @GetMapping("gallery/by-module-id/{moduleId}")
     public ResponseEntity<GalleryDto> getGalleryByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/galleries/by-module-id/{} - Retrieving latest gallery version by moduleId", moduleId);
-        return galleryService.getLastVersionByModuleId(moduleId)
+        return galleryService.getPublishedByModuleId(moduleId)
                 .map(gallery -> {
                     log.debug("Gallery found: {} (version {})", gallery.getId(), gallery.getVersion());
                     return ResponseEntity.ok(galleryMapper.toDto(gallery));
@@ -107,7 +107,7 @@ public class ModulePublicController {
     @GetMapping("list/by-module-id/{moduleId}")
     public ResponseEntity<ListDto> getListByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/public/modules/list/by-module-id/{} - Retrieving latest list version by moduleId", moduleId);
-        return listService.getLastVersionByModuleId(moduleId)
+        return listService.getPublishedByModuleId(moduleId)
                 .map(list -> {
                     ListDto dto = listMapper.toDto(list);
                     // Ne renvoyer que les contenus visibles, triés par sortOrder, pour l'affichage public
@@ -142,7 +142,7 @@ public class ModulePublicController {
     @GetMapping("newsletter/by-module-id/{moduleId}")
     public ResponseEntity<NewsletterDto> getNewsletterByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/newsletters/by-module-id/{} - Retrieving latest newsletter version by moduleId", moduleId);
-        return newsletterService.getLastVersionByModuleId(moduleId)
+        return newsletterService.getPublishedByModuleId(moduleId)
                 .map(newsletter -> {
                     log.debug("Newsletter found: {} (version {})", newsletter.getId(), newsletter.getVersion());
                     return ResponseEntity.ok(newsletterMapper.toDto(newsletter));
@@ -199,7 +199,7 @@ public class ModulePublicController {
     @GetMapping("news/by-module-id/{moduleId}")
     public ResponseEntity<NewsDto> getNewsByModuleId(@PathVariable UUID moduleId) {
         log.info("GET /api/public/modules/news/by-module-id/{} - Retrieving latest news version by moduleId", moduleId);
-        return newsService.getLastVersionByModuleId(moduleId)
+        return newsService.getPublishedByModuleId(moduleId)
                 .map(news -> {
                     log.debug("News found: {} (version {})", news.getId(), news.getVersion());
                     return ResponseEntity.ok(newsMapper.toDto(news));

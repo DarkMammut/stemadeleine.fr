@@ -13,26 +13,35 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class ModuleMapper {
-    private final GalleryService galleryService;
+
     private final MediaMapper mediaMapper;
-private final ListContentMapper listContentMapper;
+    private final ListContentMapper listContentMapper;
 
     public ModuleDto toDto(Module module) {
+
         java.util.List<MediaDto> medias = Collections.emptyList();
-        if ("GALLERY".equalsIgnoreCase(module.getType()) && module.getModuleId() != null) {
-            Gallery gallery = galleryService.getLastVersionByModuleId(module.getModuleId()).orElse(null);
-            if (gallery != null && gallery.getMedias() != null) {
-                medias = gallery.getMedias().stream().map(mediaMapper::toDto).toList();
-            }
+
+        if (module instanceof Gallery gallery
+                && gallery.getMedias() != null) {
+
+            medias = gallery.getMedias()
+                    .stream()
+                    .map(mediaMapper::toDto)
+                    .toList();
         }
+
         return new ModuleDto(
                 module.getId(),
                 module.getName(),
                 module.getTitle(),
                 module.getType(),
                 module.getSortOrder(),
-                module.getSection() != null ? module.getSection().getId() : null,
-                module.getStatus() != null ? module.getStatus().name() : null,
+                module.getSection() != null
+                        ? module.getSection().getId()
+                        : null,
+                module.getStatus() != null
+                        ? module.getStatus().name()
+                        : null,
                 module.getIsVisible(),
                 module.getVersion(),
                 module.getModuleId(),

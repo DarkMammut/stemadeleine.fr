@@ -1,5 +1,6 @@
 package com.stemadeleine.api.repository;
 
+import com.stemadeleine.api.model.PublishingStatus;
 import com.stemadeleine.api.model.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,39 +12,51 @@ import java.util.UUID;
 
 public interface SectionRepository extends JpaRepository<Section, UUID> {
 
-    List<Section> findByIsVisibleTrue();
-
-    @Query("SELECT MAX(s.sortOrder) FROM Section s WHERE s.page.id = :pageId")
-    Integer findMaxSortOrderByPage(@Param("pageId") UUID pageId);
-
     @Query("""
-            SELECT DISTINCT s
+            SELECT s
             FROM Section s
-            LEFT JOIN FETCH s.contents c
             LEFT JOIN FETCH s.media
             WHERE s.sectionId = :sectionId
-              AND s.version = (
-                SELECT MAX(s2.version)
-                FROM Section s2
-                WHERE s2.sectionId = :sectionId
-              )
+              AND s.status = :status
             """)
-    Optional<Section> findTopBySectionIdOrderByVersionDesc(@Param("sectionId") UUID sectionId);
+    Optional<Section> findBySectionIdAndStatus(
+            @Param("sectionId") UUID sectionId,
+            @Param("status") PublishingStatus status
+    );
+
+    List<Section> findBySectionId(UUID sectionId);
+
+    List<Section> findByStatus(PublishingStatus status);
+
+    /**
+     * Sections of a logical page (pageId) in a given status.
+     */
+    @Query("""
+            SELECT s
+            FROM Section s
+            LEFT JOIN FETCH s.media
+            WHERE s.page.pageId = :pageId
+              AND s.status = :status
+            ORDER BY s.sortOrder ASC
+            """)
+    List<Section> findByPageIdAndStatus(
+            @Param("pageId") UUID pageId,
+            @Param("status") PublishingStatus status
+    );
+
+    /**
+     * Sections attached to a given page row (technical id) in a given status.
+     */
+    List<Section> findByPageIdAndStatusOrderBySortOrderAsc(UUID pageRowId, PublishingStatus status);
 
     @Query("""
-                SELECT s
-                FROM Section s
-                LEFT JOIN FETCH s.media
-                WHERE s.page.id = :pageId
-                  AND s.version = (
-                    SELECT MAX(s2.version)
-                    FROM Section s2
-                    WHERE s2.sectionId = s.sectionId
-                  )
-                ORDER BY s.sortOrder ASC
+            SELECT MAX(s.sortOrder)
+            FROM Section s
+            WHERE s.page.id = :pageRowId
+              AND s.status = :status
             """)
-    List<Section> findLastVersionsByPageId(@Param("pageId") UUID pageId);
-
-    @Query("SELECT s FROM Section s WHERE s.page.id = :pageId ORDER BY s.sortOrder ASC")
-    List<Section> findByPageId(@Param("pageId") UUID pageId);
+    Integer findMaxSortOrderByPageRowIdAndStatus(
+            @Param("pageRowId") UUID pageRowId,
+            @Param("status") PublishingStatus status
+    );
 }

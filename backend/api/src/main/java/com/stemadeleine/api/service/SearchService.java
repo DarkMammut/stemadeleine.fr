@@ -94,7 +94,7 @@ public class SearchService {
 
         // articles: search by title/name
         try {
-            var articles = articleRepository.findByStatusNot(PublishingStatus.DELETED).stream()
+            var articles = articleRepository.findByStatus(PublishingStatus.DRAFT).stream()
                     .filter(a -> a != null && ((a.getTitle() != null && a.getTitle().toLowerCase().contains(qLower)) || (a.getName() != null && a.getName().toLowerCase().contains(qLower))))
                     .limit(limitPerType)
                     .map(a -> {
@@ -114,7 +114,7 @@ public class SearchService {
 
         // news (actualités)
         try {
-            var news = newsRepository.search(qLower, PageRequest.of(0, limitPerType)).stream().map(n -> {
+            var news = newsRepository.search(qLower, PublishingStatus.DRAFT, PageRequest.of(0, limitPerType)).stream().map(n -> {
                 Map<String, Object> m = new HashMap<>();
                 m.put("id", n.getId());
                 m.put("title", n.getTitle() != null ? n.getTitle() : n.getName());
@@ -131,7 +131,7 @@ public class SearchService {
 
         // sections: visible sections, filter by name/title
         try {
-            var sections = sectionRepository.findByIsVisibleTrue().stream()
+            var sections = sectionRepository.findByStatus(PublishingStatus.DRAFT).stream().filter(s -> Boolean.TRUE.equals(s.getIsVisible()))
                     .filter(s -> s != null && ((s.getName() != null && s.getName().toLowerCase().contains(qLower)) || (s.getTitle() != null && s.getTitle().toLowerCase().contains(qLower))))
                     .limit(limitPerType)
                     .map(s -> {
@@ -151,7 +151,7 @@ public class SearchService {
 
         // pages: search by title/name/slug using repo
         try {
-            var pages = pageRepository.search(qLower, PageRequest.of(0, limitPerType)).stream().map(p -> {
+            var pages = pageRepository.search(qLower, PublishingStatus.DRAFT, PageRequest.of(0, limitPerType)).stream().map(p -> {
                 Map<String, Object> m = new HashMap<>();
                 m.put("id", p.getId());
                 m.put("title", p.getTitle() != null ? p.getTitle() : p.getSlug());
@@ -168,7 +168,7 @@ public class SearchService {
 
         // modules: search by name using repo
         try {
-            var modules = moduleRepository.search(qLower, PageRequest.of(0, limitPerType)).stream().map(mo -> {
+            var modules = moduleRepository.search(qLower, PublishingStatus.DRAFT, PageRequest.of(0, limitPerType)).stream().map(mo -> {
                 Map<String, Object> m = new HashMap<>();
                 m.put("id", mo.getId());
                 m.put("title", mo.getName() != null ? mo.getName() : mo.getId().toString());
@@ -205,7 +205,7 @@ public class SearchService {
 
         // newsletters
         try {
-            var newsletters = newsletterRepository.findByStatusNot(PublishingStatus.DELETED).stream()
+            var newsletters = newsletterRepository.findByStatus(PublishingStatus.DRAFT).stream()
                     .filter(n -> n != null && ((n.getTitle() != null && n.getTitle().toLowerCase().contains(qLower))))
                     .limit(limitPerType)
                     .map(n -> {

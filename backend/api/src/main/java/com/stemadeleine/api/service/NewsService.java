@@ -3,14 +3,17 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.dto.CreateModuleRequest;
 import com.stemadeleine.api.dto.UpdateNewsPutRequest;
 import com.stemadeleine.api.dto.UpdateNewsRequest;
-import com.stemadeleine.api.model.Module;
-import com.stemadeleine.api.model.*;
+import com.stemadeleine.api.model.News;
+import com.stemadeleine.api.model.NewsVariants;
+import com.stemadeleine.api.model.Page;
+import com.stemadeleine.api.model.PublishingStatus;
+import com.stemadeleine.api.model.Section;
+import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.NewsRepository;
-import com.stemadeleine.api.repository.SectionRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,86 +27,61 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NewsService {
 
+    private static final String DETAIL_PAGE_URL = "/actualites";
+
     private final NewsRepository newsRepository;
     private final ModuleService moduleService;
-    private final SectionRepository sectionRepository;
     private final PageService pageService;
     private final SectionService sectionService;
 
     public List<News> getAllNews() {
-        log.info("Récupération de toutes les actualités non supprimées");
-        List<News> news = newsRepository.findByStatusNot(PublishingStatus.DELETED);
-        log.debug("Nombre d'actualités trouvées : {}", news.size());
-        return news;
+        return newsRepository.findByStatus(PublishingStatus.DRAFT);
     }
 
     public Optional<News> getNewsById(UUID id) {
-        log.info("Recherche de l'actualité avec l'ID : {}", id);
-        Optional<News> news = newsRepository.findById(id)
-                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
-        log.debug("Actualité trouvée : {}", news.isPresent());
-        return news;
+        return newsRepository.findById(id)
+                .filter(n -> n.getStatus() == PublishingStatus.DRAFT || n.getStatus() == PublishingStatus.PUBLISHED);
     }
 
+    /**
+     * DRAFT of a news module (backoffice).
+     */
     public Optional<News> getLastVersionByModuleId(UUID moduleId) {
-        log.info("Recherche de la dernière version de l'actualité avec le moduleId : {}", moduleId);
-        Optional<News> news = newsRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
-                .filter(n -> n.getStatus() != PublishingStatus.DELETED);
-        log.debug("Actualité trouvée : {}", news.isPresent());
-        return news;
+        return newsRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.DRAFT);
+    }
+
+    /**
+     * PUBLISHED version of a news module (public site).
+     */
+    public Optional<News> getPublishedByModuleId(UUID moduleId) {
+        return newsRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.PUBLISHED);
     }
 
     public boolean existsNewsWithVariantAll() {
-        log.info("Vérification de l'existence d'une actualité avec la variante ALL");
-        boolean exists = newsRepository.existsByVariantAndStatusNot(NewsVariants.ALL, PublishingStatus.DELETED);
-        log.debug("Actualité avec variante ALL existe : {}", exists);
-        return exists;
+        return newsRepository.existsByVariantAndStatus(NewsVariants.ALL, PublishingStatus.DRAFT);
     }
 
+    /**
+     * Creates and publishes the pages structure of the news: /actualites, its section,
+     * the dynamic detail page and the "all news" module.
+     */
     @Transactional
     public Map<String, UUID> createNewsPagesStructure(User author) {
         log.info("Création de la structure complète pour les pages Actualités avec URL fixe /actualites");
 
-        // 1. Créer la page "Actualités" à la racine (parentPageId = null)
         Page actualitesPage = pageService.createNewPage(null, "Actualités", author);
-
-        // Mettre à jour le slug et publier la page
         actualitesPage = pageService.updatePage(
-                actualitesPage.getPageId(),
-                "Actualités",
-                "Actualités",
-                null,
-                "/actualites",
-                null,
-                true,
-                author
-        );
-        log.debug("Page Actualités créée et publiée avec l'ID : {}", actualitesPage.getPageId());
+                actualitesPage.getPageId(), "Actualités", "Actualités", null, "/actualites", null, true, author);
 
-        // 2. Créer une section dans cette page
         Section section = sectionService.createNewSection(actualitesPage.getPageId(), "Section Actualités", author);
-        section = sectionService.updateSection(section.getSectionId(), "Section Actualités", "Section Actualités", true, author);
-        log.debug("Section créée et publiée avec l'ID : {}", section.getSectionId());
+        section = sectionService.updateSection(
+                section.getSectionId(), "Section Actualités", "Section Actualités", true, author);
 
-        // 3. Créer la page enfant dynamique [newsId]
+        // Dynamic detail page [newsId], not visible in the navigation
         Page detailPage = pageService.createNewPage(actualitesPage.getPageId(), "[newsId]", author);
         detailPage = pageService.updatePage(
-                detailPage.getPageId(),
-                "[newsId]",
-                "[newsId]",
-                null,
-                "/[newsId]",
-                null,
-                false, // Invisible dans la navigation (route dynamique)
-                author
-        );
-        log.debug("Page détail créée et publiée (invisible) avec l'ID : {}", detailPage.getPageId());
+                detailPage.getPageId(), "[newsId]", "[newsId]", null, "/[newsId]", null, false, author);
 
-        // 4. URL de détail toujours fixée à /actualites
-        String detailPageUrl = "/actualites";
-        log.debug("URL de base pour les détails : {}", detailPageUrl);
-
-        // 5. Créer le module News avec variante ALL
         News news = News.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.ALL)
@@ -114,87 +92,62 @@ public class NewsService {
                 .type("NEWS")
                 .sortOrder(0)
                 .isVisible(true)
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .author(author)
                 .version(1)
                 .description("Module pour afficher toutes les actualités")
-                .detailPageUrl(detailPageUrl)
+                .detailPageUrl(DETAIL_PAGE_URL)
                 .build();
-
         News savedNews = newsRepository.save(news);
-        log.debug("Module News créé et publié avec l'ID : {}, URL de détail : {}", savedNews.getModuleId(), detailPageUrl);
 
-        // 6. Mettre à jour tous les modules News existants (non supprimés) avec l'URL /actualites
-        log.info("Mise à jour de tous les modules News existants avec l'URL : {}", detailPageUrl);
-        List<News> existingNewsList = newsRepository.findByStatusNot(PublishingStatus.DELETED);
-        int updatedCount = 0;
+        // The module is published together with its section (the page must be published first)
+        pageService.publishPage(actualitesPage.getPageId(), author);
+        sectionService.publishSection(section.getSectionId(), author);
 
-        for (News existingNews : existingNewsList) {
-            if (!existingNews.getId().equals(savedNews.getId())) {
-                existingNews.setDetailPageUrl(detailPageUrl);
-                newsRepository.save(existingNews);
-                updatedCount++;
+        // All the other news modules (DRAFT and PUBLISHED rows) share the same detail page
+        for (PublishingStatus status : List.of(PublishingStatus.DRAFT, PublishingStatus.PUBLISHED)) {
+            for (News existingNews : newsRepository.findByStatus(status)) {
+                if (!existingNews.getModuleId().equals(savedNews.getModuleId())) {
+                    existingNews.setDetailPageUrl(DETAIL_PAGE_URL);
+                    newsRepository.save(existingNews);
+                }
             }
         }
-
-        log.info("Mise à jour terminée : {} module(s) News mis à jour avec l'URL {}", updatedCount, detailPageUrl);
-        log.info("Structure Actualités créée avec succès");
 
         Map<String, UUID> result = new HashMap<>();
         result.put("actualitesPageId", actualitesPage.getPageId());
         result.put("detailPageId", detailPage.getPageId());
         result.put("sectionId", section.getSectionId());
         result.put("newsModuleId", savedNews.getModuleId());
-
         return result;
     }
 
+    @Transactional
     public News updateNews(UUID id, UpdateNewsPutRequest request) {
-        log.info("Mise à jour de l'actualité avec l'ID : {}", id);
-        return newsRepository.findById(id)
-                .map(news -> {
-                    if (request.getTitle() != null) {
-                        news.setTitle(request.getTitle());
-                    }
-                    if (request.getName() != null) {
-                        news.setName(request.getName());
-                    }
-                    if (request.getSortOrder() != null) {
-                        news.setSortOrder(request.getSortOrder());
-                    }
-                    if (request.getVariant() != null) {
-                        news.setVariant(request.getVariant());
-                    }
-                    log.debug("Actualité mise à jour : {}", news);
-                    return newsRepository.save(news);
-                })
-                .orElseThrow(() -> {
-                    log.error("Actualité non trouvée avec l'ID : {}", id);
-                    return new RuntimeException("News not found");
-                });
+        News news = moduleService.findDraftByRowId(newsRepository, id)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+
+        if (request.getTitle() != null) news.setTitle(request.getTitle());
+        if (request.getName() != null) news.setName(request.getName());
+        if (request.getSortOrder() != null) news.setSortOrder(request.getSortOrder());
+        if (request.getVariant() != null) news.setVariant(request.getVariant());
+
+        return moduleService.saveDraft(news);
     }
 
+    @Transactional
     public void softDeleteNews(UUID id) {
-        log.info("Suppression logique de l'actualité avec l'ID : {}", id);
-        newsRepository.findById(id).ifPresent(news -> {
-            news.setStatus(PublishingStatus.DELETED);
-            newsRepository.save(news);
-            log.debug("Actualité marquée comme supprimée : {}", id);
-        });
+        moduleService.softDeleteModuleByRowId(id);
     }
 
+    @Transactional
     public News createNewsWithModule(CreateModuleRequest request, User author) {
-        log.info("Création d'une nouvelle actualité pour la section : {}", request.sectionId());
+        Section section = moduleService.getDraftSection(request.sectionId());
 
-        // Récupérer la section à partir de l'UUID
-        Section section = sectionRepository.findTopBySectionIdOrderByVersionDesc(request.sectionId())
-                .orElseThrow(() -> new RuntimeException("Section not found for id: " + request.sectionId()));
-
-        // Créer directement la news (hérite de Module)
         News news = News.builder()
                 .moduleId(UUID.randomUUID())
                 .variant(NewsVariants.LAST3)
-                .contents(new java.util.ArrayList<>())
+                .contents(new ArrayList<>())
                 .section(section)
                 .name(request.name())
                 .title(request.name())
@@ -207,50 +160,22 @@ public class NewsService {
                 .description("News description")
                 .build();
 
-        News savedNews = newsRepository.save(news);
-        log.info("Actualité créée avec succès, ID : {}", savedNews.getId());
-        return savedNews;
+        return newsRepository.save(news);
     }
 
+    /**
+     * Updates the DRAFT of the news module in place (no new row).
+     */
+    @Transactional
     public News createNewsVersion(UpdateNewsRequest request, User author) {
-        log.info("Création d'une nouvelle version de news pour le moduleId : {}", request.moduleId());
+        News news = newsRepository.findByModuleIdAndStatus(request.moduleId(), PublishingStatus.DRAFT)
+                .orElseThrow(() -> new RuntimeException("Draft news not found for moduleId: " + request.moduleId()));
 
-        // 1. Récupérer le module
-        Module module = moduleService.getModuleByModuleId(request.moduleId())
-                .orElseThrow(() -> new RuntimeException("Module not found for id: " + request.moduleId()));
+        if (request.name() != null) news.setName(request.name());
+        if (request.title() != null) news.setTitle(request.title());
+        if (request.variant() != null) news.setVariant(request.variant());
+        news.setAuthor(author);
 
-        // 2. Récupérer la dernière version de la news pour ce module
-        News previousNews = newsRepository.findTopByModuleIdOrderByVersionDesc(request.moduleId())
-                .orElse(null);
-
-        // 3. Fusionner les infos du request et de la version précédente
-        String name = request.name() != null ? request.name() : (previousNews != null ? previousNews.getName() : module.getName());
-        String title = request.title() != null ? request.title() : (previousNews != null ? previousNews.getTitle() : module.getTitle());
-        NewsVariants variant = request.variant() != null ? request.variant() : (previousNews != null ? previousNews.getVariant() : NewsVariants.LAST3);
-        List<Content> contents = previousNews != null ? new ArrayList<>(previousNews.getContents()) : new ArrayList<>();
-        String type = module.getType();
-        Integer sortOrder = module.getSortOrder();
-        Boolean isVisible = module.getIsVisible();
-        PublishingStatus status = PublishingStatus.DRAFT;
-        int newVersion = previousNews != null ? previousNews.getVersion() + 1 : 1;
-
-        News news = News.builder()
-                .variant(variant)
-                .contents(contents)
-                .moduleId(module.getModuleId())
-                .section(module.getSection())
-                .name(name)
-                .title(title)
-                .type(type)
-                .sortOrder(sortOrder)
-                .isVisible(isVisible)
-                .status(status)
-                .author(author)
-                .version(newVersion)
-                .build();
-
-        News savedNews = newsRepository.save(news);
-        log.info("Nouvelle version de news créée avec succès, ID : {}", savedNews.getId());
-        return savedNews;
+        return moduleService.saveDraft(news);
     }
 }

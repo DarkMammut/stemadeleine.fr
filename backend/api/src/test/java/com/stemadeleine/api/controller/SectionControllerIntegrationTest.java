@@ -97,7 +97,7 @@ class SectionControllerIntegrationTest {
                 .subTitle("Test Subtitle")
                 .slug("test-page-" + System.currentTimeMillis())
                 .description("Test Description")
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .isVisible(true)
                 .sortOrder(1)
                 .version(1)
@@ -114,7 +114,7 @@ class SectionControllerIntegrationTest {
                 .name("Test Section")
                 .title("Test Section Title")
                 .version(1)
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .isVisible(true)
                 .sortOrder(1)
                 .author(testUser)
@@ -165,7 +165,7 @@ class SectionControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Test Section"))
                 .andExpect(jsonPath("$.title").value("Test Section Title"))
                 .andExpect(jsonPath("$.isVisible").value(true))
-                .andExpect(jsonPath("$.status").value("PUBLISHED"));
+                .andExpect(jsonPath("$.status").value("DRAFT"));
     }
 
     @Test

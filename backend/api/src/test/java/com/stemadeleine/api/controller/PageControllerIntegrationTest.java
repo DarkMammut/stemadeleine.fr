@@ -90,7 +90,7 @@ class PageControllerIntegrationTest {
                 .subTitle("Test Subtitle")
                 .slug("test-page-" + System.currentTimeMillis()) // Slug unique
                 .description("Test Description")
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .isVisible(true)
                 .sortOrder(1)
                 .version(1)
@@ -232,7 +232,7 @@ class PageControllerIntegrationTest {
                     .andExpect(jsonPath("$.name").value("Updated Page"));
 
             // Vérifier que la page a été mise à jour en DB
-            Page updatedPage = pageRepository.findTopByPageIdOrderByVersionDesc(testPage.getPageId()).orElse(null);
+            Page updatedPage = pageRepository.findByPageIdAndStatus(testPage.getPageId(), PublishingStatus.DRAFT).orElse(null);
             assertThat(updatedPage).isNotNull();
             assertThat(updatedPage.getName()).isEqualTo("Updated Page");
         } finally {
@@ -256,7 +256,7 @@ class PageControllerIntegrationTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
             // Vérifier que la visibilité a été mise à jour en DB
-            Page updatedPage = pageRepository.findTopByPageIdOrderByVersionDesc(testPage.getPageId()).orElse(null);
+            Page updatedPage = pageRepository.findByPageIdAndStatus(testPage.getPageId(), PublishingStatus.DRAFT).orElse(null);
             assertThat(updatedPage).isNotNull();
             assertThat(updatedPage.getIsVisible()).isEqualTo(false);
         } finally {
@@ -273,7 +273,7 @@ class PageControllerIntegrationTest {
                 .name("Page 2")
                 .title("Title 2")
                 .slug("page-2-" + System.currentTimeMillis()) // Slug unique
-                .status(PublishingStatus.PUBLISHED)
+                .status(PublishingStatus.DRAFT)
                 .isVisible(true)
                 .sortOrder(2)
                 .version(1)
@@ -321,7 +321,7 @@ class PageControllerIntegrationTest {
                     .andExpect(status().isNoContent());
 
             // Vérifier que la page a été supprimée logiquement (status = DELETED)
-            Page deletedPage = pageRepository.findTopByPageIdOrderByVersionDesc(testPage.getPageId()).orElse(null);
+            Page deletedPage = pageRepository.findByPageId(testPage.getPageId()).stream().findFirst().orElse(null);
             assertThat(deletedPage).isNotNull();
             assertThat(deletedPage.getStatus()).isEqualTo(PublishingStatus.DELETED);
         } finally {
@@ -354,13 +354,9 @@ class PageControllerIntegrationTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.name").value("Version 2"));
 
-            // Vérifier qu'une nouvelle version a été créée
-            List<Page> allPages = pageRepository.findAll();
-            List<Page> versions = allPages.stream()
-                    .filter(page -> page.getPageId().equals(testPage.getPageId()))
-                    .sorted((p1, p2) -> p2.getVersion().compareTo(p1.getVersion()))
-                    .toList();
-            assertThat(versions).hasSize(2);
+            // Le draft est mis à jour en place (une seule ligne, version incrémentée)
+            List<Page> versions = pageRepository.findByPageId(testPage.getPageId());
+            assertThat(versions).hasSize(1);
             assertThat(versions.get(0).getVersion()).isEqualTo(2);
             assertThat(versions.get(0).getName()).isEqualTo("Version 2");
         } finally {
@@ -394,7 +390,7 @@ class PageControllerIntegrationTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
             // Vérifier que la page a été publiée
-            Page publishedPage = pageRepository.findTopByPageIdOrderByVersionDesc(draftPage.getPageId()).orElse(null);
+            Page publishedPage = pageRepository.findByPageIdAndStatus(draftPage.getPageId(), PublishingStatus.PUBLISHED).orElse(null);
             assertThat(publishedPage).isNotNull();
             assertThat(publishedPage.getStatus()).isEqualTo(PublishingStatus.PUBLISHED);
         } finally {

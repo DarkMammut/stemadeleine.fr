@@ -13,7 +13,23 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "modules")
+@Table(
+        name = "modules",
+        indexes = {
+                @Index(
+                        name = "idx_modules_module_id_version",
+                        columnList = "module_id, version DESC"
+                ),
+                @Index(
+                        name = "idx_modules_module_id_status",
+                        columnList = "module_id, status"
+                ),
+                @Index(
+                        name = "idx_modules_section_id_status",
+                        columnList = "section_id, status"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,7 +42,7 @@ public class Module {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "module_id", nullable = false)
+    @Column(name = "module_id", nullable = false, updatable = false)
     private UUID moduleId;
 
     @Column(nullable = false)

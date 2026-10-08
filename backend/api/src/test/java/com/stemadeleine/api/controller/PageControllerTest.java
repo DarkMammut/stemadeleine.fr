@@ -106,8 +106,9 @@ class PageControllerTest {
     @DisplayName("GET /api/pages/tree - Doit retourner l'arbre des pages")
     void shouldReturnPageTree() throws Exception {
         // Given
-        List<Page> pages = List.of(testPage);
-        when(pageService.getLatestPagesForTree()).thenReturn(pages);
+        List<PageDto> pages = List.of(new PageDto(testPage.getId(), testPage.getPageId(), "Test Page", "Test Page", null,
+                "test-page", null, PublishingStatus.DRAFT, 1, true, List.of()));
+        when(pageService.getDraftTree()).thenReturn(pages);
 
         // When & Then
         mockMvc.perform(get("/api/pages/tree"))
@@ -122,7 +123,7 @@ class PageControllerTest {
     void shouldReturnPageBySlug() throws Exception {
         // Given
         String slug = "test-page";
-        when(pageService.getPublishedPageBySlug(slug)).thenReturn(Optional.of(testPage));
+        when(pageService.getDraftBySlug(slug)).thenReturn(Optional.of(testPage));
 
         // When & Then
         mockMvc.perform(get("/api/pages/slug/{slug}", slug))
@@ -136,7 +137,7 @@ class PageControllerTest {
     void shouldReturn404WhenPageNotFoundBySlug() throws Exception {
         // Given
         String slug = "non-existent-page";
-        when(pageService.getPublishedPageBySlug(slug)).thenReturn(Optional.empty());
+        when(pageService.getDraftBySlug(slug)).thenReturn(Optional.empty());
 
         // When & Then
         mockMvc.perform(get("/api/pages/slug/{slug}", slug))

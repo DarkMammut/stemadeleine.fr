@@ -32,59 +32,43 @@ public class SectionService {
     private ModuleService moduleService;
 
     /**
-     * Get all sections
+     * Get all sections (DRAFT rows, backoffice)
      */
     public List<Section> getAllSections() {
-        log.debug("Retrieving all sections");
-        return sectionRepository.findAll();
+        return sectionRepository.findByStatus(PublishingStatus.DRAFT);
     }
 
     /**
-     * Get section by ID
+     * Get section by technical ID (DRAFT or PUBLISHED row)
      */
     public Optional<Section> getSectionById(UUID id) {
-        log.debug("Retrieving section by ID: {}", id);
-        return sectionRepository.findById(id);
+        return sectionRepository.findById(id)
+                .filter(s -> s.getStatus() == PublishingStatus.DRAFT || s.getStatus() == PublishingStatus.PUBLISHED);
     }
 
     /**
-     * Get sections by page ID
+     * DRAFT sections of a page identified by its logical pageId (backoffice)
      */
     public List<Section> getSectionsByPageId(UUID pageId) {
-        // Récupérer la dernière version de la page métier
-        Optional<Page> lastPageOpt = pageService.getLastVersion(pageId);
-        if (lastPageOpt.isEmpty()) {
-            log.warn("No page found for business pageId: {}", pageId);
-            return List.of();
-        }
-        Page lastPage = lastPageOpt.get();
-        // Utiliser l'id technique pour récupérer les sections
-        List<Section> sections = sectionRepository.findLastVersionsByPageId(lastPage.getId());
-        log.info("Sections retrieved for business pageId {} (technical id {}): {}", pageId, lastPage.getId(), sections.stream().map(s -> String.format("[id=%s, name=%s, status=%s, pageId=%s]", s.getId(), s.getName(), s.getStatus(), s.getPage().getId())).toList());
-        return sections;
+        return sectionRepository.findByPageIdAndStatus(pageId, PublishingStatus.DRAFT);
     }
 
     /**
-     * Get last version of a section by sectionId
+     * DRAFT of a section (backoffice)
      */
     public Optional<Section> getLastVersion(UUID sectionId) {
-        log.debug("Retrieving last version of section: {}", sectionId);
-        return sectionRepository.findTopBySectionIdOrderByVersionDesc(sectionId);
+        return sectionRepository.findBySectionIdAndStatus(sectionId, PublishingStatus.DRAFT);
     }
 
     /**
-     * Create a new section
+     * Create a new DRAFT section in the DRAFT page
      */
+    @Transactional
     public Section createNewSection(UUID pageId, String name, User author) {
-        log.info("Creating new section '{}' for page {}", name, pageId);
-
         Page parentPage = pageService.getLastVersion(pageId)
                 .orElseThrow(() -> new RuntimeException("Page not found with id: " + pageId));
 
-        Integer maxSortOrder = sectionRepository.findMaxSortOrderByPage(parentPage.getId());
-        if (maxSortOrder == null) {
-            maxSortOrder = 0;
-        }
+        Integer maxSortOrder = sectionRepository.findMaxSortOrderByPageRowIdAndStatus(parentPage.getId(), PublishingStatus.DRAFT);
 
         Section section = Section.builder()
                 .sectionId(UUID.randomUUID())
@@ -92,36 +76,28 @@ public class SectionService {
                 .version(1)
                 .name(name)
                 .title(name)
-                .sortOrder(maxSortOrder + 1)
+                .sortOrder((maxSortOrder != null ? maxSortOrder : 0) + 1)
                 .author(author)
                 .status(PublishingStatus.DRAFT)
                 .isVisible(false)
                 .build();
 
-        Section savedSection = sectionRepository.save(section);
-        log.debug("Section created successfully with ID: {}", savedSection.getId());
-        return savedSection;
+        return sectionRepository.save(section);
     }
 
     /**
-     * Update section basic information
+     * Update the DRAFT section in place
      */
     @Transactional
     public Section updateSection(UUID sectionId, String name, String title, Boolean isVisible, User author) {
-        log.info("Updating section {} by user: {} (in-place update)", sectionId, author.getUsername());
+        Section section = getDraftOrThrow(sectionId);
 
-        Section currentSection = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+        if (name != null) section.setName(name);
+        if (title != null) section.setTitle(title);
+        if (isVisible != null) section.setIsVisible(isVisible);
+        if (author != null) section.setAuthor(author);
 
-        if (name != null) currentSection.setName(name);
-        if (title != null) currentSection.setTitle(title);
-        if (isVisible != null) currentSection.setIsVisible(isVisible);
-        if (author != null) currentSection.setAuthor(author);
-
-        Section savedSection = sectionRepository.save(currentSection);
-        log.debug("Section updated in-place: version {} for sectionId: {}",
-                savedSection.getVersion(), savedSection.getSectionId());
-        return savedSection;
+        return saveDraft(section);
     }
 
     /**
@@ -131,8 +107,7 @@ public class SectionService {
     public Content addContentToSection(UUID sectionId, String title, JsonNode body, User author) {
         log.info("Adding content '{}' to section: {} by user: {}", title, sectionId, author.getUsername());
 
-        Section section = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+        getDraftOrThrow(sectionId);
 
         return contentService.createContent(title, body, sectionId, author);
     }
@@ -166,35 +141,17 @@ public class SectionService {
      */
     @Transactional
     public Section setSectionMedia(UUID sectionId, UUID mediaId, User author) {
-        log.info("Setting media {} for section {} by user: {}", mediaId, sectionId, author.getUsername());
-
-        Section currentSection = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+        Section section = getDraftOrThrow(sectionId);
 
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new RuntimeException("Media not found: " + mediaId));
 
-        // Met à jour le ownerId du média
         media.setOwnerId(sectionId);
         mediaRepository.save(media);
 
-        Section updatedSection = Section.builder()
-                .sectionId(sectionId)
-                .page(currentSection.getPage())
-                .version(currentSection.getVersion() + 1)
-                .name(currentSection.getName())
-                .title(currentSection.getTitle())
-                .sortOrder(currentSection.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(currentSection.getIsVisible())
-                .media(media)
-                .build();
-
-        Section savedSection = sectionRepository.save(updatedSection);
-        log.debug("Media set for section: version {} for sectionId: {}",
-                savedSection.getVersion(), savedSection.getSectionId());
-        return savedSection;
+        section.setMedia(media);
+        section.setAuthor(author);
+        return saveDraft(section);
     }
 
     /**
@@ -202,200 +159,131 @@ public class SectionService {
      */
     @Transactional
     public Section removeSectionMedia(UUID sectionId, User author) {
-        log.info("Removing media from section {} by user: {}", sectionId, author.getUsername());
+        Section section = getDraftOrThrow(sectionId);
 
-        Section currentSection = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-
-        Media media = currentSection.getMedia();
+        Media media = section.getMedia();
         if (media != null) {
             media.setOwnerId(null);
             mediaRepository.save(media);
         }
 
-        Section updatedSection = Section.builder()
-                .sectionId(sectionId)
-                .page(currentSection.getPage())
-                .version(currentSection.getVersion() + 1)
-                .name(currentSection.getName())
-                .title(currentSection.getTitle())
-                .sortOrder(currentSection.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(currentSection.getIsVisible())
-                .media(null)
-                .build();
-
-        Section savedSection = sectionRepository.save(updatedSection);
-        log.debug("Media removed for section: {}", sectionId);
-        return savedSection;
+        section.setMedia(null);
+        section.setAuthor(author);
+        return saveDraft(section);
     }
 
     /**
-     * Delete section (mark as deleted)
+     * Delete section: DRAFT becomes DELETED, PUBLISHED becomes ARCHIVED (modules follow)
      */
     @Transactional
     public Section deleteSection(UUID sectionId, User author) {
-        log.info("Deleting section {} by user: {}", sectionId, author.getUsername());
-
-        Section currentSection = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-
-        Section deletedSection = Section.builder()
-                .sectionId(sectionId)
-                .page(currentSection.getPage())
-                .version(currentSection.getVersion() + 1)
-                .name(currentSection.getName())
-                .title(currentSection.getTitle())
-                .sortOrder(currentSection.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DELETED)
-                .isVisible(false)
-                .media(currentSection.getMedia())
-                .build();
-
-        Section savedSection = sectionRepository.save(deletedSection);
-        log.debug("Section marked as deleted: version {} for sectionId: {}",
-                savedSection.getVersion(), savedSection.getSectionId());
-        return savedSection;
+        Section draft = getDraftOrThrow(sectionId);
+        for (Section row : sectionRepository.findBySectionId(sectionId)) {
+            softDeleteRow(row);
+        }
+        draft.setAuthor(author);
+        return sectionRepository.save(draft);
     }
 
     /**
-     * Update section sort order
+     * Logical deletion of all the sections (and their modules) attached to a page row
+     */
+    @Transactional
+    public void softDeleteSectionsOfPage(Page pageRow) {
+        sectionRepository.findByPageIdAndStatusOrderBySortOrderAsc(pageRow.getId(), pageRow.getStatus())
+                .forEach(this::softDeleteRow);
+    }
+
+    private void softDeleteRow(Section row) {
+        if (row.getStatus() != PublishingStatus.DRAFT && row.getStatus() != PublishingStatus.PUBLISHED) {
+            return;
+        }
+        moduleService.softDeleteModulesOfSection(row);
+        row.setStatus(row.getStatus() == PublishingStatus.DRAFT ? PublishingStatus.DELETED : PublishingStatus.ARCHIVED);
+        row.setIsVisible(false);
+        sectionRepository.save(row);
+    }
+
+    /**
+     * Update section sort order (DRAFT)
      */
     @Transactional
     public void updateSectionSortOrder(UUID pageId, List<UUID> sectionIds, User author) {
-        log.info("Updating section sort order for page {} by user: {}", pageId, author.getUsername());
-
         for (int i = 0; i < sectionIds.size(); i++) {
-            UUID sectionId = sectionIds.get(i);
-            Section currentSection = getLastVersion(sectionId)
-                    .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-
-            if (!currentSection.getSortOrder().equals(i + 1)) {
-                Section updatedSection = Section.builder()
-                        .sectionId(sectionId)
-                        .page(currentSection.getPage())
-                        .version(currentSection.getVersion() + 1)
-                        .name(currentSection.getName())
-                        .title(currentSection.getTitle())
-                        .sortOrder(i + 1)
-                        .author(author)
-                        .status(currentSection.getStatus())
-                        .isVisible(currentSection.getIsVisible())
-                        .media(currentSection.getMedia())
-                        .build();
-
-                sectionRepository.save(updatedSection);
-                log.debug("Section sort order updated: sectionId {} to position {}", sectionId, i + 1);
+            Section section = getDraftOrThrow(sectionIds.get(i));
+            if (!Integer.valueOf(i + 1).equals(section.getSortOrder())) {
+                section.setSortOrder(i + 1);
+                section.setAuthor(author);
+                saveDraft(section);
             }
         }
     }
 
     /**
-     * Create section version
+     * Updates the DRAFT section in place (no new row)
      */
     @Transactional
     public Section createSectionVersion(UUID sectionId, String name, String title, Boolean isVisible, User author) {
-        // Récupérer la dernière version de la section
-        Section currentSection = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-
-        // Créer la nouvelle version de la section
-        Section newSection = Section.builder()
-                .sectionId(sectionId)
-                .page(currentSection.getPage())
-                .version(currentSection.getVersion() + 1)
-                .name(name != null ? name : currentSection.getName())
-                .title(title != null ? title : currentSection.getTitle())
-                .sortOrder(currentSection.getSortOrder())
-                .author(author)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(isVisible != null ? isVisible : currentSection.getIsVisible())
-                .media(currentSection.getMedia())
-                .build();
-
-        // Correction : déclaration de clonedModules avant le if
-        List<Module> clonedModules = new ArrayList<>();
-        if (currentSection.getModules() != null) {
-            for (Module module : currentSection.getModules()) {
-                module.setSection(newSection);
-                clonedModules.add(module);
-            }
-            newSection.setModules(clonedModules);
-        }
-
-        Section savedSection = sectionRepository.save(newSection);
-        // Sauvegarder les modules pour mettre à jour la relation section
-        if (!clonedModules.isEmpty()) {
-            moduleService.saveAll(clonedModules);
-        }
-        log.debug("Section version created and modules attached: version {} for sectionId: {}", savedSection.getVersion(), savedSection.getSectionId());
-        return savedSection;
+        return updateSection(sectionId, name, title, isVisible, author);
     }
 
     /**
-     * Save all sections
-     */
-    public List<Section> saveAll(List<Section> sections) {
-        return sectionRepository.saveAll(sections);
-    }
-
-    /**
-     * Publish section
+     * Publish section: the PUBLISHED row is created or updated from the draft (same version),
+     * and all the modules of the draft section are published with it. The page must be published.
      */
     @Transactional
     public Section publishSection(UUID sectionId, User author) {
-        Section section = getLastVersion(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
-        section.setStatus(PublishingStatus.PUBLISHED);
-        section.setAuthor(author);
-        section.setUpdatedAt(java.time.OffsetDateTime.now());
-        // Publier les modules si besoin
-        if (section.getModules() != null) {
-            for (Module module : section.getModules()) {
-                module.setStatus(PublishingStatus.PUBLISHED);
-                module.setAuthor(author);
-                module.setUpdatedAt(java.time.OffsetDateTime.now());
-            }
+        Section draft = getDraftOrThrow(sectionId);
+
+        Page publishedPage = pageService.getPublishedPage(draft.getPage().getPageId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "The page must be published before its sections: " + draft.getPage().getPageId()));
+
+        Section published = sectionRepository.findBySectionIdAndStatus(sectionId, PublishingStatus.PUBLISHED)
+                .orElseGet(() -> Section.builder()
+                        .sectionId(sectionId)
+                        .status(PublishingStatus.PUBLISHED)
+                        .build());
+        published.setPage(publishedPage);
+        published.setVersion(draft.getVersion());
+        published.setName(draft.getName());
+        published.setTitle(draft.getTitle());
+        published.setSortOrder(draft.getSortOrder());
+        published.setIsVisible(draft.getIsVisible());
+        published.setMedia(draft.getMedia());
+        published.setAuthor(author != null ? author : draft.getAuthor());
+        published = sectionRepository.save(published);
+
+        for (Module module : moduleService.getModulesBySection(draft.getId())) {
+            moduleService.publishModule(module.getModuleId(), author);
         }
-        return sectionRepository.save(section);
+        return published;
     }
 
     /**
-     * Get published and visible sections by business pageId for public access
+     * Get published and visible sections by logical pageId for public access
      */
     public List<Section> getPublishedVisibleSectionsByPageId(UUID pageId) {
-        log.info("Retrieving published and visible sections for business pageId: {}", pageId);
-
-        // Get the published version of the page
-        Optional<Page> publishedPageOpt = pageService.getPublishedPage(pageId);
-        if (publishedPageOpt.isEmpty()) {
-            log.warn("No published page found for business pageId: {}", pageId);
+        Optional<Page> publishedPage = pageService.getPublishedPage(pageId)
+                .or(() -> pageService.findByIdAndVisible(pageId, true));
+        if (publishedPage.isEmpty()) {
             return List.of();
         }
-
-        Page publishedPage = publishedPageOpt.get();
-        log.debug("Found published page with technical id: {} for business pageId: {}", publishedPage.getId(), pageId);
-
-        // Get sections for this page that are published and visible
-        List<Section> allSections = sectionRepository.findLastVersionsByPageId(publishedPage.getId());
-        List<Section> visibleSections = allSections.stream()
-                .filter(section -> section.getStatus() == PublishingStatus.PUBLISHED)
-                .filter(Section::getIsVisible)
-                .sorted((s1, s2) -> {
-                    Integer order1 = s1.getSortOrder() != null ? s1.getSortOrder() : 0;
-                    Integer order2 = s2.getSortOrder() != null ? s2.getSortOrder() : 0;
-                    return order1.compareTo(order2);
-                })
+        return sectionRepository
+                .findByPageIdAndStatusOrderBySortOrderAsc(publishedPage.get().getId(), PublishingStatus.PUBLISHED)
+                .stream()
+                .filter(s -> Boolean.TRUE.equals(s.getIsVisible()))
                 .toList();
+    }
 
-        log.info("Found {} published and visible sections for business pageId: {}", visibleSections.size(), pageId);
-        log.debug("Visible sections: {}", visibleSections.stream()
-                .map(s -> String.format("[id=%s, name=%s, sortOrder=%s]",
-                        s.getId(), s.getName(), s.getSortOrder()))
-                .toList());
+    private Section getDraftOrThrow(UUID sectionId) {
+        return getLastVersion(sectionId)
+                .orElseThrow(() -> new RuntimeException("Section not found: " + sectionId));
+    }
 
-        return visibleSections;
+    private Section saveDraft(Section section) {
+        section.setStatus(PublishingStatus.DRAFT);
+        section.setVersion(section.getVersion() + 1);
+        return sectionRepository.save(section);
     }
 }

@@ -28,7 +28,8 @@ public class Newsletter extends Module {
     @Column(name = "detail_page_url", length = 500)
     private String detailPageUrl;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    // ManyToOne: the DRAFT and PUBLISHED rows of a module may reference the same media
+    @ManyToOne
     @JoinColumn(name = "media_id", referencedColumnName = "id")
     private Media media;
 

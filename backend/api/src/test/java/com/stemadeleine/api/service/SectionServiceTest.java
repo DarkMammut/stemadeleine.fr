@@ -115,7 +115,7 @@ class SectionServiceTest {
     void shouldReturnAllSections() {
         // Given
         List<Section> sections = List.of(testSection);
-        when(sectionRepository.findAll()).thenReturn(sections);
+        when(sectionRepository.findByStatus(PublishingStatus.DRAFT)).thenReturn(sections);
 
         // When
         List<Section> result = sectionService.getAllSections();
@@ -123,7 +123,7 @@ class SectionServiceTest {
         // Then
         assertEquals(1, result.size());
         assertEquals(testSection.getId(), result.get(0).getId());
-        verify(sectionRepository).findAll();
+        verify(sectionRepository).findByStatus(PublishingStatus.DRAFT);
     }
 
     @Test
@@ -163,8 +163,7 @@ class SectionServiceTest {
     void shouldReturnSectionsByPageId() {
         // Given
         List<Section> sections = List.of(testSection);
-        when(pageService.getLastVersion(testPageId)).thenReturn(Optional.of(testPage));
-        when(sectionRepository.findLastVersionsByPageId(testPage.getId())).thenReturn(sections);
+        when(sectionRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(sections);
 
         // When
         List<Section> result = sectionService.getSectionsByPageId(testPageId);
@@ -172,30 +171,14 @@ class SectionServiceTest {
         // Then
         assertEquals(1, result.size());
         assertEquals(testSection.getId(), result.get(0).getId());
-        verify(pageService).getLastVersion(testPageId);
-        verify(sectionRepository).findLastVersionsByPageId(testPage.getId());
-    }
-
-    @Test
-    @DisplayName("Devrait retourner une liste vide quand la page n'existe pas")
-    void shouldReturnEmptyListWhenPageNotFound() {
-        // Given
-        when(pageService.getLastVersion(testPageId)).thenReturn(Optional.empty());
-
-        // When
-        List<Section> result = sectionService.getSectionsByPageId(testPageId);
-
-        // Then
-        assertTrue(result.isEmpty());
-        verify(pageService).getLastVersion(testPageId);
-        verify(sectionRepository, never()).findLastVersionsByPageId(any());
+        verify(sectionRepository).findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT);
     }
 
     @Test
     @DisplayName("Devrait retourner la dernière version d'une section")
     void shouldReturnLastVersionOfSection() {
         // Given
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
 
         // When
         Optional<Section> result = sectionService.getLastVersion(testSectionId);
@@ -203,7 +186,7 @@ class SectionServiceTest {
         // Then
         assertTrue(result.isPresent());
         assertEquals(testSection.getId(), result.get().getId());
-        verify(sectionRepository).findTopBySectionIdOrderByVersionDesc(testSectionId);
+        verify(sectionRepository).findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT);
     }
 
     @Test
@@ -227,7 +210,7 @@ class SectionServiceTest {
                 .build();
 
         when(pageService.getLastVersion(testPageId)).thenReturn(Optional.of(testPage));
-        when(sectionRepository.findMaxSortOrderByPage(testPage.getId())).thenReturn(0);
+        when(sectionRepository.findMaxSortOrderByPageRowIdAndStatus(testPage.getId(), PublishingStatus.DRAFT)).thenReturn(0);
         when(sectionRepository.save(any(Section.class))).thenReturn(savedSection);
 
         // When
@@ -241,7 +224,7 @@ class SectionServiceTest {
         assertFalse(result.getIsVisible());
         assertEquals(1, result.getSortOrder());
         verify(pageService).getLastVersion(testPageId);
-        verify(sectionRepository).findMaxSortOrderByPage(testPage.getId());
+        verify(sectionRepository).findMaxSortOrderByPageRowIdAndStatus(testPage.getId(), PublishingStatus.DRAFT);
         verify(sectionRepository).save(any(Section.class));
     }
 
@@ -269,7 +252,7 @@ class SectionServiceTest {
         String newTitle = "Updated Title";
         Boolean newVisibility = false;
 
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
         when(sectionRepository.save(any(Section.class))).thenReturn(testSection);
 
         // When
@@ -277,7 +260,7 @@ class SectionServiceTest {
 
         // Then
         assertNotNull(result);
-        verify(sectionRepository).findTopBySectionIdOrderByVersionDesc(testSectionId);
+        verify(sectionRepository).findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT);
         verify(sectionRepository).save(testSection);
     }
 
@@ -286,7 +269,7 @@ class SectionServiceTest {
     void shouldThrowExceptionWhenUpdatingNonExistentSection() {
         // Given
         String newName = "Updated Section";
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.empty());
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.empty());
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -310,7 +293,7 @@ class SectionServiceTest {
                 .author(testUser)
                 .build();
 
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
         when(contentService.createContent(contentTitle, contentBody, testSectionId, testUser)).thenReturn(mockContent);
 
         // When
@@ -319,7 +302,7 @@ class SectionServiceTest {
         // Then
         assertNotNull(result);
         assertEquals(contentTitle, result.getTitle());
-        verify(sectionRepository).findTopBySectionIdOrderByVersionDesc(testSectionId);
+        verify(sectionRepository).findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT);
         verify(contentService).createContent(contentTitle, contentBody, testSectionId, testUser);
     }
 
@@ -338,7 +321,7 @@ class SectionServiceTest {
                 .build();
 
         when(contentService.createDefaultBody()).thenReturn(defaultBody);
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
         when(contentService.createContent(contentTitle, defaultBody, testSectionId, testUser)).thenReturn(mockContent);
 
         // When
@@ -359,14 +342,14 @@ class SectionServiceTest {
                 Content.builder().id(UUID.randomUUID()).title("Content 1").ownerId(testSectionId).build(),
                 Content.builder().id(UUID.randomUUID()).title("Content 2").ownerId(testSectionId).build()
         );
-        when(contentService.getLatestContentsByOwner(testSectionId)).thenReturn(mockContents);
+        when(contentService.getContentsByOwner(testSectionId)).thenReturn(mockContents);
 
         // When
         List<Content> result = sectionService.getContentsBySection(testSectionId);
 
         // Then
         assertEquals(2, result.size());
-        verify(contentService).getLatestContentsByOwner(testSectionId);
+        verify(contentService).getContentsByOwner(testSectionId);
     }
 
     @Test
@@ -374,7 +357,7 @@ class SectionServiceTest {
     void shouldSetSectionMedia() {
         // Given
         UUID mediaId = testMedia.getId();
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
         when(mediaRepository.findById(mediaId)).thenReturn(Optional.of(testMedia));
         when(mediaRepository.save(testMedia)).thenReturn(testMedia);
         when(sectionRepository.save(any(Section.class))).thenReturn(testSection);
@@ -384,7 +367,7 @@ class SectionServiceTest {
 
         // Then
         assertNotNull(result);
-        verify(sectionRepository).findTopBySectionIdOrderByVersionDesc(testSectionId);
+        verify(sectionRepository).findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT);
         verify(mediaRepository).findById(mediaId);
         verify(mediaRepository).save(testMedia);
         verify(sectionRepository).save(any(Section.class));
@@ -395,7 +378,7 @@ class SectionServiceTest {
     void shouldThrowExceptionWhenMediaNotFoundOnSet() {
         // Given
         UUID mediaId = UUID.randomUUID();
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.of(testSection));
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testSection));
         when(mediaRepository.findById(mediaId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -411,7 +394,7 @@ class SectionServiceTest {
     void shouldThrowExceptionWhenSectionNotFoundOnSetMedia() {
         // Given
         UUID mediaId = testMedia.getId();
-        when(sectionRepository.findTopBySectionIdOrderByVersionDesc(testSectionId)).thenReturn(Optional.empty());
+        when(sectionRepository.findBySectionIdAndStatus(testSectionId, PublishingStatus.DRAFT)).thenReturn(Optional.empty());
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,

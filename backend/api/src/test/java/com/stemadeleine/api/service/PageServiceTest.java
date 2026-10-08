@@ -78,160 +78,6 @@ class PageServiceTest {
                 .slug("test-page")
                 .description("Test Description")
                 .version(1)
-                .status(PublishingStatus.PUBLISHED)
-                .isVisible(true)
-                .sortOrder(1)
-                .author(testUser)
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
-    }
-
-    @Test
-    @DisplayName("Devrait retourner une page publiée par ID")
-    void shouldReturnPublishedPageById() {
-        // Given
-        when(pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(testPageId, PublishingStatus.PUBLISHED))
-                .thenReturn(Optional.of(testPage));
-
-        // When
-        Optional<Page> result = pageService.getPublishedPage(testPageId);
-
-        // Then
-        assertTrue(result.isPresent());
-        assertEquals(testPage.getId(), result.get().getId());
-        assertEquals(testPage.getTitle(), result.get().getTitle());
-        verify(pageRepository).findTopByPageIdAndStatusOrderByVersionDesc(testPageId, PublishingStatus.PUBLISHED);
-    }
-
-    @Test
-    @DisplayName("Devrait retourner empty quand aucune page publiée trouvée")
-    void shouldReturnEmptyWhenNoPublishedPageFound() {
-        // Given
-        when(pageRepository.findTopByPageIdAndStatusOrderByVersionDesc(testPageId, PublishingStatus.PUBLISHED))
-                .thenReturn(Optional.empty());
-
-        // When
-        Optional<Page> result = pageService.getPublishedPage(testPageId);
-
-        // Then
-        assertFalse(result.isPresent());
-        verify(pageRepository).findTopByPageIdAndStatusOrderByVersionDesc(testPageId, PublishingStatus.PUBLISHED);
-    }
-
-    @Test
-    @DisplayName("Devrait retourner une page publiée par slug")
-    void shouldReturnPublishedPageBySlug() {
-        // Given
-        String slug = "test-page";
-        when(pageRepository.findBySlug(slug)).thenReturn(Optional.of(testPage));
-
-        // When
-        Optional<Page> result = pageService.getPublishedPageBySlug(slug);
-
-        // Then
-        assertTrue(result.isPresent());
-        assertEquals(testPage.getSlug(), result.get().getSlug());
-        assertTrue(result.get().getIsVisible());
-        verify(pageRepository).findBySlug(slug);
-    }
-
-    @Test
-    @DisplayName("Devrait retourner empty pour une page non visible par slug")
-    void shouldReturnEmptyForInvisiblePageBySlug() {
-        // Given
-        String slug = "test-page";
-        Page invisiblePage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(testPage.getVersion())
-                .status(testPage.getStatus())
-                .isVisible(false) // La seule différence
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
-        when(pageRepository.findBySlug(slug)).thenReturn(Optional.of(invisiblePage));
-
-        // When
-        Optional<Page> result = pageService.getPublishedPageBySlug(slug);
-
-        // Then
-        assertFalse(result.isPresent());
-        verify(pageRepository).findBySlug(slug);
-    }
-
-    @Test
-    @DisplayName("Devrait retourner la dernière version d'une page")
-    void shouldReturnLastVersionOfPage() {
-        // Given
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-
-        // When
-        Optional<Page> result = pageService.getLastVersion(testPageId);
-
-        // Then
-        assertTrue(result.isPresent());
-        assertEquals(testPage.getId(), result.get().getId());
-        verify(pageRepository).findTopByPageIdOrderByVersionDesc(testPageId);
-    }
-
-    @Test
-    @DisplayName("Devrait retourner toutes les pages")
-    void shouldReturnAllPages() {
-        // Given
-        List<Page> pages = List.of(testPage);
-        when(pageRepository.findAll()).thenReturn(pages);
-
-        // When
-        List<Page> result = pageService.getAllPages();
-
-        // Then
-        assertEquals(1, result.size());
-        assertEquals(testPage.getId(), result.get(0).getId());
-        verify(pageRepository).findAll();
-    }
-
-    @Test
-    @DisplayName("Devrait créer une nouvelle page")
-    void shouldCreateNewPage() {
-        // Given
-        UUID parentPageId = UUID.randomUUID();
-        String pageName = "New Page";
-
-        // Créer une page parent pour le mock
-        Page parentPage = Page.builder()
-                .id(UUID.randomUUID())
-                .pageId(parentPageId)
-                .name("Parent Page")
-                .title("Parent Title")
-                .subTitle("Parent Subtitle")
-                .slug("parent-page")
-                .description("Parent Description")
-                .version(1)
-                .status(PublishingStatus.PUBLISHED)
-                .isVisible(true)
-                .sortOrder(1)
-                .author(testUser)
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
-
-        Page savedPage = Page.builder()
-                .id(UUID.randomUUID())
-                .pageId(UUID.randomUUID())
-                .name(pageName)
-                .title(pageName)
-                .subTitle("")
-                .slug("new-page")
-                .description("")
-                .version(1)
                 .status(PublishingStatus.DRAFT)
                 .isVisible(true)
                 .sortOrder(1)
@@ -239,354 +85,186 @@ class PageServiceTest {
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
+    }
 
-        // Mock pour la page parent
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(parentPageId)).thenReturn(Optional.of(parentPage));
-        // Mock pour l'ordre de tri
-        when(pageRepository.findMaxSortOrderByParentPage(parentPageId)).thenReturn(0);
-        when(pageRepository.save(any(Page.class))).thenReturn(savedPage);
-
-        // When
-        Page result = pageService.createNewPage(parentPageId, pageName, testUser);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(pageName, result.getName());
-        verify(pageRepository).findTopByPageIdOrderByVersionDesc(parentPageId);
-        verify(pageRepository).findMaxSortOrderByParentPage(parentPageId);
-        verify(pageRepository).save(any(Page.class));
+    private Page publishedRow() {
+        return Page.builder().id(UUID.randomUUID()).pageId(testPageId).name("Test Page").title("Test Page")
+                .slug("test-page").version(1).status(PublishingStatus.PUBLISHED).isVisible(true).sortOrder(1)
+                .author(testUser).build();
     }
 
     @Test
-    @DisplayName("Devrait mettre à jour une page")
-    void shouldUpdatePage() {
-        // Given
-        String newName = "Updated Page";
-        String newTitle = "Updated Title";
-        String newSubTitle = "Updated Subtitle";
-        String newSlug = "updated-slug";
-        String newDescription = "Updated Description";
-        Boolean newVisibility = false;
+    @DisplayName("Retourne la ligne PUBLISHED d'une page")
+    void shouldReturnPublishedPage() {
+        Page published = publishedRow();
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.PUBLISHED)).thenReturn(Optional.of(published));
 
-        Page updatedPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(newName)
-                .title(newTitle)
-                .subTitle(newSubTitle)
-                .slug(newSlug)
-                .description(newDescription)
-                .version(2)
-                .status(testPage.getStatus())
-                .isVisible(newVisibility)
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
-
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-        when(pageRepository.save(any(Page.class))).thenReturn(updatedPage);
-
-        // When
-        Page result = pageService.updatePage(testPageId, newName, newTitle, newSubTitle, newSlug, newDescription, newVisibility, testUser);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(newName, result.getName());
-        assertEquals(newTitle, result.getTitle());
-        assertEquals(2, result.getVersion());
-        verify(pageRepository).findTopByPageIdOrderByVersionDesc(testPageId);
-        verify(pageRepository).save(any(Page.class));
+        assertEquals(published, pageService.getPublishedPage(testPageId).orElseThrow());
     }
 
     @Test
-    @DisplayName("Devrait lever une exception lors de la mise à jour d'une page inexistante")
-    void shouldThrowExceptionWhenUpdatingNonExistentPage() {
-        // Given
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.empty());
+    @DisplayName("Retourne la ligne DRAFT d'une page")
+    void shouldReturnDraftPage() {
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
 
-        // When & Then
-        assertThrows(RuntimeException.class, () ->
-                pageService.updatePage(testPageId, "New Name", "New Title", "New Subtitle", "new-slug", "New Description", true, testUser));
-
-        verify(pageRepository).findTopByPageIdOrderByVersionDesc(testPageId);
-        verify(pageRepository, never()).save(any(Page.class));
+        assertEquals(testPage, pageService.getLastVersion(testPageId).orElseThrow());
     }
 
     @Test
-    @DisplayName("Devrait mettre à jour la visibilité d'une page")
-    void shouldUpdatePageVisibility() {
-        // Given
-        Boolean newVisibility = false;
-        Page updatedPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(2)
-                .status(testPage.getStatus())
-                .isVisible(newVisibility)
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
+    @DisplayName("La page publiée par slug doit être visible")
+    void shouldReturnPublishedVisiblePageBySlug() {
+        Page published = publishedRow();
+        when(pageRepository.findBySlugAndStatus("test-page", PublishingStatus.PUBLISHED)).thenReturn(List.of(published));
 
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-        when(pageRepository.save(any(Page.class))).thenReturn(updatedPage);
+        assertTrue(pageService.getPublishedPageBySlug("test-page").isPresent());
 
-        // When
-        Page result = pageService.updatePageVisibility(testPageId, newVisibility, testUser);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(newVisibility, result.getIsVisible());
-        assertEquals(2, result.getVersion());
-        verify(pageRepository).save(any(Page.class));
+        published.setIsVisible(false);
+        assertTrue(pageService.getPublishedPageBySlug("test-page").isEmpty());
     }
 
     @Test
-    @DisplayName("Devrait définir le média hero de la dernière version")
-    void shouldSetHeroMediaLastVersion() {
-        // Given
-        UUID heroMediaId = UUID.randomUUID();
-        Page updatedPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(2)
-                .status(testPage.getStatus())
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .heroMedia(testMedia) // Media ajouté
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
+    @DisplayName("Crée une nouvelle page DRAFT à la racine")
+    void shouldCreateNewDraftPage() {
+        when(pageRepository.findMaxSortOrderByParentPageAndStatus(null, PublishingStatus.DRAFT)).thenReturn(2);
+        when(pageRepository.findBySlugAndStatus(any(), eq(PublishingStatus.DRAFT))).thenReturn(List.of());
+        when(pageRepository.save(any(Page.class))).thenAnswer(i -> i.getArgument(0));
 
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-        when(mediaRepository.findById(heroMediaId)).thenReturn(Optional.of(testMedia));
-        when(pageRepository.save(any(Page.class))).thenReturn(updatedPage);
+        Page result = pageService.createNewPage(null, "Ma Page", testUser);
 
-        // When
-        Page result = pageService.setHeroMediaLastVersion(testPageId, heroMediaId);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(testMedia, result.getHeroMedia());
-        verify(pageRepository).save(any(Page.class));
-        verify(mediaRepository).findById(heroMediaId);
+        assertEquals(PublishingStatus.DRAFT, result.getStatus());
+        assertEquals(1, result.getVersion());
+        assertEquals("/ma-page", result.getSlug());
+        assertEquals(3, result.getSortOrder());
+        assertFalse(result.getIsVisible());
     }
 
     @Test
-    @DisplayName("Devrait lever une exception si le média hero n'existe pas")
-    void shouldThrowExceptionWhenHeroMediaNotFound() {
-        // Given
-        UUID heroMediaId = UUID.randomUUID();
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-        when(mediaRepository.findById(heroMediaId)).thenReturn(Optional.empty());
+    @DisplayName("La mise à jour modifie le draft en place et incrémente la version")
+    void shouldUpdateDraftInPlace() {
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(pageRepository.save(any(Page.class))).thenAnswer(i -> i.getArgument(0));
 
-        // When & Then
-        assertThrows(RuntimeException.class, () ->
-                pageService.setHeroMediaLastVersion(testPageId, heroMediaId));
+        Page result = pageService.updatePage(testPageId, null, "Nouveau titre", null, null, null, false, testUser);
 
-        verify(mediaRepository).findById(heroMediaId);
-        verify(pageRepository, never()).save(any(Page.class));
-    }
-
-    @Test
-    @DisplayName("Devrait supprimer le média hero de la dernière version")
-    void shouldRemoveHeroMediaLastVersion() {
-        // Given
-        Page pageWithHero = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(testPage.getVersion())
-                .status(testPage.getStatus())
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .heroMedia(testMedia) // Avec media
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
-
-        Page updatedPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(2)
-                .status(testPage.getStatus())
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .heroMedia(null) // Media supprimé
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
-
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(pageWithHero));
-        when(pageRepository.save(any(Page.class))).thenReturn(updatedPage);
-
-        // When
-        Page result = pageService.removeHeroMediaLastVersion(testPageId);
-
-        // Then
-        assertNotNull(result);
-        assertNull(result.getHeroMedia());
-        verify(pageRepository).save(any(Page.class));
-    }
-
-    @Test
-    @DisplayName("Devrait supprimer logiquement une page")
-    void shouldDeletePageLogically() {
-        // Given
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-
-        // When
-        pageService.delete(testPageId);
-
-        // Then
-        verify(pageRepository).findTopByPageIdOrderByVersionDesc(testPageId);
-        verify(pageRepository).softDeleteById(testPage.getId());
-    }
-
-    @Test
-    @DisplayName("Devrait créer une nouvelle version de page")
-    void shouldCreatePageVersion() {
-        // Given
-        String newName = "Version 2";
-        String newTitle = "Version 2 Title";
-        Page newVersion = Page.builder()
-                .id(UUID.randomUUID()) // Nouvel ID
-                .pageId(testPage.getPageId()) // Même pageId
-                .name(newName)
-                .title(newTitle)
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(2)
-                .status(PublishingStatus.DRAFT)
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
-
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(testPage));
-        when(pageRepository.save(any(Page.class))).thenReturn(newVersion);
-
-        // When
-        Page result = pageService.createPageVersion(testPageId, newName, newTitle, "New Subtitle", "new-slug", "New Description", true, testUser);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(newName, result.getName());
+        assertSame(testPage, result);
+        assertEquals("Nouveau titre", result.getTitle());
         assertEquals(2, result.getVersion());
         assertEquals(PublishingStatus.DRAFT, result.getStatus());
-        verify(pageRepository).save(any(Page.class));
+        assertFalse(result.getIsVisible());
     }
 
     @Test
-    @DisplayName("Devrait publier une page")
-    void shouldPublishPage() {
-        // Given
-        Page draftPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(testPage.getVersion())
-                .status(PublishingStatus.DRAFT)
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
+    @DisplayName("La mise à jour d'une page inexistante lève une exception")
+    void shouldThrowWhenUpdatingUnknownPage() {
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.empty());
 
-        Page publishedPage = Page.builder()
-                .id(testPage.getId())
-                .pageId(testPage.getPageId())
-                .name(testPage.getName())
-                .title(testPage.getTitle())
-                .subTitle(testPage.getSubTitle())
-                .slug(testPage.getSlug())
-                .description(testPage.getDescription())
-                .version(testPage.getVersion())
-                .status(PublishingStatus.PUBLISHED)
-                .isVisible(testPage.getIsVisible())
-                .sortOrder(testPage.getSortOrder())
-                .author(testPage.getAuthor())
-                .createdAt(testPage.getCreatedAt())
-                .updatedAt(testPage.getUpdatedAt())
-                .build();
+        assertThrows(RuntimeException.class,
+                () -> pageService.updatePage(testPageId, "x", null, null, null, null, null, testUser));
+    }
 
-        when(pageRepository.findTopByPageIdOrderByVersionDesc(testPageId)).thenReturn(Optional.of(draftPage));
-        when(pageRepository.save(any(Page.class))).thenReturn(publishedPage);
+    @Test
+    @DisplayName("La publication crée la ligne PUBLISHED avec la version du draft")
+    void shouldPublishDraftIntoNewPublishedRow() {
+        testPage.setVersion(5);
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.PUBLISHED)).thenReturn(Optional.empty());
+        when(pageRepository.findByParentPageAndStatus(testPage, PublishingStatus.DRAFT)).thenReturn(List.of());
+        when(pageRepository.save(any(Page.class))).thenAnswer(i -> i.getArgument(0));
 
-        // When
+        Page published = pageService.publishPage(testPageId, testUser);
+
+        assertEquals(PublishingStatus.PUBLISHED, published.getStatus());
+        assertEquals(5, published.getVersion());
+        assertEquals(testPageId, published.getPageId());
+        assertEquals(PublishingStatus.DRAFT, testPage.getStatus());
+    }
+
+    @Test
+    @DisplayName("La publication met à jour la ligne PUBLISHED existante")
+    void shouldPublishDraftIntoExistingPublishedRow() {
+        Page published = publishedRow();
+        testPage.setVersion(7);
+        testPage.setTitle("Draft title");
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.PUBLISHED)).thenReturn(Optional.of(published));
+        when(pageRepository.findByParentPageAndStatus(testPage, PublishingStatus.DRAFT)).thenReturn(List.of());
+        when(pageRepository.save(any(Page.class))).thenAnswer(i -> i.getArgument(0));
+
         Page result = pageService.publishPage(testPageId, testUser);
 
-        // Then
-        assertNotNull(result);
-        assertEquals(PublishingStatus.PUBLISHED, result.getStatus());
-        verify(pageRepository).save(any(Page.class));
+        assertSame(published, result);
+        assertEquals(7, result.getVersion());
+        assertEquals("Draft title", result.getTitle());
     }
 
     @Test
-    @DisplayName("Devrait mettre à jour l'arbre des pages")
-    void shouldUpdatePageTree() {
-        // Given
-        PageDto pageDto1 = new PageDto(testPage.getId(), testPageId, "Page 1", "Title 1", "Subtitle 1", "page-1", "Description 1", PublishingStatus.PUBLISHED, 1, true, List.of());
-        PageDto pageDto2 = new PageDto(UUID.randomUUID(), UUID.randomUUID(), "Page 2", "Title 2", "Subtitle 2", "page-2", "Description 2", PublishingStatus.PUBLISHED, 2, true, List.of());
-        List<PageDto> tree = List.of(pageDto1, pageDto2);
+    @DisplayName("Publier une page dont le parent n'est pas publié échoue")
+    void shouldFailPublishingWhenParentNotPublished() {
+        UUID parentId = UUID.randomUUID();
+        Page parent = Page.builder().id(UUID.randomUUID()).pageId(parentId).status(PublishingStatus.DRAFT).version(1).build();
+        testPage.setParentPage(parent);
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(pageRepository.findByPageIdAndStatus(parentId, PublishingStatus.PUBLISHED)).thenReturn(Optional.empty());
 
-        when(pageRepository.findById(any(UUID.class))).thenReturn(Optional.of(testPage));
-        when(pageRepository.save(any(Page.class))).thenReturn(testPage);
-
-        // When
-        pageService.updatePageTree(tree, null);
-
-        // Then
-        verify(pageRepository, atLeastOnce()).findById(any(UUID.class));
-        verify(pageRepository, atLeastOnce()).save(any(Page.class));
+        assertThrows(IllegalStateException.class, () -> pageService.publishPage(testPageId, testUser));
     }
 
     @Test
-    @DisplayName("Devrait retourner les dernières pages pour l'arbre")
-    void shouldReturnLatestPagesForTree() {
-        // Given
-        List<Page> pages = List.of(testPage);
-        when(pageRepository.findAll()).thenReturn(pages);
+    @DisplayName("La suppression passe le DRAFT en DELETED et le PUBLISHED en ARCHIVED")
+    void shouldDeleteDraftAndArchivePublished() {
+        Page published = publishedRow();
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(pageRepository.findByPageId(testPageId)).thenReturn(List.of(testPage, published));
+        when(pageRepository.findByParentPageAndStatus(any(), any())).thenReturn(List.of());
 
-        // When
-        List<Page> result = pageService.getLatestPagesForTree();
+        pageService.delete(testPageId);
 
-        // Then
-        assertEquals(1, result.size());
-        assertEquals(testPage.getId(), result.get(0).getId());
-        verify(pageRepository).findAll();
+        assertEquals(PublishingStatus.DELETED, testPage.getStatus());
+        assertEquals(PublishingStatus.ARCHIVED, published.getStatus());
+        assertFalse(published.getIsVisible());
+        verify(sectionService, times(2)).softDeleteSectionsOfPage(any(Page.class));
+    }
+
+    @Test
+    @DisplayName("L'arbre du backoffice est construit à partir des pages DRAFT")
+    void shouldBuildDraftTree() {
+        Page child = Page.builder().id(UUID.randomUUID()).pageId(UUID.randomUUID()).name("Child").title("Child")
+                .slug("/child").version(1).status(PublishingStatus.DRAFT).isVisible(true).sortOrder(1)
+                .parentPage(testPage).build();
+        when(pageRepository.findByStatus(PublishingStatus.DRAFT)).thenReturn(List.of(child, testPage));
+
+        List<PageDto> tree = pageService.getDraftTree();
+
+        assertEquals(1, tree.size());
+        assertEquals(testPage.getId(), tree.get(0).id());
+        assertEquals(1, tree.get(0).children().size());
+        assertEquals(child.getId(), tree.get(0).children().get(0).id());
+    }
+
+    @Test
+    @DisplayName("L'arbre public ne contient que les pages publiées et visibles")
+    void shouldBuildPublicTreeWithVisiblePublishedPages() {
+        Page visible = publishedRow();
+        Page hidden = publishedRow();
+        hidden.setIsVisible(false);
+        when(pageRepository.findByStatus(PublishingStatus.PUBLISHED)).thenReturn(List.of(visible, hidden));
+
+        List<PageDto> tree = pageService.findVisiblePagesHierarchyDto();
+
+        assertEquals(1, tree.size());
+        assertEquals(visible.getId(), tree.get(0).id());
+    }
+
+    @Test
+    @DisplayName("Le hero media est défini sur le draft")
+    void shouldSetHeroMediaOnDraft() {
+        when(pageRepository.findByPageIdAndStatus(testPageId, PublishingStatus.DRAFT)).thenReturn(Optional.of(testPage));
+        when(mediaRepository.findById(testMedia.getId())).thenReturn(Optional.of(testMedia));
+        when(pageRepository.save(any(Page.class))).thenAnswer(i -> i.getArgument(0));
+
+        Page result = pageService.setHeroMediaLastVersion(testPageId, testMedia.getId());
+
+        assertEquals(testMedia, result.getHeroMedia());
+        assertEquals(testPageId, testMedia.getOwnerId());
     }
 }

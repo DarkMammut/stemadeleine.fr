@@ -3,6 +3,7 @@ package com.stemadeleine.api.service;
 import com.stemadeleine.api.model.Gallery;
 import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.MediaAttachable;
+import com.stemadeleine.api.model.PublishingStatus;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.GalleryRepository;
 import jakarta.transaction.Transactional;
@@ -31,8 +32,8 @@ public class MediaGalleryService {
     }
 
     private Gallery getGalleryByModuleIdOrThrow(UUID moduleId) {
-        return galleryRepository.findTopByModuleIdOrderByVersionDesc(moduleId)
-                .orElseThrow(() -> new RuntimeException("Aucune galerie trouvée pour ce moduleId (" + moduleId + "). Vérifiez que ce module est bien de type Gallery et existe en base."));
+        return galleryRepository.findByModuleIdAndStatus(moduleId, PublishingStatus.DRAFT)
+                .orElseThrow(() -> new RuntimeException("Aucune galerie DRAFT trouvée pour ce moduleId (" + moduleId + "). Vérifiez que ce module est bien de type Gallery et existe en base."));
     }
 
     public List<Media> getMediasByOwnerId(UUID ownerId) {
@@ -50,6 +51,7 @@ public class MediaGalleryService {
             media.setId(mediaId);
             medias.add(media);
             gallery.setMedias(medias);
+            gallery.setVersion(gallery.getVersion() + 1);
             galleryRepository.save(gallery);
         }
         return media;
@@ -62,6 +64,7 @@ public class MediaGalleryService {
         boolean removed = medias.removeIf(m -> m.getId().equals(mediaId));
         if (removed) {
             gallery.setMedias(medias);
+            gallery.setVersion(gallery.getVersion() + 1);
             galleryRepository.save(gallery);
         }
     }

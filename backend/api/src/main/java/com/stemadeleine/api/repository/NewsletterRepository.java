@@ -1,17 +1,10 @@
 package com.stemadeleine.api.repository;
 
-import com.stemadeleine.api.model.Newsletter;
 import com.stemadeleine.api.model.NewsVariants;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.stemadeleine.api.model.Newsletter;
+import com.stemadeleine.api.model.PublishingStatus;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+public interface NewsletterRepository extends ModuleSubtypeRepository<Newsletter> {
 
-public interface NewsletterRepository extends JpaRepository<Newsletter, UUID> {
-    List<Newsletter> findByStatusNot(com.stemadeleine.api.model.PublishingStatus status);
-
-    Optional<Newsletter> findTopByModuleIdOrderByVersionDesc(UUID moduleId);
-
-    boolean existsByVariantAndStatusNot(NewsVariants variant, com.stemadeleine.api.model.PublishingStatus status);
+    boolean existsByVariantAndStatus(NewsVariants variant, PublishingStatus status);
 }

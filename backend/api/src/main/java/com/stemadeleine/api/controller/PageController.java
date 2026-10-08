@@ -49,16 +49,24 @@ public class PageController {
     @GetMapping("/tree")
     public List<PageDto> getPageTree() {
         log.info("GET /api/pages/tree - Retrieving page tree");
-        List<Page> pages = pageService.getLatestPagesForTree();
-        log.debug("Number of pages in tree: {}", pages.size());
-        return pageMapper.toDtoList(pages);
+        return pageService.getDraftTree();
+    }
+
+    @PutMapping("/tree/publish")
+    public ResponseEntity<Void> publishPageTree(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User currentUser = extractUser(customUserDetails);
+        if (currentUser == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        pageService.publishTree(currentUser);
+        return ResponseEntity.ok().build();
     }
 
     // Specific routes BEFORE generic routes to avoid conflicts
     @GetMapping("/slug/{slug}")
     public ResponseEntity<PageDto> getPageBySlug(@PathVariable String slug) {
         log.info("GET /api/pages/slug/{} - Retrieving page by slug", slug);
-        return pageService.getPublishedPageBySlug(slug)
+        return pageService.getDraftBySlug(slug)
                 .map(page -> {
                     log.debug("Page found by slug: {}", page.getId());
                     return ResponseEntity.ok(pageMapper.toDto(page));
