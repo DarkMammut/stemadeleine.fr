@@ -1,10 +1,14 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.ForgotPasswordRequest;
 import com.stemadeleine.api.dto.LoginRequest;
+import com.stemadeleine.api.dto.ResetPasswordRequest;
 import com.stemadeleine.api.dto.SignupRequest;
 import com.stemadeleine.api.service.AuthService;
+import com.stemadeleine.api.service.PasswordResetService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +25,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final PasswordResetService passwordResetService;
 
     @Value("${jwt.cookie.secure:false}")
     private boolean jwtCookieSecure;
@@ -100,5 +105,54 @@ public class AuthController {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", "Logout successful");
         return ResponseEntity.ok(responseBody);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("POST /api/auth/forgot-password - Demande de réinitialisation pour : {}", request.email());
+        try {
+            passwordResetService.requestPasswordReset(request);
+
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Si cet email existe, un lien de réinitialisation a été envoyé");
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            log.error("Erreur lors de la demande de réinitialisation pour : {} - Raison : {}",
+                    request.email(), e.getMessage());
+            // On renvoie toujours le même message pour ne pas révéler si l'email existe
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Si cet email existe, un lien de réinitialisation a été envoyé");
+            return ResponseEntity.ok(responseBody);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("POST /api/auth/reset-password - Tentative de réinitialisation avec token");
+        try {
+            passwordResetService.resetPassword(request);
+
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Mot de passe réinitialisé avec succès");
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            log.error("Échec de la réinitialisation du mot de passe - Raison : {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/validate-reset-token")
+    public ResponseEntity<?> validateResetToken(@RequestParam String token) {
+        log.info("GET /api/auth/validate-reset-token - Validation du token de réinitialisation");
+        try {
+            boolean isValid = passwordResetService.validateToken(token);
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("valid", isValid);
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            log.error("Erreur lors de la validation du token - Raison : {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("valid", false));
+        }
     }
 }

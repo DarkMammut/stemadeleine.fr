@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4f46e5;
+            margin: 0;
+        }
+
+        .content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>👋 Bienvenue !</h1>
+    </div>
+
+    <div class="content">
+        <p>Bonjour <strong th:text="${userName}">Utilisateur</strong>,</p>
+
+        <p>Bienvenue sur le backoffice de la Paroisse Sainte Madeleine !</p>
+
+        <p>Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter et accéder à toutes les
+            fonctionnalités.</p>
+
+        <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+
+        <p>À bientôt,<br>L'équipe Sainte Madeleine</p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Paroisse Sainte Madeleine - Tous droits réservés</p>
+    </div>
+</div>
+</body>
+</html>
