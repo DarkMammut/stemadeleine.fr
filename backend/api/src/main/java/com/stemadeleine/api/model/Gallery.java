@@ -22,6 +22,7 @@ public class Gallery extends Module implements MediaAttachable {
             joinColumns = @JoinColumn(name = "gallery_id"),
             inverseJoinColumns = @JoinColumn(name = "media_id")
     )
+    @OrderBy("sortOrder ASC")
     private List<Media> medias = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

@@ -170,6 +170,7 @@ const MediaManager = ({
                           title = "Galerie de médias", // Titre personnalisable
                           loading = false,
                       }) => {
+    const axios = useAxiosClient();
     const effectiveLoading = loading;
     const [showMediaSelector, setShowMediaSelector] = useState(false);
     const [showMediaModifier, setShowMediaModifier] = useState(false);
@@ -237,6 +238,36 @@ const MediaManager = ({
         }
     };
 
+    const handleMoveMedia = async (mediaId, direction) => {
+        const medias = [...(content.medias || [])];
+        const from = medias.findIndex((m) => m.id === mediaId);
+        const to = from + direction;
+        if (from < 0 || to < 0 || to >= medias.length) return;
+
+        [medias[from], medias[to]] = [medias[to], medias[from]];
+
+        try {
+            // Renumérote toute la liste pour éviter les sortOrder nuls ou dupliqués
+            await Promise.all(
+                medias
+                    .map((m, i) => ({m, i}))
+                    .filter(({m, i}) => m.sortOrder !== i)
+                    .map(({m, i}) =>
+                        axios.put(`/api/media/${m.id}/sort-order`, JSON.stringify(i), {
+                            headers: {"Content-Type": "application/json"},
+                        }),
+                    ),
+            );
+            if (onMediaChanged) onMediaChanged();
+        } catch (error) {
+            console.error("Error reordering medias:", error);
+            showError(
+                "Erreur de déplacement",
+                "Impossible de modifier l'ordre des médias. Veuillez réessayer.",
+            );
+        }
+    };
+
     const handleEditMedia = (media) => {
         setSelectedMediaId(media.id);
         setShowMediaModifier(true);
@@ -261,6 +292,7 @@ const MediaManager = ({
                         medias={content.medias || []}
                         onRemove={handleRemoveMedia}
                         onEdit={handleEditMedia}
+                        onMove={handleMoveMedia}
                         loading={effectiveLoading}
                     />
                 )}

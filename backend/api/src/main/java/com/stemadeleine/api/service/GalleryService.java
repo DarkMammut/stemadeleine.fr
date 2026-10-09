@@ -125,6 +125,7 @@ public class GalleryService {
 
         List<Media> medias = gallery.getMedias() != null ? gallery.getMedias() : new ArrayList<>();
         if (medias.stream().noneMatch(m -> m.getId().equals(mediaId))) {
+            media.setSortOrder(Media.nextSortOrder(medias));
             medias.add(media);
             gallery.setMedias(medias);
             moduleService.saveDraft(gallery);

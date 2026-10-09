@@ -136,6 +136,7 @@ public class ListContentService {
             medias = new ArrayList<>();
         }
         if (medias.stream().noneMatch(m -> m.getId().equals(mediaId))) {
+            media.setSortOrder(Media.nextSortOrder(medias));
             medias.add(media);
             content.setMedias(medias);
             listContentRepository.save(content);

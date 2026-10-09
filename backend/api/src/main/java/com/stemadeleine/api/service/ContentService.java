@@ -341,6 +341,7 @@ public class ContentService {
                 );
 
         if (!draft.getMedias().contains(media)) {
+            media.setSortOrder(Media.nextSortOrder(draft.getMedias()));
             draft.getMedias().add(media);
 
             draft.setVersion(draft.getVersion() + 1);

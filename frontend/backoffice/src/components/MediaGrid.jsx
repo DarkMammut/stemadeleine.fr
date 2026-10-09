@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { PencilIcon } from '@heroicons/react/16/solid';
+import { ChevronLeftIcon, ChevronRightIcon, PencilIcon } from '@heroicons/react/16/solid';
 import Button from '@/components/ui/Button';
 import DeleteButton from '@/components/ui/DeleteButton';
 
@@ -9,6 +9,7 @@ import DeleteButton from '@/components/ui/DeleteButton';
  * @param {Object[]} medias - Liste des médias à afficher
  * @param {Function} onRemove - Fonction appelée avec l'id du média à supprimer
  * @param {Function} onEdit - Fonction appelée avec l'objet média à éditer
+ * @param {Function} onMove - Fonction appelée avec (id, direction) où direction vaut -1 (gauche) ou 1 (droite)
  * @param {Boolean} loading - Désactive les boutons si true
  * @param {String} className - Classes CSS additionnelles
  */
@@ -16,6 +17,7 @@ export default function MediaGrid({
   medias = [],
   onRemove,
   onEdit,
+  onMove,
   loading = false,
   className = "",
 }) {
@@ -44,7 +46,7 @@ export default function MediaGrid({
   return (
     <div className={`${gridClasses} ${className}`}>
       <AnimatePresence>
-        {medias.map((media) => {
+        {medias.map((media, index) => {
           // Compatibilité : fileUrl ou url, title ou filename
           const url = media.fileUrl || media.url || "";
           const title = media.title || media.filename || "";
@@ -70,13 +72,26 @@ export default function MediaGrid({
               )}
 
               {/* Action buttons overlay */}
-              {(onRemove || onEdit) && (
+              {(onRemove || onEdit || onMove) && (
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                   <div className="flex gap-2">
-                    {onEdit && (
+                    {onMove && medias.length > 1 && index > 0 && (
                       <Button
                         type="button"
                         variant="secondary"
+                        size="sm"
+                        className="p-1 rounded-full"
+                        title="Déplacer vers la gauche"
+                        onClick={() => onMove(media.id, -1)}
+                        disabled={loading}
+                      >
+                        <ChevronLeftIcon className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {onEdit && (
+                      <Button
+                        type="button"
+                        variant="primary"
                         size="sm"
                         className="p-1 rounded-full"
                         title="Éditer ce média"
@@ -96,6 +111,19 @@ export default function MediaGrid({
                         disabled={loading}
                         hoverExpand={false}
                       />
+                    )}
+                    {onMove && medias.length > 1 && index < medias.length - 1 && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="p-1 rounded-full"
+                        title="Déplacer vers la droite"
+                        onClick={() => onMove(media.id, 1)}
+                        disabled={loading}
+                      >
+                        <ChevronRightIcon className="w-4 h-4" />
+                      </Button>
                     )}
                   </div>
                 </div>

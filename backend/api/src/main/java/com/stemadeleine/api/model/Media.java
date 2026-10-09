@@ -53,6 +53,16 @@ public class Media {
     @Column(name = "owner_id")
     private UUID ownerId;
 
+    /** Next sort order to place a media at the end of the given list. */
+    public static int nextSortOrder(java.util.List<Media> medias) {
+        if (medias == null) return 0;
+        return medias.stream()
+                .map(Media::getSortOrder)
+                .filter(java.util.Objects::nonNull)
+                .max(Integer::compare)
+                .orElse(-1) + 1;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

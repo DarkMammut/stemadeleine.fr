@@ -54,5 +54,6 @@ public class ListContent {
             joinColumns = @JoinColumn(name = "list_content_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "media_id")
     )
+    @OrderBy("sortOrder ASC")
     private List<Media> medias = new ArrayList<>();
 }
