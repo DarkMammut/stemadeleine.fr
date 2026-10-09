@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   const canonicalPath = `/newsletters/${newsletterId}`;
   const pageForSeo = {
-    name: newsletter.title || newsletter.name || page?.name || 'Newsletters',
+    title: newsletter.title || newsletter.name || page?.title || page?.name || 'Newsletters',
     description: newsletter.description || page?.description,
     heroMedia: newsletter.media?.fileUrl ? { fileUrl: newsletter.media.fileUrl } : page?.heroMedia,
     slug: canonicalPath,
