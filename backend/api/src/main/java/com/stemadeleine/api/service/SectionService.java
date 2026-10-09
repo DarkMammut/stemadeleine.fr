@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.model.Module;
 import com.stemadeleine.api.model.*;
 import com.stemadeleine.api.repository.MediaRepository;
@@ -26,6 +27,7 @@ public class SectionService {
     private final PageService pageService;
     private final MediaRepository mediaRepository;
     private final ContentService contentService;
+    private final PublicationStatusService publicationStatusService;
 
     @Autowired
     @Lazy
@@ -257,7 +259,59 @@ public class SectionService {
         for (Module module : moduleService.getModulesBySection(draft.getId())) {
             moduleService.publishModule(module.getModuleId(), author);
         }
+        contentService.publishAllContentsByOwner(sectionId, author);
         return published;
+    }
+
+    /**
+     * Resets the DRAFT section to its PUBLISHED state: section data, version, modules and contents
+     * become identical to the published ones. Modules and contents never published are deleted.
+     */
+    @Transactional
+    public Section resetSectionToPublished(UUID sectionId, User author) {
+        Section draft = getDraftOrThrow(sectionId);
+        Section published = sectionRepository.findBySectionIdAndStatus(sectionId, PublishingStatus.PUBLISHED)
+                .orElseThrow(() -> new RuntimeException("Published section not found: " + sectionId));
+
+        draft.setName(published.getName());
+        draft.setTitle(published.getTitle());
+        draft.setSortOrder(published.getSortOrder());
+        draft.setIsVisible(published.getIsVisible());
+        draft.setMedia(published.getMedia());
+        draft.setVersion(published.getVersion());
+        draft.setAuthor(author);
+        draft = sectionRepository.save(draft);
+
+        for (Module module : moduleService.getModulesBySection(draft.getId())) {
+            moduleService.resetOrDeleteDraft(module.getModuleId(), author);
+        }
+        contentService.resetAllContentsByOwner(sectionId, author);
+        return draft;
+    }
+
+    /**
+     * Resets (or deletes when never published) every DRAFT section of a page.
+     */
+    @Transactional
+    public void resetSectionsOfPage(UUID pageId, User author) {
+        for (Section section : getSectionsByPageId(pageId)) {
+            if (sectionRepository.findBySectionIdAndStatus(section.getSectionId(), PublishingStatus.PUBLISHED).isPresent()) {
+                resetSectionToPublished(section.getSectionId(), author);
+            } else {
+                softDeleteRow(section);
+            }
+        }
+    }
+
+    public PublicationInfoDto getPublicationInfo(UUID sectionId) {
+        Section draft = getDraftOrThrow(sectionId);
+        Section published = sectionRepository.findBySectionIdAndStatus(sectionId, PublishingStatus.PUBLISHED).orElse(null);
+        return new PublicationInfoDto(
+                draft.getVersion(),
+                draft.getUpdatedAt(),
+                published != null ? published.getVersion() : null,
+                published != null ? published.getUpdatedAt() : null,
+                publicationStatusService.sectionHasUnpublishedChanges(sectionId));
     }
 
     /**

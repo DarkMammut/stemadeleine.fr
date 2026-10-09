@@ -1,5 +1,6 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.dto.*;
 import com.stemadeleine.api.mapper.ContentMapper;
 import com.stemadeleine.api.mapper.ModuleMapper;
@@ -174,5 +175,22 @@ public class ModuleController {
         User currentUser = currentUserDetails.account().getUser();
         Module publishedModule = moduleService.publishModule(moduleId, currentUser);
         return ResponseEntity.ok(moduleMapper.toDto(publishedModule));
+    }
+
+    @GetMapping("/{moduleId}/publication-info")
+    public ResponseEntity<PublicationInfoDto> getPublicationInfo(@PathVariable UUID moduleId) {
+        return ResponseEntity.ok(moduleService.getPublicationInfo(moduleId));
+    }
+
+    @PutMapping("/{moduleId}/reset-draft")
+    public ResponseEntity<ModuleDto> resetDraftToPublished(
+            @PathVariable UUID moduleId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        Module draft = moduleService.resetDraftToPublished(moduleId, currentUser);
+        return ResponseEntity.ok(moduleMapper.toDto(draft));
     }
 }

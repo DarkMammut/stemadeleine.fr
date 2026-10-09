@@ -65,4 +65,25 @@ public interface ModuleRepository extends JpaRepository<Module, UUID> {
             @Param("status") PublishingStatus status,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT COUNT(d)
+            FROM Module d
+            WHERE d.section.sectionId IN :sectionIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+              AND NOT EXISTS (
+                  SELECT 1 FROM Module p
+                  WHERE p.moduleId = d.moduleId
+                    AND p.status = com.stemadeleine.api.model.PublishingStatus.PUBLISHED
+                    AND p.version = d.version)
+            """)
+    long countUnpublishedDrafts(@Param("sectionIds") java.util.Collection<UUID> sectionIds);
+
+    @Query("""
+            SELECT d.moduleId
+            FROM Module d
+            WHERE d.section.sectionId IN :sectionIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+            """)
+    List<UUID> findDraftModuleIdsBySectionIds(@Param("sectionIds") java.util.Collection<UUID> sectionIds);
 }

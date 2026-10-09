@@ -125,10 +125,7 @@ export default function Pages() {
   // Fonction pour publier toutes les pages (et enfants) via la nouvelle route backend
   const handlePublishPages = async () => {
     try {
-      if (!treeData || treeData.length === 0) return;
-      await Promise.all(
-        treeData.map((page) => axios.put(`/api/pages/${page.pageId}/publish`)),
-      );
+      await axios.put("/api/pages/tree/publish");
       await refetch();
       showSuccess(
         "Publication terminée",

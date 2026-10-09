@@ -3,6 +3,10 @@
 import React, { useEffect, useState } from "react";
 import Title from "@/components/ui/Title";
 import useGetModule from "@/hooks/useGetModule";
+import usePublicationInfo from "@/hooks/usePublicationInfo";
+import Notification from "@/components/ui/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import { useAxiosClient } from "@/utils/axiosClient";
 import SceneLayout from "@/components/ui/SceneLayout";
 
 // Import des composants spécialisés par type de module (basés sur votre backend Java)
@@ -34,6 +38,41 @@ export default function EditModule({
 }) {
   const { module, refetch, loading, error } = useGetModule({ moduleId });
   const [moduleData, setModuleData] = useState(null);
+  const [resetKey, setResetKey] = useState(0);
+  const axios = useAxiosClient();
+  const { info, refetchInfo, resetDraft } = usePublicationInfo(
+    "modules",
+    moduleId,
+  );
+  const { notification, showSuccess, showError, hideNotification } =
+    useNotification();
+
+  const handlePublishModule = async () => {
+    try {
+      await axios.put(`/api/modules/${moduleId}/publish`);
+      await refetch();
+      await refetchInfo();
+      showSuccess("Module publié", "Le module a été publié avec succès");
+    } catch (err) {
+      console.error(err);
+      showError("Erreur de publication", "Impossible de publier le module");
+    }
+  };
+
+  const handleResetModule = async () => {
+    try {
+      await resetDraft();
+      await refetch();
+      setResetKey((prev) => prev + 1);
+      showSuccess(
+        "Module réinitialisé",
+        "Le module est revenu à la version publiée",
+      );
+    } catch (err) {
+      console.error(err);
+      showError("Erreur", "Impossible de réinitialiser le module");
+    }
+  };
 
   // Ne pas retourner tôt — laisser les composants afficher leur état `loading` via props.
   useEffect(() => {
@@ -55,6 +94,9 @@ export default function EditModule({
     <SceneLayout>
       <Title
         label={`Édition de module - ${safeModuleData ? safeModuleData.type : "..."}`}
+        onPublish={handlePublishModule}
+        onReset={handleResetModule}
+        publicationInfo={info}
         loading={loading}
       />
 
@@ -70,10 +112,14 @@ export default function EditModule({
           </div>
         ) : ModuleComponent ? (
           <ModuleComponent
+            key={resetKey}
             moduleId={moduleId}
             moduleData={safeModuleData}
             setModuleData={setModuleData}
-            refetch={refetch}
+            refetch={async () => {
+              await refetch();
+              refetchInfo();
+            }}
             loading={Boolean(loading || !safeModuleData)}
           />
         ) : (
@@ -82,6 +128,13 @@ export default function EditModule({
           </div>
         )}
       </div>
+      <Notification
+        show={notification.show}
+        onClose={hideNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+      />
     </SceneLayout>
   );
 }

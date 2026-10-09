@@ -6,6 +6,7 @@ import { PlusIcon } from "@heroicons/react/16/solid";
 
 // Hooks
 import useGetPage from "@/hooks/useGetPage";
+import usePublicationInfo from "@/hooks/usePublicationInfo";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
@@ -30,6 +31,7 @@ export default function Sections({ pageId }) {
     route: `${pageId}/sections`,
   });
 
+  const { info, refetchInfo, resetDraft } = usePublicationInfo("pages", pageId);
   const { createSection } = useAddSection();
   const { updateSectionOrder } = useUpdateSectionOrder();
   const { updateSectionVisibility, deleteSection } = useSectionOperations();
@@ -234,15 +236,25 @@ export default function Sections({ pageId }) {
     }
   };
 
-  // Fonction pour publier toutes les sections de la page
+  // Publie la page (sections, modules et contenus compris)
   const handlePublishSections = async () => {
-    if (!page?.sections) return;
-    await Promise.all(
-      page.sections.map((section) =>
-        axiosClient.put(`/api/sections/${section.sectionId}/publish`),
-      ),
-    );
+    await axiosClient.put(`/api/pages/${pageId}/publish`);
     await refetch();
+    await refetchInfo();
+  };
+
+  const handleResetPage = async () => {
+    try {
+      await resetDraft();
+      await refetch();
+      showSuccess(
+        "Page réinitialisée",
+        "La page est revenue à la version publiée",
+      );
+    } catch (err) {
+      console.error(err);
+      showError("Erreur", "Impossible de réinitialiser la page");
+    }
   };
 
   // Construire les breadcrumbs pour la page sections
@@ -253,6 +265,8 @@ export default function Sections({ pageId }) {
       <Title
         label="Content Management"
         onPublish={handlePublishSections}
+        onReset={handleResetPage}
+        publicationInfo={info}
         showBreadcrumbs={!!page}
         breadcrumbs={breadcrumbs}
         loading={loading}

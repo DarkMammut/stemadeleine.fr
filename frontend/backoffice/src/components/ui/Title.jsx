@@ -2,6 +2,13 @@ import PublishButton from "@/components/ui/PublishButton";
 import BackButton from "@/components/ui/BackButton";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
+import IconButton from "@/components/ui/IconButton";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+
+const formatDate = (value) =>
+  value ? new Date(value).toLocaleDateString("fr-FR") : "";
 
 export default function Title({
   label = "Title",
@@ -14,8 +21,24 @@ export default function Title({
   autoHideBackButton = true, // Nouvelle prop pour contrôler l'auto-hide
   loading = false, // nouvelle prop pour désactiver actions pendant le chargement
   rightActions = null, // nouveaux boutons à afficher à droite (React node ou array)
+  publicationInfo = null, // { draftVersion, draftUpdatedAt, publishedVersion }
+  onReset = null, // réinitialise le draft sur la version publiée
 }) {
   const router = useRouter();
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  const handleConfirmReset = async () => {
+    try {
+      setResetting(true);
+      await onReset();
+    } catch (err) {
+      console.error("Erreur réinitialisation :", err);
+    } finally {
+      setResetting(false);
+      setShowResetModal(false);
+    }
+  };
 
   return (
     <div className="w-full mb-8">
@@ -99,6 +122,21 @@ export default function Title({
         <div className="mt-4 flex shrink-0 md:mt-0 md:ml-4 items-center gap-2">
           {rightActions}
 
+          {onPublish && publicationInfo && (
+            <div className="text-xs text-gray-500 text-right leading-tight mr-2">
+              <div>
+                Dernière modification : V{publicationInfo.draftVersion}{" "}
+                {formatDate(publicationInfo.draftUpdatedAt)}
+              </div>
+              <div>
+                Version publiée :{" "}
+                {publicationInfo.publishedVersion != null
+                  ? `V${publicationInfo.publishedVersion}`
+                  : "non publié"}
+              </div>
+            </div>
+          )}
+
           {onPublish && (
             <PublishButton
               onPublish={onPublish}
@@ -106,10 +144,42 @@ export default function Title({
               publishedLabel="À jour"
               size="md"
               disabled={loading}
+              upToDate={publicationInfo?.hasUnpublishedChanges === false}
+            />
+          )}
+
+          {onPublish && onReset && (
+            <IconButton
+              icon={ArrowUturnLeftIcon}
+              variant="secondary"
+              size="md"
+              title="Revenir à la version publiée"
+              aria-label="Réinitialiser"
+              onClick={() => setShowResetModal(true)}
+              disabled={
+                loading ||
+                resetting ||
+                !publicationInfo ||
+                publicationInfo.publishedVersion == null ||
+                !publicationInfo.hasUnpublishedChanges
+              }
             />
           )}
         </div>
       </div>
+
+      {onReset && (
+        <ConfirmModal
+          open={showResetModal}
+          onClose={() => setShowResetModal(false)}
+          onConfirm={handleConfirmReset}
+          title="Réinitialiser les modifications"
+          message="Toutes les modifications non publiées seront perdues : les données reviendront exactement à la dernière version publiée (y compris les éléments liés). Continuer ?"
+          confirmLabel="Réinitialiser"
+          isLoading={resetting}
+          variant="danger"
+        />
+      )}
     </div>
   );
 }

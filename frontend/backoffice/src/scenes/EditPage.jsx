@@ -6,6 +6,7 @@ import PagesTabs from "@/components/PagesTabs";
 import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
 import useGetPage from "@/hooks/useGetPage";
+import usePublicationInfo from "@/hooks/usePublicationInfo";
 import useAddPage from "@/hooks/useAddPage";
 import useUpdatePageVisibility from "@/hooks/useUpdatePageVisibility";
 import EditablePanelV2 from "@/components/ui/EditablePanel";
@@ -18,6 +19,7 @@ import { useNotification } from "@/hooks/useNotification";
 
 export default function EditPage({ pageId }) {
   const { page, refetch } = useGetPage({ route: pageId });
+  const { info, refetchInfo, resetDraft } = usePublicationInfo("pages", pageId);
   const { updatePage } = useAddPage();
   const { updatePageVisibility } = useUpdatePageVisibility();
   const [pageData, setPageData] = useState(null);
@@ -110,6 +112,7 @@ export default function EditPage({ pageId }) {
       });
       setSaving(false);
       refetch();
+      refetchInfo();
       showSuccess("Page enregistrée", "La page a été mise à jour avec succès");
     } catch (err) {
       console.error(err);
@@ -147,10 +150,26 @@ export default function EditPage({ pageId }) {
     try {
       await axios.put(`/api/pages/${pageId}/publish`);
       await refetch();
+      await refetchInfo();
       showSuccess("Page publiée", "La page a été publiée avec succès");
     } catch (err) {
       console.error(err);
       showError("Erreur de publication", "Impossible de publier la page");
+    }
+  };
+
+  const handleResetPage = async () => {
+    try {
+      await resetDraft();
+      await refetch();
+      setFormKey((prev) => prev + 1);
+      showSuccess(
+        "Page réinitialisée",
+        "La page est revenue à la version publiée",
+      );
+    } catch (err) {
+      console.error(err);
+      showError("Erreur", "Impossible de réinitialiser la page");
     }
   };
 
@@ -163,6 +182,8 @@ export default function EditPage({ pageId }) {
           pageData ? pageData.name || "Page sans nom" : "Gestion des pages"
         }
         onPublish={handlePublishPage}
+        onReset={handleResetPage}
+        publicationInfo={info}
         showBreadcrumbs={!!pageData}
         breadcrumbs={breadcrumbs}
         loading={!page}

@@ -1,6 +1,7 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.CreateContentRequest;
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.model.Article;
 import com.stemadeleine.api.model.CTA;
 import com.stemadeleine.api.model.Content;
@@ -54,6 +55,8 @@ public class ModuleService {
     private final ContentRepository contentRepository;
     private final FieldRepository fieldRepository;
     private final MediaGalleryService mediaAttachmentService;
+    private final ContentService contentService;
+    private final PublicationStatusService publicationStatusService;
 
     // ==== READ ====
 
@@ -308,6 +311,7 @@ public class ModuleService {
         }
 
         Module saved = moduleRepository.save(published);
+        contentService.publishAllContentsByOwner(moduleId, author);
         log.info("Module published: moduleId={}, version={}", moduleId, saved.getVersion());
         return saved;
     }
@@ -327,7 +331,8 @@ public class ModuleService {
     }
 
     /**
-     * Resets the DRAFT to the PUBLISHED version.
+     * Resets the DRAFT to the PUBLISHED version: module data (including type specific data),
+     * version and contents become identical to the published ones.
      */
     @Transactional
     public Module resetDraftToPublished(UUID moduleId, User author) {
@@ -340,9 +345,35 @@ public class ModuleService {
         }
 
         copyModuleData(published, draft);
-        draft.setVersion(draft.getVersion() + 1);
+        draft.setVersion(published.getVersion());
         draft.setAuthor(author);
-        return moduleRepository.save(draft);
+        Module saved = moduleRepository.save(draft);
+        contentService.resetAllContentsByOwner(moduleId, author);
+        return saved;
+    }
+
+    /**
+     * Resets a DRAFT module to its published state, or deletes it when it was never published.
+     */
+    @Transactional
+    public void resetOrDeleteDraft(UUID moduleId, User author) {
+        if (getPublishedModuleByModuleId(moduleId).isPresent()) {
+            resetDraftToPublished(moduleId, author);
+        } else {
+            softDeleteModule(moduleId);
+        }
+    }
+
+    public PublicationInfoDto getPublicationInfo(UUID moduleId) {
+        Module draft = getModuleByModuleId(moduleId)
+                .orElseThrow(() -> new RuntimeException("Draft module not found: " + moduleId));
+        Module published = getPublishedModuleByModuleId(moduleId).orElse(null);
+        return new PublicationInfoDto(
+                draft.getVersion(),
+                draft.getUpdatedAt(),
+                published != null ? published.getVersion() : null,
+                published != null ? published.getUpdatedAt() : null,
+                publicationStatusService.moduleHasUnpublishedChanges(moduleId));
     }
 
     // ==== COPY ====

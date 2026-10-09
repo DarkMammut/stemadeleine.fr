@@ -59,4 +59,25 @@ public interface SectionRepository extends JpaRepository<Section, UUID> {
             @Param("pageRowId") UUID pageRowId,
             @Param("status") PublishingStatus status
     );
+
+    @Query("""
+            SELECT COUNT(d)
+            FROM Section d
+            WHERE d.sectionId IN :sectionIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+              AND NOT EXISTS (
+                  SELECT 1 FROM Section p
+                  WHERE p.sectionId = d.sectionId
+                    AND p.status = com.stemadeleine.api.model.PublishingStatus.PUBLISHED
+                    AND p.version = d.version)
+            """)
+    long countUnpublishedDrafts(@Param("sectionIds") java.util.Collection<UUID> sectionIds);
+
+    @Query("""
+            SELECT d.sectionId
+            FROM Section d
+            WHERE d.page.pageId IN :pageIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+            """)
+    List<UUID> findDraftSectionIdsByPageIds(@Param("pageIds") java.util.Collection<UUID> pageIds);
 }

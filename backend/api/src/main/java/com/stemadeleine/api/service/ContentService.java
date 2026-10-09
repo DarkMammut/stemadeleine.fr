@@ -285,7 +285,7 @@ public class ContentService {
                         new RuntimeException("Draft not found: " + contentId)
                 );
 
-        draft.setVersion(draft.getVersion() + 1);
+        draft.setVersion(published.getVersion());
 
         draft.setOwnerId(published.getOwnerId());
         draft.setTitle(published.getTitle());
@@ -297,6 +297,29 @@ public class ContentService {
         synchronizeMedias(draft, published);
 
         return contentRepository.save(draft);
+    }
+
+    /**
+     * Resets every content of an owner to its published state: drafts having a PUBLISHED row are
+     * restored (same data, medias and version), drafts that were never published are deleted.
+     */
+    @Transactional
+    public int resetAllContentsByOwner(UUID ownerId, User author) {
+        List<Content> drafts = new ArrayList<>(contentRepository.findByOwnerIdAndStatusOrderBySortOrderAsc(
+                ownerId,
+                PublishingStatus.DRAFT
+        ));
+
+        int count = 0;
+        for (Content draft : drafts) {
+            if (getPublished(draft.getContentId()).isPresent()) {
+                resetDraftToPublished(draft.getContentId(), author);
+            } else {
+                deleteContent(draft.getContentId(), author);
+            }
+            count++;
+        }
+        return count;
     }
 
     /**

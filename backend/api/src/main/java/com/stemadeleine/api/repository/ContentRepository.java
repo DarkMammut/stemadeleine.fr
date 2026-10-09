@@ -78,4 +78,20 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
     Optional<Content> findByIdWithMedias(
             @Param("id") UUID id
     );
+
+    /**
+     * Number of DRAFT contents of the given owners that are not published at the same version.
+     */
+    @Query("""
+            SELECT COUNT(d)
+            FROM Content d
+            WHERE d.ownerId IN :ownerIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+              AND NOT EXISTS (
+                  SELECT 1 FROM Content p
+                  WHERE p.contentId = d.contentId
+                    AND p.status = com.stemadeleine.api.model.PublishingStatus.PUBLISHED
+                    AND p.version = d.version)
+            """)
+    long countUnpublishedDrafts(@Param("ownerIds") java.util.Collection<UUID> ownerIds);
 }

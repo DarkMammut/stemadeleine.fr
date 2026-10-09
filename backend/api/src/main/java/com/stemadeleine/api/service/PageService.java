@@ -1,9 +1,11 @@
 package com.stemadeleine.api.service;
 
 import com.stemadeleine.api.dto.PageDto;
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.model.Media;
 import com.stemadeleine.api.model.Page;
 import com.stemadeleine.api.model.PublishingStatus;
+import com.stemadeleine.api.model.Section;
 import com.stemadeleine.api.model.User;
 import com.stemadeleine.api.repository.MediaRepository;
 import com.stemadeleine.api.repository.PageRepository;
@@ -32,11 +34,14 @@ public class PageService {
     private final MediaRepository mediaRepository;
     private final PageRepository pageRepository;
     private final SectionService sectionService;
+    private final PublicationStatusService publicationStatusService;
 
-    public PageService(MediaRepository mediaRepository, PageRepository pageRepository, @Lazy SectionService sectionService) {
+    public PageService(MediaRepository mediaRepository, PageRepository pageRepository, @Lazy SectionService sectionService,
+                       PublicationStatusService publicationStatusService) {
         this.mediaRepository = mediaRepository;
         this.pageRepository = pageRepository;
         this.sectionService = sectionService;
+        this.publicationStatusService = publicationStatusService;
     }
 
     // ==== READ ====
@@ -309,10 +314,70 @@ public class PageService {
         published.setAuthor(author != null ? author : draft.getAuthor());
         published = pageRepository.save(published);
 
+        for (Section section : sectionService.getSectionsByPageId(draft.getPageId())) {
+            sectionService.publishSection(section.getSectionId(), author);
+        }
+
         for (Page child : pageRepository.findByParentPageAndStatus(draft, PublishingStatus.DRAFT)) {
             publishPageRecursive(child, author);
         }
         return published;
+    }
+
+    /**
+     * Resets the draft of the page to its published state, recursively: page data and version,
+     * position in the tree, child pages, sections, modules and contents become identical to the
+     * published ones. Pages, sections, modules and contents that were never published are deleted.
+     */
+    @Transactional
+    public Page resetPageToPublished(UUID pageId, User author) {
+        getDraftOrThrow(pageId);
+        getPublishedPage(pageId)
+                .orElseThrow(() -> new IllegalStateException("The page has never been published: " + pageId));
+        return resetPageRecursive(pageId, author);
+    }
+
+    private Page resetPageRecursive(UUID pageId, User author) {
+        Page draft = getDraftOrThrow(pageId);
+        Page published = getPublishedPage(pageId).orElseThrow();
+
+        draft.setVersion(published.getVersion());
+        draft.setName(published.getName());
+        draft.setTitle(published.getTitle());
+        draft.setSubTitle(published.getSubTitle());
+        draft.setSlug(published.getSlug());
+        draft.setDescription(published.getDescription());
+        draft.setSortOrder(published.getSortOrder());
+        draft.setIsVisible(published.getIsVisible());
+        draft.setHeroMedia(published.getHeroMedia());
+        draft.setParentPage(published.getParentPage() != null
+                ? getLastVersion(published.getParentPage().getPageId()).orElse(null)
+                : null);
+        draft.setAuthor(author);
+        draft = pageRepository.save(draft);
+
+        sectionService.resetSectionsOfPage(pageId, author);
+
+        for (Page publishedChild : pageRepository.findByParentPageAndStatus(published, PublishingStatus.PUBLISHED)) {
+            resetPageRecursive(publishedChild.getPageId(), author);
+        }
+        for (Page draftChild : pageRepository.findByParentPageAndStatus(draft, PublishingStatus.DRAFT)) {
+            if (getPublishedPage(draftChild.getPageId()).isEmpty()) {
+                deleteRecursive(draftChild.getPageId());
+            }
+        }
+        return draft;
+    }
+
+    public PublicationInfoDto getPublicationInfo(UUID pageId) {
+        Page draft = getDraftOrThrow(pageId);
+        Page published = getPublishedPage(pageId).orElse(null);
+        return new PublicationInfoDto(
+                draft.getVersion(),
+                draft.getUpdatedAt(),
+                published != null ? published.getVersion() : null,
+                published != null ? published.getUpdatedAt() : null,
+                publicationStatusService.pageHasUnpublishedChanges(pageId));
     }
 
     /**

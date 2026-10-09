@@ -1,5 +1,6 @@
 package com.stemadeleine.api.controller;
 
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.dto.PageDto;
 import com.stemadeleine.api.dto.PageEditDto;
 import com.stemadeleine.api.dto.PageRequest;
@@ -311,6 +312,25 @@ public class PageController {
         log.info("PUT /api/pages/{}/publish - Publishing page by user: {}", pageId, currentUser.getUsername());
         Page publishedPage = pageService.publishPage(pageId, currentUser);
         return ResponseEntity.ok(pageMapper.toDto(publishedPage));
+    }
+
+    // ----- PUBLICATION INFO / RESET -----
+    @GetMapping("/{pageId}/publication-info")
+    public ResponseEntity<PublicationInfoDto> getPublicationInfo(@PathVariable UUID pageId) {
+        return ResponseEntity.ok(pageService.getPublicationInfo(pageId));
+    }
+
+    @PutMapping("/{pageId}/reset-draft")
+    public ResponseEntity<PageDto> resetDraftToPublished(
+            @PathVariable UUID pageId,
+            @AuthenticationPrincipal CustomUserDetails currentUserDetails
+    ) {
+        if (currentUserDetails == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        User currentUser = currentUserDetails.account().getUser();
+        log.info("PUT /api/pages/{}/reset-draft - Resetting draft by user: {}", pageId, currentUser.getUsername());
+        return ResponseEntity.ok(pageMapper.toDto(pageService.resetPageToPublished(pageId, currentUser)));
     }
 
     private User extractUser(CustomUserDetails customUserDetails) {

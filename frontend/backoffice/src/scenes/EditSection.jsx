@@ -5,6 +5,7 @@ import SectionsTabs from "@/components/SectionsTabs";
 import Utilities from "@/components/ui/Utilities";
 import Title from "@/components/ui/Title";
 import useGetSection from "@/hooks/useGetSection";
+import usePublicationInfo from "@/hooks/usePublicationInfo";
 import useAddSection from "@/hooks/useAddSection";
 import { useSectionOperations } from "@/hooks/useSectionOperations";
 import EditablePanel from "@/components/ui/EditablePanel";
@@ -19,6 +20,10 @@ import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
 
 export default function EditSection({ sectionId, pageId }) {
   const { section, refetch, loading, error } = useGetSection({ sectionId });
+  const { info, refetchInfo, resetDraft } = usePublicationInfo(
+    "sections",
+    sectionId,
+  );
   const { updateSection } = useAddSection();
   const { updateSectionVisibility } = useSectionOperations();
   const [sectionData, setSectionData] = useState(null);
@@ -94,6 +99,7 @@ export default function EditSection({ sectionId, pageId }) {
         order: parseInt(values.order) || 0,
       });
       refetch();
+      refetchInfo();
       // MyForm gère déjà les notifications de succès
     } catch (err) {
       console.error(err);
@@ -131,10 +137,26 @@ export default function EditSection({ sectionId, pageId }) {
     try {
       await axios.put(`/api/sections/${sectionId}/publish`);
       await refetch();
+      await refetchInfo();
       showSuccess("Section publiée", "La section a été publiée avec succès");
     } catch (err) {
       console.error(err);
       showError("Erreur", "Impossible de publier la section");
+    }
+  };
+
+  const handleResetSection = async () => {
+    try {
+      await resetDraft();
+      await refetch();
+      setFormKey((prev) => prev + 1);
+      showSuccess(
+        "Section réinitialisée",
+        "La section est revenue à la version publiée",
+      );
+    } catch (err) {
+      console.error(err);
+      showError("Erreur", "Impossible de réinitialiser la section");
     }
   };
 
@@ -156,6 +178,8 @@ export default function EditSection({ sectionId, pageId }) {
       <Title
         label="Gestion de la section"
         onPublish={handlePublishSection}
+        onReset={handleResetSection}
+        publicationInfo={info}
         showBreadcrumbs={!!section}
         breadcrumbs={breadcrumbs}
         loading={loading}
@@ -189,6 +213,7 @@ export default function EditSection({ sectionId, pageId }) {
 
         {/* Rich Text Content Editor */}
         <ContentManager
+          key={`contents-${formKey}`}
           parentId={section?.sectionId}
           parentType="section"
           customLabels={{

@@ -2,6 +2,7 @@ package com.stemadeleine.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stemadeleine.api.dto.PublicationInfoDto;
 import com.stemadeleine.api.dto.ContentDto;
 import com.stemadeleine.api.dto.SectionDto;
 import com.stemadeleine.api.dto.SectionRequest;
@@ -528,6 +529,23 @@ public class SectionController {
         log.info("PUT /api/sections/{}/publish - Publishing section by user: {}", sectionId, currentUser.getUsername());
         Section publishedSection = sectionService.publishSection(sectionId, currentUser);
         return ResponseEntity.ok(sectionMapper.toDto(publishedSection));
+    }
+
+    @GetMapping("/{sectionId}/publication-info")
+    public ResponseEntity<PublicationInfoDto> getPublicationInfo(@PathVariable UUID sectionId) {
+        return ResponseEntity.ok(sectionService.getPublicationInfo(sectionId));
+    }
+
+    @PutMapping("/{sectionId}/reset-draft")
+    public ResponseEntity<SectionDto> resetDraftToPublished(@PathVariable UUID sectionId, @AuthenticationPrincipal CustomUserDetails currentUserDetails, Principal principal, HttpServletRequest httpRequest) {
+        User currentUser = extractUser(currentUserDetails, principal, httpRequest);
+        if (currentUser == null) {
+            log.error("Attempt to reset section without authentication");
+            throw new RuntimeException("User not authenticated");
+        }
+        log.info("PUT /api/sections/{}/reset-draft - Resetting draft by user: {}", sectionId, currentUser.getUsername());
+        Section section = sectionService.resetSectionToPublished(sectionId, currentUser);
+        return ResponseEntity.ok(sectionMapper.toDto(section));
     }
 
     private User extractUser(CustomUserDetails customUserDetails, Principal principal, HttpServletRequest httpRequest) {

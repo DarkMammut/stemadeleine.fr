@@ -6,6 +6,7 @@ import {PlusIcon} from "@heroicons/react/24/outline";
 
 // Hooks
 import useGetSection from "@/hooks/useGetSection";
+import usePublicationInfo from "@/hooks/usePublicationInfo";
 import {useModuleOperations} from "@/hooks/useModuleOperations";
 import {useAxiosClient} from "@/utils/axiosClient";
 import {useNotification} from "@/hooks/useNotification";
@@ -25,6 +26,7 @@ export default function Modules({pageId, sectionId}) {
     const router = useRouter();
     const axiosClient = useAxiosClient();
     const {section, refetch, loading, error} = useGetSection({sectionId});
+    const {info, refetchInfo, resetDraft} = usePublicationInfo("sections", sectionId);
     const {updateModuleVisibility, deleteModule} = useModuleOperations();
     const {notification, showSuccess, showError, hideNotification} =
         useNotification();
@@ -177,15 +179,25 @@ export default function Modules({pageId, sectionId}) {
 
     if (error) return <p>Erreur: {error.message}</p>;
 
-    // Fonction pour publier tous les modules de la section
+    // Publie la section (modules et contenus compris)
     const handlePublishModules = async () => {
-        if (!section?.modules) return;
-        await Promise.all(
-            section.modules.map((module) =>
-                axiosClient.put(`/api/modules/${module.moduleId}/publish`),
-            ),
-        );
+        await axiosClient.put(`/api/sections/${sectionId}/publish`);
         await refetch();
+        await refetchInfo();
+    };
+
+    const handleResetSection = async () => {
+        try {
+            await resetDraft();
+            await refetch();
+            showSuccess(
+                "Section réinitialisée",
+                "La section est revenue à la version publiée",
+            );
+        } catch (error) {
+            console.error("Erreur lors de la réinitialisation :", error);
+            showError("Erreur", "Impossible de réinitialiser la section");
+        }
     };
 
     // Construire les breadcrumbs
@@ -201,6 +213,8 @@ export default function Modules({pageId, sectionId}) {
             <Title
                 label={`Modules de ${section?.name || "la section"}`}
                 onPublish={handlePublishModules}
+                onReset={handleResetSection}
+                publicationInfo={info}
                 showBreadcrumbs={!!section}
                 breadcrumbs={breadcrumbs}
                 loading={loading}

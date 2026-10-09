@@ -10,6 +10,7 @@ import { CloudArrowUpIcon } from '@heroicons/react/24/solid';
  * @param {string} publishLabel - Texte du bouton de publication
  * @param {string} publishedLabel - Texte affiché quand publié
  * @param {string} size - Taille du bouton ("sm", "md", "lg")
+ * @param {boolean} upToDate - Force l'état "à jour" (rien à publier)
  * @param {boolean} resetAfterDelay - Remet le bouton à l'état initial après un délai
  */
 export default function PublishButton({
@@ -19,6 +20,7 @@ export default function PublishButton({
   publishedLabel = "À jour",
   size = "md",
   resetAfterDelay = true,
+  upToDate = false,
 }) {
   const [loading, setLoading] = useState(false);
   const [published, setPublished] = useState(false);
@@ -44,7 +46,7 @@ export default function PublishButton({
     }
   };
 
-  if (published) {
+  if (published || upToDate) {
     return (
       <Flag variant="success" size={size}>
         {publishedLabel}

@@ -58,4 +58,17 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
             @Param("status") PublishingStatus status,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT COUNT(d)
+            FROM Page d
+            WHERE d.pageId IN :pageIds
+              AND d.status = com.stemadeleine.api.model.PublishingStatus.DRAFT
+              AND NOT EXISTS (
+                  SELECT 1 FROM Page p
+                  WHERE p.pageId = d.pageId
+                    AND p.status = com.stemadeleine.api.model.PublishingStatus.PUBLISHED
+                    AND p.version = d.version)
+            """)
+    long countUnpublishedDrafts(@Param("pageIds") java.util.Collection<UUID> pageIds);
 }

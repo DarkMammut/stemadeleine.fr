@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {AnimatePresence} from "framer-motion";
 import {PlusIcon} from "@heroicons/react/24/outline";
 import Button from "@/components/ui/Button";
@@ -44,6 +44,7 @@ const ContentManager = ({
                             loading: externalLoading = false,
                         }) => {
     const [contents, setContents] = useState([]);
+    const skipNotifyRef = useRef(true);
     const [expandedContents, setExpandedContents] = useState(new Set());
     const [loadingLocal, setLoadingLocal] = useState(false);
     const [savingStates, setSavingStates] = useState({});
@@ -88,6 +89,7 @@ const ContentManager = ({
 
             const uniqueContents = await getContents(parentId);
 
+            skipNotifyRef.current = true;
             setContents(uniqueContents);
 
             if (onContentsChange) {
@@ -104,6 +106,15 @@ const ContentManager = ({
             setLoadingLocal(false);
         }
     };
+
+    // Les contenus modifiés changent l'état de publication des parents (page, section, module)
+    useEffect(() => {
+        if (skipNotifyRef.current) {
+            skipNotifyRef.current = false;
+            return;
+        }
+        window.dispatchEvent(new Event("publication-info-changed"));
+    }, [contents]);
 
     // Toggle content expansion
     const toggleContentExpansion = (contentId) => {
@@ -512,6 +523,11 @@ const ContentManager = ({
         );
     };
 
+    const isStandalonePublication = [
+        "news-publication",
+        "newsletter-publication",
+    ].includes(parentType);
+
     const effectiveLoading =
         externalLoading || loadingLocal;
 
@@ -520,23 +536,27 @@ const ContentManager = ({
             title={customLabels.header || "Contenus"}
             actions={
                 <div className="flex items-center gap-2">
-                    <PublishButton
-                        onPublish={handleOpenPublishAllModal}
-                        disabled={
-                            effectiveLoading ||
-                            contents.length === 0 ||
-                            isPublishingAll ||
-                            (parentType === "news-publication" &&
-                                !contentOwnerId)
-                        }
-                        publishLabel={
-                            customLabels.publishButton ||
-                            "Publier tous"
-                        }
-                        publishedLabel="Tous publiés"
-                        size="md"
-                        resetAfterDelay={true}
-                    />
+                    {/* Sections/modules : la publication est portée par le parent (page, section, module).
+                        Les publications news/newsletter n'ont pas de parent versionné. */}
+                    {isStandalonePublication && (
+                        <PublishButton
+                            onPublish={handleOpenPublishAllModal}
+                            disabled={
+                                effectiveLoading ||
+                                contents.length === 0 ||
+                                isPublishingAll ||
+                                (parentType === "news-publication" &&
+                                    !contentOwnerId)
+                            }
+                            publishLabel={
+                                customLabels.publishButton ||
+                                "Publier tous"
+                            }
+                            publishedLabel="Tous publiés"
+                            size="md"
+                            resetAfterDelay={true}
+                        />
+                    )}
 
                     <Button
                         onClick={handleAddContent}
@@ -868,7 +888,7 @@ const ContentManager = ({
                 </div>
             </div>
 
-            <ConfirmModal
+            {isStandalonePublication && <ConfirmModal
                 open={showPublishAllModal}
                 onClose={() =>
                     setShowPublishAllModal(false)
@@ -879,7 +899,7 @@ const ContentManager = ({
                 confirmLabel="Publier tous"
                 isLoading={isPublishingAll}
                 variant="primary"
-            />
+            />}
 
             <Notification
                 {...notification}
