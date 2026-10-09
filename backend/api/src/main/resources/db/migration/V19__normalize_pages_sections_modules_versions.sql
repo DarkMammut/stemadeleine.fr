@@ -25,7 +25,7 @@
 --   - Un enfant DRAFT d'un parent DELETED passe DELETED, un enfant PUBLISHED d'un parent
 --     ARCHIVED passe ARCHIVED.
 --   - Les lignes dupliquées reçoivent leur propre copie des données spécifiques au type de module
---     (articles, news, newsletters, galleries, timelines, lists, form, cta), de la liste
+--     (articles, news, newsletters, gallery, timelines, lists, form, cta), de la liste
 --     d'items (list_contents + list_content_media), des champs de formulaire (field,
 --     form_fields), des médias de galerie, de article_content et de section_content.
 --   - Les médias (media) et les contents (rattachés par owner_id = id logique) sont partagés
@@ -169,7 +169,7 @@ $mig$
         -- ====================================================================
         -- 3. Données propres aux modules dupliqués
         -- ====================================================================
-        FOREACH s IN ARRAY ARRAY ['articles', 'news', 'newsletters', 'galleries', 'timelines', 'lists', 'form', 'cta']
+        FOREACH s IN ARRAY ARRAY ['articles', 'news', 'newsletters', 'gallery', 'timelines', 'lists', 'form', 'cta']
             LOOP
                 IF to_regclass('public.' || quote_ident(s)) IS NOT NULL THEN
                     EXECUTE format(
