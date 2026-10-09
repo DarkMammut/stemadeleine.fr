@@ -5,8 +5,10 @@ import Title from "@/components/ui/Title";
 import UserDetails from "@/components/UserDetails";
 import SceneLayout from "@/components/ui/SceneLayout";
 import { useUserOperations } from "@/hooks/useUserOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { getCurrentUser } = useUserOperations();
 
   const [user, setUser] = useState(null);
@@ -26,7 +28,7 @@ export default function Profile() {
       }
       setUser(res);
     } catch (e) {
-      alert("Erreur lors du chargement du profil");
+      alert(t("users.profileLoadError"));
     } finally {
       setLoading(false);
     }
@@ -34,7 +36,7 @@ export default function Profile() {
 
   return (
     <SceneLayout>
-      <Title label="Mon profil" />
+      <Title label={t("users.profileTitle")} />
 
       <UserDetails
         user={user}

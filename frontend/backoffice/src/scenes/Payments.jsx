@@ -21,12 +21,14 @@ import PaymentFormModal from "@/components/PaymentFormModal";
 import SceneLayout from "@/components/ui/SceneLayout";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Pagination from "@/components/ui/Pagination";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Payments() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const axios = useAxiosClient();
+  const { t } = useTranslation();
   const [payments, setPayments] = useState([]);
   const [pageInfo, setPageInfo] = useState({
     page: 0,
@@ -47,9 +49,17 @@ export default function Payments() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortValue, setSortValue] = useState({ field: null, direction: null });
 
-  // read initial state from URL params (if any) then fetch enums and data
+  const translateEnum = useCallback(
+    (group, value) => {
+      if (!value) return "";
+      const key = `payments.enums.${group}.${String(value).toUpperCase()}`;
+      const translated = t(key);
+      return translated === key ? value : translated;
+    },
+    [t],
+  );
+
   useEffect(() => {
-    // parse search params (useSearchParams returns a URLSearchParams-like object)
     const initStatuses =
       searchParams && searchParams.getAll ? searchParams.getAll("status") : [];
     const initTypes =
@@ -69,14 +79,11 @@ export default function Payments() {
     });
     setPageInfo((p) => ({ ...p, page: initPage, size: initSize }));
 
-    // fetch enums and initial page using parsed params
     (async () => {
       try {
         const res = await axios.get("/api/payments/enums");
         setEnums(res.data || { status: [], type: [] });
-      } catch (err) {
-        // continue even if enums fail
-      }
+      } catch (err) {}
 
       await loadPayments(initPage, initSize, {
         statuses: initStatuses,
@@ -89,16 +96,13 @@ export default function Payments() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ref to skip effect on initial mount (we already loaded data in mount effect)
   const mountedRef = useRef(false);
 
-  // effect: when filters/tri/pagination change, update URL and reload (runs after render)
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
       return;
     }
-    // update URL and reload using current state
     updateUrlFromState(
       pageInfo.page,
       pageInfo.size,
@@ -124,7 +128,6 @@ export default function Payments() {
     searchQuery,
   ]);
 
-  // helper to update URL (replace history entry) from state/overrides
   const updateUrlFromState = (
     page = pageInfo.page,
     size = pageInfo.size,
@@ -146,53 +149,48 @@ export default function Payments() {
 
     const q = params.toString();
     const url = q ? `${pathname}?${q}` : pathname;
-    // use replace to avoid adding a history entry on each toggle
-    // defer navigation to avoid updating Router during render (React error)
     setTimeout(() => {
       try {
         router.push(url);
       } catch (e) {
-        // fallback if router.replace fails for some reason
         try {
           window.history.replaceState(null, "", url);
-        } catch (err) {
-          // nothing else we can do
-        }
+        } catch (err) {}
       }
     }, 0);
   };
 
   const buildFilterItems = useCallback(() => {
     const items = [];
-    // statuses: key like status:PAID
-    (enums.status || []).forEach((s) => {
+    (enums.status || []).forEach((status) => {
       items.push({
-        key: `status:${s}`,
-        label: `Statut: ${s}`,
+        key: `status:${status}`,
+        label: `${t("payments.filterStatusPrefix")}: ${translateEnum("status", status)}`,
         type: "toggle",
-        value: selectedStatuses.includes(s),
-        group: "Statuts",
+        value: selectedStatuses.includes(status),
+        group: t("payments.groups.statuses"),
       });
     });
-    // types
-    (enums.type || []).forEach((t) => {
+    (enums.type || []).forEach((type) => {
       items.push({
-        key: `type:${t}`,
-        label: `Type: ${t}`,
+        key: `type:${type}`,
+        label: `${t("payments.filterTypePrefix")}: ${translateEnum("type", type)}`,
         type: "toggle",
-        value: selectedTypes.includes(t),
-        group: "Types",
+        value: selectedTypes.includes(type),
+        group: t("payments.groups.types"),
       });
     });
     return items;
-  }, [enums, selectedStatuses, selectedTypes]);
+  }, [enums, selectedStatuses, selectedTypes, t, translateEnum]);
 
-  const fields = [
-    { key: "paymentDate", label: "Date" },
-    { key: "amount", label: "Montant" },
-  ];
+  const fields = useMemo(
+    () => [
+      { key: "paymentDate", label: t("payments.fields.paymentDate") },
+      { key: "amount", label: t("payments.fields.amount") },
+    ],
+    [t],
+  );
 
-  // loadPayments accepts optional overrides to avoid races with setState
   const loadPayments = async (
     page = 0,
     size = pageInfo.size,
@@ -230,21 +228,19 @@ export default function Payments() {
       }));
     } catch (error) {
       console.error("Erreur lors du chargement des paiements:", error);
-      showError("Erreur de chargement", "Impossible de charger les paiements");
+      showError(t("payments.loadErrorTitle"), t("payments.loadErrorMessage"));
     } finally {
       setLoading(false);
     }
   };
 
   const handleFilterChange = ({ key, value }) => {
-    // key format: status:XXX or type:YYY
     const [kind, val] = key.split(":");
     if (kind === "status") {
-      // just update state and reset to first page; effect will handle URL + reload
       setSelectedStatuses((prev) => {
         const next = value
           ? Array.from(new Set([...prev, val]))
-          : prev.filter((s) => s !== val);
+          : prev.filter((status) => status !== val);
         setPageInfo((p) => ({ ...p, page: 0 }));
         return next;
       });
@@ -252,7 +248,7 @@ export default function Payments() {
       setSelectedTypes((prev) => {
         const next = value
           ? Array.from(new Set([...prev, val]))
-          : prev.filter((t) => t !== val);
+          : prev.filter((type) => type !== val);
         setPageInfo((p) => ({ ...p, page: 0 }));
         return next;
       });
@@ -262,9 +258,7 @@ export default function Payments() {
   const handleSortChange = (nextSort) => {
     const ns = nextSort || { field: null, direction: null };
     setSortValue(ns);
-    // reset to page 0
     setPageInfo((p) => ({ ...p, page: 0 }));
-    // effect will pick up the changed sortValue and pageInfo and reload
   };
 
   const handleCreatePayment = async (paymentData) => {
@@ -273,10 +267,16 @@ export default function Payments() {
       await createPayment(paymentData);
       await loadPayments(pageInfo.page, pageInfo.size);
       setIsModalOpen(false);
-      showSuccess("Paiement créé", "Le paiement a été créé avec succès");
+      showSuccess(
+        t("payments.createSuccessTitle"),
+        t("payments.createSuccessMessage"),
+      );
     } catch (error) {
       console.error("Erreur lors de la création du paiement:", error);
-      showError("Erreur de création", "Impossible de créer le paiement");
+      showError(
+        t("payments.createErrorTitle"),
+        t("payments.createErrorMessage"),
+      );
     } finally {
       setIsCreating(false);
     }
@@ -287,15 +287,12 @@ export default function Payments() {
       await axios.post("/api/payments/import");
       await loadPayments(pageInfo.page, pageInfo.size);
       showSuccess(
-        "Import HelloAsso terminé",
-        "Les paiements ont été importés avec succès",
+        t("payments.importSuccessTitle"),
+        t("payments.importSuccessMessage"),
       );
     } catch (error) {
       console.error("Erreur lors de l'import HelloAsso:", error);
-      showError(
-        "Erreur d'import",
-        "Impossible d'importer les paiements HelloAsso",
-      );
+      showError(t("payments.importErrorTitle"), t("payments.importErrorMessage"));
     }
   };
 
@@ -303,7 +300,6 @@ export default function Payments() {
     router.push(`/payments/${payment.id}`);
   };
 
-  /** prepare filtersConfig via useMemo to keep stable reference */
   const filtersConfig = useMemo(
     () => ({
       fields,
@@ -334,35 +330,34 @@ export default function Payments() {
           search: "",
         });
       },
-      label: "Filtres",
-      placeholder: "Rechercher...",
+      label: t("payments.filtersLabel"),
+      placeholder: t("payments.searchPlaceholder"),
     }),
     [
       fields,
-      handleSortChange,
       sortValue,
       buildFilterItems,
-      handleFilterChange,
       searchQuery,
       pageInfo.size,
+      t,
     ],
   );
 
   return (
     <SceneLayout>
-      <Title label="Paiements" />
+      <Title label={t("payments.title")} />
 
       <div className="flex items-center justify-between gap-2">
         <Utilities
           actions={[
             {
               icon: PlusIcon,
-              label: "Nouveau Paiement",
+              label: t("payments.newPayment"),
               callback: () => setIsModalOpen(true),
             },
             {
               variant: "refresh",
-              label: "Actualiser HelloAsso",
+              label: t("payments.refreshHelloAsso"),
               callback: handleImportHelloAsso,
               hoverExpand: true,
             },
@@ -376,7 +371,7 @@ export default function Payments() {
           <LoadingSkeleton variant="card" count={6} showActions={true} />
         </div>
       ) : (
-        <CardList emptyMessage="Aucun paiement trouvé.">
+        <CardList emptyMessage={t("payments.empty")}>
           {payments.map((payment) => (
             <PaymentCard
               key={payment.id}
@@ -398,11 +393,9 @@ export default function Payments() {
         }
         onChange={(p) => {
           setPageInfo((prev) => ({ ...prev, page: p }));
-          // effect will handle update URL + reload
         }}
         onPageSizeChange={(newSize) => {
           setPageInfo((p) => ({ ...p, size: newSize, page: 0 }));
-          // effect will handle update URL + reload
         }}
       />
 

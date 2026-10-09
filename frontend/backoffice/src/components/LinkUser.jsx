@@ -19,9 +19,10 @@ import Button from "./ui/Button";
 import { useRouter } from "next/navigation";
 import Panel from "@/components/ui/Panel";
 import AddUserModal from "@/components/AddUserModal";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function LinkUser({
-  title = "Lier un utilisateur",
+  title = null,
   accountId,
   currentUser,
   onLinked,
@@ -31,6 +32,7 @@ export default function LinkUser({
   loading: parentLoading = false,
   operations = null, // { attach: fn, detach: fn, updateLocal: fn }
 }) {
+  const { t } = useTranslation();
   const { getAllUsers } = useUserOperations();
   const accountOps = useAccountOperations();
   const { showSuccess, showError } = useNotification();
@@ -126,7 +128,10 @@ export default function LinkUser({
   // rewrite handleLink and handleUnlink to use doAttach / doDetach and optionally update local data via operations.updateLocal
   const handleLink = async () => {
     if (!selected)
-      return showError("Sélection requise", "Choisissez un utilisateur");
+      return showError(
+        t("accounts.linkUser.selectionRequiredTitle"),
+        t("accounts.linkUser.selectionRequiredMessage"),
+      );
     setShowConfirmLink(false);
     setSaving(true);
     console.debug("LinkUser: handleLink called, selected=", selected);
@@ -143,12 +148,15 @@ export default function LinkUser({
         }
       }
 
-      showSuccess("Utilisateur lié", "L'utilisateur a été lié avec succès");
+      showSuccess(
+        t("accounts.linkUser.linkedSuccessTitle"),
+        t("accounts.linkUser.linkedSuccessMessage"),
+      );
       onLinked && onLinked();
       setEditing(false);
     } catch (err) {
       console.error("Erreur lors du lien:", err);
-      showError("Erreur", "Impossible d'effectuer l'opération de liaison");
+      showError(t("accounts.linkUser.errorTitle"), t("accounts.linkUser.linkedErrorMessage"));
     } finally {
       setSaving(false);
     }
@@ -170,7 +178,10 @@ export default function LinkUser({
         }
       }
 
-      showSuccess("Compte détaché", "Le compte a été détaché de l'utilisateur");
+      showSuccess(
+        t("accounts.linkUser.unlinkedSuccessTitle"),
+        t("accounts.linkUser.unlinkedSuccessMessage"),
+      );
       setSelected("");
       onLinked && onLinked();
       if (typeof onUnlink === "function") {
@@ -184,7 +195,7 @@ export default function LinkUser({
       setEditing(true);
     } catch (err) {
       console.error("Erreur lors du détachement:", err);
-      showError("Erreur", "Impossible de détacher le compte de l'utilisateur");
+      showError(t("accounts.linkUser.errorTitle"), t("accounts.linkUser.unlinkedErrorMessage"));
     } finally {
       setSaving(false);
     }
@@ -196,7 +207,7 @@ export default function LinkUser({
       {editing ? null : (
         <IconButton
           icon={PencilIcon}
-          label="Modifier"
+          label={t("accounts.linkUser.edit")}
           size="md"
           onClick={() => setEditing(true)}
           disabled={combinedLoading}
@@ -205,7 +216,7 @@ export default function LinkUser({
       {!editing && currentUser ? (
         <IconButton
           icon={UserMinusIcon}
-          label="Détacher"
+          label={t("accounts.linkUser.unlink")}
           variant="danger"
           size="md"
           hoverExpand={true}
@@ -235,7 +246,7 @@ export default function LinkUser({
             {(currentUser.firstname || "") +
               (currentUser.lastname ? " " + currentUser.lastname : "") ||
               currentUser.email ||
-              "Utilisateur"}
+              t("accounts.linkUser.defaultUserLabel")}
           </Button>
         )}
 
@@ -245,17 +256,17 @@ export default function LinkUser({
           open={showConfirmUnlink}
           onClose={() => setShowConfirmUnlink(false)}
           onConfirm={handleUnlink}
-          title="Confirmer le détachement"
-          message={"Voulez-vous vraiment détacher ce compte de l'utilisateur ?"}
-          confirmLabel="Détacher"
-          cancelLabel="Annuler"
+          title={t("accounts.linkUser.confirmUnlinkTitle")}
+          message={t("accounts.linkUser.confirmUnlinkMessage")}
+          confirmLabel={t("accounts.linkUser.confirmUnlink")}
+          cancelLabel={t("accounts.linkUser.cancel")}
           isDeleting={saving}
         />
       </div>
     ) : (
       <div className="space-y-3">
         <label className="text-sm font-semibold text-gray-500">
-          Utilisateur lié
+          {t("accounts.linkUser.linkedUserLabel")}
         </label>
         <div className="flex items-center space-x-2">
           <div className="w-80">
@@ -265,12 +276,12 @@ export default function LinkUser({
               options={userOptions}
               labelKey="label"
               valueKey="value"
-              placeholder="-- Aucun --"
+              placeholder={t("accounts.linkUser.noUser")}
               disabled={combinedLoading}
             />
           </div>
           <IconButton
-            label="Ajouter un nouvel utilisateur"
+            label={t("accounts.linkUser.addNewUser")}
             onClick={() => setShowCreateModal(true)}
             disabled={combinedLoading}
             size="md"
@@ -281,19 +292,19 @@ export default function LinkUser({
             open={showConfirmLink}
             onClose={() => setShowConfirmLink(false)}
             onConfirm={handleLink}
-            title="Confirmer le lien"
+            title={t("accounts.linkUser.confirmLinkTitle")}
             message={
-              "Voulez-vous vraiment lier ce compte à l'utilisateur sélectionné ?"
+              t("accounts.linkUser.confirmLinkMessage")
             }
-            confirmLabel="Lier"
-            cancelLabel="Annuler"
+            confirmLabel={t("accounts.linkUser.confirmLink")}
+            cancelLabel={t("accounts.linkUser.cancel")}
             isLoading={saving}
             variant="primary"
           />
 
           {combinedLoading && (
             <div className="text-sm text-gray-500">
-              Chargement utilisateurs...
+              {t("accounts.linkUser.loadingUsers")}
             </div>
           )}
         </div>
@@ -309,7 +320,7 @@ export default function LinkUser({
             size="md"
             variant="outline"
           >
-            Annuler
+            {t("accounts.linkUser.cancel")}
           </Button>
           <Button
             variant="primary"
@@ -317,14 +328,18 @@ export default function LinkUser({
             onClick={() => setShowConfirmLink(true)}
             disabled={combinedLoading || !selected}
           >
-            Enregistrer
+            {t("accounts.linkUser.save")}
           </Button>
         </div>
       </div>
     );
 
   return (
-    <Panel title={title} icon={LinkIcon} actions={headerActions}>
+    <Panel
+      title={title || t("accounts.linkUser.title")}
+      icon={LinkIcon}
+      actions={headerActions}
+    >
       {panelContent}
 
       {/* Create user modal (shared) */}
@@ -352,7 +367,10 @@ export default function LinkUser({
             }
           } catch (err) {
             console.error("Erreur lors de la liaison après création:", err);
-            showError("Erreur", "Impossible de lier l'utilisateur créé");
+            showError(
+              t("accounts.linkUser.errorTitle"),
+              t("accounts.linkUser.createLinkErrorMessage"),
+            );
             throw err;
           }
         }}
@@ -381,6 +399,6 @@ LinkUser.defaultProps = {
   onCreateAndLink: null,
   onUnlink: null,
   loading: false,
-  title: "Lier un utilisateur",
+  title: null,
   operations: null,
 };

@@ -6,13 +6,25 @@ import Card from "@/components/ui/Card";
 import CardSkeleton from "@/components/ui/CardSkeleton";
 import { CreditCardIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import Currency from "@/components/ui/Currency";
+import { useTranslation } from "@/i18n/I18nContext";
+
+const resolveIntlLocale = (locale) => (locale === "en" ? "en-US" : "fr-FR");
 
 export default function PaymentCard({ payment, onClick, loading = false }) {
+  const { locale, t } = useTranslation();
+
   if (loading) return <CardSkeleton showActions={false} />;
 
+  const translateEnum = (group, value) => {
+    if (!value) return "";
+    const key = `payments.enums.${group}.${String(value).toUpperCase()}`;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
+
   const formatDate = (date) => {
-    if (!date) return "Non renseignée";
-    return new Date(date).toLocaleDateString("fr-FR", {
+    if (!date) return t("payments.card.noDate");
+    return new Date(date).toLocaleDateString(resolveIntlLocale(locale), {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -37,16 +49,14 @@ export default function PaymentCard({ payment, onClick, loading = false }) {
   return (
     <Card onClick={onClick}>
       <div className="flex items-start gap-4">
-        {/* Icon */}
         <div className="flex-shrink-0 mt-1">
           <CreditCardIcon className="h-6 w-6 text-gray-400" />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-base font-medium text-gray-900">
-              {payment.label || `Paiement #${payment.id}`}
+              {payment.label || `${t("payments.card.paymentLabelPrefix")} #${payment.id}`}
             </h3>
             <span className="text-base font-semibold text-gray-900">
               <Currency value={payment.amount} currency={payment.currency} />
@@ -55,11 +65,15 @@ export default function PaymentCard({ payment, onClick, loading = false }) {
 
           <div className="space-y-1 mb-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>Date: {formatDate(payment.paymentDate)}</span>
+              <span>
+                {t("payments.card.dateLabel")}: {formatDate(payment.paymentDate)}
+              </span>
               {payment.type && (
                 <>
                   <span>•</span>
-                  <span>Type: {payment.type}</span>
+                  <span>
+                    {t("payments.card.typeLabel")}: {translateEnum("type", payment.type)}
+                  </span>
                 </>
               )}
             </div>
@@ -79,7 +93,7 @@ export default function PaymentCard({ payment, onClick, loading = false }) {
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}
               >
-                {payment.status}
+                {translateEnum("status", payment.status)}
               </span>
             </div>
           )}

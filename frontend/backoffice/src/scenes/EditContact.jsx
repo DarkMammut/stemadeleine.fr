@@ -9,8 +9,10 @@ import { useContactsContext } from "@/contexts/ContactsContext";
 import { buildContactBreadcrumbs } from "@/utils/breadcrumbs";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EditContact() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const router = useRouter();
   const [contact, setContact] = useState(null);
@@ -57,7 +59,7 @@ export default function EditContact() {
       }
     } catch (error) {
       console.error("Error loading contact:", error);
-      showError("Erreur de chargement", "Impossible de charger le contact");
+      showError(t("contacts.loadErrorTitle"), t("contacts.loadErrorMessage"));
     } finally {
       setLoading(false);
     }
@@ -67,11 +69,14 @@ export default function EditContact() {
     try {
       await deleteContact(id);
       await refreshUnreadCount();
-      showSuccess("Contact supprimé", "Le contact a été supprimé avec succès");
+      showSuccess(
+        t("contacts.deleteSuccessTitle"),
+        t("contacts.deleteSuccessMessage"),
+      );
       setTimeout(() => router.push("/contacts"), 1000);
     } catch (error) {
       console.error("Error deleting contact:", error);
-      showError("Erreur de suppression", "Impossible de supprimer le contact");
+      showError(t("contacts.deleteErrorTitle"), t("contacts.deleteErrorMessage"));
     }
   };
 
@@ -82,12 +87,17 @@ export default function EditContact() {
       setContact((prev) => ({ ...prev, isRead: newStatus }));
       await refreshUnreadCount();
       showSuccess(
-        `Contact marqué comme ${newStatus ? "lu" : "non lu"}`,
-        "Le statut a été mis à jour",
+        newStatus
+          ? t("contacts.markedReadTitle")
+          : t("contacts.markedUnreadTitle"),
+        t("contacts.statusUpdatedMessage"),
       );
     } catch (error) {
       console.error("Error toggling read status:", error);
-      showError("Erreur", "Impossible de modifier le statut du contact");
+      showError(
+        t("contacts.toggleReadErrorTitle"),
+        t("contacts.toggleReadErrorMessage"),
+      );
     }
   };
 
@@ -109,7 +119,7 @@ export default function EditContact() {
     if (!contact) return "";
     return (
       [contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
-      "Anonyme"
+      t("contacts.anonymous")
     );
   };
 
@@ -118,7 +128,7 @@ export default function EditContact() {
   return (
     <>
       <Title
-        label={`Contact: ${getFullName()}`}
+        label={`${t("contacts.detailTitlePrefix")} ${getFullName()}`}
         showBreadcrumbs={!!contact}
         breadcrumbs={breadcrumbs}
       />

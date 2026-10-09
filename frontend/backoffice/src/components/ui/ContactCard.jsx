@@ -5,26 +5,31 @@ import PropTypes from "prop-types";
 import Card from "@/components/ui/Card";
 import CardSkeleton from "@/components/ui/CardSkeleton";
 import { EnvelopeIcon, EnvelopeOpenIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ContactCard({ contact, onClick, loading = false }) {
+  const { locale, t } = useTranslation();
   if (loading) return <CardSkeleton showActions={false} />;
 
   const getFullName = () => {
     return (
       [contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
-      "Anonyme"
+      t("contacts.anonymous")
     );
   };
 
   const formatDate = (date) => {
-    if (!date) return "Non renseignée";
-    return new Date(date).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    if (!date) return t("contacts.notProvided");
+    return new Date(date).toLocaleString(
+      locale === "en" ? "en-US" : "fr-FR",
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      },
+    );
   };
 
   return (
@@ -76,7 +81,7 @@ export default function ContactCard({ contact, onClick, loading = false }) {
 
           {contact.user && (
             <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              Lié à l'utilisateur: {contact.user.firstname}{" "}
+              {t("contacts.linkedUserBadge")} {contact.user.firstname}{" "}
               {contact.user.lastname}
             </div>
           )}

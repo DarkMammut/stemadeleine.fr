@@ -6,6 +6,7 @@ import {useAccountOperations} from "@/hooks/useAccountOperations";
 import {useNotification} from "@/hooks/useNotification";
 import PropTypes from "prop-types";
 import Modal from "@/components/ui/Modal";
+import {useTranslation} from "@/i18n/I18nContext";
 
 export default function ChangePasswordModal({
                                                 open,
@@ -14,6 +15,7 @@ export default function ChangePasswordModal({
                                                 onSuccess,
                                                 allowAdminReset = false,
                                             }) {
+    const {t} = useTranslation();
     const [loading, setLoading] = useState(false);
     // initialize adminMode from prop so EditAccount can open modal already in admin mode
     const [adminMode, setAdminMode] = useState(() => Boolean(allowAdminReset));
@@ -34,13 +36,13 @@ export default function ChangePasswordModal({
         const base = [
             {
                 name: "newPassword",
-                label: "Nouveau mot de passe",
+                label: t("accounts.password.newPassword"),
                 type: "password",
                 required: true,
             },
             {
                 name: "confirmPassword",
-                label: "Confirmer le nouveau mot de passe",
+                label: t("accounts.password.confirmPassword"),
                 type: "password",
                 required: true,
             },
@@ -48,7 +50,7 @@ export default function ChangePasswordModal({
         if (!adminMode) {
             base.unshift({
                 name: "currentPassword",
-                label: "Mot de passe actuel",
+                label: t("accounts.password.currentPassword"),
                 type: "password",
                 required: true,
             });
@@ -58,7 +60,7 @@ export default function ChangePasswordModal({
 
     const handleSubmit = async (payload) => {
         if (!accountId)
-            throw {fieldErrors: {currentPassword: "Compte invalide"}};
+            throw {fieldErrors: {currentPassword: t("accounts.password.invalidAccount")}};
         // Normalize (trim) inputs to avoid accidental spaces
         const currentPassword = (payload.currentPassword || "").trim();
         const newPassword = (payload.newPassword || "").trim();
@@ -66,34 +68,34 @@ export default function ChangePasswordModal({
 
         if (newPassword !== confirmPassword) {
             // Return field error for confirmPassword
-            const fe = {confirmPassword: "Les mots de passe ne correspondent pas"};
+            const fe = {confirmPassword: t("accounts.password.mismatch")};
             // show an overall error too
-            showError("Erreur", fe.confirmPassword, {autoClose: false});
+            showError(t("accounts.password.updateErrorTitle"), fe.confirmPassword, {autoClose: false});
             throw {fieldErrors: fe};
         }
         // Client-side validation: enforce minimum length and difference to current
         if (!newPassword || newPassword.length < 8) {
             const fe = {
                 newPassword:
-                    "Le nouveau mot de passe doit contenir au moins 8 caractères",
+                    t("accounts.password.minLength"),
             };
-            showError("Erreur", fe.newPassword, {autoClose: false});
+            showError(t("accounts.password.updateErrorTitle"), fe.newPassword, {autoClose: false});
             throw {fieldErrors: fe};
         }
         if (!adminMode && currentPassword && currentPassword === newPassword) {
             const fe = {
-                newPassword: "Le nouveau mot de passe doit être différent de l'actuel",
+                newPassword: t("accounts.password.mustDiffer"),
             };
-            showError("Erreur", fe.newPassword, {autoClose: false});
+            showError(t("accounts.password.updateErrorTitle"), fe.newPassword, {autoClose: false});
             throw {fieldErrors: fe};
         }
         // Ensure currentPassword is provided
         if (!adminMode) {
             if (!currentPassword || currentPassword.length === 0) {
                 const fe = {
-                    currentPassword: "Veuillez entrer votre mot de passe actuel",
+                    currentPassword: t("accounts.password.currentRequired"),
                 };
-                showError("Erreur", fe.currentPassword, {autoClose: false});
+                showError(t("accounts.password.updateErrorTitle"), fe.currentPassword, {autoClose: false});
                 throw {fieldErrors: fe};
             }
         }
@@ -111,7 +113,7 @@ export default function ChangePasswordModal({
                 });
             }
 
-            showSuccess("Mot de passe modifié", "Le mot de passe a été modifié", {
+            showSuccess(t("accounts.password.modalSuccessTitle"), t("accounts.password.modalSuccessMessage"), {
                 autoClose: false,
             });
 
@@ -150,7 +152,7 @@ export default function ChangePasswordModal({
             if (fieldErrors) {
                 // show overall notification
                 const firstMsg = Object.values(fieldErrors)[0];
-                showError("Erreur", firstMsg, {autoClose: false});
+                showError(t("accounts.password.updateErrorTitle"), firstMsg, {autoClose: false});
                 // throw structured error so MyForm will display inline messages
                 throw {fieldErrors};
             }
@@ -159,21 +161,21 @@ export default function ChangePasswordModal({
             if (status === 400) {
                 const apiMessage =
                     err?.response?.data?.message ||
-                    "Le nouveau mot de passe doit contenir au moins 8 caractères et être différent de l'actuel";
-                showError("Erreur", apiMessage, {autoClose: false});
+                    t("accounts.password.invalidPasswordMessage");
+                showError(t("accounts.password.updateErrorTitle"), apiMessage, {autoClose: false});
                 throw {fieldErrors: {newPassword: apiMessage}};
             } else if (status === 403 || status === 401) {
                 const apiMessage =
                     err?.response?.data?.message ||
-                    "Mot de passe actuel incorrect ou vous n'êtes pas autorisé à changer ce mot de passe";
-                showError("Erreur", apiMessage, {autoClose: false});
+                    t("accounts.password.unauthorizedMessage");
+                showError(t("accounts.password.updateErrorTitle"), apiMessage, {autoClose: false});
                 throw {fieldErrors: {currentPassword: apiMessage}};
             } else {
                 const apiMessage =
                     err?.response?.data?.message ||
                     err?.message ||
-                    "Impossible de changer le mot de passe";
-                showError("Erreur", apiMessage, {autoClose: false});
+                    t("accounts.password.updateErrorMessage");
+                showError(t("accounts.password.updateErrorTitle"), apiMessage, {autoClose: false});
                 throw {fieldErrors: {newPassword: apiMessage}};
             }
         } finally {
@@ -197,9 +199,7 @@ export default function ChangePasswordModal({
                                 checked={adminMode}
                                 onChange={(e) => setAdminMode(e.target.checked)}
                             />
-                            <span>
-                Mode admin (réinitialisation sans mot de passe actuel)
-              </span>
+                            <span>{t("accounts.password.modalAdminMode")}</span>
                         </label>
                     </div>
                 )}
@@ -207,15 +207,17 @@ export default function ChangePasswordModal({
                 <MyForm
                     title={
                         adminMode
-                            ? "Réinitialiser le mot de passe (admin)"
-                            : "Changer le mot de passe"
+                            ? t("accounts.password.modalAdminTitle")
+                            : t("accounts.password.modalUserTitle")
                     }
                     fields={buildFields()}
                     initialValues={{}}
                     onSubmit={handleSubmit}
                     onCancel={handleClose}
                     submitButtonLabel={
-                        adminMode ? "Réinitialiser" : "Changer le mot de passe"
+                        adminMode
+                            ? t("accounts.password.modalAdminSubmit")
+                            : t("accounts.password.modalUserSubmit")
                     }
                     // Render a single field per line and make the form a bit wider inside the modal
                     columns={1}

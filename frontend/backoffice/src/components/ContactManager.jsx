@@ -7,6 +7,7 @@ import NavigationButtons from "@/components/ui/NavigationButtons";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import Panel from "@/components/ui/Panel";
 import { CheckIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ContactManager({
   contact,
@@ -18,8 +19,10 @@ export default function ContactManager({
   hasPrevious = false,
   hasNext = false,
 }) {
+  const { locale, t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const dateLocale = locale === "en" ? "en-US" : "fr-FR";
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
@@ -40,12 +43,14 @@ export default function ContactManager({
         actions={[
           {
             icon: contact?.isRead ? XMarkIcon : CheckIcon,
-            label: contact?.isRead ? "Marquer non lu" : "Marquer lu",
+            label: contact?.isRead
+              ? t("contacts.markUnread")
+              : t("contacts.markRead"),
             callback: onToggleRead,
           },
           {
             icon: TrashIcon,
-            label: "Supprimer",
+            label: t("contacts.delete"),
             callback: () => setShowDeleteModal(true),
             variant: "danger",
           },
@@ -68,7 +73,9 @@ export default function ContactManager({
                     : "bg-blue-100 text-blue-800"
                 }`}
               >
-                {contact?.isRead ? "Lu" : "Non lu"}
+                {contact?.isRead
+                  ? t("contacts.statusRead")
+                  : t("contacts.statusUnread")}
               </span>
             )}
           </div>
@@ -77,7 +84,7 @@ export default function ContactManager({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nom complet
+                {t("contacts.fullName")}
               </label>
               {loading ? (
                 <div className="skeleton-light h-5 w-48" />
@@ -85,14 +92,14 @@ export default function ContactManager({
                 <p className="text-base text-gray-900">
                   {(contact?.firstName || "") +
                     (contact?.lastName ? " " + contact.lastName : "") ||
-                    "Anonyme"}
+                    t("contacts.anonymous")}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t("contacts.fieldEmail")}
               </label>
               {loading ? (
                 <div className="skeleton-light h-5 w-64" />
@@ -112,14 +119,14 @@ export default function ContactManager({
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sujet
+                    {t("contacts.subject")}
                   </label>
                   <div className="skeleton-light h-4 w-80" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Message
+                    {t("contacts.message")}
                   </label>
                   <div className="bg-gray-50 rounded-md p-4">
                     <div className="skeleton-light h-20 w-full" />
@@ -128,7 +135,7 @@ export default function ContactManager({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date de réception
+                    {t("contacts.receivedAt")}
                   </label>
                   <div className="skeleton-light h-4 w-40" />
                 </div>
@@ -138,7 +145,7 @@ export default function ContactManager({
                 {contact?.subject && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Sujet
+                      {t("contacts.subject")}
                     </label>
                     <p className="text-base text-gray-900">{contact.subject}</p>
                   </div>
@@ -147,7 +154,7 @@ export default function ContactManager({
                 {contact?.message && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Message
+                      {t("contacts.message")}
                     </label>
                     <div className="bg-gray-50 rounded-md p-4">
                       <p className="text-base text-gray-900 whitespace-pre-wrap">
@@ -159,25 +166,25 @@ export default function ContactManager({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date de réception
+                    {t("contacts.receivedAt")}
                   </label>
                   <p className="text-base text-gray-900">
                     {contact?.createdAt
-                      ? new Date(contact.createdAt).toLocaleString("fr-FR", {
+                      ? new Date(contact.createdAt).toLocaleString(dateLocale, {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
                         })
-                      : "Non renseignée"}
+                      : t("contacts.notProvided")}
                   </p>
                 </div>
 
                 {contact?.user && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Utilisateur lié
+                      {t("contacts.linkedUser")}
                     </label>
                     <div className="bg-green-50 rounded-md p-3">
                       <p className="text-sm text-green-900">
@@ -204,8 +211,8 @@ export default function ContactManager({
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        title="Supprimer le contact"
-        message="Êtes-vous sûr de vouloir supprimer ce contact ? Cette action est irréversible."
+        title={t("contacts.deleteModalTitle")}
+        message={t("contacts.deleteModalMessage")}
         isLoading={isDeleting}
         variant="danger"
       />

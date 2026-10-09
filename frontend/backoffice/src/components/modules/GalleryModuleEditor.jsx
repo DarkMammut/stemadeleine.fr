@@ -12,6 +12,7 @@ import { useGalleriesMediasOperations } from "@/hooks/useGalleriesMediasOperatio
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function GalleryModuleEditor({
   moduleId,
@@ -20,6 +21,7 @@ export default function GalleryModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
   const [savingModule, setSavingModule] = useState(false);
@@ -81,16 +83,16 @@ export default function GalleryModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de la galerie",
+      label: t("pages.modules.gallery.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
   ];
@@ -99,7 +101,7 @@ export default function GalleryModuleEditor({
   const galleryFields = [
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.gallery.variant"),
       type: "select",
       required: true,
       options: variantOptions,
@@ -126,7 +128,7 @@ export default function GalleryModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du module:", err);
       throw err;
@@ -151,7 +153,7 @@ export default function GalleryModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Galerie mise à jour avec succès");
+      showSuccess(t("pages.notifications.galleryUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde de la galerie:", err);
       throw err;
@@ -181,14 +183,16 @@ export default function GalleryModuleEditor({
       }
 
       showSuccess(
-        "Visibilité mise à jour",
-        `Le module est maintenant ${isVisible ? "visible" : "masqué"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
       );
     } catch (err) {
       console.error(err);
       showError(
-        "Erreur de visibilité",
-        "Impossible de mettre à jour la visibilité du module",
+        t("pages.errors.visibilityTitle"),
+        t("pages.errors.visibilityModuleMessage"),
       );
       setSavingVisibility(false);
     }
@@ -203,8 +207,8 @@ export default function GalleryModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -212,7 +216,7 @@ export default function GalleryModuleEditor({
 
       {/* Formulaire Module (name, title) */}
       <EditablePanelV2
-        title="Détails de la galerie"
+        title={t("pages.modules.gallery.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -223,7 +227,7 @@ export default function GalleryModuleEditor({
 
       {/* Formulaire Gallery (variant) */}
       <EditablePanelV2
-        title="Paramètres de la galerie"
+        title={t("pages.modules.gallery.settingsTitle")}
         fields={galleryFields}
         initialValues={galleryData || {}}
         onSubmit={handleGallerySubmit}

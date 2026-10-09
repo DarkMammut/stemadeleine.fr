@@ -15,6 +15,7 @@ import { useNotification } from "@/hooks/useNotification";
 import Panel from "@/components/ui/Panel";
 import CollapsibleCard from "@/components/ui/CollapsibleCard";
 import PropTypes from "prop-types";
+import { useTranslation } from "@/i18n/I18nContext";
 
 /**
  * Composant de gestion des contenus d'un module Liste (List).
@@ -27,6 +28,7 @@ const ListContentManager = ({
   customLabels = {},
   loading: externalLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [contents, setContents] = useState([]);
   const [expandedContents, setExpandedContents] = useState(new Set());
   const [loadingLocal, setLoadingLocal] = useState(false);
@@ -66,8 +68,8 @@ const ListContentManager = ({
     } catch (error) {
       console.error("Error loading list contents:", error);
       showError(
-        "Erreur de chargement",
-        "Erreur lors du chargement des contenus",
+        t("pages.errors.loadContentsTitle"),
+        t("pages.errors.loadContentsMessage"),
       );
     } finally {
       setLoadingLocal(false);
@@ -91,17 +93,20 @@ const ListContentManager = ({
       setLoadingLocal(true);
       const newContent = await createContent(
         listId,
-        customLabels.defaultTitle || "Nouveau contenu",
+        customLabels.defaultTitle || t("pages.common.newContent"),
       );
       await loadContents();
       setExpandedContents((prev) => new Set([...prev, newContent.id]));
       showSuccess(
-        "Contenu ajouté",
-        "Le nouveau contenu a été créé avec succès",
+        t("pages.notifications.contentAddedTitle"),
+        t("pages.notifications.contentAddedMessage"),
       );
     } catch (error) {
       console.error("Error adding list content:", error);
-      showError("Erreur", "Erreur lors de l'ajout du contenu");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.creationModuleMessage"),
+      );
     } finally {
       setLoadingLocal(false);
     }
@@ -115,14 +120,20 @@ const ListContentManager = ({
       if (!content) return;
       await updateContent(id, {
         title: newTitle,
-        body: content.body || { html: "<p>Commencez à écrire...</p>" },
+        body: content.body || { html: `<p>${t("pages.common.startWriting")}</p>` },
         linkUrl: content.linkUrl || null,
       });
       await loadContents();
-      showSuccess("Titre modifié", "Le titre a été mis à jour avec succès");
+      showSuccess(
+        t("pages.notifications.contentTitleUpdatedTitle"),
+        t("pages.notifications.contentTitleUpdatedMessage"),
+      );
     } catch (error) {
       console.error("Error updating list content title:", error);
-      showError("Erreur", "Erreur lors de la mise à jour du titre");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.titleUpdateMessage"),
+      );
     } finally {
       setSavingStates((prev) => ({ ...prev, [id]: false }));
     }
@@ -164,12 +175,15 @@ const ListContentManager = ({
         prev.map((c) => (c.id === id ? { ...c, hasLocalChanges: false } : c)),
       );
       showSuccess(
-        "Contenu enregistré",
-        "Le contenu a été sauvegardé avec succès",
+        t("pages.notifications.contentSavedTitle"),
+        t("pages.notifications.contentSavedMessage"),
       );
     } catch (error) {
       console.error("Error saving list content:", error);
-      showError("Erreur", "Erreur lors de la sauvegarde du contenu");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.saveContentMessage"),
+      );
     } finally {
       setSavingStates((prev) => ({ ...prev, [id]: false }));
     }
@@ -184,12 +198,17 @@ const ListContentManager = ({
         prev.map((c) => (c.id === id ? { ...c, isVisible } : c)),
       );
       showSuccess(
-        "Visibilité modifiée",
-        `Le contenu est maintenant ${isVisible ? "visible" : "masqué"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.content")} ${
+          isVisible ? t("pages.common.visible") : t("pages.common.hidden")
+        }`,
       );
     } catch (error) {
       console.error("Error updating list content visibility:", error);
-      showError("Erreur", "Erreur lors de la mise à jour de la visibilité");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.visibilityMessage"),
+      );
     } finally {
       setSavingStates((prev) => ({ ...prev, [id]: false }));
     }
@@ -206,10 +225,16 @@ const ListContentManager = ({
         newSet.delete(id);
         return newSet;
       });
-      showSuccess("Contenu supprimé", "Le contenu a été supprimé avec succès");
+      showSuccess(
+        t("pages.notifications.contentDeletedTitle"),
+        t("pages.notifications.contentDeletedMessage"),
+      );
     } catch (error) {
       console.error("Error deleting list content:", error);
-      showError("Erreur", "Erreur lors de la suppression du contenu");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.deleteContentMessage"),
+      );
       throw error; // Re-throw pour que DeleteButton gère l'état
     } finally {
       setSavingStates((prev) => ({ ...prev, [id]: false }));
@@ -238,7 +263,7 @@ const ListContentManager = ({
 
   return (
     <Panel
-      title={customLabels.header || "Contenus de la liste"}
+      title={customLabels.header || t("pages.listContentManager.title")}
       actions={
         <div className="flex items-center gap-2">
           <Button
@@ -250,7 +275,7 @@ const ListContentManager = ({
             {effectiveLoading ? (
               <span className="skeleton-light w-32 h-4 inline-block" />
             ) : (
-              customLabels.addButton || "Ajouter un contenu"
+              customLabels.addButton || t("pages.common.addContent")
             )}
           </Button>
         </div>
@@ -268,7 +293,7 @@ const ListContentManager = ({
           <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
             <p>
               {customLabels.empty ||
-                "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
+                t("pages.contentManager.empty")}
             </p>
           </div>
         )}
@@ -317,7 +342,7 @@ const ListContentManager = ({
                         size="sm"
                         disabled={savingStates[content.id] || effectiveLoading}
                       >
-                        {customLabels.save || "Enregistrer"}
+                        {customLabels.save || t("pages.contentManager.saveInline")}
                       </Button>
                       <Button
                         type="button"
@@ -326,7 +351,7 @@ const ListContentManager = ({
                         onClick={() => stopEditing(content.id, "title")}
                         disabled={savingStates[content.id] || effectiveLoading}
                       >
-                        {customLabels.cancel || "Annuler"}
+                        {customLabels.cancel || t("pages.contentManager.cancelInline")}
                       </Button>
                     </form>
                   ) : (
@@ -340,12 +365,12 @@ const ListContentManager = ({
                           title={
                             content.title ||
                             customLabels.untitled ||
-                            "Contenu sans titre"
+                            t("pages.common.untitledContent")
                           }
                         >
                           {content.title ||
                             customLabels.untitled ||
-                            "Contenu sans titre"}
+                            t("pages.common.untitledContent")}
                         </h4>
                       )}
                       {content.linkUrl && (
@@ -356,7 +381,7 @@ const ListContentManager = ({
                       )}
                       {content.hasLocalChanges && !effectiveLoading && (
                         <span className="text-xs text-orange-600 flex-shrink-0">
-                          • Modifications non sauvegardées
+                          • {t("pages.common.unsavedChanges")}
                         </span>
                       )}
                     </div>
@@ -367,9 +392,9 @@ const ListContentManager = ({
                     <DeleteButton
                       onDelete={() => handleDeleteContent(content.id)}
                       disabled={savingStates[content.id] || effectiveLoading}
-                      deleteLabel="Supprimer"
-                      confirmTitle="Supprimer le contenu"
-                      confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
+                      deleteLabel={t("pages.common.delete")}
+                      confirmTitle={t("pages.contentManager.deleteContentTitle")}
+                      confirmMessage={t("pages.contentManager.deleteContentMessage")}
                       size="sm"
                       hoverExpand={true}
                     />
@@ -387,7 +412,7 @@ const ListContentManager = ({
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           {customLabels.linkLabel ||
-                            "Lien / URL (rend le contenu cliquable)"}
+                            t("pages.listContentManager.linkLabel")}
                         </label>
                         <div className="flex items-center gap-2">
                           <LinkIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -397,7 +422,7 @@ const ListContentManager = ({
                             onChange={(e) =>
                               handleLinkUrlChange(content.id, e.target.value)
                             }
-                            placeholder="https://exemple.fr/page"
+                            placeholder={t("pages.listContentManager.linkPlaceholder")}
                             className="flex-1 px-3 py-1.5 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                             disabled={savingStates[content.id]}
                           />
@@ -411,7 +436,7 @@ const ListContentManager = ({
                         }
                         placeholder={
                           customLabels.bodyPlaceholder ||
-                          "Commencez à écrire..."
+                          t("pages.common.startWriting")
                         }
                         height="200px"
                         disabled={savingStates[content.id]}
@@ -425,7 +450,7 @@ const ListContentManager = ({
                         onMediaAdd={addContentMedia}
                         onMediaRemove={removeContentMedia}
                         onMediaChanged={loadContents}
-                        title="Médias du contenu"
+                        title={t("pages.common.mediaTitle")}
                       />
 
                       {content.hasLocalChanges && (
@@ -435,7 +460,7 @@ const ListContentManager = ({
                             disabled={savingStates[content.id]}
                           >
                             {customLabels.saveContent ||
-                              "Enregistrer le contenu"}
+                              t("pages.common.saveContent")}
                           </Button>
                         </div>
                       )}
@@ -443,7 +468,7 @@ const ListContentManager = ({
                       {savingStates[content.id] && (
                         <div className="text-sm text-blue-600 flex items-center gap-2">
                           <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                          {customLabels.saving || "Sauvegarde..."}
+                          {customLabels.saving || t("pages.common.saving")}
                         </div>
                       )}
                     </>

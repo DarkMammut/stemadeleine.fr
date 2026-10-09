@@ -6,6 +6,7 @@ import VariableDisplay from "@/components/ui/VariableDisplay";
 import ModifyButton from "@/components/ui/ModifyButton";
 import DeleteButton from "@/components/ui/DeleteButton";
 import PanelCard from "@/components/ui/PanelCard";
+import { useTranslation } from "@/i18n/I18nContext";
 
 // MembershipCard: tailored card for membership entries using VariableDisplay
 // - title defaults to year extracted from `dateAdhesion`
@@ -23,6 +24,7 @@ export default function MembershipCard({
   gap = 3,
   className = "",
 }) {
+  const { t, locale } = useTranslation();
   // Title render: show year and active badge
   const renderTitle = (opts) => {
     const { data: d, loading: l } = opts || { data, loading };
@@ -45,7 +47,7 @@ export default function MembershipCard({
         </div>
         {isActive && (
           <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-            Actif
+            {t("memberships.active")}
           </span>
         )}
       </div>
@@ -60,16 +62,16 @@ export default function MembershipCard({
     <div className="flex flex-col items-end gap-2">
       <ModifyButton
         size="sm"
-        modifyLabel="Modifier"
+        modifyLabel={t("memberships.edit")}
         onModify={onEdit}
         disabled={loading || !onEdit}
       />
       <DeleteButton
         onDelete={onDelete}
         size="sm"
-        deleteLabel="Supprimer"
-        confirmTitle={"Supprimer"}
-        confirmMessage={"Confirmer la suppression ?"}
+        deleteLabel={t("memberships.delete")}
+        confirmTitle={t("addresses.deleteConfirmTitle")}
+        confirmMessage={t("addresses.deleteConfirmMessage")}
         disabled={loading || !onDelete}
       />
     </div>
@@ -94,17 +96,21 @@ export default function MembershipCard({
           <div className="leading-tight">
             {start && (
               <div className="text-sm">
-                Début:{" "}
+                {t("memberships.start")}:{" "}
                 <span className="font-medium">
-                  {new Date(start).toLocaleDateString("fr-FR")}
+                  {new Date(start).toLocaleDateString(
+                    locale === "en" ? "en-GB" : "fr-FR",
+                  )}
                 </span>
               </div>
             )}
             {end && (
               <div className="text-sm">
-                Fin:{" "}
+                {t("memberships.end")}:{" "}
                 <span className="font-medium">
-                  {new Date(end).toLocaleDateString("fr-FR")}
+                  {new Date(end).toLocaleDateString(
+                    locale === "en" ? "en-GB" : "fr-FR",
+                  )}
                 </span>
               </div>
             )}

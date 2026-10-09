@@ -2,16 +2,18 @@
 import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 import Tabs from "@/components/ui/Tabs";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function PagesTabs({ pageId }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const tabs = useMemo(
     () => [
-      { label: "Informations", url: `/pages/${pageId}` },
-      { label: "Contenu", url: `/pages/${pageId}/sections` },
+      { label: t("pages.tabs.pageInfo"), url: `/pages/${pageId}` },
+      { label: t("pages.tabs.pageContent"), url: `/pages/${pageId}/sections` },
     ],
-    [pageId],
+    [pageId, t],
   );
 
   // Déterminer l'onglet actif en fonction de l'URL

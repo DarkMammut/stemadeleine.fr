@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from "react";
 import RichTextEditor from "./RichTextEditor";
 import {useContentOperations} from "@/hooks/useContentOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 /**
  * Composant générique d'édition de contenu pour section, module, etc.
@@ -18,6 +19,7 @@ const ContentEditor = ({
   onContentSaved,
   customLabels = {},
 }) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
   const [isSaving, setIsSaving] = useState(false);
@@ -81,7 +83,7 @@ const ContentEditor = ({
       }
     } catch (error) {
       console.error("Erreur lors de la sauvegarde du contenu:", error);
-      alert("Erreur lors de la sauvegarde du contenu.");
+      alert(t("pages.contentEditor.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -100,21 +102,23 @@ const ContentEditor = ({
     <div className="content-editor space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-text">
-          {customLabels.header || "Éditeur de contenu"}
+          {customLabels.header || t("pages.contentEditor.header")}
         </h3>
         <div className="flex items-center gap-4">
           <div className="text-sm text-text-muted">
             {isSaving && (
-              <span className="text-blue-600">💾 Sauvegarde...</span>
+              <span className="text-blue-600">
+                💾 {t("pages.contentEditor.saving")}
+              </span>
             )}
             {!isSaving && hasUnsavedChanges && (
               <span className="text-orange-600">
-                ⚠️ Modifications non sauvegardées
+                ⚠️ {t("pages.contentEditor.unsavedChanges")}
               </span>
             )}
             {!isSaving && !hasUnsavedChanges && lastSaved && (
               <span className="text-green-600">
-                ✅ Sauvegardé à {formatLastSaved(lastSaved)}
+                ✅ {t("pages.contentEditor.savedAt")} {formatLastSaved(lastSaved)}
               </span>
             )}
           </div>
@@ -126,10 +130,12 @@ const ContentEditor = ({
             {isSaving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                {customLabels.saving || "Sauvegarde..."}
+                {customLabels.saving || t("pages.contentEditor.saving")}
               </>
             ) : (
-              <>💾 {customLabels.saveButton || "Enregistrer le contenu"}</>
+              <>
+                💾 {customLabels.saveButton || t("pages.contentEditor.saveButton")}
+              </>
             )}
           </button>
         </div>
@@ -139,28 +145,31 @@ const ContentEditor = ({
           htmlFor="content-title"
           className="block text-sm font-medium text-text"
         >
-          {customLabels.titleLabel || "Titre du contenu"}
+          {customLabels.titleLabel || t("pages.contentEditor.titleLabel")}
         </label>
         <input
           id="content-title"
           type="text"
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder={customLabels.titlePlaceholder || "Titre..."}
+          placeholder={
+            customLabels.titlePlaceholder ||
+            t("pages.contentEditor.titlePlaceholder")
+          }
           disabled={isSaving}
           className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>
       <div className="space-y-2">
         <label className="block text-sm font-medium text-text">
-          {customLabels.bodyLabel || "Contenu"}
+          {customLabels.bodyLabel || t("pages.contentEditor.bodyLabel")}
         </label>
         <div className="border border-border rounded-lg overflow-hidden">
           <RichTextEditor
             value={content}
             onChange={handleContentChange}
             placeholder={
-              customLabels.bodyPlaceholder || "Commencez à écrire..."
+              customLabels.bodyPlaceholder || t("pages.common.startWriting")
             }
             height="300px"
             disabled={isSaving}
@@ -169,18 +178,21 @@ const ContentEditor = ({
       </div>
       <div className="text-sm text-text-muted">
         <p>
-          💡 Cliquez sur "{customLabels.saveButton || "Enregistrer le contenu"}"
-          pour sauvegarder.{" "}
-          {currentContentId ? `(ID: ${currentContentId})` : "(Nouveau contenu)"}
+          💡 {t("pages.contentEditor.saveHintPrefix")}
+          {customLabels.saveButton || t("pages.contentEditor.saveButton")}
+          {t("pages.contentEditor.saveHintSuffix")}{" "}
+          {currentContentId
+            ? `(ID: ${currentContentId})`
+            : `(${t("pages.contentEditor.newContentLabel")})`}
         </p>
         {hasUnsavedChanges && (
           <p className="text-orange-600 mt-1">
-            ⚠️ Modifications non sauvegardées
+            ⚠️ {t("pages.contentEditor.unsavedChanges")}
           </p>
         )}
       </div>
       <div className="text-xs text-text-muted opacity-75">
-        💡 Astuce : Ctrl+S pour sauvegarder rapidement
+        💡 {t("pages.contentEditor.shortcutHint")}
       </div>
     </div>
   );

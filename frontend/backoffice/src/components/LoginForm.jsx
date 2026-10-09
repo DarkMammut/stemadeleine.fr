@@ -4,8 +4,10 @@ import {useState} from "react";
 import useLogin from "@/utils/auth/useLogin";
 import {useRouter} from "next/navigation";
 import BackButton from "@/components/ui/BackButton";
+import {useTranslation} from "@/i18n/I18nContext";
 
 export default function LoginForm() {
+    const {t} = useTranslation();
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -36,10 +38,10 @@ export default function LoginForm() {
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-xl">
                 <div className="mb-4">
-                    <BackButton to="/" label="Retour à l'accueil" autoHide={false}/>
+                    <BackButton to="/" label={t("login.backHome")} autoHide={false}/>
                 </div>
                 <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                    Connexion au backoffice
+                    {t("login.title")}
                 </h2>
             </div>
 
@@ -57,7 +59,7 @@ export default function LoginForm() {
                                 htmlFor="email"
                                 className="block text-sm/6 font-bold text-gray-900"
                             >
-                                Adresse email
+                                {t("login.email")}
                             </label>
                             <div className="mt-2">
                                 <input
@@ -79,7 +81,7 @@ export default function LoginForm() {
                                     htmlFor="password"
                                     className="block text-sm/6 font-bold text-gray-900"
                                 >
-                                    Mot de passe
+                                    {t("login.password")}
                                 </label>
                                 <div className="text-sm">
                                     <button
@@ -87,7 +89,7 @@ export default function LoginForm() {
                                         onClick={handleForgotPassword}
                                         className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer"
                                     >
-                                        Mot de passe oublié ?
+                                        {t("login.forgotPassword")}
                                     </button>
                                 </div>
                             </div>
@@ -153,7 +155,7 @@ export default function LoginForm() {
                                 disabled={loading}
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
-                                {loading ? "Connexion..." : "Se connecter"}
+                                {loading ? t("login.loading") : t("login.submit")}
                             </button>
                         </div>
                     </form>
@@ -167,7 +169,7 @@ export default function LoginForm() {
                                 disabled={loading}
                                 className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm/6 font-semibold text-indigo-600 shadow-xs ring-1 ring-inset ring-indigo-600 hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
-                                Dev login
+                                {t("login.devLogin")}
                             </button>
                         </div>
                     )}

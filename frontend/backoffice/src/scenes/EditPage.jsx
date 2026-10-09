@@ -16,8 +16,10 @@ import { useAxiosClient } from "@/utils/axiosClient";
 import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EditPage({ pageId }) {
+  const { t } = useTranslation();
   const { page, refetch } = useGetPage({ route: pageId });
   const { info, refetchInfo, resetDraft } = usePublicationInfo("pages", pageId);
   const { updatePage } = useAddPage();
@@ -37,37 +39,37 @@ export default function EditPage({ pageId }) {
   const fields = [
     {
       name: "name",
-      label: "Nom de la page",
+      label: t("pages.scenes.editPage.fields.name"),
       type: "text",
-      placeholder: "Entrez le nom de page",
+      placeholder: t("pages.scenes.editPage.fields.namePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre",
+      label: t("pages.scenes.editPage.fields.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.scenes.editPage.fields.titlePlaceholder"),
       required: true,
     },
     {
       name: "subTitle",
-      label: "Sous-titre",
+      label: t("pages.scenes.editPage.fields.subTitle"),
       type: "text",
-      placeholder: "Entrez le sous-titre",
+      placeholder: t("pages.scenes.editPage.fields.subTitlePlaceholder"),
       required: false,
     },
     {
       name: "slug",
-      label: "Slug",
+      label: t("pages.scenes.editPage.fields.slug"),
       type: "readonly",
-      placeholder: "Le slug sera généré automatiquement",
+      placeholder: t("pages.scenes.editPage.fields.slugPlaceholder"),
       required: true,
     },
     {
       name: "description",
-      label: "Description",
+      label: t("pages.scenes.editPage.fields.description"),
       type: "textarea",
-      placeholder: "Entrez une description",
+      placeholder: t("pages.scenes.editPage.fields.descriptionPlaceholder"),
       required: false,
     },
   ];
@@ -113,10 +115,13 @@ export default function EditPage({ pageId }) {
       setSaving(false);
       refetch();
       refetchInfo();
-      showSuccess("Page enregistrée", "La page a été mise à jour avec succès");
+      showSuccess(
+        t("pages.notifications.pageUpdatedTitle"),
+        t("pages.notifications.pageUpdatedMessage"),
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur de sauvegarde", "Impossible d'enregistrer la page");
+      showError(t("pages.errors.saveTitle"), t("pages.errors.savePageMessage"));
       setSaving(false);
     }
   };
@@ -124,7 +129,10 @@ export default function EditPage({ pageId }) {
   const handleCancelEdit = () => {
     setPageData(page);
     setFormKey((prev) => prev + 1);
-    showSuccess("Modifications annulées", "Les changements ont été annulés");
+    showSuccess(
+      t("pages.notifications.changesCancelledTitle"),
+      t("pages.notifications.changesCancelledMessage"),
+    );
   };
 
   const handleVisibilityChange = async (isVisible) => {
@@ -135,12 +143,17 @@ export default function EditPage({ pageId }) {
       setPageData((prev) => ({ ...prev, isVisible }));
       refetch();
       showSuccess(
-        `Page ${isVisible ? "rendue visible" : "masquée"}`,
-        "La visibilité a été mise à jour automatiquement",
+        `${t("pages.common.pageCapitalized")} ${
+          isVisible ? t("pages.common.visible") : t("pages.common.hidden")
+        }`,
+        t("pages.notifications.visibilityUpdatedAutomaticMessage"),
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur de visibilité", "Impossible de modifier la visibilité");
+      showError(
+        t("pages.errors.visibilityTitle"),
+        t("pages.errors.visibilityMessage"),
+      );
       setSavingVisibility(false);
     }
   };
@@ -151,10 +164,16 @@ export default function EditPage({ pageId }) {
       await axios.put(`/api/pages/${pageId}/publish`);
       await refetch();
       await refetchInfo();
-      showSuccess("Page publiée", "La page a été publiée avec succès");
+      showSuccess(
+        t("pages.notifications.publishedTitle"),
+        t("pages.notifications.pagePublishedMessage"),
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur de publication", "Impossible de publier la page");
+      showError(
+        t("pages.errors.publishTitle"),
+        t("pages.errors.publishPageMessage"),
+      );
     }
   };
 
@@ -164,12 +183,12 @@ export default function EditPage({ pageId }) {
       await refetch();
       setFormKey((prev) => prev + 1);
       showSuccess(
-        "Page réinitialisée",
-        "La page est revenue à la version publiée",
+        t("pages.notifications.resetPageTitle"),
+        t("pages.notifications.resetPageMessage"),
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de réinitialiser la page");
+      showError(t("pages.errors.genericTitle"), t("pages.errors.resetPageMessage"));
     }
   };
 
@@ -179,7 +198,9 @@ export default function EditPage({ pageId }) {
     <SceneLayout>
       <Title
         label={
-          pageData ? pageData.name || "Page sans nom" : "Gestion des pages"
+          pageData
+            ? pageData.name || t("pages.scenes.editPage.unnamedPage")
+            : t("pages.scenes.editPage.fallbackTitle")
         }
         onPublish={handlePublishPage}
         onReset={handleResetPage}
@@ -194,8 +215,8 @@ export default function EditPage({ pageId }) {
       <div className="space-y-6">
         {/* Section Visibilité séparée */}
         <VisibilitySwitch
-          title="Visibilité de la page"
-          label="Page visible sur le site"
+          title={t("pages.scenes.editPage.visibilityTitle")}
+          label={t("pages.scenes.editPage.visibilityLabel")}
           isVisible={pageData?.isVisible || false}
           onChange={handleVisibilityChange}
           savingVisibility={savingVisibility}
@@ -205,7 +226,7 @@ export default function EditPage({ pageId }) {
         {/* Formulaire principal */}
         <EditablePanelV2
           key={`${(pageData && pageData.id) || "page-form"}-${formKey}`}
-          title="Détails de la page"
+          title={t("pages.scenes.editPage.detailsTitle")}
           fields={fields}
           initialValues={pageData || {}}
           onSubmit={handleSubmit}
@@ -217,7 +238,7 @@ export default function EditPage({ pageId }) {
       {/* Gestion de l'image de bannière (Hero Media) */}
       {pageData && (
         <MediaManager
-          title="Image de bannière"
+          title={t("pages.scenes.editPage.heroMediaTitle")}
           content={{
             id: pageId,
             medias: page?.heroMedia ? [page.heroMedia] : [],

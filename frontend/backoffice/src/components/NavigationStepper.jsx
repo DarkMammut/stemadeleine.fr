@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { ChevronRightIcon, DocumentTextIcon } from "@heroicons/react/16/solid";
 import { useBreadcrumbData } from "@/hooks/useBreadcrumbData";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function NavigationStepper() {
   const pathname = usePathname();
   const params = useParams();
+  const { t } = useTranslation();
 
   const { pageId, sectionId, moduleId } = params;
   const { page, section, module, loading, error } = useBreadcrumbData({
@@ -29,7 +31,7 @@ export default function NavigationStepper() {
   const buildBreadcrumbs = () => {
     const breadcrumbs = [
       {
-        name: "Website",
+        name: t("pages.navigation.root"),
         href: "/pages",
         icon: DocumentTextIcon,
         current: false,
@@ -39,7 +41,7 @@ export default function NavigationStepper() {
     // Ajouter la page si elle existe
     if (page) {
       breadcrumbs.push({
-        name: page.name || "Page sans nom",
+        name: page.name || t("pages.navigation.unnamedPage"),
         href: `/pages/${pageId}`,
         current: !sectionId && !moduleId,
       });
@@ -47,7 +49,7 @@ export default function NavigationStepper() {
       // Ajouter "Sections" si on est dans les sections
       if (sectionId || pathname.includes("/sections")) {
         breadcrumbs.push({
-          name: "Sections",
+          name: t("pages.navigation.sections"),
           href: `/pages/${pageId}/sections`,
           current: !sectionId,
         });
@@ -57,7 +59,7 @@ export default function NavigationStepper() {
     // Ajouter la section si elle existe
     if (section) {
       breadcrumbs.push({
-        name: section.name || "Section sans nom",
+        name: section.name || t("pages.navigation.unnamedSection"),
         href: `/pages/${pageId}/sections/${sectionId}`,
         current: !moduleId,
       });
@@ -66,7 +68,7 @@ export default function NavigationStepper() {
     // Ajouter le module si il existe
     if (module) {
       breadcrumbs.push({
-        name: module.name || "Module sans nom",
+        name: module.name || t("pages.navigation.unnamedModule"),
         href: `/pages/${pageId}/sections/${sectionId}/modules/${moduleId}`,
         current: true,
       });
@@ -92,7 +94,7 @@ export default function NavigationStepper() {
       <nav className="flex mb-4" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
           <li className="text-red-500 text-sm">
-            Erreur de navigation: {error}
+            {t("pages.navigation.errorPrefix")}: {error}
           </li>
         </ol>
       </nav>

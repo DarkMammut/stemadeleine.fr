@@ -3,8 +3,10 @@ import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/ui/Utilities";
 import CampaignCard from "@/components/CampaignCard";
 import CardLayout from "@/components/ui/CardLayout";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Campaigns({ onNotifyError, refreshSignal }) {
+  const { t } = useTranslation();
   const axios = useAxiosClient();
   const [campaigns, setCampaigns] = useState([]);
 
@@ -31,8 +33,8 @@ export default function Campaigns({ onNotifyError, refreshSignal }) {
     } catch (error) {
       console.error("Error loading campaigns:", error);
       onNotifyError?.(
-        "Erreur de chargement",
-        "Impossible de charger les campagnes",
+        t("dashboard.campaignsLoadErrorTitle"),
+        t("dashboard.campaignsLoadErrorMessage"),
       );
     }
   };
@@ -63,7 +65,7 @@ export default function Campaigns({ onNotifyError, refreshSignal }) {
       {/* Utilities left empty here - refresh is provided by parent Title */}
       <Utilities actions={[]} />
 
-      <CardLayout emptyMessage="Aucune campagne trouvée.">
+      <CardLayout emptyMessage={t("dashboard.noCampaigns")}>
         {filteredCampaigns.map((campaign) => (
           <CampaignCard
             key={campaign.id}

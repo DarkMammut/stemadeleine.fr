@@ -12,49 +12,49 @@ import {
 
 export const NAV_ITEMS = [
   {
-    label: "Dashboard",
+    labelKey: "navigation.dashboard",
     icon: <HomeIcon className="w-5 h-5" />,
     url: "/dashboard",
     key: "dashboard",
   },
   {
-    label: "Website",
+    labelKey: "navigation.website",
     icon: <DocumentTextIcon className="w-5 h-5" />,
     url: "/pages",
     key: "website",
   },
   {
-    label: "Actualités",
+    labelKey: "navigation.news",
     icon: <NewspaperIcon className="w-5 h-5" />,
     url: "/news",
     key: "news",
   },
   {
-    label: "Newsletters",
+    labelKey: "navigation.newsletters",
     icon: <EnvelopeIcon className="w-5 h-5" />,
     url: "/newsletters",
     key: "newsletters",
   },
   {
-    label: "Demandes",
+    labelKey: "navigation.contacts",
     icon: <InboxIcon className="w-5 h-5" />,
     url: "/contacts",
     key: "contacts",
   },
   {
-    label: "Adhérents",
+    labelKey: "navigation.users",
     icon: <UserGroupIcon className="w-5 h-5" />,
     url: "/users",
     key: "users",
   },
   {
-    label: "Paiements",
+    labelKey: "navigation.payments",
     icon: <CreditCardIcon className="w-5 h-5" />,
     url: "/payments",
     key: "payments",
   },
   {
-    label: "Paramètres",
+    labelKey: "navigation.settings",
     icon: <Cog6ToothIcon className="w-5 h-5" />,
     url: "/settings",
     key: "settings",

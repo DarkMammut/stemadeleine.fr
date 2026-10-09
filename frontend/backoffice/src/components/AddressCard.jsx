@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import ModifyButton from "@/components/ui/ModifyButton";
 import DeleteButton from "@/components/ui/DeleteButton";
 import PanelCard from "@/components/ui/PanelCard";
+import { useTranslation } from "@/i18n/I18nContext";
 
 // AddressCard: clean postal-address layout specialized for addresses.
 export default function AddressCard({
@@ -17,6 +18,7 @@ export default function AddressCard({
   loading = false,
   className = "",
 }) {
+  const { t } = useTranslation();
   // address components
   const line1 = data?.addressLine1 || "";
   const line2 = data?.addressLine2 || "";
@@ -29,16 +31,16 @@ export default function AddressCard({
     <div className="flex flex-col items-end gap-2">
       <ModifyButton
         size="sm"
-        modifyLabel="Modifier"
+        modifyLabel={t("addresses.edit")}
         onModify={onEdit}
         disabled={loading || !onEdit}
       />
       <DeleteButton
         onDelete={onDelete}
         size="sm"
-        deleteLabel="Supprimer"
-        confirmTitle={"Supprimer"}
-        confirmMessage={"Confirmer la suppression ?"}
+        deleteLabel={t("addresses.delete")}
+        confirmTitle={t("addresses.deleteConfirmTitle")}
+        confirmMessage={t("addresses.deleteConfirmMessage")}
         disabled={loading || !onDelete}
       />
     </div>
@@ -79,7 +81,7 @@ export default function AddressCard({
             )}
             {!line1 && !line2 && !postCode && !city && !state && !country && (
               <div className="text-sm text-gray-500">
-                Aucune adresse renseignée
+                {t("addresses.emptyValue")}
               </div>
             )}
           </div>

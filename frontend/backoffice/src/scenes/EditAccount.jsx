@@ -12,8 +12,10 @@ import ActiveSwitch from "@/components/ActiveSwitch";
 import Utilities from "@/components/ui/Utilities";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
 import Button from "@/components/ui/Button";
+import {useTranslation} from "@/i18n/I18nContext";
 
 export default function EditAccount() {
+    const {t} = useTranslation();
     const {id} = useParams();
     const router = useRouter();
     const accountOps = useAccountOperations();
@@ -61,14 +63,19 @@ export default function EditAccount() {
                 setRoleOptions(
                     (roles || []).map((r) => ({
                         value: r,
-                        label: r.replace(/^ROLE_/, ""),
+                        label:
+                            r === "ROLE_ADMIN"
+                                ? t("accounts.roleAdmin")
+                                : r === "ROLE_USER"
+                                    ? t("accounts.roleUser")
+                                    : r.replace(/^ROLE_/, ""),
                     })),
                 );
             } catch (e) {
                 console.warn("Unable to fetch roles for select", e);
             }
         })();
-    }, [getRoles]);
+    }, [getRoles, t]);
 
     useEffect(() => {
         if (id) fetchAccount();
@@ -101,7 +108,7 @@ export default function EditAccount() {
             setAccount(normalized);
             // no need to keep a separate `form` state; EditablePanel uses account for initial values
         } catch (e) {
-            showError("Erreur lors du chargement du compte", e?.message || "");
+            showError(t("accounts.loadErrorTitleSingle"), e?.message || "");
         } finally {
             setLoading(false);
         }
@@ -110,10 +117,13 @@ export default function EditAccount() {
     const handleDelete = async () => {
         try {
             await accountOps.deleteAccount(id);
-            showSuccess("Compte supprimé", "Le compte a bien été supprimé");
+            showSuccess(
+                t("accounts.deleteSuccessTitle"),
+                t("accounts.deleteSuccessMessage"),
+            );
             router.push(`/settings/accounts?r=${Date.now()}`);
         } catch (err) {
-            showError("Erreur lors de la suppression", err?.message || "");
+            showError(t("accounts.deleteErrorTitle"), err?.message || "");
         }
     };
 
@@ -142,13 +152,13 @@ export default function EditAccount() {
             await accountOps.updateAccount(id, payload);
             await fetchAccount();
             showSuccess(
-                "Compte mis à jour",
-                "Les modifications ont été enregistrées",
+                t("accounts.updateSuccessTitle"),
+                t("accounts.updateSuccessMessage"),
             );
             // redirect to list with selected
             router.push(`/settings/accounts?selected=${id}`);
         } catch (e) {
-            showError("Erreur lors de la mise à jour du compte", e?.message || "");
+            showError(t("accounts.updateErrorTitle"), e?.message || "");
             throw e;
         } finally {
             setSaving(false);
@@ -162,7 +172,7 @@ export default function EditAccount() {
 
     return (
         <SceneLayout>
-            <Title label="Modifier le compte"/>
+            <Title label={t("accounts.editTitle")}/>
 
             <div className="space-y-6">
                 <ActiveSwitch
@@ -198,7 +208,7 @@ export default function EditAccount() {
                             };
                             setAccount(normalized);
                         } catch (e) {
-                            showError("Erreur lors du changement d'état", e?.message || "");
+                            showError(t("accounts.toggleErrorTitle"), e?.message || "");
                         } finally {
                             setSaving(false);
                         }
@@ -215,14 +225,14 @@ export default function EditAccount() {
                     actions={[
                         {
                             variant: "reset-password",
-                            label: "Générer / réinitialiser le mot de passe",
+                            label: t("accounts.resetPasswordAction"),
                             // callback receives the generated password from Utilities (newPass)
                             callback: async (newPass) => {
                                 try {
                                     await accountOps.resetPasswordByAdmin(id, newPass);
                                     showSuccess(
-                                        "Mot de passe mis à jour",
-                                        "Le mot de passe a été réinitialisé et copié dans le presse-papier",
+                                        t("accounts.resetPasswordSuccessTitle"),
+                                        t("accounts.resetPasswordSuccessMessage"),
                                     );
                                 } catch (err) {
                                     // remonter l'erreur pour que Utilities puisse l'afficher si besoin
@@ -233,7 +243,7 @@ export default function EditAccount() {
                             },
                             // meta permet au composant Utilities de désactiver le bouton suivant le provider
                             meta: {
-                                currentProvider: account ? account.provider : "local",
+                                currentProvider: account ? account.provider : t("accounts.localProvider"),
                                 provider: "local",
                             },
                             size: "sm",
@@ -256,44 +266,47 @@ export default function EditAccount() {
                         onClick={() => setShowChangePwd(true)}
                         title={
                             account && account.provider && account.provider.toLowerCase() !== "local"
-                                ? `Modification non disponible pour les comptes ${account.provider}`
-                                : "Modifier le mot de passe (mode administrateur)"
+                                ? t("accounts.adminChangePasswordUnavailable").replace(
+                                    "{provider}",
+                                    account.provider,
+                                )
+                                : t("accounts.adminChangePasswordTitle")
                         }
                     >
-                        Modifier le mot de passe (admin)
+                        {t("accounts.adminChangePassword")}
                     </Button>
                     {account && account.provider && account.provider.toLowerCase() !== "local" && (
                         <p className="mt-1 text-xs text-gray-500">
-                            La modification de mot de passe n'est disponible que pour les comptes locaux
+                            {t("accounts.adminChangePasswordHint")}
                         </p>
                     )}
                 </div>
 
                 <EditablePanel
                     key={account ? account.id : "account"}
-                    title={getDisplayName(account) || "Compte"}
+                    title={getDisplayName(account) || t("accounts.fallbackTitle")}
                     icon={UserIcon}
                     canEdit={true}
                     initialValues={formInitialValues || {}}
                     fields={[
                         {
                             name: "provider",
-                            label: "Provider",
+                            label: t("accounts.providerField"),
                             type: "text",
                             required: true,
                         },
                         {
                             name: "username",
-                            label: "Username",
+                            label: t("accounts.usernameField"),
                             type: "text",
                             required: true,
                         },
                         {
                             name: "roles",
-                            label: "Roles",
+                            label: t("accounts.rolesField"),
                             type: "select",
                             required: true,
-                            options: [{value: "", label: "-- Choisir --"}, ...roleOptions],
+                            options: [{value: "", label: t("accounts.chooseOption")}, ...roleOptions],
                         },
                     ]}
                     displayColumns={2}

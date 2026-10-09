@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function TimelineModuleEditor({
   moduleId,
@@ -12,6 +13,7 @@ export default function TimelineModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule, updateModuleVisibility } = useModuleOperations();
   const [saving, setSaving] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
@@ -20,27 +22,27 @@ export default function TimelineModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de la chronologie",
+      label: t("pages.modules.timeline.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.timeline.variant"),
       type: "select",
       required: true,
       options: [
-        { value: "TABS", label: "Onglets" },
-        { value: "VERTICAL", label: "Timeline verticale" },
-        { value: "HORIZONTAL", label: "Timeline horizontale" },
+        { value: "TABS", label: t("pages.modules.timeline.tabs") },
+        { value: "VERTICAL", label: t("pages.modules.timeline.vertical") },
+        { value: "HORIZONTAL", label: t("pages.modules.timeline.horizontal") },
       ],
     },
   ];
@@ -58,10 +60,10 @@ export default function TimelineModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module chronologie mis à jour !");
+      alert(t("pages.modules.timeline.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -74,7 +76,7 @@ export default function TimelineModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -83,8 +85,8 @@ export default function TimelineModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -92,7 +94,7 @@ export default function TimelineModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails du module chronologie"
+        title={t("pages.modules.timeline.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}

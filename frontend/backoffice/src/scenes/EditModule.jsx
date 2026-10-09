@@ -8,6 +8,7 @@ import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 import SceneLayout from "@/components/ui/SceneLayout";
+import { useTranslation } from "@/i18n/I18nContext";
 
 // Import des composants spécialisés par type de module (basés sur votre backend Java)
 import NewsModuleEditor from "@/components/modules/NewsModuleEditor";
@@ -36,6 +37,7 @@ export default function EditModule({
   pageId: _pageId,
   sectionId: _sectionId,
 }) {
+  const { t } = useTranslation();
   const { module, refetch, loading, error } = useGetModule({ moduleId });
   const [moduleData, setModuleData] = useState(null);
   const [resetKey, setResetKey] = useState(0);
@@ -52,10 +54,16 @@ export default function EditModule({
       await axios.put(`/api/modules/${moduleId}/publish`);
       await refetch();
       await refetchInfo();
-      showSuccess("Module publié", "Le module a été publié avec succès");
+      showSuccess(
+        t("pages.notifications.publishedTitle"),
+        t("pages.notifications.modulePublishedMessage"),
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur de publication", "Impossible de publier le module");
+      showError(
+        t("pages.errors.publishTitle"),
+        t("pages.errors.publishModuleMessage"),
+      );
     }
   };
 
@@ -65,12 +73,15 @@ export default function EditModule({
       await refetch();
       setResetKey((prev) => prev + 1);
       showSuccess(
-        "Module réinitialisé",
-        "Le module est revenu à la version publiée",
+        t("pages.notifications.resetModuleTitle"),
+        t("pages.notifications.resetModuleMessage"),
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de réinitialiser le module");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.resetModuleMessage"),
+      );
     }
   };
 
@@ -85,6 +96,14 @@ export default function EditModule({
   const safeModuleData = moduleData
     ? { ...moduleData, type: moduleData?.type ?? "" }
     : null;
+  const moduleTypeKey = (safeModuleData?.type || "").toLowerCase();
+  const translatedModuleType = moduleTypeKey
+    ? t(`pages.moduleTypes.${moduleTypeKey}`)
+    : "";
+  const moduleTypeLabel =
+    translatedModuleType !== `pages.moduleTypes.${moduleTypeKey}`
+      ? translatedModuleType
+      : safeModuleData?.type;
 
   // Sélectionner le composant approprié en fonction du type de module (protéger les accès)
   const ModuleComponent =
@@ -93,7 +112,9 @@ export default function EditModule({
   return (
     <SceneLayout>
       <Title
-        label={`Édition de module - ${safeModuleData ? safeModuleData.type : "..."}`}
+        label={`${t("pages.scenes.editModule.titlePrefix")} ${
+          safeModuleData ? moduleTypeLabel : "..."
+        }`}
         onPublish={handlePublishModule}
         onReset={handleResetModule}
         publicationInfo={info}
@@ -104,11 +125,11 @@ export default function EditModule({
       <div className="space-y-6">
         {error ? (
           <div className="text-center py-8 text-red-600">
-            Erreur: {error.message}
+            {t("pages.errors.loadingPrefix")}: {error.message}
           </div>
         ) : !safeModuleData ? (
           <div className="text-center py-8 text-gray-500">
-            Chargement du module…
+            {t("pages.common.loadingModule")}
           </div>
         ) : ModuleComponent ? (
           <ModuleComponent
@@ -124,7 +145,8 @@ export default function EditModule({
           />
         ) : (
           <div className="text-center py-8 text-red-600">
-            Type de module non supporté: {safeModuleData?.type ?? "(inconnu)"}
+            {t("pages.scenes.editModule.unsupportedTypePrefix")}:{" "}
+            {moduleTypeLabel ?? `(${t("pages.common.unknown")})`}
           </div>
         )}
       </div>

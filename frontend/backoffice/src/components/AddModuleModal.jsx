@@ -6,6 +6,7 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
 import Panel from '@/components/ui/Panel';
+import { useTranslation } from "@/i18n/I18nContext";
 
 /**
  * Modal pour ajouter un module à une section
@@ -35,6 +36,11 @@ export default function AddModuleModal({
   ],
 }) {
   const [selectedType, setSelectedType] = useState("");
+  const { t } = useTranslation();
+  const resolvedModuleTypes = moduleTypes.map((moduleType) => ({
+    ...moduleType,
+    label: t(`pages.moduleTypes.${moduleType.value}`),
+  }));
 
   // Réinitialiser la sélection quand le modal s'ouvre
   useEffect(() => {
@@ -57,16 +63,16 @@ export default function AddModuleModal({
 
   return (
     <Modal open={open} onClose={handleClose} size="md">
-      <Panel title={"Ajouter un module"} icon={PlusCircleIcon}>
+      <Panel title={t("pages.addModuleModal.title")} icon={PlusCircleIcon}>
         <div className="mt-2">
           <p className="text-sm text-gray-500 mb-4">
             {section ? (
               <>
-                Ajouter un module à la section{" "}
+                {t("pages.addModuleModal.descriptionWithSectionPrefix")}{" "}
                 <span className="font-semibold">{section.name}</span>
               </>
             ) : (
-              "Sélectionnez le type de module à ajouter"
+              t("pages.addModuleModal.descriptionWithoutSection")
             )}
           </p>
 
@@ -76,15 +82,15 @@ export default function AddModuleModal({
               htmlFor="module-type"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Type de module
+              {t("pages.addModuleModal.fieldLabel")}
             </label>
             <Select
               id="module-type"
               value={selectedType}
               onValueChange={setSelectedType}
               disabled={isLoading}
-              options={moduleTypes}
-              placeholder="Sélectionner un type"
+              options={resolvedModuleTypes}
+              placeholder={t("pages.addModuleModal.fieldPlaceholder")}
               className="block w-full rounded-md border-0 py-2 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
@@ -101,7 +107,7 @@ export default function AddModuleModal({
             loading={isLoading}
             className="w-full sm:w-auto"
           >
-            Ajouter
+            {t("pages.addModuleModal.confirm")}
           </Button>
           <Button
             type="button"
@@ -111,7 +117,7 @@ export default function AddModuleModal({
             size="md"
             className="mt-3 sm:mt-0 w-full sm:w-auto"
           >
-            Annuler
+            {t("pages.addModuleModal.cancel")}
           </Button>
         </div>
       </Panel>

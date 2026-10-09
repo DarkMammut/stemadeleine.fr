@@ -1,15 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useContactsContext } from "@/contexts/ContactsContext";
+import { useTranslation } from "@/i18n/I18nContext";
 import NAV_ITEMS from "../../utils/navigation";
 
 export default function Sidebar({ current, setCurrent }) {
   const router = useRouter();
   const { unreadCount } = useContactsContext();
+  const { t } = useTranslation();
   const items = NAV_ITEMS;
 
   return (
-    // Hidden on small screens, fixed under the header on md+
     <aside className="hidden md:block fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)] bg-gray-900 text-white">
       <nav className="flex flex-col p-4 space-y-2">
         {items.map((item) => (
@@ -24,7 +25,7 @@ export default function Sidebar({ current, setCurrent }) {
             }`}
           >
             {item.icon}
-            <span className="flex-1 text-left">{item.label}</span>
+            <span className="flex-1 text-left">{t(item.labelKey)}</span>
             {item.key === "contacts" && unreadCount > 0 && (
               <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
                 {unreadCount}

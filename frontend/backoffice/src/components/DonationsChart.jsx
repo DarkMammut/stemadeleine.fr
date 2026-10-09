@@ -6,27 +6,14 @@ import { normalizeToArray } from "@/utils/normalizeApiResponse";
 import Card from "@/components/ui/Card";
 import Currency from "@/components/ui/Currency";
 import Select from "@/components/ui/Select";
-
-const MONTHS = [
-  "Jan",
-  "Fév",
-  "Mar",
-  "Avr",
-  "Mai",
-  "Juin",
-  "Juil",
-  "Aoû",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Déc",
-];
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function DonationsChart({
   className = "",
   chartHeight = "h-56",
   refreshSignal = 0,
 }) {
+  const { t } = useTranslation();
   const axios = useAxiosClient();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,12 +98,29 @@ export default function DonationsChart({
     : monthlyTotals;
   const maxForRender = Math.max(...monthlyTotalsForRender, 1);
   const yearForRender = loading ? new Date().getFullYear() : year;
+  const months = useMemo(
+    () => [
+      t("dashboard.months.jan"),
+      t("dashboard.months.feb"),
+      t("dashboard.months.mar"),
+      t("dashboard.months.apr"),
+      t("dashboard.months.may"),
+      t("dashboard.months.jun"),
+      t("dashboard.months.jul"),
+      t("dashboard.months.aug"),
+      t("dashboard.months.sep"),
+      t("dashboard.months.oct"),
+      t("dashboard.months.nov"),
+      t("dashboard.months.dec"),
+    ],
+    [t],
+  );
 
   return (
     <Card as="div" className={`mb-6 ${className}`}>
       <div className="flex items-center justify-between px-2 sm:px-4 py-3">
         <h4 className="text-base font-semibold text-gray-800">
-          Dons — {yearForRender}
+          {t("dashboard.donationsTitle")} — {yearForRender}
         </h4>
         <div className="flex items-center gap-2">
           <Select
@@ -224,7 +228,7 @@ export default function DonationsChart({
                           stroke="#8b5cf6"
                           strokeWidth="1.8"
                         >
-                          <title>{`${MONTHS[i]}: ${p.val}`}</title>
+                          <title>{`${months[i]}: ${p.val}`}</title>
                         </circle>
                       </g>
                     ))}
@@ -239,7 +243,7 @@ export default function DonationsChart({
                         fontSize="10"
                         fill="#6b7280"
                       >
-                        {MONTHS[i]}
+                        {months[i]}
                       </text>
                     ))}
                   </g>
@@ -250,7 +254,7 @@ export default function DonationsChart({
 
           <div className="mt-3 text-sm text-gray-600 flex items-center justify-between">
             <div>
-              Total:{" "}
+              {t("dashboard.total")}:{" "}
               <span className="font-semibold text-gray-800 text-base">
                 <Currency
                   value={monthlyTotalsForRender.reduce((a, b) => a + b, 0)}
@@ -259,7 +263,7 @@ export default function DonationsChart({
               </span>
             </div>
             {loading && (
-              <div className="text-sm text-gray-500">Chargement…</div>
+              <div className="text-sm text-gray-500">{t("dashboard.loading")}</div>
             )}
           </div>
         </div>

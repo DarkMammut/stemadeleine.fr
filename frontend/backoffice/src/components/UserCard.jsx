@@ -10,6 +10,7 @@ import {
   PhoneIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function UserCard({
   user,
@@ -17,12 +18,13 @@ export default function UserCard({
   showAdherentFlag = false,
   loading = false,
 }) {
+  const { t } = useTranslation();
   if (loading) return <CardSkeleton showActions={false} />;
 
   const getFullName = () => {
     return (
       [user.firstname, user.lastname].filter(Boolean).join(" ") ||
-      "Utilisateur sans nom"
+      t("users.card.unnamed")
     );
   };
 
@@ -47,7 +49,7 @@ export default function UserCard({
             {showAdherentFlag && user.isAdherent && (
               <CheckBadgeIcon
                 className="h-5 w-5 text-green-600"
-                title="Adhérent"
+                title={t("users.card.adherent")}
               />
             )}
           </div>
@@ -69,7 +71,7 @@ export default function UserCard({
 
             {!user.email && !getPhone() && (
               <p className="text-sm text-gray-400 italic">
-                Aucune information de contact
+                {t("users.card.noContactInfo")}
               </p>
             )}
           </div>
@@ -85,7 +87,9 @@ export default function UserCard({
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {membership.active ? "Adhésion active" : "Adhésion expirée"}
+                  {membership.active
+                    ? t("users.card.membershipActive")
+                    : t("users.card.membershipExpired")}
                 </span>
               ))}
             </div>

@@ -9,12 +9,14 @@ import {
   HeartIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function KpiCards({
   kpis = {},
   containerClass = "",
   cardClass = "",
 }) {
+  const { t } = useTranslation();
   const {
     loading = true,
     activeMembers = 0,
@@ -33,7 +35,9 @@ export default function KpiCards({
           <div className="rounded-full bg-blue-200 p-3">
             <UsersIcon className="w-6 h-6 text-blue-600" />
           </div>
-          <div className="text-sm text-gray-500">Adhérents actifs</div>
+          <div className="text-sm text-gray-500">
+            {t("dashboard.activeMembers")}
+          </div>
           <div className="text-2xl font-semibold text-gray-900">
             {loading ? "—" : activeMembers}
           </div>
@@ -48,7 +52,9 @@ export default function KpiCards({
           <div className="rounded-full bg-green-200 p-3">
             <CreditCardIcon className="w-6 h-6 text-green-600" />
           </div>
-          <div className="text-sm text-gray-500">Montant adhésions</div>
+          <div className="text-sm text-gray-500">
+            {t("dashboard.membershipAmount")}
+          </div>
           <div className="text-2xl font-semibold text-gray-900">
             {loading ? (
               "—"
@@ -67,7 +73,9 @@ export default function KpiCards({
           <div className="rounded-full bg-red-200 p-3">
             <HeartIcon className="w-6 h-6 text-red-600" />
           </div>
-          <div className="text-sm text-gray-500">Donateurs</div>
+          <div className="text-sm text-gray-500">
+            {t("dashboard.donorsCount")}
+          </div>
           <div className="text-2xl font-semibold text-gray-900">
             {loading ? "—" : donorsCount}
           </div>
@@ -82,7 +90,9 @@ export default function KpiCards({
           <div className="rounded-full bg-yellow-200 p-3">
             <BanknotesIcon className="w-6 h-6 text-yellow-600" />
           </div>
-          <div className="text-sm text-gray-500">Montant dons</div>
+          <div className="text-sm text-gray-500">
+            {t("dashboard.donationsAmount")}
+          </div>
           <div className="text-2xl font-semibold text-gray-900">
             {loading ? (
               "—"

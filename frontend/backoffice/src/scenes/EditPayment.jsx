@@ -11,11 +11,13 @@ import { useNotification } from "@/hooks/useNotification";
 import SceneLayout from "@/components/ui/SceneLayout";
 import { usePaymentOperations } from "@/hooks/usePaymentOperations";
 import LinkUser from "@/components/LinkUser";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EditPayment() {
   const { id } = useParams();
   const router = useRouter();
   const axios = useAxiosClient();
+  const { t } = useTranslation();
   const [payment, setPayment] = useState(null);
   const [paymentForm, setPaymentForm] = useState({});
   const [loading, setLoading] = useState(true);
@@ -24,6 +26,13 @@ export default function EditPayment() {
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
   const { attachUser, detachUser } = usePaymentOperations();
+
+  const translateEnum = (group, value) => {
+    if (!value) return "";
+    const key = `payments.enums.${group}.${String(value).toUpperCase()}`;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
 
   useEffect(() => {
     loadPayment();
@@ -34,7 +43,6 @@ export default function EditPayment() {
     setLoading(true);
     try {
       const res = await axios.get(`/api/payments/${id}`);
-      // Mettre à jour à la fois le formulaire et l'objet payment utilisé par la vue
       setPayment(res.data);
       setPaymentForm({
         amount:
@@ -49,7 +57,7 @@ export default function EditPayment() {
       });
     } catch (e) {
       console.error("Erreur lors du chargement du paiement:", e);
-      showError("Erreur de chargement", "Impossible de charger le paiement");
+      showError(t("editPayment.loadErrorTitle"), t("editPayment.loadErrorMessage"));
     } finally {
       setLoading(false);
     }
@@ -59,9 +67,7 @@ export default function EditPayment() {
     try {
       const res = await axios.get("/api/payments/enums");
       setPaymentEnums(res.data);
-    } catch (e) {
-      // Optionnel : gestion d'erreur
-    }
+    } catch (e) {}
   };
 
   const handleSave = async (formValues) => {
@@ -70,12 +76,12 @@ export default function EditPayment() {
       await axios.put(`/api/payments/${id}`, formValues);
       await loadPayment();
       showSuccess(
-        "Paiement modifié",
-        "Les modifications ont été enregistrées avec succès",
+        t("editPayment.saveSuccessTitle"),
+        t("editPayment.saveSuccessMessage"),
       );
     } catch (e) {
       console.error("Erreur lors de la modification du paiement:", e);
-      showError("Erreur de modification", "Impossible de modifier le paiement");
+      showError(t("editPayment.saveErrorTitle"), t("editPayment.saveErrorMessage"));
     } finally {
       setSaving(false);
     }
@@ -85,15 +91,18 @@ export default function EditPayment() {
     try {
       await axios.delete(`/api/payments/${id}`);
       showSuccess(
-        "Paiement supprimé",
-        "Le paiement a été supprimé avec succès",
+        t("editPayment.deleteSuccessTitle"),
+        t("editPayment.deleteSuccessMessage"),
       );
       setTimeout(() => {
         router.push("/payments");
       }, 1500);
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
-      showError("Erreur de suppression", "Impossible de supprimer le paiement");
+      showError(
+        t("editPayment.deleteErrorTitle"),
+        t("editPayment.deleteErrorMessage"),
+      );
     }
   };
 
@@ -103,15 +112,12 @@ export default function EditPayment() {
       await axios.put(`/api/payments/${id}`, { ...paymentForm, userId });
       await loadPayment();
       showSuccess(
-        "Utilisateur lié",
-        "L'utilisateur a été lié au paiement avec succès",
+        t("editPayment.linkSuccessTitle"),
+        t("editPayment.linkSuccessMessage"),
       );
     } catch (e) {
       console.error("Erreur lors de la liaison de l'utilisateur:", e);
-      showError(
-        "Erreur de liaison",
-        "Impossible de lier l'utilisateur au paiement",
-      );
+      showError(t("editPayment.linkErrorTitle"), t("editPayment.linkErrorMessage"));
     } finally {
       setSaving(false);
     }
@@ -121,12 +127,11 @@ export default function EditPayment() {
     await handleLinkUser(userId);
   };
 
-  // Si le paiement n'est pas trouvé et que ce n'est pas (encore) en chargement, afficher l'erreur
   if (!payment && !loading) {
     return (
       <SceneLayout>
-        <Title label="Modifier le paiement" />
-        <div className="text-gray-600">Paiement introuvable.</div>
+        <Title label={t("editPayment.title")} />
+        <div className="text-gray-600">{t("editPayment.notFound")}</div>
         <Notification
           show={notification.show}
           onClose={hideNotification}
@@ -139,14 +144,13 @@ export default function EditPayment() {
 
   return (
     <SceneLayout>
-      <Title label="Modifier le paiement" />
+      <Title label={t("editPayment.title")} />
 
-      {/* Editable panel for payment (fields defined below) */}
       {(() => {
         const paymentFields = [
           {
             name: "amount",
-            label: "Montant",
+            label: t("editPayment.fields.amount"),
             type: "currency",
             currency: "EUR",
             required: true,
@@ -154,45 +158,45 @@ export default function EditPayment() {
           },
           {
             name: "type",
-            label: "Type",
+            label: t("editPayment.fields.type"),
             type: "select",
             required: true,
             defaultValue: paymentForm.type,
-            options: (paymentEnums.type || []).map((v) => ({
-              label: v,
-              value: v,
+            options: (paymentEnums.type || []).map((value) => ({
+              label: translateEnum("type", value),
+              value,
             })),
           },
           {
             name: "status",
-            label: "Statut",
+            label: t("editPayment.fields.status"),
             type: "select",
             required: true,
             defaultValue: paymentForm.status,
             flag: true,
             flagKey: "statusFlag",
-            options: (paymentEnums.status || []).map((v) => ({
-              label: v,
-              value: v,
+            options: (paymentEnums.status || []).map((value) => ({
+              label: translateEnum("status", value),
+              value,
             })),
           },
           {
             name: "formSlug",
-            label: "Slug formulaire",
+            label: t("editPayment.fields.formSlug"),
             type: "text",
             required: false,
             defaultValue: paymentForm.formSlug,
           },
           {
             name: "receiptUrl",
-            label: "URL reçu",
+            label: t("editPayment.fields.receiptUrl"),
             type: "url",
             required: false,
             defaultValue: paymentForm.receiptUrl,
           },
           {
             name: "paymentDate",
-            label: "Date de paiement",
+            label: t("editPayment.fields.paymentDate"),
             type: "date",
             required: false,
             defaultValue: paymentForm.paymentDate,
@@ -201,7 +205,7 @@ export default function EditPayment() {
 
         return (
           <EditablePanel
-            title={payment ? `Paiement #${payment.id}` : "Paiement"}
+            title={payment ? `${t("editPayment.panelTitlePrefix")} #${payment.id}` : t("editPayment.panelTitlePrefix")}
             icon={CurrencyDollarIcon}
             canEdit={true}
             initialValues={paymentForm}
@@ -215,27 +219,22 @@ export default function EditPayment() {
         );
       })()}
 
-      {/* Lier / Détacher un utilisateur - section séparée */}
       <LinkUser
-        title="Emetteur"
+        title={t("editPayment.emitterTitle")}
         onLink={handleLinkUser}
         onCreateAndLink={handleCreateAndLinkUser}
         onLinked={loadPayment}
         currentUser={payment?.user || null}
         loading={loading || saving}
         operations={{
-          // attach expects just userId
           attach: async (userId) => {
             const updated = await attachUser(id, userId);
-            // if API returned full payment, use it to update local state
             if (updated && typeof updated === "object") {
               setPayment(updated);
             } else {
-              // fallback: optimistic minimal update
               setPayment((p) => (p ? { ...p, user: { id: userId } } : p));
             }
           },
-          // detach expects no args
           detach: async () => {
             const updated = await detachUser(id);
             if (updated && typeof updated === "object") {
@@ -257,8 +256,6 @@ export default function EditPayment() {
         }}
       />
 
-      {/* Modal de confirmation pour la modification */}
-      {/* Notifications */}
       <Notification
         show={notification.show}
         onClose={hideNotification}

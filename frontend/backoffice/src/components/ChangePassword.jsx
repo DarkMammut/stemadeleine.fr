@@ -4,8 +4,10 @@ import MyForm from "@/components/ui/MyForm";
 import PropTypes from "prop-types";
 import { useNotification } from "@/hooks/useNotification";
 import { useAccountOperations } from "@/hooks/useAccountOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ChangePassword({ accountId, onChangePassword }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { showSuccess, showError } = useNotification();
   const accountOps = useAccountOperations();
@@ -13,19 +15,19 @@ export default function ChangePassword({ accountId, onChangePassword }) {
   const fields = [
     {
       name: "currentPassword",
-      label: "Mot de passe actuel",
+      label: t("accounts.password.currentPassword"),
       type: "password",
       required: true,
     },
     {
       name: "newPassword",
-      label: "Nouveau mot de passe",
+      label: t("accounts.password.newPassword"),
       type: "password",
       required: true,
     },
     {
       name: "confirmPassword",
-      label: "Confirmer le nouveau mot de passe",
+      label: t("accounts.password.confirmPassword"),
       type: "password",
       required: true,
     },
@@ -33,7 +35,7 @@ export default function ChangePassword({ accountId, onChangePassword }) {
 
   const handleSubmit = async (payload) => {
     if (payload.newPassword !== payload.confirmPassword) {
-      throw new Error("Les mots de passe ne correspondent pas");
+      throw new Error(t("accounts.password.mismatch"));
     }
     setLoading(true);
     try {
@@ -49,10 +51,14 @@ export default function ChangePassword({ accountId, onChangePassword }) {
           newPassword: payload.newPassword,
         });
       }
-      showSuccess("Mot de passe modifié", "Votre mot de passe a été modifié", {
-        autoClose: false,
-        prominent: true,
-      });
+      showSuccess(
+        t("accounts.password.updateSuccessTitle"),
+        t("accounts.password.updateSuccessMessage"),
+        {
+          autoClose: false,
+          prominent: true,
+        },
+      );
     } catch (err) {
       console.error("Erreur changement de mot de passe:", err);
       // essayer d'extraire un message utile depuis la réponse backend
@@ -60,8 +66,11 @@ export default function ChangePassword({ accountId, onChangePassword }) {
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err?.message ||
-        "Impossible de changer le mot de passe";
-      showError("Erreur", apiMessage, { autoClose: false, prominent: true });
+        t("accounts.password.updateErrorMessage");
+      showError(t("accounts.password.updateErrorTitle"), apiMessage, {
+        autoClose: false,
+        prominent: true,
+      });
       const ex = new Error(apiMessage);
       ex.original = err;
       throw ex;
@@ -71,13 +80,13 @@ export default function ChangePassword({ accountId, onChangePassword }) {
   };
 
   return (
-    <Panel title="Changer le mot de passe">
+    <Panel title={t("accounts.password.panelTitle")}>
       <MyForm
         fields={fields}
         initialValues={{}}
         onSubmit={handleSubmit}
         loading={loading}
-        submitButtonLabel="Changer le mot de passe"
+        submitButtonLabel={t("accounts.password.panelTitle")}
       />
     </Panel>
   );

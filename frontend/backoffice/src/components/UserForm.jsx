@@ -1,5 +1,6 @@
 import React from "react";
 import MyForm from "@/components/ui/MyForm";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function UserForm({
   initialValues,
@@ -9,21 +10,22 @@ export default function UserForm({
   onCancel,
   title = null,
 }) {
+  const { t } = useTranslation();
   const userFields = [
-    { name: "firstname", label: "Prénom", type: "text", required: true },
-    { name: "lastname", label: "Nom", type: "text", required: true },
-    { name: "email", label: "Email", type: "email", required: false },
+    { name: "firstname", label: t("users.form.firstname"), type: "text", required: true },
+    { name: "lastname", label: t("users.form.lastname"), type: "text", required: true },
+    { name: "email", label: t("users.form.email"), type: "email", required: false },
     {
       name: "birthDate",
-      label: "Date de naissance",
+      label: t("users.form.birthDate"),
       type: "date",
       required: false,
     },
-    { name: "phoneMobile", label: "Mobile", type: "text", required: false },
-    { name: "phoneLandline", label: "Fixe", type: "text", required: false },
+    { name: "phoneMobile", label: t("users.form.phoneMobile"), type: "text", required: false },
+    { name: "phoneLandline", label: t("users.form.phoneLandline"), type: "text", required: false },
     {
       name: "newsletter",
-      label: "Abonné à la newsletter",
+      label: t("users.form.newsletter"),
       type: "checkbox",
       required: false,
     },
@@ -57,11 +59,11 @@ export default function UserForm({
       onSubmit={handleSubmit}
       onChange={onChange}
       loading={loading}
-      submitButtonLabel="Enregistrer l'utilisateur"
+      submitButtonLabel={t("users.form.save")}
       onCancel={onCancel}
-      cancelButtonLabel="Annuler"
-      successMessage="L'utilisateur a été enregistré avec succès"
-      errorMessage="Impossible d'enregistrer l'utilisateur"
+      cancelButtonLabel={t("users.form.cancel")}
+      successMessage={t("users.form.successMessage")}
+      errorMessage={t("users.form.errorMessage")}
     />
   );
 }

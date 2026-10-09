@@ -1,45 +1,50 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "@/i18n/I18nContext";
+
+const resolveIntlLocale = (locale) => (locale === "en" ? "en-US" : "fr-FR");
+
+const formatDisplayValue = (value, cents, locale) => {
+  const normalizedValue = typeof value === "number" && !Number.isNaN(value) ? value : 0;
+  const amount = cents ? normalizedValue / 100 : normalizedValue;
+  const fixedValue = cents ? amount.toFixed(2) : String(amount);
+  return locale === "fr-FR" ? fixedValue.replace(".", ",") : fixedValue;
+};
 
 export default function CurrencyInput({
   value,
   onChange,
   currency = "EUR",
   cents = true,
+  locale: localeOverride,
   ...props
 }) {
-  // Sécurisation de la valeur
-  const safeValue = typeof value === "number" && !isNaN(value) ? value : 0;
-  // Conversion centimes -> euros pour l'affichage
+  const { locale } = useTranslation();
+  const resolvedLocale = localeOverride || resolveIntlLocale(locale);
   const [displayValue, setDisplayValue] = useState(
-    cents
-      ? (safeValue / 100).toFixed(2).replace(".", ",")
-      : safeValue.toString(),
+    formatDisplayValue(value, cents, resolvedLocale),
   );
 
   useEffect(() => {
-    setDisplayValue(
-      cents
-        ? (safeValue / 100).toFixed(2).replace(".", ",")
-        : safeValue.toString(),
-    );
-  }, [value, cents]);
+    setDisplayValue(formatDisplayValue(value, cents, resolvedLocale));
+  }, [value, cents, resolvedLocale]);
 
   const handleChange = (e) => {
-    let val = e.target.value.replace(/[^\d,]/g, "");
-    setDisplayValue(val);
-    if (val === "") {
+    const nextValue = e.target.value.replace(/[^\d,.-]/g, "");
+    setDisplayValue(nextValue);
+    if (nextValue === "") {
       onChange(0);
     }
   };
 
   const handleBlur = () => {
-    let val = displayValue.replace(",", ".");
-    const floatVal = parseFloat(val);
-    if (!isNaN(floatVal)) {
-      onChange(cents ? Math.round(floatVal * 100) : floatVal);
-      setDisplayValue(
-        cents ? floatVal.toFixed(2).replace(".", ",") : floatVal.toString(),
-      );
+    const normalizedValue = displayValue.replace(/\s/g, "").replace(/,/g, ".");
+    const floatValue = parseFloat(normalizedValue);
+
+    if (!Number.isNaN(floatValue)) {
+      onChange(cents ? Math.round(floatValue * 100) : floatValue);
+      setDisplayValue(formatDisplayValue(cents ? Math.round(floatValue * 100) : floatValue, cents, resolvedLocale));
     } else {
       onChange(0);
       setDisplayValue("");

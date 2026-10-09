@@ -6,6 +6,7 @@ import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ImageModuleEditor({
   moduleId,
@@ -14,6 +15,7 @@ export default function ImageModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
@@ -23,33 +25,33 @@ export default function ImageModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de l'image",
+      label: t("pages.modules.image.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
     },
     {
       name: "altText",
-      label: "Texte alternatif (Alt)",
+      label: t("pages.modules.image.altText"),
       type: "text",
-      placeholder: "Description de l'image pour l'accessibilité",
+      placeholder: t("pages.modules.image.altTextPlaceholder"),
       required: true,
     },
     {
       name: "caption",
-      label: "Légende",
+      label: t("pages.modules.image.caption"),
       type: "text",
-      placeholder: "Légende de l'image",
+      placeholder: t("pages.modules.image.captionPlaceholder"),
     },
     {
       name: "link",
-      label: "Lien (optionnel)",
+      label: t("pages.modules.image.link"),
       type: "url",
       placeholder: "https://...",
     },
@@ -85,10 +87,10 @@ export default function ImageModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module image mis à jour !");
+      alert(t("pages.modules.image.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -105,7 +107,7 @@ export default function ImageModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -114,8 +116,8 @@ export default function ImageModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -123,7 +125,7 @@ export default function ImageModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails de l'image"
+        title={t("pages.modules.image.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}
@@ -134,7 +136,7 @@ export default function ImageModuleEditor({
 
       {/* Sélecteur de média */}
       <MediaManager
-        title="Image du module"
+        title={t("pages.modules.shared.moduleImageTitle")}
         content={moduleContent}
         onMediaAdd={handleMediaAdd}
         onMediaRemove={handleMediaRemove}

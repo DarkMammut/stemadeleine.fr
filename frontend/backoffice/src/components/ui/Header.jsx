@@ -9,6 +9,8 @@ import useLogout from "@/utils/auth/useLogout";
 import NAV_ITEMS from "@/utils/navigation";
 
 import SearchBar from "@/components/ui/SearchBar";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
+import {useTranslation} from "@/i18n/I18nContext";
 
 export default function Header() {
     const [hoverOpen, setHoverOpen] = useState(false);
@@ -16,6 +18,7 @@ export default function Header() {
     const [organizationName, setOrganizationName] = useState("Les Amis de Sainte Madeleine de la Jarrie");
     const {signout, loading} = useLogout();
     const router = useRouter();
+    const {t} = useTranslation();
 
     // Fetch organization name
     useEffect(() => {
@@ -305,7 +308,7 @@ export default function Header() {
                     {/* Mobile burger - visible on small screens */}
                     <div className="md:hidden flex items-center">
                         <button
-                            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                            aria-label={mobileOpen ? t("header.closeMenu") : t("header.openMenu")}
                             aria-expanded={mobileOpen}
                             aria-controls="mobile-menu"
                             onClick={() => setMobileOpen((s) => !s)}
@@ -331,7 +334,7 @@ export default function Header() {
                     <button
                         onClick={() => router.push("/")}
                         className="hidden md:flex shrink-0 mr-4 hover:opacity-80 transition-opacity cursor-pointer"
-                        aria-label="Retour à l'accueil"
+                        aria-label={t("header.backHome")}
                     >
                         <div
                             className="text-white font-semibold leading-tight text-xs md:text-sm lg:text-base max-w-[20vw] lg:max-w-none">
@@ -344,7 +347,7 @@ export default function Header() {
                         <div className="flex items-center px-6 py-3.5 md:mx-auto md:max-w-3xl lg:mx-0 lg:max-w-none">
                             {/* SearchBar in header: provide fetchSuggestions and onSelect for global search */}
                             <SearchBar
-                                placeholder="Rechercher..."
+                                placeholder={t("header.search")}
                                 fetchSuggestions={fetchSuggestions}
                                 onSelect={handleSelect}
                                 onSubmit={(q) =>
@@ -354,11 +357,12 @@ export default function Header() {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
+                        <LanguageSwitcher/>
                         <button
                             type="button"
                             className="relative rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 cursor-pointer"
                         >
-                            <span className="sr-only">View notifications</span>
+                            <span className="sr-only">{t("header.notifications")}</span>
                             <BellIcon aria-hidden="true" className="w-6 h-6"/>
                         </button>
 
@@ -380,7 +384,7 @@ export default function Header() {
                                 className="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
                                 aria-expanded={hoverOpen}
                             >
-                                <span className="sr-only">Open user menu</span>
+                                <span className="sr-only">{t("header.userMenu")}</span>
                                 {/* remplaced the avatar image with the UserIcon and a subtle circular bg */}
                                 <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
                                     <UserIcon className="w-5 h-5 text-white"/>
@@ -409,7 +413,7 @@ export default function Header() {
                                                 className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                             >
                                                 <UserIcon className="w-5 h-5 mr-3 text-gray-500"/>
-                                                Your Profile
+                                                {t("header.profile")}
                                             </button>
                                         )}
                                     </Menu.Item>
@@ -423,7 +427,7 @@ export default function Header() {
                                                 }}
                                             >
                                                 <Cog6ToothIcon className="w-5 h-5 mr-3 text-gray-500"/>
-                                                Settings
+                                                {t("header.settings")}
                                             </button>
                                         )}
                                     </Menu.Item>
@@ -450,7 +454,7 @@ export default function Header() {
                                                         d="M15 12H3m0 0l3-3m-3 3l3 3M21 12v6a2 2 0 01-2 2H13"
                                                     />
                                                 </svg>
-                                                {loading ? "Signing out..." : "Sign out"}
+                                                {loading ? t("header.signingOut") : t("header.signOut")}
                                             </button>
                                         )}
                                     </Menu.Item>
@@ -495,7 +499,7 @@ export default function Header() {
                                             setMobileOpen(false);
                                         }}
                                         className="hover:opacity-80 transition-opacity cursor-pointer"
-                                        aria-label="Retour à l'accueil"
+                                        aria-label={t("header.backHome")}
                                     >
                                         <Dialog.Title
                                             className="text-white font-semibold leading-tight text-sm line-clamp-2">
@@ -505,7 +509,7 @@ export default function Header() {
                                     <button
                                         onClick={() => setMobileOpen(false)}
                                         className="p-2 rounded-md text-white hover:bg-gray-800"
-                                        aria-label="Close menu"
+                                        aria-label={t("header.closeMenu")}
                                     >
                                         <svg
                                             className="w-6 h-6 text-white"
@@ -534,7 +538,7 @@ export default function Header() {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <span className="text-gray-300">{it.icon}</span>
-                                                <span className="text-white">{it.label}</span>
+                                                <span className="text-white">{t(it.labelKey)}</span>
                                             </div>
                                         </button>
                                     ))}

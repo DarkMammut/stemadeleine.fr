@@ -1,6 +1,7 @@
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import {AuthProvider} from "@/utils/auth/AuthContext";
+import {I18nProvider} from "@/i18n/I18nContext";
 import {ContactsProvider} from "@/contexts/ContactsContext";
 
 const geistSans = Geist({
@@ -30,13 +31,15 @@ export const metadata = {
 
 export default function RootLayout({children}) {
     return (
-        <html lang="en">
+        <html lang="fr" suppressHydrationWarning>
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <AuthProvider>
-            <ContactsProvider>{children}</ContactsProvider>
-        </AuthProvider>
+        <I18nProvider>
+            <AuthProvider>
+                <ContactsProvider>{children}</ContactsProvider>
+            </AuthProvider>
+        </I18nProvider>
         </body>
         </html>
     );

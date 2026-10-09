@@ -2,22 +2,24 @@
 import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 import Tabs from "@/components/ui/Tabs";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function SectionsTabs({ pageId, sectionId }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const tabs = useMemo(
     () => [
       {
-        label: "Informations",
+        label: t("pages.tabs.sectionInfo"),
         url: `/pages/${pageId}/sections/${sectionId}`,
       },
       {
-        label: "Contenus",
+        label: t("pages.tabs.sectionContent"),
         url: `/pages/${pageId}/sections/${sectionId}/modules`,
       },
     ],
-    [pageId, sectionId],
+    [pageId, sectionId, t],
   );
 
   // Déterminer l'onglet actif en fonction de l'URL

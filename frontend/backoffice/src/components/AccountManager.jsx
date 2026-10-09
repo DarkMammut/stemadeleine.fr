@@ -10,13 +10,14 @@ import { useNotification } from "@/hooks/useNotification";
 import { useAccountOperations } from "@/hooks/useAccountOperations";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
 import IconButton from "@/components/ui/IconButton";
+import { useTranslation } from "@/i18n/I18nContext";
 import {
   KeyIcon as KeyOutlineIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
 
 export default function AccountManager({
-  label = "Mes Comptes",
+  label = null,
   accounts = [],
   userId = null,
   refreshAccounts = null,
@@ -26,6 +27,8 @@ export default function AccountManager({
   allowAdminReset = false,
   loading = false,
 }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label || t("accounts.title");
   const accountOps = useAccountOperations();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
@@ -51,7 +54,7 @@ export default function AccountManager({
       }
     } catch (err) {
       console.error("Erreur lors du chargement des comptes:", err);
-      showError("Erreur", "Impossible de charger les comptes", {
+      showError(t("accounts.loadErrorTitle"), t("accounts.manager.loadErrorMessage"), {
         autoClose: false,
       });
     }
@@ -63,15 +66,15 @@ export default function AccountManager({
   }, [userId, refreshFn, accounts]);
 
   const fields = [
-    { name: "email", label: "Email", type: "text", required: true },
+    { name: "email", label: t("accounts.manager.email"), type: "text", required: true },
     {
       name: "role",
-      label: "Rôle",
+      label: t("accounts.manager.role"),
       type: "select",
       required: true,
       options: [
-        { value: "USER", label: "Utilisateur" },
-        { value: "ADMIN", label: "Administrateur" },
+        { value: "USER", label: t("accounts.manager.userRole") },
+        { value: "ADMIN", label: t("accounts.manager.adminRole") },
       ],
     },
   ];
@@ -88,13 +91,16 @@ export default function AccountManager({
     setLoadingSubmit(true);
     try {
       await accountOps.updateAccount(editingId, payload);
-      showSuccess("Compte modifié", "Le compte a été modifié avec succès");
+      showSuccess(
+        t("accounts.manager.updateSuccessTitle"),
+        t("accounts.manager.updateSuccessMessage"),
+      );
       setEditingId(null);
       if (refreshFn) await refreshFn();
       else await loadAccounts();
     } catch (err) {
       console.error("Erreur sauvegarde compte:", err);
-      showError("Erreur", "Impossible de sauvegarder le compte");
+      showError(t("accounts.updateErrorTitle"), t("accounts.manager.updateErrorMessage"));
       throw err;
     } finally {
       setLoadingSubmit(false);
@@ -105,12 +111,15 @@ export default function AccountManager({
     if (!editable || !refreshFn) return;
     try {
       await accountOps.deleteAccount(accountId);
-      showSuccess("Compte supprimé", "Le compte a été supprimé avec succès");
+      showSuccess(
+        t("accounts.manager.deleteSuccessTitle"),
+        t("accounts.manager.deleteSuccessMessage"),
+      );
       if (refreshFn) await refreshFn();
       else await loadAccounts();
     } catch (err) {
       console.error("Erreur suppression compte:", err);
-      showError("Erreur", "Impossible de supprimer le compte");
+      showError(t("accounts.deleteErrorTitle"), t("accounts.manager.deleteErrorMessage"));
     }
   };
 
@@ -136,10 +145,13 @@ export default function AccountManager({
       setEditingId(null);
       if (refreshFn) await refreshFn();
       else await loadAccounts();
-      showSuccess("Compte ajouté", "Le compte a été ajouté avec succès");
+      showSuccess(
+        t("accounts.manager.addSuccessTitle"),
+        t("accounts.manager.addSuccessMessage"),
+      );
     } catch (err) {
       console.error("Erreur ajout compte:", err);
-      showError("Erreur", "Impossible d'ajouter le compte");
+      showError(t("accounts.form.errorTitle"), t("accounts.manager.addErrorMessage"));
     }
   };
 
@@ -147,7 +159,7 @@ export default function AccountManager({
   const headerAction = editable ? (
     <IconButton
       icon={PlusIcon}
-      label="Ajouter"
+      label={t("accounts.manager.add")}
       variant="primary"
       size="md"
       onClick={handleAddClick}
@@ -159,7 +171,7 @@ export default function AccountManager({
   const TitleNode = (
     <div className="flex items-center gap-3">
       <KeyOutlineIcon className="w-6 h-6 text-gray-500" />
-      <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
+      <h3 className="text-lg font-semibold text-gray-900">{resolvedLabel}</h3>
     </div>
   );
 
@@ -176,12 +188,12 @@ export default function AccountManager({
                 initialValues={addForm}
                 onSubmit={handleAddSubmit}
                 onChange={setAddForm}
-                submitButtonLabel="Ajouter"
+                submitButtonLabel={t("accounts.manager.add")}
                 onCancel={() => {
                   setAdding(false);
                   setEditingId(null);
                 }}
-                cancelButtonLabel="Annuler"
+                cancelButtonLabel={t("users.form.cancel")}
                 allowNoChanges={true}
                 inline={true}
                 loading={loading}
@@ -197,7 +209,7 @@ export default function AccountManager({
                 initialValues={editForm}
                 onSubmit={handleSubmit}
                 onChange={setEditForm}
-                submitButtonLabel="Enregistrer"
+                submitButtonLabel={t("accounts.manager.save")}
                 onCancel={() => setEditingId(null)}
                 inline={true}
                 loading={loadingSubmit || loading}
@@ -231,9 +243,12 @@ export default function AccountManager({
                           </span>
                           <div className="space-y-1 text-sm text-gray-600">
                             <div>
-                              Fournisseur: {account.provider || "local"}
+                              {t("accounts.manager.providerLabel")}:{" "}
+                              {account.provider || t("accounts.localProvider")}
                             </div>
-                            <div>Rôle: {account.role}</div>
+                            <div>
+                              {t("accounts.manager.roleLabel")}: {account.role}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -243,7 +258,7 @@ export default function AccountManager({
                         {editable && (
                           <ModifyButton
                             size="sm"
-                            modifyLabel="Modifier"
+                            modifyLabel={t("accounts.manager.edit")}
                             onModify={() => handleEdit(account)}
                           />
                         )}
@@ -252,9 +267,11 @@ export default function AccountManager({
                           <DeleteButton
                             onDelete={() => handleDelete(account.id)}
                             size="sm"
-                            deleteLabel="Supprimer"
-                            confirmTitle="Supprimer le compte"
-                            confirmMessage={`Êtes-vous sûr de vouloir supprimer le compte ${account.email} ?`}
+                            deleteLabel={t("accounts.manager.delete")}
+                            confirmTitle={t("accounts.manager.deleteConfirmTitle")}
+                            confirmMessage={t(
+                              "accounts.manager.deleteConfirmMessage",
+                            ).replace("{email}", account.email)}
                           />
                         )}
 
@@ -265,7 +282,7 @@ export default function AccountManager({
                             onClick={() => openChangePassword(account.id)}
                             disabled={!account}
                           >
-                            Changer le mot de passe
+                            {t("accounts.manager.changePassword")}
                           </Button>
                         )}
                       </div>
@@ -275,7 +292,7 @@ export default function AccountManager({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">Aucun compte lié.</p>
+            <p className="text-sm text-gray-500">{t("accounts.manager.empty")}</p>
           )}
 
           {/* Affiche le bouton bas uniquement si la liste est vide (évite une bordure vide sous la liste) */}
@@ -285,7 +302,7 @@ export default function AccountManager({
             localAccounts.length === 0 && (
               <div className="mt-0">
                 <Button variant="link" size="sm" onClick={handleAddClick}>
-                  + Ajouter un compte
+                  {t("accounts.manager.emptyAdd")}
                 </Button>
               </div>
             )}
@@ -329,7 +346,7 @@ AccountManager.propTypes = {
 };
 
 AccountManager.defaultProps = {
-  label: "Comptes liés",
+  label: null,
   accounts: [],
   userId: null,
   refreshAccounts: null,

@@ -5,6 +5,7 @@ import EditablePanelV2 from "@/components/ui/EditablePanel";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EventModuleEditor({
   moduleId,
@@ -13,6 +14,7 @@ export default function EventModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
@@ -22,55 +24,55 @@ export default function EventModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de l'événement",
+      label: t("pages.modules.event.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
     {
       name: "description",
-      label: "Description",
+      label: t("pages.modules.event.description"),
       type: "textarea",
-      placeholder: "Description de l'événement",
+      placeholder: t("pages.modules.event.descriptionPlaceholder"),
     },
     {
       name: "startDate",
-      label: "Date et heure de début",
+      label: t("pages.modules.event.startDate"),
       type: "datetime-local",
       required: true,
     },
     {
       name: "endDate",
-      label: "Date et heure de fin",
+      label: t("pages.modules.event.endDate"),
       type: "datetime-local",
     },
     {
       name: "location",
-      label: "Lieu",
+      label: t("pages.modules.event.location"),
       type: "text",
-      placeholder: "Adresse ou nom du lieu",
+      placeholder: t("pages.modules.event.locationPlaceholder"),
     },
     {
       name: "price",
-      label: "Prix (€)",
+      label: t("pages.modules.event.price"),
       type: "number",
       step: "0.01",
       min: "0",
-      placeholder: "0.00",
+      placeholder: t("pages.modules.event.pricePlaceholder"),
     },
     {
       name: "maxAttendees",
-      label: "Nombre maximum de participants",
+      label: t("pages.modules.event.maxAttendees"),
       type: "number",
       min: "1",
-      placeholder: "Illimité si vide",
+      placeholder: t("pages.modules.event.maxAttendeesPlaceholder"),
     },
   ];
 
@@ -80,7 +82,7 @@ export default function EventModuleEditor({
       refetch();
     } catch (error) {
       console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
+      alert(t("pages.modules.event.mediaError"));
     }
   };
 
@@ -102,10 +104,10 @@ export default function EventModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module événement mis à jour !");
+      alert(t("pages.modules.event.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -123,7 +125,7 @@ export default function EventModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -132,8 +134,8 @@ export default function EventModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -141,7 +143,7 @@ export default function EventModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails de l'événement"
+        title={t("pages.modules.event.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}

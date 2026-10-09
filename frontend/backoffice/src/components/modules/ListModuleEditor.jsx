@@ -11,6 +11,7 @@ import ListContentManager from "@/components/ListContentManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ListModuleEditor({
   moduleId,
@@ -19,6 +20,7 @@ export default function ListModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
   const [savingModule, setSavingModule] = useState(false);
@@ -77,16 +79,16 @@ export default function ListModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de la liste",
+      label: t("pages.modules.list.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
   ];
@@ -95,7 +97,7 @@ export default function ListModuleEditor({
   const listFields = [
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.list.variant"),
       type: "select",
       required: true,
       options: variantOptions,
@@ -122,7 +124,7 @@ export default function ListModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du module:", err);
       throw err;
@@ -147,7 +149,7 @@ export default function ListModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Liste mise à jour avec succès");
+      showSuccess(t("pages.notifications.listUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde de la liste:", err);
       throw err;
@@ -177,14 +179,16 @@ export default function ListModuleEditor({
       }
 
       showSuccess(
-        "Visibilité mise à jour",
-        `Le module est maintenant ${isVisible ? "visible" : "masqué"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
       );
     } catch (err) {
       console.error(err);
       showError(
-        "Erreur de visibilité",
-        "Impossible de mettre à jour la visibilité du module",
+        t("pages.errors.visibilityTitle"),
+        t("pages.errors.visibilityModuleMessage"),
       );
       setSavingVisibility(false);
     }
@@ -199,8 +203,8 @@ export default function ListModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -208,7 +212,7 @@ export default function ListModuleEditor({
 
       {/* Formulaire Module (name, title) */}
       <EditablePanelV2
-        title="Détails du module liste"
+        title={t("pages.modules.list.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -219,7 +223,7 @@ export default function ListModuleEditor({
 
       {/* Formulaire List (variant) */}
       <EditablePanelV2
-        title="Paramètres de la liste"
+        title={t("pages.modules.list.settingsTitle")}
         fields={listFields}
         initialValues={listData || {}}
         onSubmit={handleListSubmit}
@@ -234,9 +238,9 @@ export default function ListModuleEditor({
           listId={list.id}
           loading={effectiveLoading}
           customLabels={{
-            header: "Contenus de la liste",
-            addButton: "Ajouter un contenu",
-            empty: "Aucun contenu pour cette liste.",
+            header: t("pages.modules.list.contentHeader"),
+            addButton: t("pages.common.addContent"),
+            empty: t("pages.modules.list.contentEmpty"),
           }}
         />
       ) : (
@@ -244,8 +248,8 @@ export default function ListModuleEditor({
           <Notification
             show={true}
             type="info"
-            title="Contenus indisponibles"
-            message="Enregistrez d'abord le module pour pouvoir ajouter des contenus."
+            title={t("pages.modules.list.unavailableTitle")}
+            message={t("pages.modules.list.unavailableMessage")}
             onClose={() => {}}
           />
         )

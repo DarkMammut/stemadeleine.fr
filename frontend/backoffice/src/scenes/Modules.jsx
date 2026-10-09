@@ -21,9 +21,11 @@ import DraggableTree from "@/components/ui/DraggableTree";
 import AddModuleModal from "@/components/AddModuleModal";
 import Utilities from "@/components/ui/Utilities";
 import Notification from "@/components/ui/Notification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Modules({pageId, sectionId}) {
     const router = useRouter();
+    const { t } = useTranslation();
     const axiosClient = useAxiosClient();
     const {section, refetch, loading, error} = useGetSection({sectionId});
     const {info, refetchInfo, resetDraft} = usePublicationInfo("sections", sectionId);
@@ -33,6 +35,16 @@ export default function Modules({pageId, sectionId}) {
 
     const [treeData, setTreeData] = useState([]);
     const [showAddModuleModal, setShowAddModuleModal] = useState(false);
+
+    const getModuleTypeLabel = useCallback(
+        (moduleType) => t(`pages.moduleTypes.${moduleType}`),
+        [t],
+    );
+
+    const getDefaultModuleName = useCallback(
+        (moduleType) => t(`pages.defaultNames.${moduleType}`),
+        [t],
+    );
 
     useEffect(() => {
         if (section?.modules) {
@@ -73,18 +85,18 @@ export default function Modules({pageId, sectionId}) {
                     modules: moduleOrders,
                 });
                 showSuccess(
-                    "Ordre mis à jour",
-                    "L'ordre des modules a été modifié avec succès",
+                    t("pages.notifications.orderUpdatedTitle"),
+                    t("pages.notifications.modulesOrderUpdatedMessage"),
                 );
             } catch (error) {
                 console.error("Erreur lors du changement d'ordre des modules :", error);
                 showError(
-                    "Erreur de réorganisation",
-                    "Impossible de modifier l'ordre des modules",
+                    t("pages.errors.reorderTitle"),
+                    t("pages.errors.reorderModulesMessage"),
                 );
             }
         },
-        [sectionId, axiosClient, showSuccess, showError],
+        [sectionId, axiosClient, showSuccess, showError, t],
     );
 
     const handleToggle = useCallback(
@@ -92,8 +104,10 @@ export default function Modules({pageId, sectionId}) {
             try {
                 await updateModuleVisibility(item.moduleId, newVal);
                 showSuccess(
-                    "Visibilité mise à jour",
-                    `Le module est maintenant ${newVal ? "visible" : "masqué"}`,
+                    t("pages.notifications.visibilityUpdatedTitle"),
+                    `${t("pages.common.moduleCapitalized")} ${t(
+                        newVal ? "pages.common.visible" : "pages.common.hidden",
+                    )}`,
                 );
                 setTreeData((prev) =>
                     prev.map((module) =>
@@ -103,12 +117,12 @@ export default function Modules({pageId, sectionId}) {
             } catch (error) {
                 console.error("Erreur lors du changement de visibilité :", error);
                 showError(
-                    "Erreur de visibilité",
-                    "Impossible de modifier la visibilité",
+                    t("pages.errors.visibilityTitle"),
+                    t("pages.errors.visibilityMessage"),
                 );
             }
         },
-        [updateModuleVisibility, showSuccess, showError],
+        [updateModuleVisibility, showSuccess, showError, t],
     );
 
     const handleEdit = useCallback(
@@ -124,15 +138,21 @@ export default function Modules({pageId, sectionId}) {
         async (item) => {
             try {
                 await deleteModule(item.moduleId);
-                showSuccess("Module supprimé", "Le module a été supprimé avec succès");
+                showSuccess(
+                    t("pages.notifications.moduleDeletedTitle"),
+                    t("pages.notifications.moduleDeletedMessage"),
+                );
                 await refetch();
                 setTreeData((prev) => removeItem(prev, item.id));
             } catch (error) {
                 console.error("Erreur lors de la suppression :", error);
-                showError("Erreur de suppression", "Impossible de supprimer le module");
+                showError(
+                    t("pages.errors.deleteTitle"),
+                    t("pages.errors.deleteModuleMessage"),
+                );
             }
         },
-        [deleteModule, refetch, showSuccess, showError],
+        [deleteModule, refetch, showSuccess, showError, t],
     );
 
     const handleConfirmAddModule = async (moduleType) => {
@@ -154,30 +174,35 @@ export default function Modules({pageId, sectionId}) {
                 const childEndpoint = typeToEndpoint[moduleType];
                 await axiosClient.post(childEndpoint, {
                     sectionId: sectionId,
-                    name: `New ${moduleType}`,
+                    name: getDefaultModuleName(moduleType),
                 });
             } else {
                 const url = "/api/modules";
                 const payload = {
                     sectionId: sectionId,
                     type: moduleType,
-                    name: `New ${moduleType}`,
+                    name: getDefaultModuleName(moduleType),
                 };
                 await axiosClient.post(url, payload);
             }
             setShowAddModuleModal(false);
             await refetch();
             showSuccess(
-                "Module créé",
-                `Le module ${moduleType} a été ajouté avec succès`,
+                t("pages.notifications.moduleCreatedTitle"),
+                `${getModuleTypeLabel(moduleType)} · ${t(
+                    "pages.notifications.moduleCreatedMessage",
+                )}`,
             );
         } catch (error) {
             console.error("Erreur lors de l'ajout du module :", error);
-            showError("Erreur de création", "Impossible d'ajouter le module");
+            showError(
+                t("pages.errors.creationTitle"),
+                t("pages.errors.creationModuleMessage"),
+            );
         }
     };
 
-    if (error) return <p>Erreur: {error.message}</p>;
+    if (error) return <p>{t("pages.errors.loadingPrefix")}: {error.message}</p>;
 
     // Publie la section (modules et contenus compris)
     const handlePublishModules = async () => {
@@ -191,19 +216,22 @@ export default function Modules({pageId, sectionId}) {
             await resetDraft();
             await refetch();
             showSuccess(
-                "Section réinitialisée",
-                "La section est revenue à la version publiée",
+                t("pages.notifications.resetSectionTitle"),
+                t("pages.notifications.resetSectionMessage"),
             );
         } catch (error) {
             console.error("Erreur lors de la réinitialisation :", error);
-            showError("Erreur", "Impossible de réinitialiser la section");
+            showError(
+                t("pages.errors.genericTitle"),
+                t("pages.errors.resetSectionMessage"),
+            );
         }
     };
 
     // Construire les breadcrumbs
     const breadcrumbs = section
         ? buildPageBreadcrumbs(
-            {id: pageId, name: section.page?.name || "Page"},
+            {id: pageId, name: section.page?.name || t("pages.common.pageCapitalized")},
             section,
         )
         : [];
@@ -211,7 +239,9 @@ export default function Modules({pageId, sectionId}) {
     return (
         <SceneLayout>
             <Title
-                label={`Modules de ${section?.name || "la section"}`}
+                label={`${t("pages.scenes.modules.titlePrefix")} ${
+                    section?.name || t("pages.scenes.modules.titleFallback")
+                }`}
                 onPublish={handlePublishModules}
                 onReset={handleResetSection}
                 publicationInfo={info}
@@ -226,7 +256,7 @@ export default function Modules({pageId, sectionId}) {
                 actions={[
                     {
                         icon: PlusIcon,
-                        label: "Nouveau Module",
+                        label: t("pages.scenes.modules.newModule"),
                         callback: () => setShowAddModuleModal(true),
                     },
                 ]}

@@ -10,8 +10,10 @@ import { useUserOperations } from "@/hooks/useUserOperations";
 import DonationsChart from "@/components/DonationsChart";
 import { useAxiosClient } from "@/utils/axiosClient";
 import Utilities from "@/components/ui/Utilities";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
   const { getAllPayments } = usePaymentOperations();
@@ -41,14 +43,14 @@ export default function Dashboard() {
       // also bump dashboard counter to refresh KPIs and charts
       setDashboardRefreshCounter((c) => c + 1);
       showSuccess?.(
-        "Import HelloAsso terminé",
-        "Les données ont été mises à jour avec succès",
+        t("dashboard.importSuccessTitle"),
+        t("dashboard.importSuccessMessage"),
       );
     } catch (e) {
       console.error("Erreur import HelloAsso", e);
       showError?.(
-        "Erreur d'import",
-        "Impossible d'importer les données HelloAsso",
+        t("dashboard.importErrorTitle"),
+        t("dashboard.importErrorMessage"),
       );
       throw e;
     }
@@ -86,7 +88,7 @@ export default function Dashboard() {
 
   return (
     <SceneLayout>
-      <Title label="Dashboard" />
+      <Title label={t("dashboard.title")} />
 
       {/* Utilities with refresh hover-expand under Title (reduced spacing) */}
       <div className="space-y-10">
@@ -94,7 +96,7 @@ export default function Dashboard() {
           actions={[
             {
               variant: "refresh",
-              label: "Actualiser HelloAsso",
+              label: t("dashboard.importHelloAsso"),
               callback: handleImportHelloAsso,
               hoverExpand: true,
               size: "md",

@@ -1,20 +1,17 @@
 "use client";
 
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
-import { CreditCardIcon } from '@heroicons/react/24/outline';
-import MyForm from '@/components/ui/MyForm';
-import { useEffect, useState } from 'react';
-import { useAxiosClient } from '@/utils/axiosClient';
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
+import { CreditCardIcon } from "@heroicons/react/24/outline";
+import MyForm from "@/components/ui/MyForm";
+import { useEffect, useState } from "react";
+import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
-/**
- * Modal de création/modification de paiement
- *
- * @param {boolean} open - Contrôle l'état d'ouverture du modal
- * @param {function} onClose - Callback appelé lors de la fermeture du modal
- * @param {function} onSubmit - Callback appelé lors de la validation du formulaire
- * @param {object} payment - Paiement à éditer (null pour création)
- * @param {boolean} isLoading - Indique si l'opération est en cours
- */
 export default function PaymentFormModal({
   open,
   onClose,
@@ -23,6 +20,7 @@ export default function PaymentFormModal({
   isLoading = false,
 }) {
   const axios = useAxiosClient();
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [paymentEnums, setPaymentEnums] = useState({ status: [], type: [] });
   const [loadingData, setLoadingData] = useState(true);
@@ -33,15 +31,20 @@ export default function PaymentFormModal({
     }
   }, [open]);
 
+  const translateEnum = (group, value) => {
+    if (!value) return "";
+    const key = `payments.enums.${group}.${String(value).toUpperCase()}`;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
+
   const loadFormData = async () => {
     try {
       setLoadingData(true);
-      // Charger les utilisateurs et les enums en parallèle
       const [usersRes, enumsRes] = await Promise.all([
         axios.get("/api/users"),
         axios.get("/api/payments/enums"),
       ]);
-      // L'API peut renvoyer soit un tableau d'utilisateurs, soit une structure paginée { content: [...] }
       const rawUsers = usersRes?.data;
       const normalizedUsers = Array.isArray(rawUsers)
         ? rawUsers
@@ -72,30 +75,6 @@ export default function PaymentFormModal({
     return `${year}-${month}-${day}`;
   };
 
-  const getTypeLabel = (type) => {
-    const labels = {
-      DONATION: "Don",
-      MEMBERSHIP: "Adhésion",
-      EVENT: "Événement",
-      OTHER: "Autre",
-    };
-    return labels[type] || type;
-  };
-
-  const getStatusLabel = (status) => {
-    const labels = {
-      PENDING: "En attente",
-      AUTHORIZED: "Autorisé",
-      PAID: "Payé",
-      REFUNDED: "Remboursé",
-      CANCELED: "Annulé",
-      FAILED: "Échoué",
-      DELETED: "Supprimé",
-      ARCHIVED: "Archivé",
-    };
-    return labels[status] || status;
-  };
-
   const initialValues = payment
     ? {
         amount: payment.amount || 0,
@@ -118,7 +97,6 @@ export default function PaymentFormModal({
         userId: "",
       };
 
-  // normalize users source to always be an array for fields/options
   const usersArray = Array.isArray(users)
     ? users
     : (users?.content ?? users?.users ?? []);
@@ -126,7 +104,7 @@ export default function PaymentFormModal({
   const fields = [
     {
       name: "amount",
-      label: "Montant",
+      label: t("payments.form.fields.amount"),
       type: "currency",
       currency: "EUR",
       required: true,
@@ -134,36 +112,36 @@ export default function PaymentFormModal({
     },
     {
       name: "paymentDate",
-      label: "Date du paiement",
+      label: t("payments.form.fields.paymentDate"),
       type: "date",
       required: true,
       fullWidth: false,
     },
     {
       name: "type",
-      label: "Type de paiement",
+      label: t("payments.form.fields.type"),
       type: "select",
       required: true,
       fullWidth: false,
       options: paymentEnums.type.map((type) => ({
         value: type,
-        label: getTypeLabel(type),
+        label: translateEnum("type", type),
       })),
     },
     {
       name: "status",
-      label: "Statut",
+      label: t("payments.form.fields.status"),
       type: "select",
       required: true,
       fullWidth: false,
       options: paymentEnums.status.map((status) => ({
         value: status,
-        label: getStatusLabel(status),
+        label: translateEnum("status", status),
       })),
     },
     {
       name: "userId",
-      label: "Utilisateur",
+      label: t("payments.form.fields.user"),
       type: "select",
       required: false,
       fullWidth: true,
@@ -171,28 +149,27 @@ export default function PaymentFormModal({
         value: user.id,
         label: `${user.firstname} ${user.lastname}${user.email ? ` (${user.email})` : ""}`,
       })),
-      placeholder: "Sélectionner un utilisateur (optionnel)",
+      placeholder: t("payments.form.placeholders.user"),
     },
     {
       name: "formSlug",
-      label: "Identifiant du formulaire",
+      label: t("payments.form.fields.formSlug"),
       type: "text",
       required: false,
       fullWidth: true,
-      placeholder: "Ex: don-2025",
+      placeholder: t("payments.form.placeholders.formSlug"),
     },
     {
       name: "receiptUrl",
-      label: "URL du reçu",
+      label: t("payments.form.fields.receiptUrl"),
       type: "url",
       required: false,
       fullWidth: true,
-      placeholder: "https://...",
+      placeholder: t("payments.form.placeholders.receiptUrl"),
     },
   ];
 
   const handleSubmit = (formData) => {
-    // Préparer les données pour l'API
     const paymentData = {
       amount: formData.amount,
       currency: formData.currency,
@@ -232,13 +209,13 @@ export default function PaymentFormModal({
                     as="h3"
                     className="text-base font-semibold text-gray-900"
                   >
-                    {payment ? "Modifier le paiement" : "Nouveau paiement"}
+                    {payment ? t("payments.form.editTitle") : t("payments.form.newTitle")}
                   </DialogTitle>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
                       {payment
-                        ? "Modifiez les informations du paiement ci-dessous."
-                        : "Remplissez les informations pour créer un nouveau paiement."}
+                        ? t("payments.form.editDescription")
+                        : t("payments.form.newDescription")}
                     </p>
                   </div>
                 </div>
@@ -246,7 +223,7 @@ export default function PaymentFormModal({
 
               {loadingData ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">Chargement des données...</p>
+                  <p className="text-gray-500">{t("payments.form.loadingData")}</p>
                 </div>
               ) : (
                 <MyForm
@@ -255,16 +232,16 @@ export default function PaymentFormModal({
                   onSubmit={handleSubmit}
                   loading={isLoading}
                   submitButtonLabel={
-                    payment ? "Enregistrer" : "Créer le paiement"
+                    payment ? t("payments.form.submitSave") : t("payments.form.submitCreate")
                   }
                   onCancel={onClose}
-                  cancelButtonLabel="Annuler"
+                  cancelButtonLabel={t("payments.form.cancel")}
                   successMessage={
                     payment
-                      ? "Le paiement a été mis à jour avec succès"
-                      : "Le paiement a été créé avec succès"
+                      ? t("payments.form.successUpdate")
+                      : t("payments.form.successCreate")
                   }
-                  errorMessage="Impossible d'enregistrer le paiement"
+                  errorMessage={t("payments.form.errorSave")}
                 />
               )}
             </div>

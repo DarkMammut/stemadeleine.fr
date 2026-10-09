@@ -21,9 +21,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Utilities from "@/components/ui/Utilities";
 import Pagination from "@/components/ui/Pagination";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 import AddAccountModal from "@/components/AddAccountModal";
 
 export default function Accounts() {
+  const { t } = useTranslation();
   const { notification, showError, hideNotification } = useNotification();
   const accountOps = useAccountOperations();
   const { getCurrentUser } = useUserOperations();
@@ -139,7 +141,7 @@ export default function Accounts() {
       if (error?.name === "CanceledError" || error?.message === "canceled")
         return;
       console.error("Error loading accounts:", error);
-      showError("Erreur de chargement", "Impossible de charger les comptes");
+      showError(t("accounts.loadErrorTitle"), t("accounts.loadErrorMessage"));
     } finally {
       if (thisFetchId !== undefined && fetchIdRef.current === thisFetchId)
         setLoading(false);
@@ -155,7 +157,7 @@ export default function Accounts() {
         // load initial page
         await loadAccounts(pageInfo.page, pageInfo.size);
       } catch (e) {
-        showError("Erreur de chargement", "Impossible de charger les comptes");
+        showError(t("accounts.loadErrorTitle"), t("accounts.loadErrorMessage"));
       } finally {
         setLoading(false);
       }
@@ -228,41 +230,41 @@ export default function Accounts() {
   // Define role and provider options (could be fetched from backend if dynamic)
   const roleOptions = useMemo(() => {
     return [
-      { value: "", label: "Tous" },
-      { value: "ROLE_USER", label: "Utilisateur" },
-      { value: "ROLE_ADMIN", label: "Administrateur" },
+      { value: "", label: t("accounts.all") },
+      { value: "ROLE_USER", label: t("accounts.roleUser") },
+      { value: "ROLE_ADMIN", label: t("accounts.roleAdmin") },
     ];
-  }, []);
+  }, [t]);
 
   const providerOptions = useMemo(() => {
     return [
-      { value: "", label: "Tous" },
+      { value: "", label: t("accounts.all") },
       { value: "local", label: "Local" },
       { value: "google", label: "Google" },
       { value: "github", label: "GitHub" },
     ];
-  }, []);
+  }, [t]);
 
   const filtersConfig = useMemo(
     () => ({
       fields: [
-        { key: "email", label: "Email" },
-        { key: "provider", label: "Fournisseur" },
-        { key: "role", label: "Rôle" },
+        { key: "email", label: t("accounts.email") },
+        { key: "provider", label: t("accounts.provider") },
+        { key: "role", label: t("accounts.role") },
       ],
       onSearch: handleFiltersSearch,
       onSortChange: handleFiltersSort,
       filterItems: [
         {
           key: "role",
-          label: "Rôle",
+          label: t("accounts.role"),
           type: "select",
           value: roleFilter,
           options: roleOptions,
         },
         {
           key: "provider",
-          label: "Fournisseur",
+          label: t("accounts.provider"),
           type: "select",
           value: providerFilter,
           options: providerOptions,
@@ -286,7 +288,7 @@ export default function Accounts() {
       searchValue: searchQuery,
       sortValue: sortState,
       initialSort: { field: null, direction: null },
-      placeholder: "Rechercher un compte...",
+      placeholder: t("accounts.searchPlaceholder"),
     }),
     [
       handleFiltersSearch,
@@ -299,6 +301,7 @@ export default function Accounts() {
       pageInfo.size,
       roleOptions,
       providerOptions,
+      t,
     ],
   );
 
@@ -323,13 +326,13 @@ export default function Accounts() {
 
   return (
     <SceneLayout>
-      <Title label="Comptes" />
+      <Title label={t("accounts.title")} />
 
       <Utilities
         actions={[
           {
             icon: PlusIcon,
-            label: "Nouveau Compte",
+            label: t("accounts.newAccount"),
             callback: handleCreateAccount,
           },
         ]}
@@ -342,7 +345,7 @@ export default function Accounts() {
             <LoadingSkeleton variant="card" count={6} showActions={false} />
           </div>
         ) : (
-          <CardList emptyMessage={"Aucun compte trouvé."}>
+          <CardList emptyMessage={t("accounts.empty")}>
             {(accounts || []).map((acc) => (
               <Card
                 key={acc.id}

@@ -10,9 +10,10 @@ import {
   UserGroupIcon as UserGroupOutlineIcon,
 } from "@heroicons/react/24/outline";
 import MembershipCard from "@/components/MembershipCard";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function MembershipManager({
-  label = "Adhésions",
+  label = null,
   memberships = [],
   userId,
   refreshMemberships,
@@ -21,6 +22,8 @@ export default function MembershipManager({
   isAdherent = false,
   loading = false,
 }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label || t("memberships.title");
   const membershipOps = useMembershipOperations();
   const { showSuccess, showError } = useNotification();
   const [editingId, setEditingId] = useState(null);
@@ -47,8 +50,11 @@ export default function MembershipManager({
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err?.message ||
-        "Impossible de charger les adhésions";
-      showError("Erreur", apiMessage, { autoClose: false, prominent: true });
+        t("memberships.loadErrorMessage");
+      showError(t("memberships.saveErrorTitle"), apiMessage, {
+        autoClose: false,
+        prominent: true,
+      });
     }
   };
 
@@ -68,7 +74,7 @@ export default function MembershipManager({
     editable && !isLimitReached ? (
       <IconButton
         icon={PlusIcon}
-        label="Ajouter"
+        label={t("memberships.add")}
         variant="primary"
         size="md"
         onClick={() => handleAddClick()}
@@ -80,10 +86,10 @@ export default function MembershipManager({
   const titleNode = (
     <div className="flex items-center gap-3">
       <UserGroupOutlineIcon className="w-6 h-6 text-gray-500" />
-      <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
+      <h3 className="text-lg font-semibold text-gray-900">{resolvedLabel}</h3>
       {isAdherent && (
         <span className="ml-2 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
-          Adhérent
+          {t("memberships.adherent")}
         </span>
       )}
     </div>
@@ -92,13 +98,13 @@ export default function MembershipManager({
   const membershipFields = [
     {
       name: "dateAdhesion",
-      label: "Date d'adhésion",
+      label: t("memberships.fields.dateAdhesion"),
       type: "date",
       required: true,
     },
     {
       name: "dateFin",
-      label: "Date de fin",
+      label: t("memberships.fields.dateFin"),
       type: "date",
       required: true,
     },
@@ -195,8 +201,13 @@ export default function MembershipManager({
   const handleEditSubmit = async (formValues) => {
     // Validate preconditions and fail loudly so caller (MyForm) doesn't show a false success
     if (!editable || !userId) {
-      const reason = !editable ? "Édition non autorisée" : "userId manquant";
-      showError("Erreur", `Impossible d'effectuer l'opération: ${reason}`);
+      const reason = !editable
+        ? t("memberships.editNotAllowed")
+        : t("memberships.missingUserId");
+      showError(
+        t("memberships.saveErrorTitle"),
+        `${t("memberships.operationErrorPrefix")}: ${reason}`,
+      );
       throw new Error(`MembershipManager precondition failed: ${reason}`);
     }
 
@@ -230,11 +241,10 @@ export default function MembershipManager({
         if (edt < sdt) {
           // Create an error object carrying field-level errors so MyForm can display them inline
           const validationError = new Error(
-            "La date de fin ne peut pas être antérieure à la date de début",
+            t("memberships.invalidDateRange"),
           );
           validationError.fieldErrors = {
-            dateFin:
-              "La date de fin ne peut pas être antérieure à la date de début",
+            dateFin: t("memberships.invalidDateRange"),
           };
           // Return a rejected promise so the async caller (MyForm) can catch it and display fieldErrors
           return Promise.reject(validationError);
@@ -248,8 +258,8 @@ export default function MembershipManager({
         // Create new membership — use hook
         const created = await membershipOps.createMembership(userId, payload);
         showSuccess(
-          "Adhésion ajoutée",
-          "L'adhésion a été ajoutée avec succès",
+          t("memberships.addSuccessTitle"),
+          t("memberships.addSuccessMessage"),
           { autoClose: false, prominent: true },
         );
         // If no external refresh function, update local list optimistically
@@ -267,8 +277,8 @@ export default function MembershipManager({
         // Update existing membership
         await membershipOps.updateMembership(editingId, payload);
         showSuccess(
-          "Adhésion modifiée",
-          "L'adhésion a été modifiée avec succès",
+          t("memberships.updateSuccessTitle"),
+          t("memberships.updateSuccessMessage"),
           { autoClose: false, prominent: true },
         );
         // If no external refresh function, reload the list to reflect updates
@@ -286,9 +296,12 @@ export default function MembershipManager({
         err?.response?.data?.error ||
         err?.message ||
         (editingId === "new"
-          ? "Impossible d'ajouter l'adhésion. Veuillez réessayer."
-          : "Impossible de modifier l'adhésion. Veuillez réessayer.");
-      showError("Erreur", apiMessage, { autoClose: false, prominent: true });
+          ? t("memberships.addErrorMessage")
+          : t("memberships.updateErrorMessage"));
+      showError(t("memberships.saveErrorTitle"), apiMessage, {
+        autoClose: false,
+        prominent: true,
+      });
       const ex = new Error(apiMessage);
       ex.original = err;
       throw ex;
@@ -299,13 +312,13 @@ export default function MembershipManager({
 
   const handleDelete = async (membershipId) => {
     if (!editable) return;
-    if (!window.confirm("Voulez-vous vraiment supprimer cette adhésion ?"))
+    if (!window.confirm(t("memberships.deleteConfirm")))
       return;
     try {
       await membershipOps.deleteMembership(membershipId);
       showSuccess(
-        "Adhésion supprimée",
-        "L'adhésion a été supprimée avec succès",
+        t("memberships.deleteSuccessTitle"),
+        t("memberships.deleteSuccessMessage"),
       );
       // Optimistically remove from local list
       setLocalMemberships((prev) =>
@@ -319,8 +332,11 @@ export default function MembershipManager({
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err?.message ||
-        "Impossible de supprimer l'adhésion. Veuillez réessayer.";
-      showError("Erreur", apiMessage, { autoClose: false, prominent: true });
+        t("memberships.deleteErrorMessage");
+      showError(t("memberships.saveErrorTitle"), apiMessage, {
+        autoClose: false,
+        prominent: true,
+      });
     }
   };
 
@@ -337,7 +353,7 @@ export default function MembershipManager({
             onCancel={() => {
               setEditingId(null);
             }}
-            submitButtonLabel="Ajouter"
+            submitButtonLabel={t("memberships.add")}
             loading={loadingSubmit}
             onChange={handleFormChange}
           />
@@ -347,8 +363,7 @@ export default function MembershipManager({
       <div>
         {sortedMemberships.length === 0 && (
           <div className="text-center text-gray-500 py-4">
-            Aucune adhésion trouvée.{" "}
-            {editable && "Ajoutez une adhésion ci-dessus."}
+            {t("memberships.empty")} {editable && t("memberships.emptyWithAction")}
           </div>
         )}
         <div className="space-y-3">
@@ -361,7 +376,7 @@ export default function MembershipManager({
                     initialValues={editForm}
                     onSubmit={handleEditSubmit}
                     onCancel={() => setEditingId(null)}
-                    submitButtonLabel="Sauvegarder"
+                    submitButtonLabel={t("memberships.save")}
                     fields={membershipFields}
                     loading={loadingSubmit}
                     onChange={handleFormChange}

@@ -11,6 +11,7 @@ import ContentManager from "@/components/ContentManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function ArticleModuleEditor({
   moduleId,
@@ -19,6 +20,7 @@ export default function ArticleModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
   const [savingModule, setSavingModule] = useState(false);
@@ -77,16 +79,16 @@ export default function ArticleModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de l'article",
+      label: t("pages.modules.article.moduleTitle"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
   ];
@@ -95,21 +97,21 @@ export default function ArticleModuleEditor({
   const articleFields = [
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.article.variant"),
       type: "select",
       required: true,
       options: variantOptions,
     },
     {
       name: "writer",
-      label: "Auteur",
+      label: t("pages.modules.article.author"),
       type: "text",
-      placeholder: "Nom de l'auteur",
+      placeholder: t("pages.modules.article.authorPlaceholder"),
       required: false,
     },
     {
       name: "writingDate",
-      label: "Date d'écriture",
+      label: t("pages.modules.article.writingDate"),
       type: "date",
       required: false,
     },
@@ -135,7 +137,7 @@ export default function ArticleModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du module:", err);
       throw err;
@@ -162,7 +164,7 @@ export default function ArticleModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Article mis à jour avec succès");
+      showSuccess(t("pages.notifications.articleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde de l'article:", err);
       throw err;
@@ -192,14 +194,16 @@ export default function ArticleModuleEditor({
       }
 
       showSuccess(
-        "Visibilité mise à jour",
-        `Le module est maintenant ${isVisible ? "visible" : "masqué"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
       );
     } catch (err) {
       console.error(err);
       showError(
-        "Erreur de visibilité",
-        "Impossible de mettre à jour la visibilité du module",
+        t("pages.errors.visibilityTitle"),
+        t("pages.errors.visibilityModuleMessage"),
       );
       setSavingVisibility(false);
     }
@@ -214,8 +218,8 @@ export default function ArticleModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -223,7 +227,7 @@ export default function ArticleModuleEditor({
 
       {/* Formulaire Module (name, title) */}
       <EditablePanelV2
-        title="Détails de l'article"
+        title={t("pages.modules.article.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -234,7 +238,7 @@ export default function ArticleModuleEditor({
 
       {/* Formulaire Article (variant, writer, writingDate) */}
       <EditablePanelV2
-        title="Paramètres de l'article"
+        title={t("pages.modules.article.settingsTitle")}
         fields={articleFields}
         initialValues={articleData || {}}
         onSubmit={handleArticleSubmit}
@@ -248,12 +252,12 @@ export default function ArticleModuleEditor({
         parentId={moduleId}
         parentType="module"
         customLabels={{
-          header: "Contenus de l'article",
-          addButton: "Ajouter un contenu d'article",
-          empty: "Aucun contenu pour cet article.",
-          loading: "Chargement des contenus...",
-          saveContent: "Enregistrer le contenu",
-          bodyLabel: "Contenu de l'article",
+          header: t("pages.modules.article.contentHeader"),
+          addButton: t("pages.modules.article.contentAdd"),
+          empty: t("pages.modules.article.contentEmpty"),
+          loading: t("pages.common.loadingContents"),
+          saveContent: t("pages.common.saveContent"),
+          bodyLabel: t("pages.modules.article.contentBodyLabel"),
         }}
       />
 

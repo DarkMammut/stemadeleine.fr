@@ -16,6 +16,7 @@ import {useNotification} from "@/hooks/useNotification";
 import Panel from "@/components/ui/Panel";
 import CollapsibleCard from "@/components/ui/CollapsibleCard";
 import PropTypes from "prop-types";
+import { useTranslation } from "@/i18n/I18nContext";
 
 /**
  * Composant générique de gestion de contenus.
@@ -43,6 +44,7 @@ const ContentManager = ({
                             showSaveButton = false,
                             loading: externalLoading = false,
                         }) => {
+    const { t } = useTranslation();
     const [contents, setContents] = useState([]);
     const skipNotifyRef = useRef(true);
     const [expandedContents, setExpandedContents] = useState(new Set());
@@ -99,8 +101,8 @@ const ContentManager = ({
             console.error("Error loading contents:", error);
 
             showError(
-                "Erreur de chargement",
-                "Erreur lors du chargement des contenus",
+                t("pages.errors.loadContentsTitle"),
+                t("pages.errors.loadContentsMessage"),
             );
         } finally {
             setLoadingLocal(false);
@@ -136,7 +138,7 @@ const ContentManager = ({
 
             const newContent = await createContent(
                 parentId,
-                customLabels.defaultTitle || "Nouveau contenu",
+                customLabels.defaultTitle || t("pages.common.newContent"),
             );
 
             await loadContents();
@@ -146,15 +148,15 @@ const ContentManager = ({
             );
 
             showSuccess(
-                "Contenu ajouté",
-                "Le nouveau contenu a été créé avec succès",
+                t("pages.notifications.contentAddedTitle"),
+                t("pages.notifications.contentAddedMessage"),
             );
         } catch (error) {
             console.error("Error adding content:", error);
 
             showError(
-                "Erreur",
-                "Erreur lors de l'ajout du contenu",
+                t("pages.errors.genericTitle"),
+                t("pages.errors.creationModuleMessage"),
             );
         } finally {
             setLoadingLocal(false);
@@ -180,15 +182,15 @@ const ContentManager = ({
             await updateContent(contentId, {
                 title: newTitle,
                 body: content.body || {
-                    html: "<p>Commencez à écrire...</p>",
+                    html: `<p>${t("pages.common.startWriting")}</p>`,
                 },
             });
 
             await loadContents();
 
             showSuccess(
-                "Titre modifié",
-                "Le titre a été mis à jour avec succès",
+                t("pages.notifications.contentTitleUpdatedTitle"),
+                t("pages.notifications.contentTitleUpdatedMessage"),
             );
         } catch (error) {
             console.error(
@@ -197,8 +199,8 @@ const ContentManager = ({
             );
 
             showError(
-                "Erreur",
-                "Erreur lors de la mise à jour du titre",
+                t("pages.errors.genericTitle"),
+                t("pages.errors.titleUpdateMessage"),
             );
         } finally {
             setSavingStates((prev) => ({
@@ -256,8 +258,8 @@ const ContentManager = ({
             );
 
             showSuccess(
-                "Contenu enregistré",
-                "Le contenu a été sauvegardé avec succès",
+                t("pages.notifications.contentSavedTitle"),
+                t("pages.notifications.contentSavedMessage"),
             );
         } catch (error) {
             console.error(
@@ -266,8 +268,8 @@ const ContentManager = ({
             );
 
             showError(
-                "Erreur",
-                "Erreur lors de la sauvegarde du contenu",
+                t("pages.errors.genericTitle"),
+                t("pages.errors.saveContentMessage"),
             );
         } finally {
             setSavingStates((prev) => ({
@@ -305,9 +307,11 @@ const ContentManager = ({
             );
 
             showSuccess(
-                "Visibilité modifiée",
-                `Le contenu est maintenant ${
-                    isVisible ? "visible" : "masqué"
+                t("pages.notifications.visibilityUpdatedTitle"),
+                `${t("pages.common.content")} ${
+                    isVisible
+                        ? t("pages.common.visible")
+                        : t("pages.common.hidden")
                 }`,
             );
         } catch (error) {
@@ -317,8 +321,8 @@ const ContentManager = ({
             );
 
             showError(
-                "Erreur",
-                "Erreur lors de la mise à jour de la visibilité",
+                t("pages.errors.genericTitle"),
+                t("pages.errors.visibilityMessage"),
             );
         } finally {
             setSavingStates((prev) => ({
@@ -351,8 +355,8 @@ const ContentManager = ({
             });
 
             showSuccess(
-                "Contenu supprimé",
-                "Le contenu a été supprimé avec succès",
+                t("pages.notifications.contentDeletedTitle"),
+                t("pages.notifications.contentDeletedMessage"),
             );
         } catch (error) {
             console.error(
@@ -361,8 +365,8 @@ const ContentManager = ({
             );
 
             showError(
-                "Erreur",
-                "Erreur lors de la suppression du contenu",
+                t("pages.errors.genericTitle"),
+                t("pages.errors.deleteContentMessage"),
             );
 
             throw error;
@@ -402,9 +406,7 @@ const ContentManager = ({
             const ownerId = contentOwnerId || parentId;
 
             if (!ownerId) {
-                throw new Error(
-                    "Impossible de publier les contenus : identifiant du propriétaire manquant.",
-                );
+                throw new Error(t("pages.contentManager.publishMissingOwner"));
             }
 
             const result = await publishAllContents(ownerId);
@@ -414,8 +416,12 @@ const ContentManager = ({
             await loadContents();
 
             showSuccess(
-                "Publication terminée",
-                `${result.publishedCount} contenu(s) publié(s), ${result.skippedCount || 0} ignoré(s)`,
+                t("pages.notifications.publishCompletedTitle"),
+                `${result.publishedCount} ${t(
+                    "pages.contentManager.publishResultPublished",
+                )}, ${result.skippedCount || 0} ${t(
+                    "pages.contentManager.publishResultSkipped",
+                )}`,
             );
         } catch (error) {
             console.error(
@@ -426,10 +432,10 @@ const ContentManager = ({
             const errorMessage =
                 error.response?.data?.message ||
                 error.message ||
-                "Erreur lors de la publication des contenus";
+                t("pages.errors.publishContentsMessage");
 
             showError(
-                "Erreur",
+                t("pages.errors.genericTitle"),
                 errorMessage,
             );
         } finally {
@@ -533,7 +539,7 @@ const ContentManager = ({
 
     return (
         <Panel
-            title={customLabels.header || "Contenus"}
+            title={customLabels.header || t("pages.contentManager.title")}
             actions={
                 <div className="flex items-center gap-2">
                     {/* Sections/modules : la publication est portée par le parent (page, section, module).
@@ -550,9 +556,9 @@ const ContentManager = ({
                             }
                             publishLabel={
                                 customLabels.publishButton ||
-                                "Publier tous"
+                                t("pages.contentManager.publishAllButton")
                             }
-                            publishedLabel="Tous publiés"
+                            publishedLabel={t("pages.contentManager.publishAllDone")}
                             size="md"
                             resetAfterDelay={true}
                         />
@@ -569,7 +575,7 @@ const ContentManager = ({
                             <span className="skeleton-light w-32 h-4 inline-block"/>
                         ) : (
                             customLabels.addButton ||
-                            "Ajouter un contenu"
+                            t("pages.contentManager.addButton")
                         )}
                     </Button>
                 </div>
@@ -590,7 +596,7 @@ const ContentManager = ({
                         <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
                             <p>
                                 {customLabels.empty ||
-                                    "Aucun contenu. Cliquez sur 'Ajouter un contenu'."}
+                                    t("pages.contentManager.empty")}
                             </p>
                         </div>
                     )}
@@ -693,7 +699,7 @@ const ContentManager = ({
                                                 }
                                             >
                                                 {customLabels.save ||
-                                                    "Enregistrer"}
+                                                    t("pages.contentManager.saveInline")}
                                             </Button>
 
                                             <Button
@@ -714,7 +720,7 @@ const ContentManager = ({
                                                 }
                                             >
                                                 {customLabels.cancel ||
-                                                    "Annuler"}
+                                                    t("pages.contentManager.cancelInline")}
                                             </Button>
                                         </form>
                                     ) : (
@@ -733,12 +739,12 @@ const ContentManager = ({
                                                     title={
                                                         content.title ||
                                                         customLabels.untitled ||
-                                                        "Contenu sans titre"
+                                                        t("pages.common.untitledContent")
                                                     }
                                                 >
                                                     {content.title ||
                                                         customLabels.untitled ||
-                                                        "Contenu sans titre"}
+                                                        t("pages.common.untitledContent")}
                                                 </h4>
                                             )}
 
@@ -747,7 +753,7 @@ const ContentManager = ({
                                                     <span className="skeleton-light w-20 h-3 inline-block rounded"/>
                                                 ) : (
                                                     <>
-                                                        v
+                                                        {t("pages.contentManager.versionPrefix")}
                                                         {
                                                             content.version
                                                         }{" "}
@@ -761,7 +767,7 @@ const ContentManager = ({
                                                 {content.hasLocalChanges &&
                                                     !effectiveLoading && (
                                                         <span className="text-orange-600 ml-2">
-                                                            • Modifications non sauvegardées
+                                                            • {t("pages.common.unsavedChanges")}
                                                         </span>
                                                     )}
                                             </div>
@@ -781,9 +787,9 @@ const ContentManager = ({
                                                 ] ||
                                             effectiveLoading
                                         }
-                                        deleteLabel="Supprimer"
-                                        confirmTitle="Supprimer le contenu"
-                                        confirmMessage="Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible."
+                                        deleteLabel={t("pages.common.delete")}
+                                        confirmTitle={t("pages.contentManager.deleteContentTitle")}
+                                        confirmMessage={t("pages.contentManager.deleteContentMessage")}
                                         size="sm"
                                         hoverExpand={true}
                                     />
@@ -810,7 +816,7 @@ const ContentManager = ({
                                                 }
                                                 placeholder={
                                                     customLabels.bodyPlaceholder ||
-                                                    "Commencez à écrire..."
+                                                    t("pages.common.startWriting")
                                                 }
                                                 height="200px"
                                                 disabled={
@@ -845,7 +851,7 @@ const ContentManager = ({
                                                                 }
                                                             >
                                                                 {customLabels.saveContent ||
-                                                                    "Enregistrer le contenu"}
+                                                                    t("pages.common.saveContent")}
                                                             </Button>
                                                         </div>
                                                     )
@@ -876,7 +882,7 @@ const ContentManager = ({
                                                         className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"/>
 
                                                     {customLabels.saving ||
-                                                        "Sauvegarde..."}
+                                                        t("pages.common.saving")}
                                                 </div>
                                             )}
                                         </>
@@ -894,9 +900,21 @@ const ContentManager = ({
                     setShowPublishAllModal(false)
                 }
                 onConfirm={handleConfirmPublishAll}
-                title="Publier tous les contenus"
-                message={`Êtes-vous sûr de vouloir publier tous les contenus de ce ${parentType} ? Cette action créera une nouvelle version pour chaque contenu modifié.`}
-                confirmLabel="Publier tous"
+                title={t("pages.contentManager.publishAllTitle")}
+                message={
+                    parentType === "section"
+                        ? t("pages.contentManager.publishAllConfirmationSection")
+                        : parentType === "module"
+                          ? t("pages.contentManager.publishAllConfirmationModule")
+                          : parentType === "news-publication"
+                            ? t(
+                                "pages.contentManager.publishAllConfirmationNewsPublication",
+                              )
+                            : t(
+                                "pages.contentManager.publishAllConfirmationNewsletterPublication",
+                              )
+                }
+                confirmLabel={t("pages.contentManager.publishAllButton")}
                 isLoading={isPublishingAll}
                 variant="primary"
             />}

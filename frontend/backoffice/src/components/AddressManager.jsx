@@ -12,18 +12,22 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import AddressCard from "@/components/AddressCard";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function AddressManager({
-  label = "Mes Adresses",
+  label = null,
   addresses,
   ownerId,
   ownerType,
   refreshAddresses,
   editable = true,
-  newAddressName = "Nouvelle adresse",
+  newAddressName = null,
   maxAddresses = undefined,
   loading = false,
 }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label || t("addresses.title");
+  const resolvedNewAddressName = newAddressName || t("addresses.newAddressName");
   const handleAddClick = () => {
     if (!editable || isLimitReached) return;
     setAdding(true);
@@ -37,7 +41,7 @@ export default function AddressManager({
   const [editForm, setEditForm] = useState({});
   const [adding, setAdding] = useState(false);
   const [addForm, setAddForm] = useState({
-    name: newAddressName,
+    name: resolvedNewAddressName,
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -51,13 +55,28 @@ export default function AddressManager({
     (addresses?.length || 0) >= maxAddresses;
 
   const addressFields = [
-    { name: "name", label: "Nom", type: "text", required: true },
-    { name: "addressLine1", label: "Ligne 1", type: "text", required: true },
-    { name: "addressLine2", label: "Ligne 2", type: "text", required: false },
-    { name: "city", label: "Ville", type: "text", required: true },
-    { name: "postCode", label: "Code postal", type: "text", required: true },
-    { name: "state", label: "Région", type: "text", required: false },
-    { name: "country", label: "Pays", type: "text", required: false },
+    { name: "name", label: t("addresses.fields.name"), type: "text", required: true },
+    {
+      name: "addressLine1",
+      label: t("addresses.fields.addressLine1"),
+      type: "text",
+      required: true,
+    },
+    {
+      name: "addressLine2",
+      label: t("addresses.fields.addressLine2"),
+      type: "text",
+      required: false,
+    },
+    { name: "city", label: t("addresses.fields.city"), type: "text", required: true },
+    {
+      name: "postCode",
+      label: t("addresses.fields.postCode"),
+      type: "text",
+      required: true,
+    },
+    { name: "state", label: t("addresses.fields.state"), type: "text", required: false },
+    { name: "country", label: t("addresses.fields.country"), type: "text", required: false },
   ];
 
   // Ajout d'une adresse
@@ -70,7 +89,7 @@ export default function AddressManager({
         ownerType,
       });
       setAddForm({
-        name: "Nouvelle adresse",
+        name: resolvedNewAddressName,
         addressLine1: "",
         addressLine2: "",
         city: "",
@@ -80,13 +99,10 @@ export default function AddressManager({
       });
       setAdding(false);
       await refreshAddresses();
-      showSuccess("Adresse ajoutée", "L'adresse a été ajoutée avec succès");
+      showSuccess(t("addresses.addSuccessTitle"), t("addresses.addSuccessMessage"));
     } catch (err) {
       console.error("Erreur lors de l'ajout:", err);
-      showError(
-        "Erreur d'ajout",
-        "Impossible d'ajouter l'adresse. Veuillez réessayer.",
-      );
+      showError(t("addresses.addErrorTitle"), t("addresses.addErrorMessage"));
     }
   };
 
@@ -115,13 +131,13 @@ export default function AddressManager({
       });
       setEditingId(null);
       await refreshAddresses();
-      showSuccess("Adresse modifiée", "L'adresse a été modifiée avec succès");
+      showSuccess(
+        t("addresses.updateSuccessTitle"),
+        t("addresses.updateSuccessMessage"),
+      );
     } catch (err) {
       console.error("Erreur lors de la modification:", err);
-      showError(
-        "Erreur de modification",
-        "Impossible de modifier l'adresse. Veuillez réessayer.",
-      );
+      showError(t("addresses.updateErrorTitle"), t("addresses.updateErrorMessage"));
     }
   };
 
@@ -131,13 +147,13 @@ export default function AddressManager({
     try {
       await axios.delete(`/api/addresses/${addressId}`);
       await refreshAddresses();
-      showSuccess("Adresse supprimée", "L'adresse a été supprimée avec succès");
+      showSuccess(
+        t("addresses.deleteSuccessTitle"),
+        t("addresses.deleteSuccessMessage"),
+      );
     } catch (err) {
       console.error("Erreur lors de la suppression:", err);
-      showError(
-        "Erreur de suppression",
-        "Impossible de supprimer l'adresse. Veuillez réessayer.",
-      );
+      showError(t("addresses.deleteErrorTitle"), t("addresses.deleteErrorMessage"));
     }
   };
 
@@ -146,7 +162,7 @@ export default function AddressManager({
     editable && !isLimitReached ? (
       <IconButton
         icon={PlusIcon}
-        label="Ajouter"
+        label={t("addresses.add")}
         variant="primary"
         size="md"
         onClick={handleAddClick}
@@ -157,7 +173,7 @@ export default function AddressManager({
   const TitleNode = (
     <div className="flex items-center gap-3">
       <MapPinOutlineIcon className="w-6 h-6 text-gray-500" />
-      <h3 className="text-lg font-semibold text-gray-900">{label}</h3>
+      <h3 className="text-lg font-semibold text-gray-900">{resolvedLabel}</h3>
     </div>
   );
 
@@ -173,9 +189,9 @@ export default function AddressManager({
               initialValues={addForm}
               onSubmit={handleAddSubmit}
               onChange={setAddForm}
-              submitButtonLabel="Ajouter"
+              submitButtonLabel={t("addresses.add")}
               onCancel={() => setAdding(false)}
-              cancelButtonLabel="Annuler"
+              cancelButtonLabel={t("users.form.cancel")}
               allowNoChanges={true}
               inline={true}
             />
@@ -210,10 +226,10 @@ export default function AddressManager({
                       initialValues={editForm}
                       onSubmit={handleEditSubmit}
                       onChange={setEditForm}
-                      submitButtonLabel="Enregistrer"
+                      submitButtonLabel={t("addresses.save")}
                       inline={true}
                       onCancel={() => setEditingId(null)}
-                      cancelButtonLabel="Annuler"
+                      cancelButtonLabel={t("users.form.cancel")}
                     />
                   </div>
                 ) : (
@@ -235,7 +251,7 @@ export default function AddressManager({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">Aucune adresse.</p>
+          <p className="text-sm text-gray-500">{t("addresses.empty")}</p>
         )}
 
         {/* Affiche le bouton bas uniquement si la liste est vide (évite une bordure vide sous la liste) */}
@@ -243,7 +259,7 @@ export default function AddressManager({
           <div className="mt-0">
             {!adding && (
               <Button variant="link" size="sm" onClick={handleAddClick}>
-                + Ajouter une adresse
+                {t("addresses.addInline")}
               </Button>
             )}
           </div>
@@ -275,11 +291,11 @@ AddressManager.propTypes = {
 };
 
 AddressManager.defaultProps = {
-  label: "Adresses",
+  label: null,
   ownerId: null,
   ownerType: null,
   refreshAddresses: null,
   editable: true,
-  newAddressName: "Nouvelle adresse",
+  newAddressName: null,
   maxAddresses: undefined,
 };

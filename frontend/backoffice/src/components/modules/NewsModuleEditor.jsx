@@ -11,6 +11,7 @@ import ContentManager from "@/components/ContentManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function NewsModuleEditor({
   moduleId,
@@ -19,6 +20,7 @@ export default function NewsModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
   const [savingModule, setSavingModule] = useState(false);
@@ -77,16 +79,16 @@ export default function NewsModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de l'actualité",
+      label: t("pages.modules.news.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
   ];
@@ -95,7 +97,7 @@ export default function NewsModuleEditor({
   const newsFields = [
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.news.variant"),
       type: "select",
       required: true,
       options: variantOptions,
@@ -122,10 +124,10 @@ export default function NewsModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du module:", err);
-      showError("Erreur lors de la sauvegarde du module");
+      showError(t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingModule(false);
@@ -150,10 +152,10 @@ export default function NewsModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Actualité mise à jour avec succès");
+      showSuccess(t("pages.notifications.newsUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde de l'actualité:", err);
-      showError("Erreur lors de la sauvegarde de l'actualité");
+      showError(t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingNews(false);
@@ -174,10 +176,14 @@ export default function NewsModuleEditor({
       await updateModuleVisibility(moduleId, isVisible);
       setSavingVisibility(false);
       setModuleData((prev) => ({ ...prev, isVisible }));
-      showSuccess(`Module ${isVisible ? "visible" : "masqué"}`);
+      showSuccess(
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur lors de la mise à jour de la visibilité");
+      showError(t("pages.errors.visibilityModuleMessage"));
       setSavingVisibility(false);
     }
   };
@@ -198,8 +204,8 @@ export default function NewsModuleEditor({
 
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -207,7 +213,7 @@ export default function NewsModuleEditor({
 
       {/* Formulaire Module (name, title) */}
       <EditablePanelV2
-        title="Détails du module"
+        title={t("pages.modules.news.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -218,7 +224,7 @@ export default function NewsModuleEditor({
 
       {/* Formulaire News (variant, writer, writingDate) */}
       <EditablePanelV2
-        title="Détails de l'actualité"
+        title={t("pages.modules.news.settingsTitle")}
         fields={newsFields}
         initialValues={newsData || {}}
         onSubmit={handleNewsSubmit}
@@ -232,12 +238,12 @@ export default function NewsModuleEditor({
         parentId={moduleId}
         parentType="module"
         customLabels={{
-          header: "Contenus du module actualités",
-          addButton: "Ajouter un contenu d'actualité",
-          empty: "Aucun contenu pour ce module actualités.",
-          loading: "Chargement des contenus...",
-          saveContent: "Enregistrer le contenu",
-          bodyLabel: "Contenu de l'actualité",
+          header: t("pages.modules.news.contentHeader"),
+          addButton: t("pages.modules.news.contentAdd"),
+          empty: t("pages.modules.news.contentEmpty"),
+          loading: t("pages.common.loadingContents"),
+          saveContent: t("pages.common.saveContent"),
+          bodyLabel: t("pages.modules.news.contentBodyLabel"),
         }}
       />
     </div>

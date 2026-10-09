@@ -10,12 +10,14 @@ import Button from "@/components/ui/Button";
 import { useAccountOperations } from "@/hooks/useAccountOperations";
 import { useUserOperations } from "@/hooks/useUserOperations";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function AccountForm({
   initialValues = { email: "", role: "ROLE_USER", provider: "local" },
   onCreated,
   onCancel,
 }) {
+  const { t } = useTranslation();
   const accountOps = useAccountOperations();
   const { getAllUsers } = useUserOperations();
   // destructure stable callbacks to avoid triggering effects when the parent object is recreated
@@ -40,9 +42,9 @@ export default function AccountForm({
   const [selectedUser, setSelectedUser] = useState("");
   const [userOptions, setUserOptions] = useState([]);
   const [roleOptions, setRoleOptions] = useState([
-    { label: "-- Choisir --", value: "" },
-    { label: "Utilisateur", value: "ROLE_USER" },
-    { label: "Administrateur", value: "ROLE_ADMIN" },
+    { label: t("accounts.chooseOption"), value: "" },
+    { label: t("accounts.roleUser"), value: "ROLE_USER" },
+    { label: t("accounts.roleAdmin"), value: "ROLE_ADMIN" },
   ]);
   // avoid repeated fetches if effect re-runs due to parent re-creations
   const rolesLoadedRef = useRef(false);
@@ -88,9 +90,14 @@ export default function AccountForm({
           if (Array.isArray(roles) && roles.length > 0) {
             const opts = roles.map((r) => ({
               value: r,
-              label: r.replace(/^ROLE_/, ""),
+              label:
+                r === "ROLE_ADMIN"
+                  ? t("accounts.roleAdmin")
+                  : r === "ROLE_USER"
+                    ? t("accounts.roleUser")
+                    : r.replace(/^ROLE_/, ""),
             }));
-            setRoleOptions([{ label: "-- Choisir --", value: "" }, ...opts]);
+            setRoleOptions([{ label: t("accounts.chooseOption"), value: "" }, ...opts]);
             // If current formValues.role is short (e.g. USER), normalize it to ROLE_*
             setFormValues((prev) => {
               const cur = prev && prev.role ? prev.role : "ROLE_USER";
@@ -111,12 +118,12 @@ export default function AccountForm({
       mounted = false;
     };
     // depends on getRoles which is stable thanks to useCallback in the hook
-  }, [getRoles]);
+  }, [getRoles, t]);
 
   const validate = () => {
     const e = {};
     if (!formValues.email || String(formValues.email).trim() === "") {
-      e.email = "Email requis";
+      e.email = t("accounts.form.emailRequired");
     }
     // add more validation as needed
     setErrors(e);
@@ -146,7 +153,10 @@ export default function AccountForm({
         }
       }
 
-      showSuccess("Compte créé", "Le compte a été créé avec succès");
+      showSuccess(
+        t("accounts.form.successTitle"),
+        t("accounts.form.successMessage"),
+      );
       if (typeof onCreated === "function") await onCreated(created);
       // close modal after creation
       try {
@@ -155,7 +165,7 @@ export default function AccountForm({
       return created;
     } catch (err) {
       console.error("Erreur création compte:", err);
-      showError("Erreur de création", "Impossible de créer le compte");
+      showError(t("accounts.form.errorTitle"), t("accounts.form.errorMessage"));
       throw err;
     } finally {
       setSubmitting(false);
@@ -163,12 +173,12 @@ export default function AccountForm({
   };
 
   return (
-    <Panel title={"Créer un compte"}>
+    <Panel title={t("accounts.form.title")}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div className="sm:col-span-3">
             <label className="block text-sm/6 font-medium text-gray-900">
-              Email
+              {t("accounts.form.email")}
             </label>
             <div className="mt-2">
               <input
@@ -188,7 +198,7 @@ export default function AccountForm({
 
           <div className="sm:col-span-3">
             <label className="block text-sm/6 font-medium text-gray-900">
-              Rôle
+              {t("accounts.form.role")}
             </label>
             <div className="mt-2">
               <Select
@@ -202,7 +212,7 @@ export default function AccountForm({
 
           <div className="sm:col-span-3">
             <label className="block text-sm/6 font-medium text-gray-900">
-              Fournisseur
+              {t("accounts.form.provider")}
             </label>
             <div className="mt-2">
               <input
@@ -210,7 +220,7 @@ export default function AccountForm({
                 type="text"
                 value={formValues.provider || ""}
                 onChange={(e) => handleChange("provider", e.target.value)}
-                placeholder="local"
+                placeholder={t("accounts.form.providerPlaceholder")}
                 className="block w-full rounded-md px-3 py-2 text-base text-gray-700 bg-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               />
             </div>
@@ -218,7 +228,7 @@ export default function AccountForm({
 
           <div className="sm:col-span-6">
             <label className="block text-sm/6 font-medium text-gray-900">
-              Utilisateur lié (optionnel)
+              {t("accounts.form.linkedUser")}
             </label>
             <div className="mt-2 flex items-center gap-2">
               <div className="w-80">
@@ -228,7 +238,7 @@ export default function AccountForm({
                   options={userOptions}
                   labelKey="label"
                   valueKey="value"
-                  placeholder="-- Aucun --"
+                  placeholder={t("accounts.form.noUser")}
                 />
               </div>
               <Button
@@ -238,7 +248,7 @@ export default function AccountForm({
                 onClick={() => setShowCreateUserModal(true)}
                 className="ml-2"
               >
-                Créer un utilisateur
+                {t("accounts.form.createUser")}
               </Button>
             </div>
           </div>
@@ -252,7 +262,7 @@ export default function AccountForm({
             onClick={onCancel}
             disabled={submitting}
           >
-            Annuler
+            {t("accounts.form.cancel")}
           </Button>
           <Button
             type="submit"
@@ -260,7 +270,7 @@ export default function AccountForm({
             size="md"
             loading={submitting}
           >
-            {submitting ? "Création..." : "Créer"}
+            {submitting ? t("accounts.form.creating") : t("accounts.form.create")}
           </Button>
         </div>
 

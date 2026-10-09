@@ -19,9 +19,11 @@ import Title from "@/components/ui/Title";
 import Utilities from "@/components/ui/Utilities";
 import DraggableTree from "@/components/ui/DraggableTree";
 import Notification from "@/components/ui/Notification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Pages() {
   const router = useRouter();
+  const { t } = useTranslation();
   const axios = useAxiosClient();
   const { pages, refetch, loading, error } = useGetPages({ route: "tree" });
   const { createPage } = useAddPage();
@@ -98,13 +100,19 @@ export default function Pages() {
         await axios.delete(`/api/pages/${item.pageId}`);
         await refetch();
         setTreeData((prev) => removeItem(prev, item.id));
-        showSuccess("Page supprimée", "La page a été supprimée avec succès");
+        showSuccess(
+          t("pages.notifications.pageDeletedTitle"),
+          t("pages.notifications.pageDeletedMessage"),
+        );
       } catch (error) {
         console.error("Erreur lors de la suppression :", error);
-        showError("Erreur de suppression", "Impossible de supprimer la page");
+        showError(
+          t("pages.errors.deleteTitle"),
+          t("pages.errors.deletePageMessage"),
+        );
       }
     },
-    [axios, refetch, showSuccess, showError],
+    [axios, refetch, showSuccess, showError, t],
   );
 
   // Création directe d'une page racine
@@ -112,15 +120,21 @@ export default function Pages() {
     try {
       await createPage({
         parentPageId: null,
-        name: "Nouvelle page",
+        name: t("pages.defaultNames.page"),
       });
       await refetch();
-      showSuccess("Page créée", "Une nouvelle page a été créée avec succès");
+      showSuccess(
+        t("pages.notifications.pageCreatedTitle"),
+        t("pages.notifications.pageCreatedMessage"),
+      );
     } catch (error) {
       console.error("Erreur lors de l'ajout de la page:", error);
-      showError("Erreur de création", "Impossible de créer la page");
+      showError(
+        t("pages.errors.creationTitle"),
+        t("pages.errors.creationPageMessage"),
+      );
     }
-  }, [createPage, refetch, showSuccess, showError]);
+  }, [createPage, refetch, showSuccess, showError, t]);
 
   // Fonction pour publier toutes les pages (et enfants) via la nouvelle route backend
   const handlePublishPages = async () => {
@@ -128,26 +142,33 @@ export default function Pages() {
       await axios.put("/api/pages/tree/publish");
       await refetch();
       showSuccess(
-        "Publication terminée",
-        "Toutes les pages ont été publiées avec succès",
+        t("pages.notifications.publishCompletedTitle"),
+        t("pages.notifications.publishCompletedMessage"),
       );
     } catch (error) {
       console.error("Erreur lors de la publication:", error);
-      showError("Erreur de publication", "Impossible de publier les pages");
+      showError(
+        t("pages.errors.publishTitle"),
+        t("pages.errors.publishPageMessage"),
+      );
     }
   };
 
-  if (error) return <p>Erreur: {error.message}</p>;
+  if (error) return <p>{t("pages.errors.loadingPrefix")}: {error.message}</p>;
 
   return (
     <SceneLayout>
-      <Title label="Website" onPublish={handlePublishPages} loading={loading} />
+      <Title
+        label={t("pages.scenes.pages.title")}
+        onPublish={handlePublishPages}
+        loading={loading}
+      />
 
       <Utilities
         actions={[
           {
             icon: PlusIcon,
-            label: "Nouvelle Page",
+            label: t("pages.scenes.pages.newPage"),
             callback: handleCreateRootPage,
           },
         ]}

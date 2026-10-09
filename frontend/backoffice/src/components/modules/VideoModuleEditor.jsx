@@ -6,6 +6,7 @@ import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function VideoModuleEditor({
   moduleId,
@@ -14,6 +15,7 @@ export default function VideoModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
@@ -24,37 +26,37 @@ export default function VideoModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de la vidéo",
+      label: t("pages.modules.video.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
     },
     {
       name: "videoUrl",
-      label: "URL de la vidéo",
+      label: t("pages.modules.video.videoUrl"),
       type: "url",
-      placeholder: "https://www.youtube.com/watch?v=... ou lien direct",
+      placeholder: t("pages.modules.video.videoUrlPlaceholder"),
     },
     {
       name: "description",
-      label: "Description",
+      label: t("pages.modules.video.description"),
       type: "textarea",
-      placeholder: "Description de la vidéo",
+      placeholder: t("pages.modules.video.descriptionPlaceholder"),
     },
     {
       name: "autoplay",
-      label: "Lecture automatique",
+      label: t("pages.modules.video.autoplay"),
       type: "checkbox",
     },
     {
       name: "controls",
-      label: "Afficher les contrôles",
+      label: t("pages.modules.video.controls"),
       type: "checkbox",
     },
   ];
@@ -73,10 +75,10 @@ export default function VideoModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module vidéo mis à jour !");
+      alert(t("pages.modules.video.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -93,7 +95,7 @@ export default function VideoModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -117,8 +119,8 @@ export default function VideoModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -126,7 +128,7 @@ export default function VideoModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails du module vidéo"
+        title={t("pages.modules.video.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}
@@ -137,7 +139,7 @@ export default function VideoModuleEditor({
 
       {/* Sélecteur de média */}
       <MediaManager
-        title="Image du module"
+        title={t("pages.modules.shared.moduleImageTitle")}
         content={moduleContent}
         onMediaAdd={handleMediaAdd}
         onMediaRemove={handleMediaRemove}

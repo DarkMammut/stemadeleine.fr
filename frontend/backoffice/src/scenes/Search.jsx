@@ -17,6 +17,7 @@ import {
   UserIcon,
 } from "@heroicons/react/24/outline";
 import Money from "@/components/ui/Money";
+import { useTranslation } from "@/i18n/I18nContext";
 
 const TypeIcon = ({ kind }) => {
   const cls = "w-6 h-6 text-gray-400";
@@ -60,6 +61,7 @@ const mapTypeToKind = (type) => {
 const getKind = (itemType, fallback) => mapTypeToKind(itemType) || fallback;
 
 export default function Search() {
+  const { t } = useTranslation();
   const params = useSearchParams();
   const q = params?.get("q") || "";
   const [results, setResults] = useState(null);
@@ -81,22 +83,24 @@ export default function Search() {
 
   return (
     <SceneLayout>
-      <Title label="Résultats" />
-      <h2 className="text-lg font-semibold mb-4">Résultats pour «{q}»</h2>
+      <Title label={t("search.title")} />
+      <h2 className="text-lg font-semibold mb-4">
+        {t("search.resultsFor")} «{q}»
+      </h2>
       {loading ? (
         <div className="space-y-6">
           {[
-            { label: "Utilisateurs", count: 3 },
+            { label: t("search.groups.users"), count: 3 },
             {
-              label: "paiements",
+              label: t("search.groups.payments"),
               count: 2,
             },
-            { label: "Articles", count: 2 },
-            { label: "Sections", count: 2 },
-            { label: "Pages", count: 2 },
-            { label: "Modules", count: 2 },
-            { label: "Contacts", count: 2 },
-            { label: "Newsletters", count: 2 },
+            { label: t("search.groups.articles"), count: 2 },
+            { label: t("search.groups.sections"), count: 2 },
+            { label: t("search.groups.pages"), count: 2 },
+            { label: t("search.groups.modules"), count: 2 },
+            { label: t("search.groups.contacts"), count: 2 },
+            { label: t("search.groups.newsletters"), count: 2 },
           ].map((g) => (
             <section key={g.label}>
               <h3 className="font-medium mb-2">{g.label}</h3>
@@ -114,8 +118,8 @@ export default function Search() {
           <div className="space-y-6">
             {results.users && results.users.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Utilisateurs</h3>
-                <CardList emptyMessage="Aucun utilisateur trouvé.">
+                <h3 className="font-medium mb-2">{t("search.groups.users")}</h3>
+                <CardList emptyMessage={t("search.empty.users")}>
                   {results.users.map((u) => (
                     <Card
                       key={u.id}
@@ -142,8 +146,8 @@ export default function Search() {
 
             {results.payments && results.payments.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Paiements</h3>
-                <CardList emptyMessage="Aucun paiement trouvé.">
+                <h3 className="font-medium mb-2">{t("search.groups.payments")}</h3>
+                <CardList emptyMessage={t("search.empty.payments")}>
                   {results.payments.map((p) => (
                     <Card
                       key={p.id}
@@ -170,8 +174,8 @@ export default function Search() {
 
             {results.articles && results.articles.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Articles</h3>
-                <CardList emptyMessage="Aucun article trouvé.">
+                <h3 className="font-medium mb-2">{t("search.groups.articles")}</h3>
+                <CardList emptyMessage={t("search.empty.articles")}>
                   {results.articles.map((a) => (
                     <Card
                       key={a.id}
@@ -198,8 +202,8 @@ export default function Search() {
 
             {results.news && results.news.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Actualités</h3>
-                <CardList emptyMessage="Aucune actualité trouvée.">
+                <h3 className="font-medium mb-2">{t("search.groups.news")}</h3>
+                <CardList emptyMessage={t("search.empty.news")}>
                   {results.news.map((n) => (
                     <Card
                       key={n.id}
@@ -226,8 +230,8 @@ export default function Search() {
 
             {results.sections && results.sections.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Sections</h3>
-                <CardList emptyMessage="Aucune section trouvée.">
+                <h3 className="font-medium mb-2">{t("search.groups.sections")}</h3>
+                <CardList emptyMessage={t("search.empty.sections")}>
                   {results.sections.map((s) => (
                     <Card
                       key={s.id}
@@ -256,8 +260,8 @@ export default function Search() {
 
             {results.pages && results.pages.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Pages</h3>
-                <CardList emptyMessage="Aucune page trouvée.">
+                <h3 className="font-medium mb-2">{t("search.groups.pages")}</h3>
+                <CardList emptyMessage={t("search.empty.pages")}>
                   {results.pages.map((p) => (
                     <Card
                       key={p.id}
@@ -284,8 +288,8 @@ export default function Search() {
 
             {results.modules && results.modules.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Modules</h3>
-                <CardList emptyMessage="Aucun module trouvé.">
+                <h3 className="font-medium mb-2">{t("search.groups.modules")}</h3>
+                <CardList emptyMessage={t("search.empty.modules")}>
                   {results.modules.map((m) => (
                     <Card
                       key={m.id}
@@ -312,8 +316,8 @@ export default function Search() {
 
             {results.contacts && results.contacts.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Contacts</h3>
-                <CardList emptyMessage="Aucun contact trouvé.">
+                <h3 className="font-medium mb-2">{t("search.groups.contacts")}</h3>
+                <CardList emptyMessage={t("search.empty.contacts")}>
                   {results.contacts.map((c) => (
                     <Card
                       key={c.id}
@@ -340,8 +344,10 @@ export default function Search() {
 
             {results.newsletters && results.newsletters.length > 0 && (
               <section>
-                <h3 className="font-medium mb-2">Newsletters</h3>
-                <CardList emptyMessage="Aucune newsletter trouvée.">
+                <h3 className="font-medium mb-2">
+                  {t("search.groups.newsletters")}
+                </h3>
+                <CardList emptyMessage={t("search.empty.newsletters")}>
                   {results.newsletters.map((n) => (
                     <Card
                       key={n.id}
@@ -379,7 +385,7 @@ export default function Search() {
               !results.pages?.length &&
               !results.modules?.length &&
               !results.contacts?.length &&
-              !results.newsletters?.length && <p>Aucun résultat</p>}
+              !results.newsletters?.length && <p>{t("search.empty.none")}</p>}
           </div>
         )
       )}

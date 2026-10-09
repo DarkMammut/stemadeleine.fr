@@ -24,9 +24,11 @@ import Utilities from "@/components/ui/Utilities";
 import PagesTabs from "@/components/PagesTabs";
 import DraggableTree from "@/components/ui/DraggableTree";
 import AddModuleModal from "@/components/AddModuleModal";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Sections({ pageId }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const { page, refetch, loading, error } = useGetPage({
     route: `${pageId}/sections`,
   });
@@ -43,6 +45,16 @@ export default function Sections({ pageId }) {
   const [treeData, setTreeData] = useState([]);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [targetSection, setTargetSection] = useState(null);
+
+  const getModuleTypeLabel = useCallback(
+    (moduleType) => t(`pages.moduleTypes.${moduleType}`),
+    [t],
+  );
+
+  const getDefaultModuleName = useCallback(
+    (moduleType) => t(`pages.defaultNames.${moduleType}`),
+    [t],
+  );
 
   useEffect(() => {
     if (page?.sections) {
@@ -84,8 +96,8 @@ export default function Sections({ pageId }) {
       try {
         await updateSectionOrder(pageId, newTree);
         showSuccess(
-          "Ordre mis à jour",
-          "L'ordre des sections a été modifié avec succès",
+          t("pages.notifications.orderUpdatedTitle"),
+          t("pages.notifications.sectionsOrderUpdatedMessage"),
         );
       } catch (error) {
         console.error(
@@ -93,12 +105,12 @@ export default function Sections({ pageId }) {
           error,
         );
         showError(
-          "Erreur de réorganisation",
-          "Impossible de modifier l'ordre des sections",
+          t("pages.errors.reorderTitle"),
+          t("pages.errors.reorderSectionsMessage"),
         );
       }
     },
-    [pageId, updateSectionOrder, showSuccess, showError],
+    [pageId, updateSectionOrder, showSuccess, showError, t],
   );
 
   const handleToggle = useCallback(
@@ -107,14 +119,18 @@ export default function Sections({ pageId }) {
         if (item.type === "section") {
           await updateSectionVisibility(item.sectionId, newVal);
           showSuccess(
-            "Visibilité mise à jour",
-            `La section est maintenant ${newVal ? "visible" : "masquée"}`,
+            t("pages.notifications.visibilityUpdatedTitle"),
+            `${t("pages.common.sectionCapitalized")} ${t(
+              newVal ? "pages.common.visible" : "pages.common.hidden",
+            )}`,
           );
         } else if (item.type === "module") {
           await updateModuleVisibility(item.moduleId, newVal);
           showSuccess(
-            "Visibilité mise à jour",
-            `Le module est maintenant ${newVal ? "visible" : "masqué"}`,
+            t("pages.notifications.visibilityUpdatedTitle"),
+            `${t("pages.common.moduleCapitalized")} ${t(
+              newVal ? "pages.common.visible" : "pages.common.hidden",
+            )}`,
           );
         }
         setTreeData((prev) =>
@@ -138,12 +154,18 @@ export default function Sections({ pageId }) {
       } catch (error) {
         console.error("Erreur lors du changement de visibilité :", error);
         showError(
-          "Erreur de visibilité",
-          "Impossible de modifier la visibilité",
+          t("pages.errors.visibilityTitle"),
+          t("pages.errors.visibilityMessage"),
         );
       }
     },
-    [updateSectionVisibility, updateModuleVisibility, showSuccess, showError],
+    [
+      updateSectionVisibility,
+      updateModuleVisibility,
+      showSuccess,
+      showError,
+      t,
+    ],
   );
 
   const handleEdit = useCallback(
@@ -165,14 +187,14 @@ export default function Sections({ pageId }) {
         if (item.type === "section") {
           await deleteSection(item.sectionId);
           showSuccess(
-            "Section supprimée",
-            "La section a été supprimée avec succès",
+            t("pages.notifications.sectionDeletedTitle"),
+            t("pages.notifications.sectionDeletedMessage"),
           );
         } else if (item.type === "module") {
           await deleteModule(item.moduleId);
           showSuccess(
-            "Module supprimé",
-            "Le module a été supprimé avec succès",
+            t("pages.notifications.moduleDeletedTitle"),
+            t("pages.notifications.moduleDeletedMessage"),
           );
         }
         await refetch();
@@ -180,12 +202,14 @@ export default function Sections({ pageId }) {
       } catch (error) {
         console.error("Erreur lors de la suppression :", error);
         showError(
-          "Erreur de suppression",
-          `Impossible de supprimer ${item.type === "section" ? "la section" : "le module"}`,
+          t("pages.errors.deleteTitle"),
+          item.type === "section"
+            ? t("pages.errors.deleteSectionMessage")
+            : t("pages.errors.deleteModuleMessage"),
         );
       }
     },
-    [deleteSection, deleteModule, refetch, showSuccess, showError],
+    [deleteSection, deleteModule, refetch, showSuccess, showError, t],
   );
 
   const handleAddModule = useCallback((section) => {
@@ -212,14 +236,14 @@ export default function Sections({ pageId }) {
         const childEndpoint = typeToEndpoint[moduleType];
         await axiosClient.post(childEndpoint, {
           sectionId: targetSection.sectionId,
-          name: `New ${moduleType}`,
+          name: getDefaultModuleName(moduleType),
         });
       } else {
         const url = "/api/modules";
         const payload = {
           sectionId: targetSection.sectionId,
           type: moduleType,
-          name: `New ${moduleType}`,
+          name: getDefaultModuleName(moduleType),
         };
         await axiosClient.post(url, payload);
       }
@@ -227,12 +251,17 @@ export default function Sections({ pageId }) {
       setTargetSection(null);
       await refetch();
       showSuccess(
-        "Module créé",
-        `Le module ${moduleType} a été ajouté avec succès`,
+        t("pages.notifications.moduleCreatedTitle"),
+        `${getModuleTypeLabel(moduleType)} · ${t(
+          "pages.notifications.moduleCreatedMessage",
+        )}`,
       );
     } catch (error) {
       console.error("Erreur lors de l'ajout du module :", error);
-      showError("Erreur de création", "Impossible d'ajouter le module");
+      showError(
+        t("pages.errors.creationTitle"),
+        t("pages.errors.creationModuleMessage"),
+      );
     }
   };
 
@@ -248,12 +277,12 @@ export default function Sections({ pageId }) {
       await resetDraft();
       await refetch();
       showSuccess(
-        "Page réinitialisée",
-        "La page est revenue à la version publiée",
+        t("pages.notifications.resetPageTitle"),
+        t("pages.notifications.resetPageMessage"),
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de réinitialiser la page");
+      showError(t("pages.errors.genericTitle"), t("pages.errors.resetPageMessage"));
     }
   };
 
@@ -263,7 +292,7 @@ export default function Sections({ pageId }) {
   return (
     <SceneLayout>
       <Title
-        label="Content Management"
+        label={t("pages.scenes.sections.title")}
         onPublish={handlePublishSections}
         onReset={handleResetPage}
         publicationInfo={info}
@@ -278,9 +307,12 @@ export default function Sections({ pageId }) {
         actions={[
           {
             icon: PlusIcon,
-            label: "New Section",
+            label: t("pages.scenes.sections.newSection"),
             callback: async () => {
-              await createSection({ pageId: pageId, name: "New section" });
+              await createSection({
+                pageId: pageId,
+                name: t("pages.defaultNames.section"),
+              });
               await refetch();
             },
           },
@@ -290,7 +322,7 @@ export default function Sections({ pageId }) {
 
       {/* Le DraggableTree gère désormais l'affichage de chargement via sa prop `loading` */}
       {error ? (
-        <p>Error: {error.message}</p>
+        <p>{t("pages.errors.loadingPrefix")}: {error.message}</p>
       ) : (
         <DraggableTree
           initialData={treeData}

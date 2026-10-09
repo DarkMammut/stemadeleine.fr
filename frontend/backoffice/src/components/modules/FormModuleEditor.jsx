@@ -6,6 +6,7 @@ import MediaManager from "@/components/MediaManager";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import { useAddModule } from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function FormModuleEditor({
   moduleId,
@@ -14,6 +15,7 @@ export default function FormModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
@@ -23,23 +25,23 @@ export default function FormModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre du formulaire",
+      label: t("pages.modules.form.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
     {
       name: "description",
-      label: "Description",
+      label: t("pages.modules.form.description"),
       type: "textarea",
-      placeholder: "Description du formulaire (max 1000 caractères)",
+      placeholder: t("pages.modules.form.descriptionPlaceholder"),
     },
   ];
 
@@ -49,7 +51,7 @@ export default function FormModuleEditor({
       await refetch();
     } catch (error) {
       console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
+      alert(t("pages.errors.mediaAddMessage"));
     }
   };
 
@@ -62,7 +64,7 @@ export default function FormModuleEditor({
       console.debug("Media removed", { contentId, mediaId });
     } catch (error) {
       console.error("Error removing module media:", error);
-      alert("Erreur lors de la suppression du média");
+      alert(t("pages.errors.mediaDeleteMessage"));
     }
   };
 
@@ -79,10 +81,10 @@ export default function FormModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module formulaire mis à jour !");
+      alert(t("pages.modules.form.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -95,7 +97,7 @@ export default function FormModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -104,8 +106,8 @@ export default function FormModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -113,7 +115,7 @@ export default function FormModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails du formulaire"
+        title={t("pages.modules.form.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}
@@ -124,7 +126,7 @@ export default function FormModuleEditor({
 
       {/* Media manager (remplace MediaPicker) */}
       <MediaManager
-        title="Image du formulaire"
+        title={t("pages.modules.form.imageTitle")}
         content={{
           id: moduleId,
           medias: moduleData?.media ? [moduleData.media] : [],

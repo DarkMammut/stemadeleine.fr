@@ -17,8 +17,10 @@ import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { buildPageBreadcrumbs } from "@/utils/breadcrumbs";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EditSection({ sectionId, pageId }) {
+  const { t } = useTranslation();
   const { section, refetch, loading, error } = useGetSection({ sectionId });
   const { info, refetchInfo, resetDraft } = usePublicationInfo(
     "sections",
@@ -42,16 +44,16 @@ export default function EditSection({ sectionId, pageId }) {
   const fields = [
     {
       name: "name",
-      label: "Nom de la section",
+      label: t("pages.scenes.editSection.fields.name"),
       type: "text",
-      placeholder: "Entrez le nom de la section",
+      placeholder: t("pages.scenes.editSection.fields.namePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre",
+      label: t("pages.scenes.editSection.fields.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.scenes.editSection.fields.titlePlaceholder"),
       required: true,
     },
   ];
@@ -62,7 +64,10 @@ export default function EditSection({ sectionId, pageId }) {
         mediaId: mediaId,
       });
       await refetch();
-      showSuccess("Média ajouté", "Le média a été ajouté avec succès");
+      showSuccess(
+        t("pages.notifications.mediaAddedTitle"),
+        t("pages.notifications.mediaAddedMessage"),
+      );
 
       // Construire l'objet content avec le média ajouté
       return {
@@ -71,7 +76,7 @@ export default function EditSection({ sectionId, pageId }) {
       };
     } catch (error) {
       console.error("Erreur lors de l'ajout du média:", error);
-      showError("Erreur", "Impossible d'ajouter le média");
+      showError(t("pages.errors.genericTitle"), t("pages.errors.mediaAddMessage"));
       throw error;
     }
   };
@@ -80,10 +85,16 @@ export default function EditSection({ sectionId, pageId }) {
     try {
       await axios.delete(`/api/sections/${sectionId}/media`);
       await refetch();
-      showSuccess("Média supprimé", "Le média a été supprimé avec succès");
+      showSuccess(
+        t("pages.notifications.mediaDeletedTitle"),
+        t("pages.notifications.mediaDeletedMessage"),
+      );
     } catch (error) {
       console.error("Erreur lors de la suppression du média:", error);
-      showError("Erreur", "Impossible de supprimer le média");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.mediaDeleteMessage"),
+      );
       throw error;
     }
   };
@@ -122,12 +133,17 @@ export default function EditSection({ sectionId, pageId }) {
       setSavingVisibility(false);
       setSectionData((prev) => ({ ...prev, isVisible }));
       showSuccess(
-        "Visibilité modifiée",
-        `La section est maintenant ${isVisible ? "visible" : "masquée"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.sectionCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de modifier la visibilité");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.visibilityMessage"),
+      );
       setSavingVisibility(false);
     }
   };
@@ -138,10 +154,16 @@ export default function EditSection({ sectionId, pageId }) {
       await axios.put(`/api/sections/${sectionId}/publish`);
       await refetch();
       await refetchInfo();
-      showSuccess("Section publiée", "La section a été publiée avec succès");
+      showSuccess(
+        t("pages.notifications.publishedTitle"),
+        t("pages.notifications.sectionPublishedMessage"),
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de publier la section");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.publishSectionMessage"),
+      );
     }
   };
 
@@ -151,12 +173,15 @@ export default function EditSection({ sectionId, pageId }) {
       await refetch();
       setFormKey((prev) => prev + 1);
       showSuccess(
-        "Section réinitialisée",
-        "La section est revenue à la version publiée",
+        t("pages.notifications.resetSectionTitle"),
+        t("pages.notifications.resetSectionMessage"),
       );
     } catch (err) {
       console.error(err);
-      showError("Erreur", "Impossible de réinitialiser la section");
+      showError(
+        t("pages.errors.genericTitle"),
+        t("pages.errors.resetSectionMessage"),
+      );
     }
   };
 
@@ -168,7 +193,7 @@ export default function EditSection({ sectionId, pageId }) {
   // Construire les breadcrumbs
   const breadcrumbs = section
     ? buildPageBreadcrumbs(
-        { id: pageId, name: section.page?.name || "Page" },
+        { id: pageId, name: section.page?.name || t("pages.common.pageCapitalized") },
         section,
       )
     : [];
@@ -176,7 +201,7 @@ export default function EditSection({ sectionId, pageId }) {
   return (
     <SceneLayout>
       <Title
-        label="Gestion de la section"
+        label={t("pages.scenes.editSection.title")}
         onPublish={handlePublishSection}
         onReset={handleResetSection}
         publicationInfo={info}
@@ -192,8 +217,8 @@ export default function EditSection({ sectionId, pageId }) {
       <div className="space-y-6">
         {/* Section Visibilité séparée */}
         <VisibilitySwitch
-          title="Visibilité de la section"
-          label="Section visible sur le site"
+          title={t("pages.scenes.editSection.visibilityTitle")}
+          label={t("pages.scenes.editSection.visibilityLabel")}
           isVisible={sectionData?.isVisible || false}
           onChange={handleVisibilityChange}
           savingVisibility={savingVisibility}
@@ -202,7 +227,7 @@ export default function EditSection({ sectionId, pageId }) {
 
         <EditablePanel
           key={`${(sectionData && sectionData.sectionId) || "section-form"}-${formKey}`}
-          title="Détails de la section"
+          title={t("pages.scenes.editSection.detailsTitle")}
           fields={fields}
           initialValues={sectionData || {}}
           onSubmit={handleSubmit}
@@ -217,12 +242,12 @@ export default function EditSection({ sectionId, pageId }) {
           parentId={section?.sectionId}
           parentType="section"
           customLabels={{
-            header: "Contenus de la section",
-            addButton: "Ajouter un contenu",
-            empty: "Aucun contenu pour cette section.",
-            loading: "Chargement des contenus...",
-            saveContent: "Enregistrer le contenu",
-            bodyLabel: "Contenu de la section",
+            header: t("pages.scenes.editSection.contentHeader"),
+            addButton: t("pages.common.addContent"),
+            empty: t("pages.scenes.editSection.contentEmpty"),
+            loading: t("pages.common.loadingContents"),
+            saveContent: t("pages.common.saveContent"),
+            bodyLabel: t("pages.scenes.editSection.contentBodyLabel"),
           }}
         />
       </div>
@@ -230,7 +255,7 @@ export default function EditSection({ sectionId, pageId }) {
       {/* Gestion de l'image de la section (Section Media) */}
       {sectionData && (
         <MediaManager
-          title="Image de la section"
+          title={t("pages.scenes.editSection.sectionMediaTitle")}
           content={{
             id: sectionId,
             medias: section?.media ? [section.media] : [],
@@ -245,7 +270,7 @@ export default function EditSection({ sectionId, pageId }) {
       {/* Affichage d'erreur global si besoin */}
       {error && (
         <div className="text-center py-4 text-red-600">
-          Erreur: {error.message}
+          {t("pages.errors.loadingPrefix")}: {error.message}
         </div>
       )}
 

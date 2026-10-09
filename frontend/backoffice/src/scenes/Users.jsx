@@ -25,8 +25,10 @@ import Notification from "@/components/ui/Notification";
 import Pagination from "@/components/ui/Pagination";
 import { useAxiosClient } from "@/utils/axiosClient";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Users() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [users, setUsers] = useState([]);
@@ -104,10 +106,7 @@ export default function Users() {
         return;
       }
       console.error("Error loading users:", error);
-      showError(
-        "Erreur de chargement",
-        "Impossible de charger les utilisateurs",
-      );
+      showError(t("users.loadErrorTitle"), t("users.loadErrorMessage"));
     } finally {
       // only turn off loading for the latest fetch (and if thisFetchId was set)
       if (thisFetchId !== undefined && fetchIdRef.current === thisFetchId)
@@ -237,17 +236,17 @@ export default function Users() {
   const filtersConfig = useMemo(
     () => ({
       fields: [
-        { key: "lastname", label: "Nom", icon: UserIcon },
-        { key: "firstname", label: "Prénom", icon: UserIcon },
-        { key: "email", label: "Email", icon: EnvelopeIcon },
-        { key: "createdAt", label: "Date", icon: CalendarDaysIcon },
+        { key: "lastname", label: t("users.filters.lastname"), icon: UserIcon },
+        { key: "firstname", label: t("users.filters.firstname"), icon: UserIcon },
+        { key: "email", label: t("users.filters.email"), icon: EnvelopeIcon },
+        { key: "createdAt", label: t("users.filters.date"), icon: CalendarDaysIcon },
       ],
       onSearch: handleFiltersSearch,
       onSortChange: handleFiltersSort,
       filterItems: [
         {
           key: "adherents",
-          label: "Adhérents",
+          label: t("users.filters.adherents"),
           type: "toggle",
           value: showAdherentsOnly,
         },
@@ -279,7 +278,7 @@ export default function Users() {
       searchValue: searchQuery,
       sortValue: sortState,
       initialSort: { field: null, direction: null },
-      placeholder: "Rechercher un utilisateur...",
+      placeholder: t("users.searchPlaceholder"),
     }),
     [
       handleFiltersSearch,
@@ -287,13 +286,14 @@ export default function Users() {
       searchQuery,
       sortState,
       showAdherentsOnly,
+      t,
     ],
   );
 
   const handleCreateUser = async () => {
     try {
       await createUser({
-        firstname: "Nouvel Utilisateur",
+        firstname: t("users.newUser"),
         lastname: "",
         email: "",
         phoneMobile: "",
@@ -303,12 +303,12 @@ export default function Users() {
       });
       await loadUsers();
       showSuccess(
-        "Utilisateur créé",
-        "Un nouvel utilisateur a été créé avec succès",
+        t("users.createSuccessTitle"),
+        t("users.createSuccessMessage"),
       );
     } catch (error) {
       console.error("Error creating user:", error);
-      showError("Erreur de création", "Impossible de créer l'utilisateur");
+      showError(t("users.createErrorTitle"), t("users.createErrorMessage"));
     }
   };
 
@@ -317,15 +317,12 @@ export default function Users() {
       await axios.post("/api/users/import");
       await loadUsers();
       showSuccess(
-        "Import HelloAsso terminé",
-        "Les données ont été importées avec succès",
+        t("users.importSuccessTitle"),
+        t("users.importSuccessMessage"),
       );
     } catch (error) {
       console.error("Erreur lors de l'import HelloAsso:", error);
-      showError(
-        "Erreur d'import",
-        "Impossible d'importer les données HelloAsso",
-      );
+      showError(t("users.importErrorTitle"), t("users.importErrorMessage"));
     }
   };
 
@@ -336,18 +333,20 @@ export default function Users() {
   // show header + utilities and skeleton to avoid flashes
   return (
     <SceneLayout>
-      <Title label={showAdherentsOnly ? "Adhérents" : "Utilisateurs"} />
+      <Title
+        label={showAdherentsOnly ? t("users.membersTitle") : t("users.title")}
+      />
 
       <Utilities
         actions={[
           {
             icon: PlusIcon,
-            label: "Nouvel Utilisateur",
+            label: t("users.newUser"),
             callback: handleCreateUser,
           },
           {
             variant: "refresh",
-            label: "Actualiser HelloAsso",
+            label: t("users.importHelloAsso"),
             callback: handleImportHelloAsso,
             hoverExpand: true,
           },
@@ -361,7 +360,7 @@ export default function Users() {
           <LoadingSkeleton variant="card" count={10} showActions={false} />
         </div>
       ) : (
-        <CardList emptyMessage="Aucun utilisateur trouvé.">
+        <CardList emptyMessage={t("users.empty")}>
           {users.map((user) => (
             <UserCard
               key={user.id}

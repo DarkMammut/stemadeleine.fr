@@ -4,8 +4,10 @@ import { useAxiosClient } from "@/utils/axiosClient";
 import Title from "@/components/ui/Title";
 import UserDetails from "@/components/UserDetails";
 import SceneLayout from "@/components/ui/SceneLayout";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function EditUser() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const axios = useAxiosClient();
   const [user, setUser] = useState(null);
@@ -21,7 +23,7 @@ export default function EditUser() {
       const res = await axios.get(`/api/users/${id}`);
       setUser(res.data);
     } catch (e) {
-      alert("Erreur lors du chargement de l'utilisateur");
+      alert(t("users.editLoadError"));
     } finally {
       setLoading(false);
     }
@@ -30,10 +32,10 @@ export default function EditUser() {
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/users/${id}`);
-      alert("Utilisateur supprimé");
+      alert(t("users.deleteSuccess"));
       // Redirection ou autre logique ici
     } catch (error) {
-      alert("Erreur lors de la suppression");
+      alert(t("users.deleteError"));
     }
   };
 
@@ -41,7 +43,7 @@ export default function EditUser() {
   if (effectiveLoading && !user)
     return (
       <SceneLayout>
-        <Title label="Modifier l'utilisateur" />
+        <Title label={t("users.editTitle")} />
         <div className="space-y-6">
           <UserDetails loading={true} editable={false} />
         </div>
@@ -50,7 +52,7 @@ export default function EditUser() {
 
   return (
     <SceneLayout>
-      <Title label="Modifier l'utilisateur" />
+      <Title label={t("users.editTitle")} />
 
       <UserDetails
         user={user}

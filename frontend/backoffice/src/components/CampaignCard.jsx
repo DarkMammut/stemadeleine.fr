@@ -4,13 +4,15 @@ import React from "react";
 import Card from "@/components/ui/Card";
 import { BanknotesIcon, UsersIcon } from "@heroicons/react/24/outline";
 import Currency from "@/components/ui/Currency";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function CampaignCard({ campaign, onClick }) {
+  const { t } = useTranslation();
   const getStatusColor = (state) => {
-    switch (state) {
-      case "Public":
+    switch ((state || "").toLowerCase()) {
+      case "public":
         return "bg-green-50 text-green-700 border-green-200";
-      case "Private":
+      case "private":
         return "bg-orange-50 text-orange-700 border-orange-200";
       default:
         return "bg-gray-50 text-gray-600 border-gray-200";
@@ -23,6 +25,12 @@ export default function CampaignCard({ campaign, onClick }) {
   const Icon = isMembership ? UsersIcon : BanknotesIcon;
   const iconBgClass = isMembership ? "bg-blue-200" : "bg-green-200";
   const iconColorClass = isMembership ? "text-blue-600" : "text-green-600";
+  const statusLabel =
+    (campaign.state || "").toLowerCase() === "public"
+      ? t("dashboard.statePublic")
+      : (campaign.state || "").toLowerCase() === "private"
+        ? t("dashboard.statePrivate")
+        : campaign.state;
 
   return (
     <Card
@@ -45,13 +53,15 @@ export default function CampaignCard({ campaign, onClick }) {
             <span
               className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(campaign.state)}`}
             >
-              {campaign.state}
+              {statusLabel}
             </span>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Montant collecté</span>
+              <span className="text-sm text-gray-500">
+                {t("dashboard.collectedAmount")}
+              </span>
               <span className="text-sm font-medium text-gray-900">
                 <Currency
                   value={campaign.collectedAmount}
@@ -62,7 +72,7 @@ export default function CampaignCard({ campaign, onClick }) {
 
             {campaign.url && (
               <div className="text-xs text-blue-600 truncate">
-                Ouvrir la campagne →
+                {t("dashboard.openCampaign")}
               </div>
             )}
           </div>

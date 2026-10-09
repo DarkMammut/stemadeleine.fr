@@ -1,20 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/i18n/I18nContext";
 
-const allColumns = [
-  { key: "id", label: "ID" },
-  { key: "lastname", label: "Nom" },
-  { key: "firstname", label: "Prénom" },
-  { key: "email", label: "Email" },
-  { key: "membershipStatus", label: "Statut adhésion" },
-  { key: "membershipStartDate", label: "Date d'adhésion" },
-];
-
-function getMembershipField(user, field) {
+function getMembershipField(user, field, t) {
   if (!user.memberships || user.memberships.length === 0) return "-";
   // On prend le premier membership actif, sinon le premier tout court
   const active = user.memberships.find((m) => m.active === true);
   const m = active || user.memberships[0];
-  if (field === "membershipStatus") return m.active ? "active" : "inactive";
+  if (field === "membershipStatus") {
+    return m.active
+      ? t("users.list.membershipStatusActive")
+      : t("users.list.membershipStatusInactive");
+  }
   if (field === "membershipStartDate") return m.dateAdhesion || "-";
   return "-";
 }
@@ -24,6 +20,21 @@ function getUserName(user) {
 }
 
 export default function ListUser() {
+  const { t } = useTranslation();
+  const allColumns = [
+    { key: "id", label: t("users.list.columns.id") },
+    { key: "lastname", label: t("users.list.columns.lastname") },
+    { key: "firstname", label: t("users.list.columns.firstname") },
+    { key: "email", label: t("users.list.columns.email") },
+    {
+      key: "membershipStatus",
+      label: t("users.list.columns.membershipStatus"),
+    },
+    {
+      key: "membershipStartDate",
+      label: t("users.list.columns.membershipStartDate"),
+    },
+  ];
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,7 +50,7 @@ export default function ListUser() {
     fetch("/api/users")
       .then((res) => {
         if (!res.ok)
-          throw new Error("Erreur lors du chargement des utilisateurs");
+          throw new Error(t("users.loadErrorMessage"));
         return res.json();
       })
       .then((data) => {
@@ -50,7 +61,7 @@ export default function ListUser() {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [t]);
 
   // Filtrage et tri
   const filteredUsers = useMemo(() => {
@@ -63,9 +74,13 @@ export default function ListUser() {
           (u.memberships &&
             u.memberships.some(
               (m) =>
-                (m.active ? "active" : "inactive").includes(
-                  filter.toLowerCase(),
-                ) ||
+              (
+                m.active
+                  ? t("users.list.membershipStatusActive")
+                  : t("users.list.membershipStatusInactive")
+              ).includes(
+                filter.toLowerCase(),
+              ) ||
                 (m.dateAdhesion || "")
                   .toLowerCase()
                   .includes(filter.toLowerCase()),
@@ -75,8 +90,8 @@ export default function ListUser() {
     data = [...data].sort((a, b) => {
       let aValue, bValue;
       if (["membershipStatus", "membershipStartDate"].includes(sort.key)) {
-        aValue = getMembershipField(a, sort.key);
-        bValue = getMembershipField(b, sort.key);
+        aValue = getMembershipField(a, sort.key, t);
+        bValue = getMembershipField(b, sort.key, t);
       } else if (sort.key === "name") {
         aValue = getUserName(a);
         bValue = getUserName(b);
@@ -89,7 +104,7 @@ export default function ListUser() {
       return 0;
     });
     return data;
-  }, [users, filter, sort]);
+  }, [users, filter, sort, t]);
 
   // Gestion export CSV
   const handleExportCSV = () => {
@@ -101,7 +116,7 @@ export default function ListUser() {
         visibleColumns
           .map((key) => {
             if (["membershipStatus", "membershipStartDate"].includes(key)) {
-              return getMembershipField(u, key);
+            return getMembershipField(u, key, t);
             }
             if (key === "name") {
               return getUserName(u);
@@ -116,7 +131,7 @@ export default function ListUser() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "users.csv";
+    a.download = t("users.list.fileName");
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -140,15 +155,15 @@ export default function ListUser() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Liste des utilisateurs</h2>
-      {loading && <div>Chargement...</div>}
+      <h2 className="text-xl font-bold mb-4">{t("users.list.title")}</h2>
+      {loading && <div>{t("users.list.loading")}</div>}
       {error && <div className="text-red-600">{error}</div>}
       {!loading && !error && (
         <>
           <div className="mb-2 flex gap-4 items-center">
             <input
               type="text"
-              placeholder="Filtrer par nom, email ou adhésion"
+              placeholder={t("users.list.filterPlaceholder")}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="border px-2 py-1 rounded"
@@ -157,13 +172,13 @@ export default function ListUser() {
               onClick={handleExportCSV}
               className="border px-2 py-1 rounded bg-blue-100"
             >
-              Exporter CSV
+              {t("users.list.exportCsv")}
             </button>
             <button
               onClick={handlePrint}
               className="border px-2 py-1 rounded bg-green-100"
             >
-              Imprimer
+              {t("users.list.print")}
             </button>
             <div className="flex gap-2 ml-4">
               {allColumns.map((col) => (
@@ -201,7 +216,7 @@ export default function ListUser() {
                   {visibleColumns.map((key) => (
                     <td key={key} className="border px-2 py-1">
                       {["membershipStatus", "membershipStartDate"].includes(key)
-                        ? getMembershipField(u, key)
+                        ? getMembershipField(u, key, t)
                         : key === "name"
                           ? getUserName(u)
                           : u[key]}

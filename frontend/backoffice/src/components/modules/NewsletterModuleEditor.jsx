@@ -11,6 +11,7 @@ import ContentManager from "@/components/ContentManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { useAxiosClient } from "@/utils/axiosClient";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function NewsletterModuleEditor({
   moduleId,
@@ -19,6 +20,7 @@ export default function NewsletterModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModuleVisibility } = useModuleOperations();
   const axios = useAxiosClient();
   const [savingModule, setSavingModule] = useState(false);
@@ -77,16 +79,16 @@ export default function NewsletterModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre de la newsletter",
+      label: t("pages.modules.newsletter.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
   ];
@@ -95,7 +97,7 @@ export default function NewsletterModuleEditor({
   const newsletterFields = [
     {
       name: "variant",
-      label: "Variante d'affichage",
+      label: t("pages.modules.newsletter.variant"),
       type: "select",
       required: true,
       options: variantOptions,
@@ -122,10 +124,10 @@ export default function NewsletterModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde du module:", err);
-      showError("Erreur lors de la sauvegarde du module");
+      showError(t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingModule(false);
@@ -153,10 +155,10 @@ export default function NewsletterModuleEditor({
         ...response.data,
       }));
 
-      showSuccess("Newsletter mise à jour avec succès");
+      showSuccess(t("pages.notifications.newsletterUpdatedMessage"));
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde de la newsletter:", err);
-      showError("Erreur lors de la sauvegarde de la newsletter");
+      showError(t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingNewsletter(false);
@@ -177,10 +179,14 @@ export default function NewsletterModuleEditor({
       await updateModuleVisibility(moduleId, isVisible);
       setSavingVisibility(false);
       setModuleData((prev) => ({ ...prev, isVisible }));
-      showSuccess(`Module ${isVisible ? "visible" : "masqué"}`);
+      showSuccess(
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
+      );
     } catch (err) {
       console.error(err);
-      showError("Erreur lors de la mise à jour de la visibilité");
+      showError(t("pages.errors.visibilityModuleMessage"));
       setSavingVisibility(false);
     }
   };
@@ -202,8 +208,8 @@ export default function NewsletterModuleEditor({
 
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -211,7 +217,7 @@ export default function NewsletterModuleEditor({
 
       {/* Formulaire Module (name, title) */}
       <EditablePanelV2
-        title="Informations du module"
+        title={t("pages.modules.newsletter.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -222,7 +228,7 @@ export default function NewsletterModuleEditor({
 
       {/* Formulaire Newsletter (variant, writer, writingDate) */}
       <EditablePanelV2
-        title="Détails de la newsletter"
+        title={t("pages.modules.newsletter.settingsTitle")}
         fields={newsletterFields}
         initialValues={newsletterData || {}}
         onSubmit={handleNewsletterSubmit}
@@ -236,12 +242,12 @@ export default function NewsletterModuleEditor({
         parentId={moduleId}
         parentType="module"
         customLabels={{
-          header: "Contenus du module newsletter",
-          addButton: "Ajouter un contenu de newsletter",
-          empty: "Aucun contenu pour ce module newsletter.",
-          loading: "Chargement des contenus...",
-          saveContent: "Enregistrer le contenu",
-          bodyLabel: "Contenu de la newsletter",
+          header: t("pages.modules.newsletter.contentHeader"),
+          addButton: t("pages.modules.newsletter.contentAdd"),
+          empty: t("pages.modules.newsletter.contentEmpty"),
+          loading: t("pages.common.loadingContents"),
+          saveContent: t("pages.common.saveContent"),
+          bodyLabel: t("pages.modules.newsletter.contentBodyLabel"),
         }}
       />
     </div>

@@ -7,6 +7,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import PropTypes from "prop-types";
 import { useNotification } from "@/hooks/useNotification";
 import { useUserOperations } from "@/hooks/useUserOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function UserDetails({
   user,
@@ -20,6 +21,7 @@ export default function UserDetails({
   changePassword = false,
   loading = false,
 }) {
+  const { t } = useTranslation();
   // When loading, we render placeholders even if `user` is not yet available
   if (!user && !loading) return null;
 
@@ -54,19 +56,19 @@ export default function UserDetails({
   }, [user]);
 
   const userFields = [
-    { name: "firstname", label: "Prénom", type: "text", required: true },
-    { name: "lastname", label: "Nom", type: "text", required: true },
-    { name: "email", label: "Email", type: "text", required: true },
-    { name: "birthDate", label: "Date de naissance", type: "date" },
-    { name: "phoneMobile", label: "Téléphone mobile", type: "text" },
-    { name: "phoneLandline", label: "Téléphone fixe", type: "text" },
-    { name: "newsletter", label: "Newsletter", type: "checkbox" },
+    { name: "firstname", label: t("users.form.firstname"), type: "text", required: true },
+    { name: "lastname", label: t("users.form.lastname"), type: "text", required: true },
+    { name: "email", label: t("users.form.email"), type: "text", required: true },
+    { name: "birthDate", label: t("users.form.birthDate"), type: "date" },
+    { name: "phoneMobile", label: t("users.form.phoneMobile"), type: "text" },
+    { name: "phoneLandline", label: t("users.form.phoneLandline"), type: "text" },
+    { name: "newsletter", label: t("users.form.newsletter"), type: "checkbox" },
   ];
 
   return (
     <div className="space-y-6">
       <EditablePanel
-        title="Profil"
+        title={t("users.details.title")}
         icon={UserCircleIcon}
         canEdit={editable}
         loading={savingUser || loading}
@@ -81,13 +83,16 @@ export default function UserDetails({
           try {
             await updateUser(user.id, vals);
             showSuccess(
-              "Utilisateur mis à jour",
-              "Les informations ont été enregistrées",
+              t("users.details.updateSuccessTitle"),
+              t("users.details.updateSuccessMessage"),
             );
             if (refreshUser) await refreshUser();
           } catch (err) {
             console.error(err);
-            showError("Erreur", "Impossible de mettre à jour l'utilisateur");
+            showError(
+              t("users.details.updateErrorTitle"),
+              t("users.details.updateErrorMessage"),
+            );
             throw err;
           } finally {
             setSavingUser(false);
@@ -98,7 +103,7 @@ export default function UserDetails({
       {/* Adresses (gérées par AddressManager lorsque showAddresses = true) */}
       {showAddresses && (
         <AddressManager
-          label="Adresses"
+          label={t("addresses.title")}
           addresses={user?.addresses || []}
           ownerId={user?.id}
           ownerType="USER"
@@ -111,7 +116,7 @@ export default function UserDetails({
       {/* Comptes (optionnel: soit AccountManager si demandé, soit AccountDetails ailleurs) */}
       {showAccountsManager ? (
         <AccountManager
-          label="Comptes"
+          label={t("accounts.title")}
           accounts={user?.accounts || []}
           userId={user?.id}
           refreshUser={refreshUser}
@@ -124,7 +129,7 @@ export default function UserDetails({
       {/* Adhésions (gérées par MembershipManager lorsque showMemberships = true) */}
       {showMemberships && (
         <MembershipManager
-          label="Adhésions"
+          label={t("memberships.title")}
           memberships={user?.memberships || []}
           userId={user?.id}
           refreshUser={refreshUser}

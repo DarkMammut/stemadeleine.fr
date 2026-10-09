@@ -6,8 +6,10 @@ import Modal from "@/components/ui/Modal";
 import UserForm from "@/components/UserForm";
 import { useUserOperations } from "@/hooks/useUserOperations";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function AddUserModal({ open, onClose, onCreate }) {
+  const { t } = useTranslation();
   const { createUser } = useUserOperations();
   const { showError } = useNotification();
   const [saving, setSaving] = useState(false);
@@ -20,7 +22,7 @@ export default function AddUserModal({ open, onClose, onCreate }) {
       onClose && onClose();
     } catch (err) {
       console.error("Erreur création utilisateur:", err);
-      showError("Erreur", "Impossible de créer l'utilisateur");
+      showError(t("users.createErrorTitle"), t("users.createErrorMessage"));
       throw err;
     } finally {
       setSaving(false);
@@ -30,7 +32,7 @@ export default function AddUserModal({ open, onClose, onCreate }) {
   return (
     <Modal open={open} onClose={onClose}>
       <UserForm
-        title={"Ajouter un utilisateur"}
+        title={t("users.form.addTitle")}
         initialValues={{}}
         onSubmit={handleSubmit}
         onChange={() => {}}

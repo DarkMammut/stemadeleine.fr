@@ -9,9 +9,11 @@ import AddressManager from "@/components/AddressManager";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Organization() {
   const axios = useAxiosClient();
+  const { t } = useTranslation();
   const { notification, showSuccess, showError, hideNotification } =
     useNotification();
   const [organization, setOrganization] = useState(null);
@@ -31,13 +33,12 @@ export default function Organization() {
       const res = await axios.get(`/api/organizations`);
       setOrganization(res.data);
     } catch (e) {
-      showError("Erreur de chargement", "Impossible de charger l'organisation");
+      showError(t("organization.loadErrorTitle"), t("organization.loadErrorMessage"));
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper to compute flat initialValues for forms from the organization object
   const computeInitialValues = (org) => {
     if (!org) return {};
     return {
@@ -53,37 +54,37 @@ export default function Organization() {
   const organizationFields = [
     {
       name: "name",
-      label: "Nom de l'organisation",
+      label: t("organization.fields.name"),
       type: "text",
       required: true,
     },
     {
       name: "legalForm",
-      label: "Forme juridique",
+      label: t("organization.fields.legalForm"),
       type: "text",
       required: false,
     },
     {
       name: "siret",
-      label: "SIRET",
+      label: t("organization.fields.siret"),
       type: "text",
       required: false,
     },
     {
       name: "siren",
-      label: "SIREN",
+      label: t("organization.fields.siren"),
       type: "text",
       required: false,
     },
     {
       name: "vatNumber",
-      label: "Numéro de TVA",
+      label: t("organization.fields.vatNumber"),
       type: "text",
       required: false,
     },
     {
       name: "apeCode",
-      label: "Code APE",
+      label: t("organization.fields.apeCode"),
       type: "text",
       required: false,
     },
@@ -97,30 +98,24 @@ export default function Organization() {
       });
       await loadOrganization();
       showSuccess(
-        "Organisation modifiée",
-        "Les informations ont été mises à jour avec succès",
+        t("organization.saveSuccessTitle"),
+        t("organization.saveSuccessMessage"),
       );
     } catch (e) {
-      showError(
-        "Erreur de modification",
-        "Impossible de modifier l'organisation",
-      );
+      showError(t("organization.saveErrorTitle"), t("organization.saveErrorMessage"));
       throw e;
     } finally {
       setSaving(false);
     }
   };
 
-  // Ne pas rendre tôt pendant le chargement : laisser EditablePanel afficher les skeletons via la prop `loading`.
-
   return (
     <SceneLayout>
-      <Title label="Organisation" />
+      <Title label={t("organization.title")} />
 
       <div className="space-y-6">
-        {/* Informations */}
         <EditablePanel
-          title="Informations de l'organisation"
+          title={t("organization.panelTitle")}
           icon={BuildingOffice2Icon}
           canEdit={true}
           initialValues={computeInitialValues(organization)}
@@ -130,9 +125,8 @@ export default function Organization() {
           onSubmit={handleSave}
         />
 
-        {/* Adresse du siège social */}
         <AddressManager
-          label="Adresse du siège social"
+          label={t("organization.addressLabel")}
           addresses={
             organization && organization.address ? [organization.address] : []
           }
@@ -140,12 +134,11 @@ export default function Organization() {
           ownerType="ORGANIZATION"
           refreshAddresses={loadOrganization}
           editable={true}
-          newAddressName={"Siège social"}
+          newAddressName={t("organization.newAddressName")}
           maxAddresses={1}
         />
       </div>
 
-      {/* Notification */}
       {notification.show && (
         <Notification
           type={notification.type}

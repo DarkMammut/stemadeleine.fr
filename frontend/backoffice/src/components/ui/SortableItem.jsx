@@ -8,6 +8,7 @@ import ModifyButton from "@/components/ui/ModifyButton";
 import DeleteButton from "@/components/ui/DeleteButton";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function SortableItem({
   item,
@@ -18,6 +19,7 @@ export default function SortableItem({
   onAddChild, // nouvelle prop optionnelle
   isPlaceholder = false, // nouvelle prop pour les placeholders
 }) {
+  const { t } = useTranslation();
   // Si c'est un placeholder, on rend une version non-draggable avec animation "pulse"
   if (isPlaceholder) {
     return (
@@ -59,6 +61,10 @@ export default function SortableItem({
     onToggle?.(item, val);
   };
 
+  const moduleTypeLabel = item.moduleType
+    ? t(`pages.moduleTypes.${String(item.moduleType).toLowerCase()}`)
+    : null;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -86,7 +92,7 @@ export default function SortableItem({
           <span className="font-medium text-gray-900">{item.name}</span>
           {item.moduleType && (
             <span className="text-gray-500 text-sm ml-2">
-              ({item.moduleType})
+              ({moduleTypeLabel})
             </span>
           )}
         </div>
@@ -102,7 +108,7 @@ export default function SortableItem({
             className="ml-2"
           >
             <PlusIcon className="w-4 h-4 mr-1" />
-            Ajouter un module
+            {t("pages.sortableItem.addModule")}
           </Button>
         )}
 
@@ -110,12 +116,12 @@ export default function SortableItem({
         <div className="flex items-center gap-2">
           <ModifyButton
             onModify={() => onEdit?.(item)}
-            modifyLabel="Modifier"
+            modifyLabel={t("pages.sortableItem.edit")}
             size="sm"
           />
           <DeleteButton
             onDelete={() => onDelete?.(item)}
-            deleteLabel="Supprimer"
+            deleteLabel={t("pages.sortableItem.delete")}
             size="sm"
             hoverExpand={true}
           />

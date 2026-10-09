@@ -25,8 +25,10 @@ import ContactCard from "@/components/ui/ContactCard";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import Pagination from "@/components/ui/Pagination";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function Contacts() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [contacts, setContacts] = useState([]);
@@ -106,8 +108,8 @@ export default function Contacts() {
       );
       const serverMessage = error?.response?.data?.message || null;
       showError(
-        "Erreur de chargement",
-        serverMessage || "Impossible de charger les contacts",
+        t("contacts.loadErrorTitle"),
+        serverMessage || t("contacts.loadErrorMessage"),
       );
     } finally {
       if (thisFetchId !== undefined && fetchIdRef.current === thisFetchId)
@@ -128,7 +130,7 @@ export default function Contacts() {
         await refreshUnreadCount();
       } catch (error) {
         console.error("Error marking contact as read:", error);
-        showError("Erreur", "Impossible de marquer le contact comme lu");
+        showError(t("contacts.markReadErrorTitle"), t("contacts.markReadErrorMessage"));
       }
     }
     // Navigate to contact detail page
@@ -139,20 +141,13 @@ export default function Contacts() {
     try {
       await loadContacts();
       showSuccess(
-        "Actualisation réussie",
-        "La liste des contacts a été mise à jour",
+        t("contacts.refreshSuccessTitle"),
+        t("contacts.refreshSuccessMessage"),
       );
     } catch (error) {
       // Error already handled in loadContacts
     }
   };
-
-  // remove toggleFilter; filter controlled via Filters popover
-  const getFilterLabel = useCallback(() => {
-    if (filter === "unread") return "Non lus";
-    if (filter === "read") return "Lus";
-    return "Tous";
-  }, [filter]);
 
   const filteredContacts = contacts; // backend handles filter when loading
 
@@ -225,17 +220,17 @@ export default function Contacts() {
   const filtersConfig = useMemo(
     () => ({
       fields: [
-        { key: "lastName", label: "Nom", icon: UserIcon },
-        { key: "firstName", label: "Prénom", icon: UserIcon },
-        { key: "email", label: "Email", icon: EnvelopeIcon },
-        { key: "createdAt", label: "Date", icon: CalendarDaysIcon },
+        { key: "lastName", label: t("contacts.fieldLastName"), icon: UserIcon },
+        { key: "firstName", label: t("contacts.fieldFirstName"), icon: UserIcon },
+        { key: "email", label: t("contacts.fieldEmail"), icon: EnvelopeIcon },
+        { key: "createdAt", label: t("contacts.fieldDate"), icon: CalendarDaysIcon },
       ],
       onSearch: handleFiltersSearch,
       onSortChange: handleFiltersSort,
       filterItems: [
         {
           key: "unread",
-          label: "Non lus uniquement",
+          label: t("contacts.unreadOnly"),
           type: "toggle",
           value: filter === "unread",
         },
@@ -268,7 +263,7 @@ export default function Contacts() {
       searchValue: searchQuery,
       sortValue: sortState,
       initialSort: { field: null, direction: null },
-      placeholder: "Rechercher un contact...",
+      placeholder: t("contacts.searchPlaceholder"),
     }),
     [
       handleFiltersSearch,
@@ -277,6 +272,7 @@ export default function Contacts() {
       searchQuery,
       sortState,
       filter,
+      t,
     ],
   );
 
@@ -285,7 +281,7 @@ export default function Contacts() {
     <SceneLayout>
       <Title
         label={
-          filter === "unread" ? `Demandes — ${getFilterLabel()}` : "Demandes"
+          filter === "unread" ? t("contacts.unreadTitle") : t("contacts.title")
         }
       />
 
@@ -293,7 +289,7 @@ export default function Contacts() {
         actions={[
           {
             icon: ArrowPathIcon,
-            label: "Actualiser",
+            label: t("contacts.refresh"),
             callback: handleRefresh,
             variant: "refresh",
           },
@@ -306,7 +302,7 @@ export default function Contacts() {
           <LoadingSkeleton variant="card" count={6} showActions={false} />
         </div>
       ) : (
-        <CardList emptyMessage="Aucun contact trouvé.">
+        <CardList emptyMessage={t("contacts.empty")}>
           {filteredContacts.map((contact) => (
             <ContactCard
               key={contact.id}

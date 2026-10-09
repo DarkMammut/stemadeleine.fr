@@ -9,6 +9,7 @@ import useGetModule from "@/hooks/useGetModule";
 import useGetCTA from "@/hooks/useGetCTA";
 import Notification from "@/components/ui/Notification";
 import { useNotification } from "@/hooks/useNotification";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function CTAModuleEditor({
   moduleId,
@@ -17,6 +18,7 @@ export default function CTAModuleEditor({
   refetch: _parentRefetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const axios = useAxiosClient();
   const { updateModuleVisibility } = useModuleOperations();
   const { notification, showSuccess, showError, hideNotification } =
@@ -63,16 +65,16 @@ export default function CTAModuleEditor({
   const moduleFields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre",
+      label: t("pages.modules.shared.title"),
       type: "text",
-      placeholder: "Entrez le titre affiché",
+      placeholder: t("pages.modules.cta.displayedTitlePlaceholder"),
       required: true,
     },
   ];
@@ -81,26 +83,26 @@ export default function CTAModuleEditor({
   const ctaFields = [
     {
       name: "label",
-      label: "Texte du bouton / lien",
+      label: t("pages.modules.cta.label"),
       type: "text",
-      placeholder: "Ex: En savoir plus, Contactez-nous...",
+      placeholder: t("pages.modules.cta.labelPlaceholder"),
       required: true,
     },
     {
       name: "url",
-      label: "URL ou chemin de destination",
+      label: t("pages.modules.cta.url"),
       type: "text", // "text" pour autoriser les slugs internes (/page) et les URLs
-      placeholder: "https://example.com ou /page-interne",
+      placeholder: t("pages.modules.cta.urlPlaceholder"),
       required: true,
     },
     {
       name: "variant",
-      label: "Type d'affichage",
+      label: t("pages.modules.cta.variant"),
       type: "select",
       required: true,
       options: [
-        { value: "BUTTON", label: "Bouton" },
-        { value: "LINK", label: "Lien simple" },
+        { value: "BUTTON", label: t("pages.modules.cta.button") },
+        { value: "LINK", label: t("pages.modules.cta.link") },
       ],
     },
   ];
@@ -114,10 +116,10 @@ export default function CTAModuleEditor({
         title: values.title,
       });
       setModuleData((prev) => ({ ...prev, ...response.data }));
-      showSuccess("Module mis à jour avec succès");
+      showSuccess(t("pages.notifications.moduleUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du module:", err);
-      showError("Erreur", "Impossible de sauvegarder le module");
+      showError(t("pages.errors.genericTitle"), t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingModule(false);
@@ -140,10 +142,10 @@ export default function CTAModuleEditor({
         variant,
       });
       setCtaData((prev) => ({ ...prev, ...response.data }));
-      showSuccess("CTA mis à jour avec succès");
+      showSuccess(t("pages.notifications.ctaUpdatedMessage"));
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du CTA:", err);
-      showError("Erreur", "Impossible de sauvegarder le CTA");
+      showError(t("pages.errors.genericTitle"), t("pages.errors.saveModuleMessage"));
       throw err;
     } finally {
       setSavingCTA(false);
@@ -156,14 +158,16 @@ export default function CTAModuleEditor({
       await updateModuleVisibility(moduleId, isVisible);
       setModuleData((prev) => ({ ...prev, isVisible }));
       showSuccess(
-        "Visibilité mise à jour",
-        `Le module est maintenant ${isVisible ? "visible" : "masqué"}`,
+        t("pages.notifications.visibilityUpdatedTitle"),
+        `${t("pages.common.moduleCapitalized")} ${t(
+          isVisible ? "pages.common.visible" : "pages.common.hidden",
+        )}`,
       );
     } catch (err) {
       console.error(err);
       showError(
-        "Erreur de visibilité",
-        "Impossible de mettre à jour la visibilité du module",
+        t("pages.errors.visibilityTitle"),
+        t("pages.errors.visibilityModuleMessage"),
       );
     } finally {
       setSavingVisibility(false);
@@ -178,8 +182,8 @@ export default function CTAModuleEditor({
     <div className="space-y-6">
       {/* Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -187,7 +191,7 @@ export default function CTAModuleEditor({
 
       {/* Formulaire module (name, title) */}
       <EditablePanelV2
-        title="Informations du module"
+        title={t("pages.modules.cta.detailsTitle")}
         fields={moduleFields}
         initialValues={moduleData || {}}
         onSubmit={handleModuleSubmit}
@@ -198,7 +202,7 @@ export default function CTAModuleEditor({
 
       {/* Formulaire CTA (label, url, variant) */}
       <EditablePanelV2
-        title="Paramètres du CTA"
+        title={t("pages.modules.cta.settingsTitle")}
         fields={ctaFields}
         initialValues={ctaData || {}}
         onSubmit={handleCTASubmit}
@@ -209,14 +213,19 @@ export default function CTAModuleEditor({
 
       {/* Aperçu */}
       <div className="bg-surface border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">Aperçu du CTA</h3>
+        <h3 className="text-lg font-semibold text-text mb-4">
+          {t("pages.modules.cta.previewTitle")}
+        </h3>
         {ctaData?.label && ctaData?.url ? (
           <div className="p-4 bg-gray-50 rounded-lg space-y-1">
             {moduleData?.title && (
               <div className="font-medium text-text">{moduleData.title}</div>
             )}
             <div className="flex flex-wrap items-center gap-3 text-sm text-text-muted">
-              <span>Type : {ctaData.variant || "BUTTON"}</span>
+              <span>
+                {t("pages.modules.cta.previewType")} :{" "}
+                {ctaData.variant || "BUTTON"}
+              </span>
               <span>→</span>
               <span className="font-medium text-text">{ctaData.label}</span>
               <span className="italic">({ctaData.url})</span>
@@ -224,7 +233,7 @@ export default function CTAModuleEditor({
           </div>
         ) : (
           <div className="text-sm text-text-muted">
-            Remplissez les champs ci-dessus pour voir l'aperçu
+            {t("pages.modules.cta.previewHint")}
           </div>
         )}
       </div>

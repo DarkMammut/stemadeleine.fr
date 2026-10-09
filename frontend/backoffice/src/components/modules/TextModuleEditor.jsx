@@ -6,6 +6,7 @@ import MediaPicker from "@/components/MediaPicker";
 import VisibilitySwitch from "@/components/VisibiltySwitch";
 import useAddModule from "@/hooks/useAddModule";
 import { useModuleOperations } from "@/hooks/useModuleOperations";
+import { useTranslation } from "@/i18n/I18nContext";
 
 export default function TextModuleEditor({
   moduleId,
@@ -14,6 +15,7 @@ export default function TextModuleEditor({
   refetch,
   loading: parentLoading = false,
 }) {
+  const { t } = useTranslation();
   const { updateModule } = useAddModule();
   const { updateModuleVisibility, setModuleMedia } = useModuleOperations();
   const [saving, setSaving] = useState(false);
@@ -23,23 +25,23 @@ export default function TextModuleEditor({
   const fields = [
     {
       name: "name",
-      label: "Nom du module",
+      label: t("pages.modules.shared.moduleName"),
       type: "text",
-      placeholder: "Entrez le nom du module",
+      placeholder: t("pages.modules.shared.moduleNamePlaceholder"),
       required: true,
     },
     {
       name: "title",
-      label: "Titre",
+      label: t("pages.modules.shared.title"),
       type: "text",
-      placeholder: "Entrez le titre",
+      placeholder: t("pages.modules.shared.titlePlaceholder"),
       required: true,
     },
     {
       name: "content",
-      label: "Contenu texte",
+      label: t("pages.modules.text.content"),
       type: "textarea",
-      placeholder: "Entrez le contenu",
+      placeholder: t("pages.modules.text.contentPlaceholder"),
     },
   ];
 
@@ -49,7 +51,7 @@ export default function TextModuleEditor({
       refetch();
     } catch (error) {
       console.error("Error setting module media:", error);
-      alert("Erreur lors de l'ajout du média");
+      alert(t("pages.modules.text.mediaError"));
     }
   };
 
@@ -66,10 +68,10 @@ export default function TextModuleEditor({
       });
       setSaving(false);
       refetch();
-      alert("Module texte mis à jour !");
+      alert(t("pages.modules.text.updated"));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la sauvegarde du module");
+      alert(t("pages.modules.shared.saveError"));
       setSaving(false);
     }
   };
@@ -86,7 +88,7 @@ export default function TextModuleEditor({
       setModuleData((prev) => ({ ...prev, isVisible }));
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la mise à jour de la visibilité");
+      alert(t("pages.modules.shared.visibilityError"));
       setSavingVisibility(false);
     }
   };
@@ -95,8 +97,8 @@ export default function TextModuleEditor({
     <div className="space-y-6">
       {/* Section Visibilité */}
       <VisibilitySwitch
-        title="Visibilité du module"
-        label="Module visible sur le site"
+        title={t("pages.modules.shared.moduleVisibilityTitle")}
+        label={t("pages.modules.shared.moduleVisibilityLabel")}
         isVisible={moduleData?.isVisible || false}
         onChange={handleVisibilityChange}
         savingVisibility={savingVisibility}
@@ -104,7 +106,7 @@ export default function TextModuleEditor({
 
       {/* Formulaire principal */}
       <EditablePanelV2
-        title="Détails du module texte"
+        title={t("pages.modules.text.detailsTitle")}
         fields={fields}
         initialValues={moduleData || {}}
         onSubmit={handleSubmit}
@@ -119,7 +121,7 @@ export default function TextModuleEditor({
         attachToEntity={attachToEntity}
         entityType="modules"
         entityId={moduleId}
-        label="Image d'illustration"
+        label={t("pages.modules.text.illustrationTitle")}
       />
     </div>
   );
