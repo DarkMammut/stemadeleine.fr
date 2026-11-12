@@ -16,7 +16,7 @@ import {useNotification} from "@/hooks/useNotification";
 import Panel from "@/components/ui/Panel";
 import CollapsibleCard from "@/components/ui/CollapsibleCard";
 import PropTypes from "prop-types";
-import { useTranslation } from "@/i18n/I18nContext";
+import {useTranslation} from "@/i18n/I18nContext";
 
 /**
  * Composant générique de gestion de contenus.
@@ -44,7 +44,7 @@ const ContentManager = ({
                             showSaveButton = false,
                             loading: externalLoading = false,
                         }) => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const [contents, setContents] = useState([]);
     const skipNotifyRef = useRef(true);
     const [expandedContents, setExpandedContents] = useState(new Set());
@@ -406,7 +406,7 @@ const ContentManager = ({
             const ownerId = contentOwnerId || parentId;
 
             if (!ownerId) {
-                throw new Error(t("pages.contentManager.publishMissingOwner"));
+                throw new Error(t("content.publishMissingOwner"));
             }
 
             const result = await publishAllContents(ownerId);
@@ -418,9 +418,9 @@ const ContentManager = ({
             showSuccess(
                 t("pages.notifications.publishCompletedTitle"),
                 `${result.publishedCount} ${t(
-                    "pages.contentManager.publishResultPublished",
+                    "content.publishResultPublished",
                 )}, ${result.skippedCount || 0} ${t(
-                    "pages.contentManager.publishResultSkipped",
+                    "content.publishResultSkipped",
                 )}`,
             );
         } catch (error) {
@@ -539,7 +539,7 @@ const ContentManager = ({
 
     return (
         <Panel
-            title={customLabels.header || t("pages.contentManager.title")}
+            title={customLabels.header || t("content.title")}
             actions={
                 <div className="flex items-center gap-2">
                     {/* Sections/modules : la publication est portée par le parent (page, section, module).
@@ -556,9 +556,9 @@ const ContentManager = ({
                             }
                             publishLabel={
                                 customLabels.publishButton ||
-                                t("pages.contentManager.publishAllButton")
+                                t("content.publishAllButton")
                             }
-                            publishedLabel={t("pages.contentManager.publishAllDone")}
+                            publishedLabel={t("content.publishAllDone")}
                             size="md"
                             resetAfterDelay={true}
                         />
@@ -575,7 +575,7 @@ const ContentManager = ({
                             <span className="skeleton-light w-32 h-4 inline-block"/>
                         ) : (
                             customLabels.addButton ||
-                            t("pages.contentManager.addButton")
+                            t("content.addButton")
                         )}
                     </Button>
                 </div>
@@ -596,7 +596,7 @@ const ContentManager = ({
                         <div className="text-center py-8 text-gray-500 px-4 sm:px-8">
                             <p>
                                 {customLabels.empty ||
-                                    t("pages.contentManager.empty")}
+                                    t("content.empty")}
                             </p>
                         </div>
                     )}
@@ -699,7 +699,7 @@ const ContentManager = ({
                                                 }
                                             >
                                                 {customLabels.save ||
-                                                    t("pages.contentManager.saveInline")}
+                                                    t("content.saveInline")}
                                             </Button>
 
                                             <Button
@@ -720,7 +720,7 @@ const ContentManager = ({
                                                 }
                                             >
                                                 {customLabels.cancel ||
-                                                    t("pages.contentManager.cancelInline")}
+                                                    t("content.cancelInline")}
                                             </Button>
                                         </form>
                                     ) : (
@@ -753,7 +753,7 @@ const ContentManager = ({
                                                     <span className="skeleton-light w-20 h-3 inline-block rounded"/>
                                                 ) : (
                                                     <>
-                                                        {t("pages.contentManager.versionPrefix")}
+                                                        {t("content.versionPrefix")}
                                                         {
                                                             content.version
                                                         }{" "}
@@ -788,8 +788,8 @@ const ContentManager = ({
                                             effectiveLoading
                                         }
                                         deleteLabel={t("pages.common.delete")}
-                                        confirmTitle={t("pages.contentManager.deleteContentTitle")}
-                                        confirmMessage={t("pages.contentManager.deleteContentMessage")}
+                                        confirmTitle={t("content.deleteContentTitle")}
+                                        confirmMessage={t("content.deleteContentMessage")}
                                         size="sm"
                                         hoverExpand={true}
                                     />
@@ -900,21 +900,21 @@ const ContentManager = ({
                     setShowPublishAllModal(false)
                 }
                 onConfirm={handleConfirmPublishAll}
-                title={t("pages.contentManager.publishAllTitle")}
+                title={t("content.publishAllTitle")}
                 message={
                     parentType === "section"
-                        ? t("pages.contentManager.publishAllConfirmationSection")
+                        ? t("content.publishAllConfirmationSection")
                         : parentType === "module"
-                          ? t("pages.contentManager.publishAllConfirmationModule")
-                          : parentType === "news-publication"
-                            ? t(
-                                "pages.contentManager.publishAllConfirmationNewsPublication",
-                              )
-                            : t(
-                                "pages.contentManager.publishAllConfirmationNewsletterPublication",
-                              )
+                            ? t("content.publishAllConfirmationModule")
+                            : parentType === "news-publication"
+                                ? t(
+                                    "content.publishAllConfirmationNewsPublication",
+                                )
+                                : t(
+                                    "content.publishAllConfirmationNewsletterPublication",
+                                )
                 }
-                confirmLabel={t("pages.contentManager.publishAllButton")}
+                confirmLabel={t("content.publishAllButton")}
                 isLoading={isPublishingAll}
                 variant="primary"
             />}

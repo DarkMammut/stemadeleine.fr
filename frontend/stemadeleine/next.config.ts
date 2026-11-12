@@ -2,6 +2,15 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
     output: 'standalone', // Pour optimiser le build Docker
+    async redirects() {
+        return [
+            {
+                source: '/association/don',
+                destination: '/association',
+                permanent: false,
+            },
+        ];
+    },
     images: {
         remotePatterns: [
             {
